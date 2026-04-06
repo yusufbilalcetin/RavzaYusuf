@@ -5,6 +5,31 @@ const ALL_TOPICS = [
 ];
 const TOTAL = ALL_TOPICS.length;
 
+/* ══════════════════════════════
+   DARK MODE
+══════════════════════════════ */
+function initTheme() {
+  const saved = localStorage.getItem('eul_theme');
+  if (saved === 'dark') applyDark(true);
+}
+
+function applyDark(isDark) {
+  document.body.classList.toggle('dark', isDark);
+  const btn = document.getElementById('theme-switch');
+  if (btn) btn.setAttribute('aria-label', isDark ? 'Gündüz moduna geç' : 'Karanlık moda geç');
+  const topBtn = document.getElementById('topbar-theme-btn');
+  if (topBtn) topBtn.textContent = isDark ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+  const isDark = !document.body.classList.contains('dark');
+  applyDark(isDark);
+  localStorage.setItem('eul_theme', isDark ? 'dark' : 'light');
+}
+
+/* ══════════════════════════════
+   NAVIGATION
+══════════════════════════════ */
 function navigate(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
@@ -23,16 +48,18 @@ function toggleMenu() {
 function searchTopics() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   if (q.length < 2) return;
-  const sections = document.querySelectorAll('.searchable');
-  sections.forEach(sec => {
-    if (sec.innerText.toLowerCase().includes(q)) { navigate(sec.id); }
+  document.querySelectorAll('.searchable').forEach(sec => {
+    if (sec.innerText.toLowerCase().includes(q)) navigate(sec.id);
   });
 }
 
+/* ══════════════════════════════
+   PROGRESS
+══════════════════════════════ */
 function markDone(topic) {
   const btn = document.querySelector('#' + topic + ' .mark-complete');
   if (!btn) return;
-  const key   = 'eul_done_' + topic;
+  const key    = 'eul_done_' + topic;
   const isDone = localStorage.getItem(key) === 'true';
   if (isDone) {
     localStorage.setItem(key, 'false');
@@ -63,26 +90,26 @@ function initProgress() {
   updateProgress();
 }
 
+/* ══════════════════════════════
+   QUIZ
+══════════════════════════════ */
 function checkQuiz(quizId) {
   const container = document.getElementById(quizId);
   const questions = container.querySelectorAll('.question');
   let score = 0;
 
   questions.forEach(q => {
-    const labels = q.querySelectorAll('label');
-    labels.forEach(l => { l.style.background = ''; l.style.borderColor = ''; });
-
+    q.querySelectorAll('label').forEach(l => { l.style.background = ''; l.style.borderColor = ''; });
     const selected = q.querySelector('input[type="radio"]:checked');
     if (!selected) return;
-
     const lbl = selected.parentElement;
     if (selected.value === 'correct') {
       score++;
-      lbl.style.background   = '#d1fae5';
-      lbl.style.borderColor  = '#10b981';
+      lbl.style.background  = '#d1fae5';
+      lbl.style.borderColor = '#10b981';
     } else {
-      lbl.style.background   = '#fee2e2';
-      lbl.style.borderColor  = '#ef4444';
+      lbl.style.background  = '#fee2e2';
+      lbl.style.borderColor = '#ef4444';
       const correct = q.querySelector('input[value="correct"]');
       if (correct) {
         correct.parentElement.style.background  = '#d1fae5';
@@ -103,4 +130,10 @@ function checkQuiz(quizId) {
   res.style.display = 'block';
 }
 
-document.addEventListener('DOMContentLoaded', initProgress);
+/* ══════════════════════════════
+   INIT
+══════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  initProgress();
+});
