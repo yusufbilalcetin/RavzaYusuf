@@ -1,7 +1,9 @@
+// Array güncellendi, toplam 19 konu oldu.
 const ALL_TOPICS = [
-  'adjectives','possessives','perfect','perfectcont',
-  'conditionals12','conditionals3','modals','ability',
-  'phrasal','verbpatterns','causative','passive','reported','auxiliaries'
+  'wordlist1a', 'adjectives', 'presenttenses', 'possessives', 'pasttenses', 
+  'prepositions', 'futureforms', 'conditionals12', 'perfect', 'perfectcont', 
+  'modals', 'ability', 'phrasal', 'verbpatterns', 'causative', 'passive', 
+  'reported', 'conditionals3', 'auxiliaries'
 ];
 const TOTAL = ALL_TOPICS.length;
 
@@ -33,10 +35,13 @@ function toggleTheme() {
 function navigate(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  
   const page = document.getElementById(pageId);
   const btn  = document.getElementById('nav-' + pageId);
+  
   if (page) page.classList.add('active');
   if (btn)  btn.classList.add('active');
+  
   if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0, 0);
 }
@@ -54,13 +59,15 @@ function searchTopics() {
 }
 
 /* ══════════════════════════════
-   PROGRESS
+   PROGRESS TRACKER
 ══════════════════════════════ */
 function markDone(topic) {
   const btn = document.querySelector('#' + topic + ' .mark-complete');
   if (!btn) return;
+  
   const key    = 'eul_done_' + topic;
   const isDone = localStorage.getItem(key) === 'true';
+  
   if (isDone) {
     localStorage.setItem(key, 'false');
     btn.classList.remove('done');
@@ -76,6 +83,7 @@ function markDone(topic) {
 function updateProgress() {
   const count = ALL_TOPICS.filter(t => localStorage.getItem('eul_done_' + t) === 'true').length;
   const pct   = (count / TOTAL) * 100;
+  
   document.getElementById('main-progress').style.width = pct + '%';
   document.getElementById('progress-text').innerText   = count + '/' + TOTAL + ' Konu Tamamlandı';
 }
@@ -91,7 +99,7 @@ function initProgress() {
 }
 
 /* ══════════════════════════════
-   QUIZ
+   QUIZ CHECKER
 ══════════════════════════════ */
 function checkQuiz(quizId) {
   const container = document.getElementById(quizId);
@@ -99,17 +107,25 @@ function checkQuiz(quizId) {
   let score = 0;
 
   questions.forEach(q => {
-    q.querySelectorAll('label').forEach(l => { l.style.background = ''; l.style.borderColor = ''; });
+    // Reset colors
+    q.querySelectorAll('label').forEach(l => { 
+      l.style.background = ''; 
+      l.style.borderColor = ''; 
+    });
+    
     const selected = q.querySelector('input[type="radio"]:checked');
     if (!selected) return;
+    
     const lbl = selected.parentElement;
     if (selected.value === 'correct') {
       score++;
       lbl.style.background  = '#d1fae5';
       lbl.style.borderColor = '#10b981';
+      // Dark mode compatibility will fall back nicely if CSS vars aren't directly injected here
     } else {
       lbl.style.background  = '#fee2e2';
       lbl.style.borderColor = '#ef4444';
+      
       const correct = q.querySelector('input[value="correct"]');
       if (correct) {
         correct.parentElement.style.background  = '#d1fae5';
@@ -120,11 +136,12 @@ function checkQuiz(quizId) {
 
   const res = container.querySelector('.quiz-result');
   res.classList.remove('success', 'error');
+  
   if (score === questions.length) {
     res.innerHTML = '🎉 Mükemmel Ravza! Hepsini doğru yaptın (' + score + '/' + questions.length + ')! 💗';
     res.classList.add('success');
   } else {
-    res.innerHTML = 'Biraz daha çalış 💪 Puanın: ' + score + '/' + questions.length + '. Yeşil olanlar doğru cevaplar.';
+    res.innerHTML = 'Biraz daha dikkat etmelisin 💪 Puanın: ' + score + '/' + questions.length + '. Yeşil olanlar doğru cevaplar.';
     res.classList.add('error');
   }
   res.style.display = 'block';
