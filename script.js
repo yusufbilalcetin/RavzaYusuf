@@ -56,6 +56,66 @@ const TOPICS = [
     ]
   },
   {
+    id: "objectpronouns",
+    unit: "Unit 1A",
+    title: "Object Pronouns",
+    subtitle: "Direct object + indirect object + word order",
+    time: 28,
+    difficulty: "easy",
+    summaryHtml: `
+<div class="content-card">
+  <h3>Direct object and indirect object</h3>
+  <p><strong>Direct object</strong> is usually the thing affected by the action. It answers <em>what?</em></p>
+  <p><strong>Indirect object</strong> is usually the person who receives the action. It answers <em>to whom?</em> or <em>for whom?</em></p>
+  <div class="source-panel">
+    <p>David repaired his car. -> What did he repair? -> his car</p>
+    <p>They sent him a postcard. -> To whom? -> him</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Object pronouns</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Role</th><th>Pronouns</th><th>Example</th></tr></thead><tbody><tr><td>Direct object</td><td>it / them</td><td>I bought a book -> I bought it.</td></tr><tr><td>Indirect object</td><td>me / you / him / her / us / them</td><td>She sent them to us.</td></tr></tbody></table></div>
+  <div class="warning-box">
+    <p><strong>Wrong:</strong> I gave them to she.</p>
+    <p><strong>Correct:</strong> I gave them to her.</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Sentence structure</h3>
+  <ul>
+    <li><strong>verb + indirect object + direct object</strong>: Mary gave me some money.</li>
+    <li><strong>verb + direct object + to / for + indirect object</strong>: James will lend it to her.</li>
+    <li>This choice depends on the verb and on whether the direct object is a noun or a pronoun.</li>
+  </ul>
+</div>
+`,
+    keyPoints: [
+      "Direct object usually answers what; indirect object usually answers to whom / for whom.",
+      "After a preposition such as to or for, use object pronouns: to her, for us.",
+      "Word order changes more often when the direct object is a pronoun."
+    ],
+    quiz: [
+      {
+        question: "What is the direct object in 'They sent him a postcard'?",
+        options: ["him", "postcard", "they"],
+        answer: 1,
+        explanation: "The postcard is the thing that was sent, so it is the direct object."
+      },
+      {
+        question: "Choose the correct sentence.",
+        options: ["She found for me them.", "She found them for me.", "She found me them for."],
+        answer: 1,
+        explanation: "When the direct object is a pronoun, the pattern them for me is natural."
+      },
+      {
+        question: "Which answer is correct?",
+        options: ["I bought it for him.", "I bought for him it.", "I bought him for it."],
+        answer: 0,
+        explanation: "The object pronoun it comes before for + person in this structure."
+      }
+    ]
+  },
+  {
     id: "adjectives",
     unit: "Unit 1B",
     title: "Adjectives",
@@ -1131,6 +1191,325 @@ const TOPICS = [
   }
 ];
 
+const makeQuestion = (question, options, answer, explanation) => ({ question, options, answer, explanation });
+
+function getTopicById(id) {
+  return TOPICS.find((topic) => topic.id === id);
+}
+
+function appendTopicHtml(id, html) {
+  const topic = getTopicById(id);
+  if (!topic) return;
+  topic.summaryHtml += html;
+}
+
+function addTopicQuestions(id, questions) {
+  const topic = getTopicById(id);
+  if (!topic) return;
+  topic.quiz.push(...questions);
+}
+
+const STUDY_ENHANCEMENTS = {
+  objectpronouns: `
+<div class="content-card">
+  <h3>Pronoun family and verb patterns</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Subject</th><th>Object</th><th>Possessive adjective</th><th>Possessive pronoun</th></tr></thead><tbody><tr><td>I</td><td>me</td><td>my</td><td>mine</td></tr><tr><td>you</td><td>you</td><td>your</td><td>yours</td></tr><tr><td>he / she / it</td><td>him / her / it</td><td>his / her / its</td><td>his / hers / -</td></tr><tr><td>we</td><td>us</td><td>our</td><td>ours</td></tr><tr><td>they</td><td>them</td><td>their</td><td>theirs</td></tr></tbody></table></div>
+  <ul>
+    <li>After prepositions, always use the object form: to her, for them, with us.</li>
+    <li>Common verb + to patterns: give to, send to, lend to, show to, write to, offer to, read to, take to.</li>
+    <li>Common verb + for patterns: bring for, buy for, make for, cook for, find for, get for.</li>
+  </ul>
+</div>
+`,
+  adjectives: `
+<div class="content-card">
+  <h3>Extra grammar-bank rules</h3>
+  <ul>
+    <li>Use one / ones only with countable nouns. With uncountable nouns, repeat the noun or use another determiner.</li>
+    <li>Some two-syllable adjectives can take -er / -est: narrow -> narrower -> the narrowest, clever -> cleverer -> the cleverest.</li>
+    <li>Adjectives ending in -ed usually take more / the most: more bored, the most tired.</li>
+    <li>Another useful comparison pattern is not as + adjective + as: This jacket is not as expensive as that one.</li>
+  </ul>
+</div>
+`,
+  presenttenses: `
+<div class="content-card">
+  <h3>Revise the basics</h3>
+  <ul>
+    <li>Use the present simple for habits, routines and frequency words: always, often, sometimes, never.</li>
+    <li>Use the present continuous for actions happening now, around now, or temporary situations.</li>
+    <li>Use the present continuous for arranged future plans, but use the present simple for timetables and schedules.</li>
+    <li>With think, have and see, decide from the meaning: opinion / possession / understanding usually stay in the simple form.</li>
+  </ul>
+</div>
+`,
+  possessives: `
+<div class="content-card">
+  <h3>Extra possessive patterns</h3>
+  <ul>
+    <li>We can use name / person + 's for homes and shops: at the baker's, at my aunt's, at the dentist's.</li>
+    <li>A useful double possessive is a friend of mine / a cousin of ours / a colleague of hers.</li>
+    <li>Own adds emphasis: her own room, their own company, a business of your own.</li>
+    <li>With shared possession, add 's only to the second name. With separate possession, add 's to both names.</li>
+  </ul>
+</div>
+`,
+  pasttenses: `
+<div class="content-card">
+  <h3>Past simple vs past continuous vs used to</h3>
+  <ul>
+    <li>Past simple gives the finished action: The lesson ended at nine.</li>
+    <li>Past continuous gives the background or interrupted action: We were revising when the bell rang.</li>
+    <li>Used to describes old habits or states that are no longer true: I used to play tennis every weekend.</li>
+    <li>In negatives and questions with used to, use use after did / didn't: Did you use to walk to school?</li>
+  </ul>
+</div>
+`,
+  prepositions: `
+<div class="content-card">
+  <h3>More preposition rules</h3>
+  <ul>
+    <li>After a preposition, use the -ing form: good at painting, interested in learning, looking forward to seeing you.</li>
+    <li>Some verbs do not take a preposition here: discuss the problem, enter the room, marry someone, tell somebody something.</li>
+    <li>towards shows direction only; to often suggests the movement reaches the final point.</li>
+  </ul>
+</div>
+`,
+  futureforms: `
+<div class="content-card">
+  <h3>Choosing the best future form</h3>
+  <ul>
+    <li>Use will for instant decisions, promises, offers and opinion-based predictions.</li>
+    <li>Use be going to for intentions decided before speaking and predictions with visible evidence.</li>
+    <li>Use the present continuous for fixed arrangements with people, places or times already organized.</li>
+    <li>Use shall mainly with I / we for offers and suggestions: Shall I open the window? Shall we start?</li>
+  </ul>
+</div>
+`,
+  conditionals12: `
+<div class="content-card">
+  <h3>Extra first / second conditional notes</h3>
+  <ul>
+    <li>First conditional can also use imperatives and modal verbs in the main clause: If you see Anna, call me. If you study, you can pass.</li>
+    <li>unless means if not: I won't go unless you come with me.</li>
+    <li>Second conditional talks about unreal present or future situations. The past form in the if-clause does not mean past time here.</li>
+    <li>If I were you is the standard phrase for advice.</li>
+  </ul>
+</div>
+`,
+  perfect: `
+<div class="content-card">
+  <h3>More present perfect uses</h3>
+  <ul>
+    <li>Use the present perfect for life experiences when the time is not given: Have you ever seen this film?</li>
+    <li>Use just for very recent news, already mostly in positive sentences, and yet in negatives and questions.</li>
+    <li>Use for + a period of time and since + a starting point: for two weeks, since Monday.</li>
+    <li>With non-action verbs, use the present perfect simple for situations that started in the past and continue now: I've known her for years.</li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Past simple or present perfect?</h3>
+  <div class="source-panel">
+    <p>I've watched three episodes this week. / I watched three episodes last weekend.</p>
+    <p>We've only had a smart TV since last month. / She started here in 2023.</p>
+  </div>
+</div>
+`,
+  perfectcont: `
+<div class="content-card">
+  <h3>Duration and repeated activity</h3>
+  <ul>
+    <li>Use the present perfect continuous for continuous or repeated actions which started in the past and have present results now.</li>
+    <li>It often appears with lately, recently, all day, all morning and how long.</li>
+    <li>For work and live, both the simple and continuous forms are often possible: I've lived here for years / I've been living here for years.</li>
+    <li>Stative verbs normally stay in the simple form: I've known them for ten years.</li>
+  </ul>
+</div>
+`,
+  modals: `
+<div class="content-card">
+  <h3>Needn't, don't have to, mustn't</h3>
+  <ul>
+    <li>don't have to / needn't = no necessity. The action is optional.</li>
+    <li>mustn't = prohibition. The action is not allowed.</li>
+    <li>must is mainly present or future. For past obligation, use had to.</li>
+    <li>should / shouldn't and ought to / oughtn't to are used for advice and recommendation.</li>
+  </ul>
+</div>
+`,
+  ability: `
+<div class="content-card">
+  <h3>Permission and deduction</h3>
+  <ul>
+    <li>Use can / could / may to ask for permission. Could is more polite than can.</li>
+    <li>Use be able to in forms where can is not possible: will be able to, have been able to, might be able to.</li>
+    <li>For one specific successful action in the past, was / were able to or managed to is usually better than could.</li>
+    <li>Use can't to say something is impossible or not true now. Use must to say you are sure something is true.</li>
+  </ul>
+</div>
+`,
+  phrasal: `
+<div class="content-card">
+  <h3>Three core phrasal-verb types</h3>
+  <ul>
+    <li>Type 1: no object - get up, go away, set off.</li>
+    <li>Type 2: separable with an object - switch off the light / switch the light off / switch it off.</li>
+    <li>Type 3: inseparable with an object - look after someone, get on with someone, look forward to something.</li>
+    <li>Some two-particle phrasal verbs are never separated: look forward to, get on with, put up with.</li>
+  </ul>
+</div>
+`,
+  verbpatterns: `
+<div class="content-card">
+  <h3>Common verb-pattern groups</h3>
+  <ul>
+    <li>to-infinitive: agree, decide, hope, want, would like, need.</li>
+    <li>bare infinitive: modal verbs, let, make.</li>
+    <li>gerund: enjoy, finish, avoid, hate, mind, keep.</li>
+    <li>object + infinitive: ask somebody to do, tell somebody to do, want somebody to do, would like somebody to do.</li>
+  </ul>
+</div>
+`,
+  causative: `
+<div class="content-card">
+  <h3>More causative notes</h3>
+  <ul>
+    <li>have + object + past participle works in many tenses: had my phone repaired, am having my eyes tested, will have the kitchen painted.</li>
+    <li>Questions and negatives use the auxiliary: Did you have your hair cut? I don't want to have it done now.</li>
+    <li>get something done is a common spoken alternative: I'm going to get my passport renewed.</li>
+    <li>If you want to mention the person who did the job, use by: We had the heating checked by an engineer.</li>
+  </ul>
+</div>
+`,
+  passive: `
+<div class="content-card">
+  <h3>Passive forms across grammar</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Time / structure</th><th>Passive form</th><th>Example</th></tr></thead><tbody><tr><td>Present simple</td><td>am / is / are + V3</td><td>The site is visited by thousands of people.</td></tr><tr><td>Present continuous</td><td>am / is / are being + V3</td><td>The castle is being restored.</td></tr><tr><td>Present perfect</td><td>has / have been + V3</td><td>The bridge has been repaired.</td></tr><tr><td>Past continuous / past perfect</td><td>was / were being + V3 / had been + V3</td><td>The road was being cleaned. / The room had been painted.</td></tr><tr><td>Future / modal / infinitive</td><td>will be + V3 / can be + V3 / to be + V3</td><td>The museum will be opened. / The form can be found online.</td></tr></tbody></table></div>
+  <p>Use by + agent only when the doer is important. Passive is often more formal and keeps the focus on the action or result.</p>
+</div>
+`,
+  reported: `
+<div class="content-card">
+  <h3>Time and place changes</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Direct speech</th><th>Reported speech</th></tr></thead><tbody><tr><td>today</td><td>that day</td></tr><tr><td>tomorrow</td><td>the next day</td></tr><tr><td>yesterday</td><td>the day before</td></tr><tr><td>this</td><td>that</td></tr><tr><td>here</td><td>there</td></tr></tbody></table></div>
+  <ul>
+    <li>Reported yes / no questions use if or whether.</li>
+    <li>Reported wh-questions keep the question word but use statement word order.</li>
+    <li>Requests and imperatives often use tell / ask + object + to-infinitive.</li>
+  </ul>
+</div>
+`,
+  conditionals3: `
+<div class="content-card">
+  <h3>Other uses of the past perfect</h3>
+  <ul>
+    <li>Use the past perfect for the earlier of two past actions: When we got there, the film had started.</li>
+    <li>It is common in narratives to explain background information before another past event.</li>
+    <li>In reported speech, present perfect often backshifts to past perfect: She said that she had already seen the film.</li>
+    <li>If the original speech is already in the past perfect, there is usually no further change.</li>
+  </ul>
+</div>
+`,
+  auxiliaries: `
+<div class="content-card">
+  <h3>Main verb vs auxiliary verb</h3>
+  <ul>
+    <li>be can describe states or act as the auxiliary in continuous and passive forms.</li>
+    <li>do can mean perform an action, or it can build questions and negatives in the present simple and past simple.</li>
+    <li>have can show possession, or it can work as the auxiliary of perfect tenses.</li>
+    <li>Watch the structure carefully: Does she work here? / Is she working now? / Has she worked here before?</li>
+  </ul>
+</div>
+`
+};
+
+Object.entries(STUDY_ENHANCEMENTS).forEach(([id, html]) => appendTopicHtml(id, html));
+
+const EXTRA_QUIZ_QUESTIONS = {
+  wordlist1a: [
+    makeQuestion('Which phrase means "try to achieve something"?', ["overall", "seek to", "likely"], 1, "Seek to means try or attempt to do something."),
+    makeQuestion('Which phrase means "begin to deal with something in a particular way"?', ["go about", "be named after", "stand out"], 0, "Go about means start or handle something in a certain way.")
+  ],
+  objectpronouns: [
+    makeQuestion("Choose the correct sentence.", ["I'm going to lend it to she.", "I'm going to lend it to her.", "I'm going to lend her it."], 1, "After to, use the object pronoun her."),
+    makeQuestion('Which verb most naturally takes for in this lesson?', ["write", "send", "cook"], 2, "We cook something for someone, but send / write usually take to.")
+  ],
+  adjectives: [
+    makeQuestion('We do not have white bread, but we do have brown ____.', ["one", "ones", "bread"], 2, "Bread is uncountable here, so we do not replace it with one / ones."),
+    makeQuestion('Choose the correct comparison.', ["This jacket is not as expensive as that one.", "This jacket is not so expensive than that one.", "This jacket is not as more expensive as that one."], 0, "not as + adjective + as is the correct pattern.")
+  ],
+  presenttenses: [
+    makeQuestion('Do you ________ we should have lunch on the boat?', ["think", "are thinking", "thinking"], 0, "Here think expresses an opinion, so the present simple is correct."),
+    makeQuestion('What time ________ your flight arrive in New York?', ["is", "does", "do"], 1, "Timetables and schedules usually use the present simple.")
+  ],
+  possessives: [
+    makeQuestion('Choose the correct phrase.', ["a friend of mine", "a friend's of mine", "a friend of my"], 0, "The double possessive pattern is a friend of mine / ours / hers."),
+    makeQuestion('They want to open a cafe. They dream of having a business of ____.', ["their own", "theirs own", "them own"], 0, "Own is used to emphasize possession: a business of their own.")
+  ],
+  pasttenses: [
+    makeQuestion('When we were children, we ________ to the beach every weekend.', ["used to go", "were going", "go"], 0, "used to describes a repeated past habit that is no longer true."),
+    makeQuestion('I ________ dinner when the taxi arrived.', ["still packed", "was still packing", "used to pack"], 1, "The longer background action takes the past continuous.")
+  ],
+  prepositions: [
+    makeQuestion("I'm really looking forward to ________ from you.", ["hear", "hearing", "heard"], 1, "After a preposition, use the -ing form."),
+    makeQuestion('We discussed ________ problem for nearly an hour.', ["about the", "the", "for the"], 1, "Discuss does not take about in this structure.")
+  ],
+  futureforms: [
+    makeQuestion('Look at those black clouds. It ________.', ["will rain", "is going to rain", "rains"], 1, "Visible evidence usually takes be going to."),
+    makeQuestion('A: The room is hot. B: OK, I ________ the air conditioning on.', ["am going to turn", "turn", "will turn"], 2, "The decision is made at the moment of speaking, so will is best.")
+  ],
+  conditionals12: [
+    makeQuestion('If you finish the lesson early, ________ me.', ["call", "you will call", "calling"], 0, "The first conditional can use an imperative in the main clause."),
+    makeQuestion("If I ________ you, I wouldn't spend so much money.", ["am", "were", "had been"], 1, "If I were you is the standard advice pattern.")
+  ],
+  perfect: [
+    makeQuestion("This programme has been on ________ an hour.", ["since", "for", "from"], 1, "for introduces a period of time."),
+    makeQuestion('We ________ each other since we were at university.', ["have known", "have been knowing", "know"], 0, "Know is a non-action verb, so the present perfect simple is used.")
+  ],
+  perfectcont: [
+    makeQuestion('How long ________ you been looking for a new job?', ["do", "have", "are"], 1, "Present perfect continuous questions use have / has been + -ing."),
+    makeQuestion('I ________ them for ten years.', ["have known", "have been knowing", "am knowing"], 0, "Know is a stative verb, so we do not normally use the continuous form.")
+  ],
+  modals: [
+    makeQuestion("You ________ wear a tie. This restaurant is informal.", ["mustn't", "don't have to", "shouldn't"], 1, "don't have to means there is no necessity."),
+    makeQuestion('You ________ eat so much chocolate before dinner.', ["shouldn't", "mustn't to", "needn't"], 0, "This is advice, so shouldn't is the best choice.")
+  ],
+  ability: [
+    makeQuestion("She ________ be at work yet. It's only 7.30.", ["can't", "must", "could"], 0, "can't is used for an impossible conclusion."),
+    makeQuestion('He studied all night. He ________ be exhausted now.', ["must", "can", "couldn't"], 0, "must shows a strong logical deduction.")
+  ],
+  phrasal: [
+    makeQuestion("We're really ________ our trip to China.", ["looking forward to", "looking after", "looking for"], 0, "look forward to means feel excited about a future event."),
+    makeQuestion("I haven't found my glasses yet - I've been ________ for them for half an hour.", ["looking them for", "looking for them", "looking after them"], 1, "look for is inseparable, so the object comes after the particle.")
+  ],
+  verbpatterns: [
+    makeQuestion("Karen's teacher allowed her ________ school early.", ["leave", "to leave", "leaving"], 1, "Allow is followed by object + to-infinitive."),
+    makeQuestion('My husband wants me ________ to the doctor.', ["go", "to go", "going"], 1, "Want somebody to do something takes object + to-infinitive.")
+  ],
+  causative: [
+    makeQuestion("I'm going to ________ my hair cut tomorrow.", ["make", "have", "do"], 1, "The causative pattern is have + object + past participle."),
+    makeQuestion('We need to ________ the roof repaired before winter.', ["have", "having", "had"], 0, "After need to, use the base form have in the causative structure.")
+  ],
+  passive: [
+    makeQuestion('More information ________ on the website.', ["can find", "can be found", "can found"], 1, "A modal passive uses can be + past participle."),
+    makeQuestion('A new bridge ________ next year.', ["will build", "will be built", "is building"], 1, "Future passive = will be + past participle.")
+  ],
+  reported: [
+    makeQuestion('"I will see you tomorrow." -> He said that he would see me ________.', ["tomorrow", "the next day", "the day before"], 1, "tomorrow usually changes to the next day in reported speech."),
+    makeQuestion('"Are you coming with us?" -> She asked me ________.', ["if I was coming with them", "was I coming with them", "if was coming with them"], 0, "Reported yes / no questions use if / whether and statement word order.")
+  ],
+  conditionals3: [
+    makeQuestion("If I'd known his number, I ________ him.", ["called", "would call", "would have called"], 2, "Third conditional uses would have + past participle in the result clause."),
+    makeQuestion('When we arrived at the station, the train ________.', ["left", "had left", "has left"], 1, "The earlier past action takes the past perfect.")
+  ],
+  auxiliaries: [
+    makeQuestion('Where ________ your parents live?', ["are", "do", "have"], 1, "Live is a main verb here, so do is the auxiliary."),
+    makeQuestion('She ________ two brothers and a sister.', ["is having", "has", "does have been"], 1, "Here have is the main verb of possession, so has is correct.")
+  ]
+};
+
+Object.entries(EXTRA_QUIZ_QUESTIONS).forEach(([id, questions]) => addTopicQuestions(id, questions));
+
 const RECAP_CARDS = [
   { title: "Stative verbs", rule: "know, want, need, like gibi fiiller genelde -ing almaz." },
   { title: "Timetable future", rule: "Ulaşım ve program saatlerinde Present Simple kullanılır." },
@@ -1245,6 +1624,33 @@ function shuffle(array) {
   return copy;
 }
 
+function buildExamQuestions(questionCount) {
+  const chosen = [];
+  const used = new Set();
+
+  shuffle(TOPICS).forEach((topic) => {
+    if (chosen.length >= questionCount) return;
+    const candidate = shuffle(
+      QUESTION_BANK.filter((question) => question.topicId === topic.id && !used.has(question.uid))
+    )[0];
+
+    if (!candidate) return;
+    chosen.push(candidate);
+    used.add(candidate.uid);
+  });
+
+  shuffle(QUESTION_BANK).forEach((question) => {
+    if (chosen.length >= questionCount || used.has(question.uid)) return;
+    chosen.push(question);
+    used.add(question.uid);
+  });
+
+  return shuffle(chosen).slice(0, questionCount).map((item, index) => ({
+    ...item,
+    uid: `${item.uid}-${Date.now()}-${index}`
+  }));
+}
+
 function initTheme() {
   const saved = localStorage.getItem("eul_theme");
   if (saved === "dark") applyDark(true);
@@ -1266,6 +1672,12 @@ function toggleTheme() {
   const isDark = !document.body.classList.contains("dark");
   applyDark(isDark);
   localStorage.setItem("eul_theme", isDark ? "dark" : "light");
+}
+
+function closeMobileMenu() {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) sidebar.classList.remove("open");
+  document.body.classList.remove("nav-open");
 }
 
 function navigate(pageId) {
@@ -1293,8 +1705,7 @@ function navigate(pageId) {
   }
 
   if (window.innerWidth <= 768) {
-    const sidebar = document.getElementById("sidebar");
-    if (sidebar) sidebar.classList.remove("open");
+    closeMobileMenu();
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1302,7 +1713,11 @@ function navigate(pageId) {
 
 function toggleMenu() {
   const sidebar = document.getElementById("sidebar");
-  if (sidebar) sidebar.classList.toggle("open");
+  if (!sidebar) return;
+
+  const isOpen = !sidebar.classList.contains("open");
+  sidebar.classList.toggle("open", isOpen);
+  document.body.classList.toggle("nav-open", isOpen);
 }
 
 function searchTopics(event) {
@@ -1760,10 +2175,7 @@ function renderRecap() {
 }
 
 function startExam(questionCount, durationMinutes) {
-  const selectedQuestions = shuffle(QUESTION_BANK).slice(0, questionCount).map((item, index) => ({
-    ...item,
-    uid: `${item.uid}-${Date.now()}-${index}`
-  }));
+  const selectedQuestions = buildExamQuestions(questionCount);
 
   activeExam = {
     label: questionCount === 10 ? "Mini Sınav" : questionCount === 20 ? "Orta Sınav" : "Tam Sınav",
@@ -1960,6 +2372,7 @@ function submitExam(autoSubmitted = false) {
 
 window.navigate = navigate;
 window.toggleMenu = toggleMenu;
+window.closeMobileMenu = closeMobileMenu;
 window.searchTopics = searchTopics;
 window.toggleTheme = toggleTheme;
 window.renderStudyHub = renderStudyHub;
@@ -1981,4 +2394,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderRecap();
   renderActiveExam();
   updateDashboardStats();
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 768) {
+    closeMobileMenu();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeMobileMenu();
+  }
 });
