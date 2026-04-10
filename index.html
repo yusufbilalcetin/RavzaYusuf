@@ -20,6 +20,7 @@
     <ul class="nav-links">
       <li><button onclick="navigate('dashboard')" id="nav-dashboard" class="active"><span class="nav-icon">🏠</span>Ana Sayfa</button></li>
       <li><button onclick="navigate('studyhub')" id="nav-studyhub"><span class="nav-icon">📚</span>Çalışma Merkezi</button></li>
+      <li><button onclick="navigate('memoryhub')" id="nav-memoryhub"><span class="nav-icon">🧠</span>Ezber Merkezi</button></li>
       <li><button onclick="navigate('quizhub')" id="nav-quizhub"><span class="nav-icon">📝</span>Quiz Merkezi</button></li>
       <li><button onclick="navigate('examcenter')" id="nav-examcenter"><span class="nav-icon">🎯</span>Sınav Merkezi</button></li>
       <li><button onclick="navigate('recap')" id="nav-recap"><span class="nav-icon">⚡</span>Hızlı Tekrar</button></li>
@@ -113,13 +114,20 @@
 
           <div class="feature-panel">
             <div class="panel-badge quiz">2. ADIM</div>
+            <h3>Ezber Merkezi</h3>
+            <p>İngilizce kelimeyi kartın ön yüzünde gör, karta tıklayınca arka yüzde Türkçesini aç. Hızlı tekrar için ideal.</p>
+            <button class="primary-btn soft" onclick="navigate('memoryhub')">Kartlara Git</button>
+          </div>
+
+          <div class="feature-panel">
+            <div class="panel-badge quiz">3. ADIM</div>
             <h3>Quiz Merkezi</h3>
             <p>Konu çalıştıktan sonra sadece quiz odaklı ayrı sayfaya geçebilirsin. Böylece not ve soru birbirine karışmaz.</p>
             <button class="primary-btn soft" onclick="navigate('quizhub')">Quizlere Git</button>
           </div>
 
           <div class="feature-panel">
-            <div class="panel-badge exam">3. ADIM</div>
+            <div class="panel-badge exam">4. ADIM</div>
             <h3>Sınav Merkezi</h3>
             <p>Karışık soru havuzundan mini, orta veya tam deneme başlat. Süre, skor ve cevap inceleme ekranı var.</p>
             <button class="primary-btn dark" onclick="navigate('examcenter')">Sınava Başla</button>
@@ -165,6 +173,26 @@
 
       <section id="studydetail" class="page">
         <div id="studyDetailContent"></div>
+      </section>
+
+      <section id="memoryhub" class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <span class="unit-badge memory-badge">MEMORY HUB</span>
+            <h2>Ezber Merkezi</h2>
+            <p class="subtitle">Kartın ön yüzünde İngilizcesi, tıklayınca arka yüzde Türkçesi açılır.</p>
+          </div>
+        </div>
+
+        <div class="hub-toolbar">
+          <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
+          <div class="hub-legend">
+            <span><i class="dot exam"></i> Tıkla ve çevir</span>
+            <span><i class="dot success"></i> İngilizce → Türkçe</span>
+          </div>
+        </div>
+
+        <div id="memoryHubGrid" class="memory-grid"></div>
       </section>
 
       <section id="quizhub" class="page">

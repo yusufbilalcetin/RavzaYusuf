@@ -1510,6 +1510,37 @@ const EXTRA_QUIZ_QUESTIONS = {
 
 Object.entries(EXTRA_QUIZ_QUESTIONS).forEach(([id, questions]) => addTopicQuestions(id, questions));
 
+const MEMORIZATION_CARDS = [
+  { id: "mem-1", front: "Researchers", back: "Araştırmacılar" },
+  { id: "mem-2", front: "Evidence", back: "Kanıt" },
+  { id: "mem-3", front: "Survey", back: "Anket" },
+  { id: "mem-4", front: "The average", back: "Ortalama" },
+  { id: "mem-5", front: "Scale", back: "Ölçek" },
+  { id: "mem-6", front: "Rank", back: "Sıralamak" },
+  { id: "mem-7", front: "Likely", back: "Muhtemel" },
+  { id: "mem-8", front: "Overall", back: "Genel olarak" },
+  { id: "mem-9", front: "Beyond", back: "Ötesinde" },
+  { id: "mem-10", front: "Create a new image", back: "Yeni bir imaj oluşturmak" },
+  { id: "mem-11", front: "Go about", back: "Bir işi ele almak" },
+  { id: "mem-12", front: "Proof", back: "İspat / kanıt" },
+  { id: "mem-13", front: "Seek to", back: "Amaçlamak" },
+  { id: "mem-14", front: "Stand out", back: "Öne çıkmak" },
+  { id: "mem-15", front: "Solicitor", back: "Avukat" },
+  { id: "mem-16", front: "For fun", back: "Eğlence için" },
+  { id: "mem-17", front: "Birth certificate", back: "Doğum belgesi" },
+  { id: "mem-18", front: "Feel sorry", back: "Üzülmek / acımak" },
+  { id: "mem-19", front: "Maiden name", back: "Kızlık soyadı" },
+  { id: "mem-20", front: "Full name", back: "Tam ad" },
+  { id: "mem-21", front: "Nickname", back: "Lakap" },
+  { id: "mem-22", front: "Be named after", back: "Adını birinden almak" },
+  { id: "mem-23", front: "Initials", back: "Baş harfler" },
+  { id: "mem-24", front: "Brand name", back: "Marka adı" },
+  { id: "mem-25", front: "Common", back: "Yaygın" },
+  { id: "mem-26", front: "Old-fashioned", back: "Eski tarz / demode" },
+  { id: "mem-27", front: "Celebrity", back: "Ünlü" },
+  { id: "mem-28", front: "Suit", back: "Yakışmak / uygun olmak" }
+];
+
 const RECAP_CARDS = [
   { title: "Stative verbs", rule: "know, want, need, like gibi fiiller genelde -ing almaz." },
   { title: "Timetable future", rule: "Ulaşım ve program saatlerinde Present Simple kullanılır." },
@@ -1693,6 +1724,7 @@ function navigate(pageId) {
     dashboard: "nav-dashboard",
     studyhub: "nav-studyhub",
     studydetail: "nav-studyhub",
+    memoryhub: "nav-memoryhub",
     quizhub: "nav-quizhub",
     quizdetail: "nav-quizhub",
     examcenter: "nav-examcenter",
@@ -1746,6 +1778,11 @@ function searchTopics(event) {
 
   if (q.includes("quiz")) {
     navigate("quizhub");
+    return;
+  }
+
+  if (q.includes("ezber") || q.includes("kelime") || q.includes("kart") || q.includes("vocabulary") || q.includes("word")) {
+    navigate("memoryhub");
     return;
   }
 
@@ -2163,6 +2200,60 @@ function toggleQuizDone(topicId, rerender = false) {
   saveProgressToFirebase();
 }
 
+function renderMemorizationHub(filterText = "") {
+  const grid = document.getElementById("memoryHubGrid");
+  if (!grid) return;
+
+  const q = filterText.trim().toLowerCase();
+  const filtered = MEMORIZATION_CARDS.filter((card) =>
+    card.front.toLowerCase().includes(q) ||
+    card.back.toLowerCase().includes(q)
+  );
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-grid">Bu aramaya uygun ezber kartı bulunamadı.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered
+    .map((card) => `
+      <button
+        type="button"
+        class="memory-card"
+        onclick="toggleMemoryCard('${safeText(card.id)}')"
+        onkeydown="handleMemoryCardKey(event, '${safeText(card.id)}')"
+        data-card-id="${safeText(card.id)}"
+        aria-label="${safeText(card.front)} kartını çevir">
+        <div class="memory-card-inner">
+          <span class="memory-face memory-front">
+            <small>İngilizce</small>
+            <strong>${safeText(card.front)}</strong>
+            <em>Kartı çevir</em>
+          </span>
+          <span class="memory-face memory-back">
+            <small>Türkçe</small>
+            <strong>${safeText(card.back)}</strong>
+            <em>Tekrar tıkla</em>
+          </span>
+        </div>
+      </button>
+    `)
+    .join("");
+}
+
+function toggleMemoryCard(cardId) {
+  const card = document.querySelector(`[data-card-id="${cardId}"]`);
+  if (!card) return;
+  card.classList.toggle("flipped");
+}
+
+function handleMemoryCardKey(event, cardId) {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    toggleMemoryCard(cardId);
+  }
+}
+
 function renderRecap() {
   const recapGrid = document.getElementById("recapGrid");
   if (!recapGrid) return;
@@ -2376,6 +2467,9 @@ window.closeMobileMenu = closeMobileMenu;
 window.searchTopics = searchTopics;
 window.toggleTheme = toggleTheme;
 window.renderStudyHub = renderStudyHub;
+window.renderMemorizationHub = renderMemorizationHub;
+window.toggleMemoryCard = toggleMemoryCard;
+window.handleMemoryCardKey = handleMemoryCardKey;
 window.renderQuizHub = renderQuizHub;
 window.openStudyTopic = openStudyTopic;
 window.openQuizTopic = openQuizTopic;
@@ -2390,6 +2484,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initTheme();
   await loadProgressFromFirebase();
   renderStudyHub();
+  renderMemorizationHub();
   renderQuizHub();
   renderRecap();
   renderActiveExam();
