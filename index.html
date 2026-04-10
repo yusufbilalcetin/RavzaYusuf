@@ -192,6 +192,23 @@
           </div>
         </div>
 
+        <div class="memory-practice-shell">
+          <div class="memory-practice-head">
+            <div>
+              <span class="unit-badge quiz-badge">PRACTICE</span>
+              <h3 class="memory-practice-title">4 Sikli Kelime Calismasi</h3>
+              <p class="helper-line">Sorular mevcut Ezber Merkezi kelimelerinden rastgele gelir.</p>
+            </div>
+
+            <div class="memory-mode-switch" role="tablist" aria-label="Kelime calisma modu">
+              <button type="button" id="memoryModeEnTr" class="memory-mode-btn active" onclick="setMemoryPracticeMode('en-tr')">Ingilizce -> Turkce</button>
+              <button type="button" id="memoryModeTrEn" class="memory-mode-btn" onclick="setMemoryPracticeMode('tr-en')">Turkce -> Ingilizce</button>
+            </div>
+          </div>
+
+          <div id="memoryPracticeCard" class="memory-practice-card"></div>
+        </div>
+
         <div id="memoryHubGrid" class="memory-grid"></div>
       </section>
 

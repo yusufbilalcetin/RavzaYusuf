@@ -2159,6 +2159,9 @@ const QUESTION_BANK = TOPICS.flatMap((topic) =>
 const progressRef = doc(db, "progress", "ravza");
 let activeExam = null;
 let examTimer = null;
+let memoryPracticeMode = "en-tr";
+let activeMemoryPracticeQuestion = null;
+let lastMemoryPracticeKey = "";
 let activeRecapUnits = [...new Set(RECAP_CARDS.map((card) => card.unit))];
 
 function safeText(text) {
@@ -2846,6 +2849,199 @@ function handleMemoryCardKey(event, cardId) {
   }
 }
 
+function shuffleArray(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function getAllMemoryPracticeCards() {
+  return MEMORIZATION_CARDS.filter((card) => card.front && card.back);
+}
+
+function getMemoryPracticePool(mode) {
+  const cards = getAllMemoryPracticeCards();
+
+  // Turkce -> Ingilizce modunda tek dogru cevap garanti etmek icin
+  // yalnizca benzersiz Turkce karsiliklari soru olarak kullan.
+  if (mode === "tr-en") {
+    const backCounts = cards.reduce((acc, card) => {
+      const key = card.back.trim().toLowerCase();
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    return cards.filter((card) => backCounts[card.back.trim().toLowerCase()] === 1);
+  }
+
+  return cards;
+}
+
+function getMemoryPracticeQuestionKey(card, mode) {
+  return `${mode}:${mode === "en-tr" ? card.front : card.back}`.toLowerCase();
+}
+
+function pickRandomMemoryCard(mode) {
+  const pool = getMemoryPracticePool(mode);
+  if (!pool.length) return null;
+
+  let selected = pool[Math.floor(Math.random() * pool.length)];
+
+  if (pool.length > 1) {
+    let guard = 0;
+    while (getMemoryPracticeQuestionKey(selected, mode) === lastMemoryPracticeKey && guard < 10) {
+      selected = pool[Math.floor(Math.random() * pool.length)];
+      guard += 1;
+    }
+  }
+
+  return selected;
+}
+
+function buildMemoryPracticeQuestion(mode = memoryPracticeMode) {
+  const correctCard = pickRandomMemoryCard(mode);
+  if (!correctCard) return null;
+
+  const prompt = mode === "en-tr" ? correctCard.front : correctCard.back;
+  const correctLabel = mode === "en-tr" ? correctCard.back : correctCard.front;
+  const wrongPool = mode === "en-tr"
+    ? [...new Set(getAllMemoryPracticeCards().map((card) => card.back.trim()))]
+        .filter((label) => label && label !== correctLabel)
+    : getAllMemoryPracticeCards()
+        .map((card) => card.front.trim())
+        .filter((label) => label && label !== correctLabel);
+
+  const wrongOptions = shuffleArray(wrongPool).slice(0, 3);
+  const options = shuffleArray([
+    { label: correctLabel, isCorrect: true },
+    ...wrongOptions.map((label) => ({ label, isCorrect: false }))
+  ]);
+
+  lastMemoryPracticeKey = getMemoryPracticeQuestionKey(correctCard, mode);
+
+  return {
+    mode,
+    prompt,
+    correctLabel,
+    options,
+    answered: false,
+    selectedIndex: null,
+    isCorrect: false
+  };
+}
+
+function setMemoryPracticeMode(mode) {
+  if (mode !== "en-tr" && mode !== "tr-en") return;
+  if (mode === memoryPracticeMode && activeMemoryPracticeQuestion) {
+    renderMemoryPractice();
+    return;
+  }
+  memoryPracticeMode = mode;
+  activeMemoryPracticeQuestion = buildMemoryPracticeQuestion(mode);
+  renderMemoryPractice();
+}
+
+function submitMemoryPracticeAnswer(optionIndex) {
+  if (!activeMemoryPracticeQuestion || activeMemoryPracticeQuestion.answered) return;
+
+  const selectedOption = activeMemoryPracticeQuestion.options[optionIndex];
+  if (!selectedOption) return;
+
+  activeMemoryPracticeQuestion = {
+    ...activeMemoryPracticeQuestion,
+    answered: true,
+    selectedIndex: optionIndex,
+    isCorrect: selectedOption.isCorrect
+  };
+
+  renderMemoryPractice();
+}
+
+function nextMemoryPracticeQuestion() {
+  activeMemoryPracticeQuestion = buildMemoryPracticeQuestion(memoryPracticeMode);
+  renderMemoryPractice();
+}
+
+function renderMemoryPractice() {
+  const practiceCard = document.getElementById("memoryPracticeCard");
+  if (!practiceCard) return;
+
+  if (!activeMemoryPracticeQuestion) {
+    activeMemoryPracticeQuestion = buildMemoryPracticeQuestion(memoryPracticeMode);
+  }
+
+  const enTrButton = document.getElementById("memoryModeEnTr");
+  const trEnButton = document.getElementById("memoryModeTrEn");
+
+  if (enTrButton) enTrButton.classList.toggle("active", memoryPracticeMode === "en-tr");
+  if (trEnButton) trEnButton.classList.toggle("active", memoryPracticeMode === "tr-en");
+
+  if (!activeMemoryPracticeQuestion) {
+    practiceCard.innerHTML = `<div class="empty-grid">Calisma sorusu olusturulamadi.</div>`;
+    return;
+  }
+
+  const question = activeMemoryPracticeQuestion;
+  const promptLabel = question.mode === "en-tr" ? "Ingilizce kelime" : "Turkce anlam";
+  const instruction = question.mode === "en-tr"
+    ? "Dogru Turkce anlami sec."
+    : "Dogru Ingilizce kelimeyi sec.";
+  const feedbackClass = question.answered ? (question.isCorrect ? "success" : "error") : "";
+  const feedbackText = !question.answered
+    ? "Bir secenek isaretle ve cevabi kontrol et."
+    : question.isCorrect
+      ? "Dogru cevap."
+      : `Yanlis cevap. Dogru cevap: ${question.correctLabel}`;
+
+  practiceCard.innerHTML = `
+    <div class="memory-practice-body">
+      <div class="memory-prompt-box">
+        <span class="memory-prompt-label">${safeText(promptLabel)}</span>
+        <strong class="memory-prompt-text">${safeText(question.prompt)}</strong>
+        <p class="helper-line">${safeText(instruction)}</p>
+      </div>
+
+      <div class="memory-option-list">
+        ${question.options.map((option, index) => {
+          let classes = "memory-option";
+          if (question.answered && option.isCorrect) classes += " correct";
+          if (question.answered && !option.isCorrect && question.selectedIndex === index) classes += " wrong";
+          if (question.answered) classes += " locked";
+
+          return `
+            <button
+              type="button"
+              class="${classes}"
+              onclick="submitMemoryPracticeAnswer(${index})"
+              ${question.answered ? "disabled" : ""}
+            >
+              <small>Secenek ${index + 1}</small>
+              <span>${safeText(option.label)}</span>
+            </button>
+          `;
+        }).join("")}
+      </div>
+
+      <div class="memory-practice-footer">
+        <div class="memory-feedback ${feedbackClass}">
+          ${safeText(feedbackText)}
+        </div>
+        <button
+          type="button"
+          class="primary-btn soft memory-next-btn"
+          onclick="nextMemoryPracticeQuestion()"
+          ${question.answered ? "" : "disabled"}
+        >
+          Sonraki
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 function getRecapSearchValue() {
   const input = document.getElementById("recapFilter");
   return input ? input.value.trim().toLowerCase() : "";
@@ -3222,6 +3418,9 @@ window.renderStudyHub = renderStudyHub;
 window.renderMemorizationHub = renderMemorizationHub;
 window.toggleMemoryCard = toggleMemoryCard;
 window.handleMemoryCardKey = handleMemoryCardKey;
+window.setMemoryPracticeMode = setMemoryPracticeMode;
+window.submitMemoryPracticeAnswer = submitMemoryPracticeAnswer;
+window.nextMemoryPracticeQuestion = nextMemoryPracticeQuestion;
 window.renderQuizHub = renderQuizHub;
 window.renderRecap = renderRecap;
 window.toggleRecapUnitSelection = toggleRecapUnitSelection;
@@ -3242,6 +3441,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadProgressFromFirebase();
   renderStudyHub();
   renderMemorizationHub();
+  renderMemoryPractice();
   renderQuizHub();
   renderRecap();
   renderActiveExam();
