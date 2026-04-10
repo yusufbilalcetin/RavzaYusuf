@@ -285,10 +285,19 @@
           <div class="page-header-left">
             <span class="unit-badge">FAST RECAP</span>
             <h2>Hızlı Tekrar Alanı</h2>
-            <p class="subtitle">Sınav öncesi en kritik kuralların kısa özeti.</p>
+            <p class="subtitle">Sinav oncesi en kritik kurallar, formuller ve sik yapilan hatalar tek yerde.</p>
           </div>
         </div>
 
+        <div class="recap-toolbar">
+          <input type="text" id="recapFilter" class="hub-search" placeholder="Kural, unite veya kalip ara... ornek: passive / 4B / for vs since" oninput="renderRecap()">
+          <div class="recap-actions">
+            <span id="recapCount" class="recap-meta-pill">0 kart</span>
+            <button type="button" class="recap-reset" onclick="resetRecapFilters()">Filtreleri Temizle</button>
+          </div>
+        </div>
+
+        <div id="recapUnits" class="recap-filter-shell"></div>
         <div id="recapGrid" class="flashcard-grid"></div>
       </section>
     </div>

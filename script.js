@@ -1720,17 +1720,430 @@ const EXTRA_MEMORIZATION_CARDS = [
 MEMORIZATION_CARDS.splice(28, MEMORIZATION_CARDS.length - 28, ...EXTRA_MEMORIZATION_CARDS);
 
 const RECAP_CARDS = [
-  { title: "Stative verbs", rule: "know, want, need, like gibi fiiller genelde -ing almaz." },
-  { title: "Timetable future", rule: "Ulaşım ve program saatlerinde Present Simple kullanılır." },
-  { title: "mustn't vs don't have to", rule: "mustn't = yasak, don't have to = zorunlu değil." },
-  { title: "one / ones", rule: "Tekrarı önlemek için singular one, plural ones kullanılır." },
-  { title: "unless", rule: "unless = if not." },
-  { title: "Reported questions", rule: "do / does / did kalkar, word order düz cümle olur." },
-  { title: "Causative", rule: "have + object + V3 = başkasına yaptırmak." },
-  { title: "Passive", rule: "Tüm passive yapıların çekirdeği be + V3 mantığıdır." },
-  { title: "Specific past success", rule: "Tek ve zor geçmiş başarıda was/were able to kullanılır." },
-  { title: "Third conditional", rule: "If + had V3, would have + V3." }
+  {
+    unit: "1A",
+    title: "Kelime Listesi",
+    formula: "evidence / survey / stand out / maiden name",
+    rule: "Kelimeyi sadece anlamıyla değil, örnek cümlesiyle beraber ezberle.",
+    example: "There is strong evidence that exercise improves mental health.",
+    trap: "Benzer kelimeleri karıştırma: proof daha çok somut ispat, evidence ise destekleyici kanıt gibi kullanılır."
+  },
+  {
+    unit: "1A",
+    title: "Object Pronouns",
+    formula: "verb + IO + DO / verb + DO + to-for + IO",
+    rule: "Direct object şeydir; indirect object alan kişidir. Preposition sonrası object pronoun gelir.",
+    example: "James will lend it to her. / Mary gave me some money.",
+    trap: "I gave it to she değil, I gave it to her."
+  },
+  {
+    unit: "1B",
+    title: "Adjectives",
+    formula: "a bit + comparative / much + comparative / the best-the worst",
+    rule: "Tekil sayılabilen noun önünde adjective varsa çoğu zaman a/an gerekir.",
+    example: "She is a very ambitious person. / Cats are much more selfish than dogs.",
+    trap: "the most bad değil, the worst. Uncountable noun ile one/ones kullanma."
+  },
+  {
+    unit: "2A",
+    title: "Present Tenses",
+    formula: "stative -> present simple / arrangement -> present continuous / timetable -> present simple",
+    rule: "Anlama göre seç: opinion-possession-understanding simple; süreç ve ayarlanmış plan continuous olabilir.",
+    example: "I think it's a good idea. / I'm meeting my friends tonight. / The train leaves at 6.30.",
+    trap: "I'm knowing, I'm wanting gibi stative continuous hatalarından kaçın."
+  },
+  {
+    unit: "2B",
+    title: "Possessives",
+    formula: "person + 's / plural s' / of + thing / own",
+    rule: "Kişi sahipliğinde 's, cansız yapılarda çoğu zaman of, vurgu için own kullanılır.",
+    example: "my friend's car / the end of the film / their own company",
+    trap: "Shared possession varsa sadece ikinci isme 's gelir: Emma and Mia's house."
+  },
+  {
+    unit: "3A",
+    title: "Past Tenses & Used To",
+    formula: "past simple / past continuous / used to",
+    rule: "Finished action için past simple, arka plan veya bölünen eylem için past continuous, eski alışkanlık için used to.",
+    example: "I was reading when the phone rang. / We used to go to the beach every weekend.",
+    trap: "Did you went değil, Did you go. Didn't used to değil, didn't use to."
+  },
+  {
+    unit: "3B",
+    title: "Prepositions",
+    formula: "place / movement / dependent preposition",
+    rule: "Bazı verb ve adjective kalıpları sabit preposition ister; preposition sonrası fiil gelirse -ing alır.",
+    example: "interested in science / good at painting / looking forward to seeing you",
+    trap: "discuss about yanlış; discuss the problem doğru."
+  },
+  {
+    unit: "4A",
+    title: "Future Forms",
+    formula: "will / be going to / present continuous / was-were going to",
+    rule: "Anlık karar ve sözler için will, plan ve evidence için going to, ayarlanmış randevu için present continuous.",
+    example: "I'll get it. / It's going to rain. / I'm seeing the doctor on Friday.",
+    trap: "Failed plan anlatırken was/were going to kullan: I was going to call you, but..."
+  },
+  {
+    unit: "4B",
+    title: "First Conditional",
+    formula: "if + present simple, will + verb1",
+    rule: "Gerçek veya muhtemel gelecek sonucu anlatır.",
+    example: "If it rains, we'll stay at home.",
+    trap: "If clause içinde will kullanma. Gerekirse ana cümlede imperative veya can da gelebilir."
+  },
+  {
+    unit: "4B",
+    title: "Second Conditional",
+    formula: "if + past simple, would-could + verb1",
+    rule: "Şimdiki veya gelecekteki hayali-gerçek dışı durumları anlatır.",
+    example: "If I won the lottery, I would travel more. / If I spoke Spanish, I could work in Spain.",
+    trap: "Bu past form geçmiş zaman anlamı taşımaz. Tavsiye kalıbı: If I were you..."
+  },
+  {
+    unit: "5A",
+    title: "Present Perfect Simple",
+    formula: "have-has + V3 / just-already-yet / for-since",
+    rule: "Belirsiz zamanlı deneyim, yeni olmuş haber ve şimdiye bağlanan durumlar için kullanılır.",
+    example: "I've just sent the email. / Have you ever been to Edinburgh?",
+    trap: "Yesterday, last week, in 2020 gibi net geçmiş zamanı varsa past simple kullan."
+  },
+  {
+    unit: "5B",
+    title: "Present Perfect Continuous",
+    formula: "have-has been + V-ing",
+    rule: "Geçmişte başlayıp etkisi şimdi süren süreçleri veya tekrar eden son dönem aktivitelerini vurgular.",
+    example: "I've been working too hard lately. / We've been living here since last year.",
+    trap: "know, believe, want gibi stative verbs ile genelde continuous kullanma."
+  },
+  {
+    unit: "6A",
+    title: "Modals of Obligation",
+    formula: "must / have to / don't have to / mustn't / should",
+    rule: "mustn't yasak, don't have to gereklilik yok, should tavsiye, had to geçmiş zorunluluktur.",
+    example: "You mustn't be rude. / We don't have to leave yet. / You should rest.",
+    trap: "mustn't ile don't have to anlamca zıttır; ikisini karıştırma."
+  },
+  {
+    unit: "6B",
+    title: "Ability & Deduction",
+    formula: "can / could / be able to / must / can't",
+    rule: "Genel geçmiş yetenekte could, tek zor başarılı olayda was-were able to veya managed to daha doğrudur.",
+    example: "He could play the violin when he was four. / I was able to change the wheel.",
+    trap: "Future ability için can değil, will be able to kullan."
+  },
+  {
+    unit: "7A",
+    title: "Phrasal Verbs",
+    formula: "no object / separable / inseparable",
+    rule: "Pronoun varsa separable phrasal verb içinde nesne fiil ile particle arasına girer.",
+    example: "turn it off / pay it back / look after her / look forward to the trip",
+    trap: "turn off it yanlış. Inseparable yapılarda ayırma: look after him."
+  },
+  {
+    unit: "7B",
+    title: "Verb Patterns",
+    formula: "to-infinitive / gerund / bare infinitive / object + infinitive",
+    rule: "Fiile göre devamındaki yapı değişir: enjoy doing, decide to do, let-make somebody do.",
+    example: "We enjoy going to concerts. / Karen's teacher allowed her to leave early.",
+    trap: "let ve make sonrasında to kullanma."
+  },
+  {
+    unit: "8A",
+    title: "Causative",
+    formula: "have + object + V3 / get + object + V3",
+    rule: "İşi kendin yapmadığında, birine yaptırdığında bu yapı kullanılır.",
+    example: "I had my hair cut yesterday. / We're going to get the roof repaired.",
+    trap: "I had cut my hair ile I had my hair cut aynı şey değildir."
+  },
+  {
+    unit: "8B",
+    title: "Passive Voice",
+    formula: "be + V3",
+    rule: "Passive'in çekirdeği hep be + past participle mantığıdır; tense sadece be kısmını değiştirir.",
+    example: "The museum was opened in 1997. / The bridge has been repaired.",
+    trap: "Active'i passive yaparken asıl odak nesneye geçer; gerekmedikçe by + agent ekleme."
+  },
+  {
+    unit: "9A",
+    title: "Reported Speech",
+    formula: "say-tell / ask if-whether / ask-tell + object + to infinitive",
+    rule: "Reported question içinde do-does-did kalkar ve kelime sırası düz cümle olur.",
+    example: "He asked me where I lived. / They asked us to fill in the form.",
+    trap: "where did I live değil, where I lived."
+  },
+  {
+    unit: "9B",
+    title: "Third Conditional & Past Perfect",
+    formula: "if + had V3, would have + V3 / had + V3",
+    rule: "Gerçekleşmemiş geçmiş ihtimal ve pişmanlıkları anlatır; earlier past action için de past perfect kullanılır.",
+    example: "If I'd known, I would have called. / When we arrived, the film had started.",
+    trap: "Third conditional'da hem if clause hem result clause geçmişe göre kurulur; would have şartlı ana cümlededir."
+  },
+  {
+    unit: "10A",
+    title: "Be / Do / Have",
+    formula: "main verb vs auxiliary",
+    rule: "Bu üç fiil hem ana fiil hem yardımcı fiil olabilir; doğru auxiliary seçimi tense'i belirler.",
+    example: "Does she work here? / Is she working now? / Has she finished yet?",
+    trap: "Aynı cümlede fiilin görevi değişebilir; soru kurarken anlam değil yapı üzerinden düşün."
+  }
 ];
+
+const EXTRA_RECAP_CARDS = [
+  {
+    unit: "1A",
+    title: "Pronoun Map",
+    formula: "I-me-my-mine / he-him-his-his / they-them-their-theirs",
+    rule: "Subject, object, possessive adjective ve possessive pronoun formlarini birbirinden ayir.",
+    example: "She gave it to him. / This bag is mine.",
+    trap: "to she, for they gibi kullanimlar yanlistir.",
+    compare: "Subject pronoun eylemi yapar; object pronoun eylemden etkilenir.",
+    checklist: ["preposition sonrasi object pronoun kullan", "thing icin it / them dusun", "sahiplikte my ve mine farkini ayir"]
+  },
+  {
+    unit: "1B",
+    title: "One / Ones",
+    formula: "singular -> one / plural -> ones",
+    rule: "Countable noun tekrarini onlemek icin one / ones kullanilir.",
+    example: "The blue one / the red ones",
+    trap: "uncountable noun ile one / ones kullanma: bread, milk, money",
+    compare: "one bir ismin yerine gecer; adjective'in yerine gecmez.",
+    checklist: ["tekilse one", "cogulsa ones", "uncountable ise noun'u tekrar et"]
+  },
+  {
+    unit: "1B",
+    title: "Comparative vs Superlative",
+    formula: "bigger than / the biggest / more interesting / the most interesting",
+    rule: "Iki sey karsilastiriyorsan comparative, grup icinde en ust duzeyi soyluyorsan superlative kullan.",
+    example: "Tom is taller than Jim. / Tom is the tallest in the class.",
+    trap: "the most bad degil, the worst; more bored dogru ama bored-er yanlis.",
+    compare: "comparative genelde than ile gider; superlative oncesinde the gelir.",
+    checklist: ["than gorursen comparative kontrol et", "the varsa superlative dusun", "irregular: good-better-best / bad-worse-worst"]
+  },
+  {
+    unit: "2A",
+    title: "Stative Verbs",
+    formula: "know / want / need / like / believe / understand",
+    rule: "Durum, dusunce, sahiplik ve duygu anlatan fiiller genelde continuous almaz.",
+    example: "I know the answer. / I want a coffee.",
+    trap: "I'm knowing, I'm liking, I'm wanting tipik sinav hatalaridir.",
+    compare: "Bazilari anlama gore degisir: I think so / I'm thinking about it.",
+    checklist: ["opinion ise simple", "possession ise simple", "process ise continuous olabilir"]
+  },
+  {
+    unit: "2A",
+    title: "Arrangement vs Timetable",
+    formula: "present continuous vs present simple",
+    rule: "Ayarlanmis plan ve randevu present continuous; tarife, program ve sefer saatleri present simple olur.",
+    example: "I'm meeting her at 7. / The flight leaves at 6.30.",
+    trap: "Her future cumlede will veya going to kullanmak zorunda degilsin.",
+    compare: "personal arrangement != public schedule",
+    checklist: ["kisi-randevu varsa continuous dusun", "otobus-tren-ucak saatinde simple dusun", "soru formunu da ayni mantikla kur"]
+  },
+  {
+    unit: "2B",
+    title: "Shared vs Separate Possession",
+    formula: "Emma and Mia's / Emma's and Mia's",
+    rule: "Tek esya veya yer ortaksa sadece ikinci isme 's gelir; ayri sahiplikte ikisine de gelir.",
+    example: "Emma and Mia's house / Emma's and Mia's bags",
+    trap: "Ortak sahipligi iki kez 's ile yazma.",
+    compare: "one house -> one apostrophe / two bags -> two apostrophes",
+    checklist: ["once ortak mi ayri mi karar ver", "cansiz nesnelerde of yapisini da dusun", "own vurgusu ayrica kullanilabilir"]
+  },
+  {
+    unit: "3A",
+    title: "Past Simple vs Past Continuous",
+    formula: "finished action vs background action",
+    rule: "Kisa ve bitmis olay simple; o anda suren arka plan eylemi continuous olur.",
+    example: "I was studying when the lights went out.",
+    trap: "when ve while gordugunde once hangi eylem uzun-suruyor diye bak.",
+    compare: "phone rang = short action / was reading = longer action",
+    checklist: ["bir eylem digerini boluyorsa continuous + simple dusun", "specific time in the past continuous olabilir", "finished sequence simple olur"]
+  },
+  {
+    unit: "3A",
+    title: "Used To",
+    formula: "used to / didn't use to / did ... use to",
+    rule: "Artik devam etmeyen eski aliskanlik ve durumlarda kullanilir.",
+    example: "We used to live near the sea. / Did you use to play tennis?",
+    trap: "didn't used to yanlis; did'den sonra use gelir.",
+    compare: "used to aliskanlik verir; past simple sadece olayi soyler.",
+    checklist: ["eski durum mu? used to olabilir", "negative-question'da use kullan", "kisa sureli olaylar icin kullanma"]
+  },
+  {
+    unit: "3B",
+    title: "Place vs Movement",
+    formula: "in-on-under / into-through-across-along",
+    rule: "Yer belirten prepositions ile hareket belirtenleri ayir.",
+    example: "The keys are on the table. / She walked across the road.",
+    trap: "towards hedefe ulasmak zorunda degildir; to daha net varis verir.",
+    compare: "place = static / movement = dynamic",
+    checklist: ["hareket var mi? once bunu kontrol et", "path mi destination mi ayir", "after preposition + ing kuralini unutma"]
+  },
+  {
+    unit: "4A",
+    title: "Will vs Going To",
+    formula: "instant decision vs prior plan-evidence",
+    rule: "Konusma aninda karar verirsen will; onceden dusunulmus plan veya gorunur kanit varsa going to.",
+    example: "I'll answer it. / We're going to buy a new phone.",
+    trap: "Look at the clouds! will rain yerine going to rain daha dogal.",
+    compare: "reaction now != plan before now",
+    checklist: ["ani tepki -> will", "niyet-plan -> going to", "visible evidence -> going to"]
+  },
+  {
+    unit: "4A",
+    title: "Future in the Past",
+    formula: "was / were going to",
+    rule: "Gecmiste planlanmis ama gerceklesmemis niyetleri anlatir.",
+    example: "I was going to call you, but I forgot.",
+    trap: "Failed plan icin basit going to yetmez; was/were going to gerekir.",
+    compare: "future in the past = o zaman gelecekti ama olmadi",
+    checklist: ["gecmiste plan var mi", "gerceklesmedi mi", "iki bolumu but ile baglayabiliyor musun"]
+  },
+  {
+    unit: "4B",
+    title: "Would vs Could",
+    formula: "would = result / could = ability-possibility",
+    rule: "Second conditional'da would sonucu, could ise mumkunluk veya kapasiteyi gosterir.",
+    example: "If I had more money, I would move. / I could travel more.",
+    trap: "Ikisini ayni anlamda ezberleme; function farki vardir.",
+    compare: "would happen vs could do",
+    checklist: ["sonuc mu anlatiyor", "beceri-imkan mi anlatiyor", "ikisini ayni cumlede gerekirse ayir"]
+  },
+  {
+    unit: "5A",
+    title: "Just / Already / Yet",
+    formula: "just = yeni oldu / already = coktan / yet = henuz",
+    rule: "Bu zarflar present perfect simple ile cok sik kullanilir.",
+    example: "I've just eaten. / She's already left. / I haven't finished yet.",
+    trap: "yet genelde soru ve olumsuzda; already genelde olumluda daha dogaldir.",
+    compare: "just ve already olumluya yakisir, yet ise eksik-beklenen sonuca gider.",
+    checklist: ["new news mi", "beklenenden once mi", "hala olmadi mi"]
+  },
+  {
+    unit: "5A",
+    title: "For vs Since",
+    formula: "for + period / since + starting point",
+    rule: "Sure veriyorsan for, baslangic noktasi veriyorsan since kullan.",
+    example: "for two years / since 2024 / since Monday",
+    trap: "since two years yanlis; for two years dogru.",
+    compare: "period vs point",
+    checklist: ["two weeks -> for", "last summer -> since", "3 o'clock -> since"]
+  },
+  {
+    unit: "5B",
+    title: "Simple vs Continuous Perfect",
+    formula: "have-has + V3 vs have-has been + V-ing",
+    rule: "Simple sonuca veya deneyime, continuous surece ve son etkisine odaklanir.",
+    example: "I've painted the kitchen. / I've been painting the kitchen.",
+    trap: "stative verbs ile perfect continuous kullanma: I've known her for years.",
+    compare: "finished result vs ongoing activity",
+    checklist: ["sonuc mu onemli", "surec mu onemli", "visible effect var mi"]
+  },
+  {
+    unit: "6A",
+    title: "Mustn't vs Don't Have To",
+    formula: "mustn't = yasak / don't have to = gerek yok",
+    rule: "Bu iki yapi sinavda en sik karistirilan ciftlerden biridir.",
+    example: "You mustn't smoke here. / You don't have to come early.",
+    trap: "don't have to serbestlik verir; mustn't yasak koyar.",
+    compare: "prohibition vs no necessity",
+    checklist: ["yasak mi", "opsiyonel mi", "advice mi -> should dusun"]
+  },
+  {
+    unit: "6B",
+    title: "Could vs Was/Were Able To",
+    formula: "general past ability vs one successful event",
+    rule: "Genel gecmis yetenekte could, tek ve basarili spesifik olayda was/were able to daha iyidir.",
+    example: "She could swim at five. / We were able to find the house.",
+    trap: "specific success icin could bazen dogal gelmez.",
+    compare: "general ability vs successful occasion",
+    checklist: ["genel mi spesifik mi", "tek basarili olay mi", "future ise be able to dusun"]
+  },
+  {
+    unit: "7A",
+    title: "Separable vs Inseparable",
+    formula: "turn it off / look after him",
+    rule: "Pronoun varsa separable phrasal verb'de nesne ortada olur; inseparable yapida ayrilmaz.",
+    example: "switch it off / pay it back / look after the baby",
+    trap: "turn off it yanlis; look him after da yanlis.",
+    compare: "type 2 separable vs type 3 inseparable",
+    checklist: ["pronoun var mi", "fiil ayrilabiliyor mu", "iki-particle ise ayirmama ihtimalini dusun"]
+  },
+  {
+    unit: "7B",
+    title: "Let / Make / Allow",
+    formula: "let-make + object + bare infinitive / allow + object + to infinitive",
+    rule: "Bu uc kalip birlikte soruldugunda en cok to hatasi yapilir.",
+    example: "They made us wait. / She let him go. / They allowed us to leave.",
+    trap: "let him to go yanlis; allow him go yanlis.",
+    compare: "let-make yalindir / allow to alir",
+    checklist: ["let? to yok", "make? to yok", "allow? to var"]
+  },
+  {
+    unit: "8A",
+    title: "Have vs Get Something Done",
+    formula: "have/get + object + V3",
+    rule: "Ikisi de yaptirma verir; get gunluk dilde daha konusma diline yakindir.",
+    example: "I had my phone repaired. / I'm going to get my hair cut.",
+    trap: "Yapan kisi sen degilsen normal active cumle kullanma.",
+    compare: "same meaning, different tone",
+    checklist: ["object'i bul", "V3 kullan", "gerekirse tense'i auxiliary ile kur"]
+  },
+  {
+    unit: "8B",
+    title: "Passive Tense Map",
+    formula: "is done / was done / is being done / has been done / will be done",
+    rule: "Passive tense'i bulmak icin once active zamanini bul, sonra be kismini cevir.",
+    example: "They are building it. -> It is being built.",
+    trap: "V3'ten vazgecme; passive'in sabit parcasi odur.",
+    compare: "tense changes in be, not in past participle",
+    checklist: ["active tense'i bul", "subject-object odagini degistir", "be + V3 kalibini koru"]
+  },
+  {
+    unit: "9A",
+    title: "Reported Questions",
+    formula: "ask + if-whether / question word + statement order",
+    rule: "Yes-no question if/whether alir; wh-question kelimeyi korur ama duz cumle sirasi ister.",
+    example: "She asked if I was ready. / He asked where I lived.",
+    trap: "where did I live ve if was I ready yanlistir.",
+    compare: "question mark mantigi gider, statement order gelir",
+    checklist: ["do-does-did'i sil", "subject + verb sirasi kur", "if/whether gerekip gerekmedigini kontrol et"]
+  },
+  {
+    unit: "9A",
+    title: "Reported Requests",
+    formula: "ask-tell + object + to infinitive",
+    rule: "Emir, istek ve rica aktariminda object + to infinitive cok temel kaliptir.",
+    example: "She told me to wait. / They asked us to close the door.",
+    trap: "asked to close the door diyebilirsin ama kimin kapattigini object belirler.",
+    compare: "statement degil, action request aktariliyor",
+    checklist: ["speaker kimi yonlendiriyor", "object var mi", "to infinitive'i unutma"]
+  },
+  {
+    unit: "9B",
+    title: "Past Perfect Order",
+    formula: "earlier past -> had + V3",
+    rule: "Gecmiste iki olay varsa once olan olayi past perfect ile netlestir.",
+    example: "When we arrived, the film had started.",
+    trap: "Her gecmis cumlede past perfect gerekmez; daha once olan eylem varsa gerekir.",
+    compare: "past perfect = daha once / past simple = sonra olan olay",
+    checklist: ["iki gecmis olay var mi", "once olan hangisi", "hikaye sirasi karisiyor mu"]
+  },
+  {
+    unit: "10A",
+    title: "Auxiliary Choice",
+    formula: "do for simple / be for continuous-passive / have for perfect",
+    rule: "Soru veya olumsuz kurarken hangi auxiliary'nin tense'i tasidigini hizli secebilmelisin.",
+    example: "Do you like it? / Are you working? / Have you finished?",
+    trap: "Bir cumlede ana fiil gibi gorunen be-do-have baska cumlede auxiliary olabilir.",
+    compare: "structure first, meaning second",
+    checklist: ["simple mi continuous mu perfect mi", "question mi negative mi", "main verb hangisi auxiliary hangisi"]
+  }
+];
+
+RECAP_CARDS.push(...EXTRA_RECAP_CARDS);
 
 const TOTAL = TOPICS.length;
 const QUESTION_BANK = TOPICS.flatMap((topic) =>
@@ -1746,6 +2159,7 @@ const QUESTION_BANK = TOPICS.flatMap((topic) =>
 const progressRef = doc(db, "progress", "ravza");
 let activeExam = null;
 let examTimer = null;
+let activeRecapUnits = [...new Set(RECAP_CARDS.map((card) => card.unit))];
 
 function safeText(text) {
   return String(text)
@@ -2432,13 +2846,173 @@ function handleMemoryCardKey(event, cardId) {
   }
 }
 
+function getRecapSearchValue() {
+  const input = document.getElementById("recapFilter");
+  return input ? input.value.trim().toLowerCase() : "";
+}
+
+function getAllRecapUnits() {
+  return [...new Set(RECAP_CARDS.map((card) => card.unit))];
+}
+
+function getRecapDropdownLabel(units) {
+  if (!activeRecapUnits.length) return "Unite sec";
+  if (activeRecapUnits.length === units.length) return "Tum Uniteler";
+  if (activeRecapUnits.length <= 2) return activeRecapUnits.join(", ");
+  return `${activeRecapUnits.length} unite secili`;
+}
+
+function matchesRecapCard(card, searchText, selectedUnits) {
+  if (!selectedUnits.length) return false;
+  if (!selectedUnits.includes(card.unit)) return false;
+  if (!searchText) return true;
+
+  const haystack = [
+    card.unit,
+    card.title,
+    card.formula,
+    card.rule,
+    card.example,
+    card.trap,
+    card.compare,
+    ...(Array.isArray(card.checklist) ? card.checklist : [])
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(searchText);
+}
+
+function toggleRecapUnitSelection(unit) {
+  if (activeRecapUnits.includes(unit)) {
+    activeRecapUnits = activeRecapUnits.filter((item) => item !== unit);
+  } else {
+    const unitOrder = getAllRecapUnits();
+    activeRecapUnits = [...activeRecapUnits, unit].sort((a, b) => unitOrder.indexOf(a) - unitOrder.indexOf(b));
+  }
+  renderRecap();
+}
+
+function selectAllRecapUnits() {
+  activeRecapUnits = getAllRecapUnits();
+  renderRecap();
+}
+
+function clearRecapUnitSelections() {
+  activeRecapUnits = [];
+  renderRecap();
+}
+
+function resetRecapFilters() {
+  const input = document.getElementById("recapFilter");
+  if (input) input.value = "";
+  activeRecapUnits = getAllRecapUnits();
+  renderRecap();
+}
+
 function renderRecap() {
   const recapGrid = document.getElementById("recapGrid");
   if (!recapGrid) return;
-  recapGrid.innerHTML = RECAP_CARDS.map((card) => `
+  const recapUnits = document.getElementById("recapUnits");
+  const recapCount = document.getElementById("recapCount");
+  const searchText = getRecapSearchValue();
+  const units = getAllRecapUnits();
+  const dropdownWasOpen = Boolean(recapUnits?.querySelector(".recap-dropdown")?.open);
+  const filteredCards = RECAP_CARDS.filter((card) => matchesRecapCard(card, searchText, activeRecapUnits));
+
+  if (recapUnits) {
+    recapUnits.innerHTML = `
+      <details class="recap-dropdown" ${dropdownWasOpen ? "open" : ""}>
+        <summary class="recap-dropdown-summary">
+          <div class="recap-dropdown-copy">
+            <span>Unite Filtresi</span>
+            <strong>${safeText(getRecapDropdownLabel(units))}</strong>
+          </div>
+          <span class="recap-dropdown-icon">▾</span>
+        </summary>
+        <div class="recap-dropdown-menu">
+          <div class="recap-dropdown-top">
+            <div class="recap-dropdown-buttons">
+              <button type="button" onclick="selectAllRecapUnits()">Tumunu Sec</button>
+              <button type="button" onclick="clearRecapUnitSelections()">Secimi Temizle</button>
+            </div>
+            <span class="recap-dropdown-note">${activeRecapUnits.length}/${units.length} unite secili</span>
+          </div>
+          <div class="recap-dropdown-list">
+            ${units.map((unit) => {
+              const unitCount = RECAP_CARDS.filter((card) => card.unit === unit).length;
+              return `
+                <label class="recap-option">
+                  <span class="recap-option-left">
+                    <input
+                      type="checkbox"
+                      ${activeRecapUnits.includes(unit) ? "checked" : ""}
+                      onchange="toggleRecapUnitSelection('${unit}')"
+                    >
+                    <span>${safeText(unit)}</span>
+                  </span>
+                  <strong class="recap-option-count">${unitCount}</strong>
+                </label>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      </details>
+    `;
+  }
+
+  if (recapCount) {
+    const unitText = !activeRecapUnits.length
+      ? "unite secimi yok"
+      : activeRecapUnits.length === units.length
+        ? "tum uniteler"
+        : `${activeRecapUnits.length} unite secili`;
+    recapCount.textContent = `${filteredCards.length} / ${RECAP_CARDS.length} kart - ${unitText}`;
+  }
+
+  if (!filteredCards.length) {
+    recapGrid.innerHTML = `
+      <div class="empty-grid">
+        Aramaya uyan recap karti bulunamadi. Filtreleri temizleyip tekrar dene.
+      </div>
+    `;
+    return;
+  }
+
+  recapGrid.innerHTML = filteredCards.map((card) => `
     <div class="flashcard">
-      <strong>📌 ${safeText(card.title)}</strong>
-      <span class="fc-rule">${safeText(card.rule)}</span>
+      <div class="flashcard-head">
+        <strong>${safeText(card.title)}</strong>
+        <span class="fc-unit">${safeText(card.unit)}</span>
+      </div>
+      <div class="fc-formula">${safeText(card.formula)}</div>
+      <div class="fc-row">
+        <span class="fc-label">Kural</span>
+        <span class="fc-rule">${safeText(card.rule)}</span>
+      </div>
+      <div class="fc-row">
+        <span class="fc-label">Örnek</span>
+        <span class="fc-example">${safeText(card.example)}</span>
+      </div>
+      ${card.compare ? `
+        <div class="fc-row">
+          <span class="fc-label">Karsilastirma</span>
+          <span class="fc-compare">${safeText(card.compare)}</span>
+        </div>
+      ` : ""}
+      ${Array.isArray(card.checklist) && card.checklist.length ? `
+        <div class="fc-row">
+          <span class="fc-label">Mini Liste</span>
+          <ul class="fc-checklist">
+            ${card.checklist.map((item) => `<li>${safeText(item)}</li>`).join("")}
+          </ul>
+        </div>
+      ` : ""}
+      <div class="fc-row fc-row-warning">
+        <span class="fc-label">Dikkat</span>
+        <span class="fc-trap">${safeText(card.trap)}</span>
+      </div>
     </div>
   `).join("");
 }
@@ -2649,6 +3223,11 @@ window.renderMemorizationHub = renderMemorizationHub;
 window.toggleMemoryCard = toggleMemoryCard;
 window.handleMemoryCardKey = handleMemoryCardKey;
 window.renderQuizHub = renderQuizHub;
+window.renderRecap = renderRecap;
+window.toggleRecapUnitSelection = toggleRecapUnitSelection;
+window.selectAllRecapUnits = selectAllRecapUnits;
+window.clearRecapUnitSelections = clearRecapUnitSelections;
+window.resetRecapFilters = resetRecapFilters;
 window.openStudyTopic = openStudyTopic;
 window.openQuizTopic = openQuizTopic;
 window.submitTopicQuiz = submitTopicQuiz;

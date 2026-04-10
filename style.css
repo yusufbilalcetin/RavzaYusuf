@@ -521,6 +521,175 @@ body.dark .page-header-left h2 { color: var(--pink-bright); }
   color: var(--text-light);
   font-size: 13px;
 }
+.recap-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.recap-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.recap-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  color: var(--navy-mid);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.recap-reset {
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s ease;
+}
+.recap-reset:hover {
+  border-color: var(--pink);
+  color: var(--navy);
+  background: rgba(212,102,156,.08);
+}
+.recap-filter-shell {
+  margin-bottom: 20px;
+}
+.recap-dropdown {
+  width: min(100%, 420px);
+}
+.recap-dropdown summary {
+  list-style: none;
+}
+.recap-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+.recap-dropdown-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  transition: .2s ease;
+}
+.recap-dropdown[open] .recap-dropdown-summary {
+  border-color: var(--pink);
+  box-shadow: 0 14px 32px rgba(15,23,42,.08);
+}
+.recap-dropdown-copy {
+  display: grid;
+  gap: 4px;
+}
+.recap-dropdown-copy span {
+  color: var(--text-light);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+.recap-dropdown-copy strong {
+  color: var(--navy);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.recap-dropdown-icon {
+  color: var(--navy-mid);
+  font-size: 18px;
+  transition: transform .2s ease;
+}
+.recap-dropdown[open] .recap-dropdown-icon {
+  transform: rotate(180deg);
+}
+.recap-dropdown-menu {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 18px 36px rgba(15,23,42,.08);
+  display: grid;
+  gap: 12px;
+}
+.recap-dropdown-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.recap-dropdown-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.recap-dropdown-buttons button {
+  border: 1px solid var(--card-border);
+  background: var(--input-bg);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.recap-dropdown-note {
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 700;
+}
+.recap-dropdown-list {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.recap-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: var(--input-bg);
+  cursor: pointer;
+}
+.recap-option-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+.recap-option input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--pink);
+}
+.recap-option-count {
+  color: var(--navy-mid);
+  font-size: 12px;
+}
+body.dark .recap-meta-pill { color: #d8c6ff; }
+body.dark .recap-reset:hover { color: #fff; }
+body.dark .recap-dropdown-copy strong { color: #fff; }
+body.dark .recap-dropdown-icon,
+body.dark .recap-option-count { color: #d8c6ff; }
 .dot {
   width: 10px;
   height: 10px;
@@ -867,10 +1036,94 @@ body.dark .review-card h4 { color: #f8d8e6; }
   border-left: 4px solid var(--pink-bright);
   line-height: 1.7;
   font-size: 14px;
+  display: grid;
+  gap: 12px;
 }
-.flashcard strong { color: var(--navy); }
+.flashcard-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.flashcard strong {
+  color: var(--navy);
+  font-size: 17px;
+  line-height: 1.4;
+}
 body.dark .flashcard strong { color: #fff; }
-.flashcard .fc-rule { display: block; color: var(--text-light); margin-top: 6px; font-size: 13px; }
+.fc-unit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--pink-pale);
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+body.dark .fc-unit {
+  color: #f8d8e6;
+  background: rgba(212,102,156,.14);
+}
+.fc-formula {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  color: var(--navy-mid);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+body.dark .fc-formula { color: #d8c6ff; }
+.fc-row {
+  display: grid;
+  gap: 6px;
+}
+.fc-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+.fc-rule,
+.fc-example,
+.fc-trap,
+.fc-compare {
+  display: block;
+  color: var(--text-light);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.fc-example {
+  color: var(--text);
+  font-style: italic;
+}
+.fc-compare {
+  color: var(--navy-mid);
+  font-weight: 600;
+}
+body.dark .fc-compare { color: #c4b5fd; }
+.fc-checklist {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: var(--text-light);
+  font-size: 13px;
+}
+.fc-checklist li {
+  line-height: 1.65;
+}
+.fc-row-warning {
+  padding-top: 8px;
+  border-top: 1px dashed var(--card-border);
+}
+.fc-trap { color: #a16207; }
+body.dark .fc-trap { color: #facc15; }
 
 .empty-grid {
   grid-column: 1 / -1;
@@ -965,6 +1218,28 @@ body.dark .mini-title { color: var(--pink-bright); }
   .detail-grid, .quiz-layout {
     grid-template-columns: 1fr;
   }
+  .recap-toolbar {
+    align-items: stretch;
+  }
+  .recap-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .recap-meta-pill,
+  .recap-reset {
+    width: 100%;
+    justify-content: center;
+  }
+  .recap-dropdown {
+    width: 100%;
+  }
+  .recap-dropdown-top,
+  .recap-dropdown-buttons {
+    width: 100%;
+  }
+  .recap-dropdown-buttons button {
+    flex: 1 1 100%;
+  }
   .topic-card-top, .mode-top, .exam-header {
     align-items: flex-start;
   }
@@ -989,6 +1264,8 @@ body.dark .mini-title { color: var(--pink-bright); }
   .detail-title, .quiz-title, .page-header-left h2 { font-size: 22px; }
   .topbar-badge { display: none; }
   .hero::before, .hero::after { display: none; }
+  .flashcard-head { flex-direction: column; }
+  .flashcard strong { font-size: 16px; }
 }
 
 .memory-badge {
