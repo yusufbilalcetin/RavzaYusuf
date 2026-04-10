@@ -1,156 +1,1984 @@
-// Array güncellendi, toplam 19 konu oldu.
-const ALL_TOPICS = [
-  'wordlist1a', 'adjectives', 'presenttenses', 'possessives', 'pasttenses', 
-  'prepositions', 'futureforms', 'conditionals12', 'perfect', 'perfectcont', 
-  'modals', 'ability', 'phrasal', 'verbpatterns', 'causative', 'passive', 
-  'reported', 'conditionals3', 'auxiliaries'
-];
-const TOTAL = ALL_TOPICS.length;
+import { db } from "./firebase-config.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-/* ══════════════════════════════
-   DARK MODE
-══════════════════════════════ */
+const TOPICS = [
+  {
+    id: "wordlist1a",
+    unit: "Unit 1A",
+    title: "Kelime Listesi",
+    subtitle: "Tanım + örnek cümle + kullanım odağı",
+    time: 30,
+    difficulty: "easy",
+    summaryHtml: `
+<div class="content-card">
+  <h3>Kaynaktan birebir kelime listesi</h3>
+  <p>Bu bölüm doğrudan verdiğin <strong>1A Word List</strong> kaynağından sayfaya taşındı. Aşağıdaki tablo kelime, definition ve example sentence bölümlerini içerir.</p>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word/Phrase</th><th>Definition</th><th>Example Sentence</th></tr></thead><tbody><tr><td>Researchers</td><td>People who carry out studies to gain knowledge or discover information</td><td>Researchers are working on new ways to reduce air pollution.</td></tr><tr><td>Evidence</td><td>Information or facts used to support an idea or claim</td><td>There is strong evidence that exercise improves mental health.</td></tr><tr><td>Survey</td><td>A method of collecting information by asking people questions</td><td>The teacher did a survey to find out students’ favourite books.</td></tr><tr><td>The average</td><td>A typical value calculated by dividing the total by the number of items</td><td>The average score in the exam was 75.</td></tr><tr><td>Scale</td><td>A system used to measure or compare levels of something</td><td>The pain is measured on a scale from 1 to 10.</td></tr><tr><td>Rank</td><td>To arrange items or people in order based on quality or importance</td><td>Students were ranked according to their test results.</td></tr><tr><td>Likely</td><td>Something that has a high chance of happening</td><td>It is likely that it will rain tomorrow.</td></tr><tr><td>Overall</td><td>Considering everything; in general</td><td>Overall, the project was a success.</td></tr><tr><td>Beyond</td><td>Outside the limits of something or more than expected</td><td>His kindness goes beyond what we imagined.</td></tr><tr><td>Create a new image</td><td>To change how others see or think about you</td><td>The company tried to create a new image after the scandal.</td></tr><tr><td>Go about</td><td>To begin or deal with something in a particular way</td><td>How should we go about solving this problem?</td></tr><tr><td>Proof</td><td>Clear information that confirms something is true</td><td>She showed proof of her identity at the airport.</td></tr><tr><td>Seek to</td><td>To try or attempt to achieve something</td><td>The organization seeks to help poor communities.</td></tr><tr><td>Stand out</td><td>To be noticeable or different from others</td><td>Her bright dress made her stand out in the crowd.</td></tr><tr><td>Solicitor</td><td>A lawyer who gives legal advice and prepares documents</td><td>He contacted a solicitor for help with his contract.</td></tr><tr><td>For fun</td><td>Done for enjoyment, not for a serious purpose</td><td>She paints for fun in her free time.</td></tr><tr><td>Birth certificate</td><td>An official document that records a person’s birth details</td><td>You need a birth certificate to apply for a passport.</td></tr><tr><td>Feel sorry</td><td>To feel pity or sadness for someone</td><td>I feel sorry for him because he lost his job.</td></tr><tr><td>Maiden name</td><td>A woman’s family name before marriage</td><td>She still uses her maiden name at work.</td></tr><tr><td>Full name</td><td>A person’s complete name including all given names and surname</td><td>Please write your full name on the form.</td></tr><tr><td>Nickname</td><td>An informal name used instead of someone’s real name</td><td>His nickname at school was “Ace.”</td></tr><tr><td>Be named after</td><td>To be given the same name as another person</td><td>She was named after her grandmother.</td></tr><tr><td>Initials</td><td>The first letters of a person’s names</td><td>His initials are A.K.</td></tr><tr><td>Brand name</td><td>The official name used by a company for its product</td><td>This brand name is known worldwide.</td></tr><tr><td>Common</td><td>Frequently seen or used by many people</td><td>It’s common to see tourists in this area.</td></tr><tr><td>Old-fashioned</td><td>Not modern; belonging to an earlier time</td><td>That style of clothing looks old-fashioned now.</td></tr><tr><td>Celebrity</td><td>A well-known public figure</td><td>The restaurant is popular with celebrities.</td></tr><tr><td>Suit (verb)</td><td>To look good on someone or be appropriate for them</td><td>That colour really suits you.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>Nasıl çalışılmalı?</h3>
+  <ul>
+    <li>Önce kelimeyi ve definition kısmını oku.</li>
+    <li>Sonra example sentence kısmını sesli tekrar et.</li>
+    <li>Her kelime için kendin bir yeni örnek cümle kur.</li>
+  </ul>
+</div>
+`,
+    keyPoints: [
+      "Researchers, evidence, survey, the average ve scale temel akademik kelimelerdir.",
+      "Stand out, nickname, maiden name ve initials gibi kelimeler sınav metinlerinde çıkabilir.",
+      "Definition ile example sentence birlikte çalışıldığında kelime daha kalıcı olur."
+    ],
+    quiz: [
+      {
+        question: '"There is strong ___ that exercise improves mental health."',
+        options: ["survey", "evidence", "proof"],
+        answer: 1,
+        explanation: "Evidence, bir iddiayı destekleyen kanıt anlamında kullanılır."
+      },
+      {
+        question: '"Her bright dress made her ___ in the crowd."',
+        options: ["stand out", "go about", "feel sorry"],
+        answer: 0,
+        explanation: "Stand out, kalabalık içinde dikkat çekmek anlamındadır."
+      },
+      {
+        question: '"The teacher did a ___ to find out students\' favourite books."',
+        options: ["survey", "celebrity", "proof"],
+        answer: 0,
+        explanation: "Survey, bilgi toplamak için yapılan anket demektir."
+      }
+    ]
+  },
+  {
+    id: "adjectives",
+    unit: "Unit 1B",
+    title: "Adjectives",
+    subtitle: "One / ones · comparatives · superlatives · a bit / much",
+    time: 36,
+    difficulty: "easy",
+    summaryHtml: `
+<div class="content-card">
+  <h3>What is an adjective?</h3>
+  <p><strong>An adjective is a word that we use to describe places, people, or things.</strong></p>
+  <p>Tom has a big house. (how is this house?) It’s a big house.</p>
+  <div class="warning-box">
+    <p><strong>When we use an adjective with a noun, please add an article (a/an).</strong></p>
+    <p>Suzan is beautiful girl. = WRONG</p>
+    <p>Suzan is a beautiful girl. = CORRECT</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Adjective + noun / adjective without noun</h3>
+  <p>We can also use an adjective without a noun.</p>
+  <p><em>Suzan is beautiful. = CORRECT</em></p>
+  <p>The intermediate-plus book covers 3 things about adjectives:</p>
+  <ul>
+    <li>Adjective + one/ones</li>
+    <li>Comparative / Superlatives</li>
+    <li>A bit and much + comparative adjectives</li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Adjective + one / ones</h3>
+  <p>We use one/ones with singular and plural countable nouns so we don’t repeat what we are saying or writing.</p>
+  <div class="source-panel">
+    <p><strong>A:</strong> Can you give me that pen, please?</p>
+    <p><strong>B:</strong> Yes. Which one?</p>
+    <p><strong>A:</strong> The blue one, please.</p>
+  </div>
+  <div class="source-panel">
+    <p><strong>A:</strong> Can I have the books over there, please?</p>
+    <p><strong>B:</strong> Yes…but… which ones?</p>
+    <p><strong>A:</strong> The red ones.</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Comparative and superlative adjectives</h3>
+  <p>Use comparative to compare two things, people or places.</p>
+  <p>Use superlatives to say what is the “least” or “most” of something/someone in a place or group.</p>
+  <div class="info-box">
+    <p><strong>To make comparative adjectives:</strong> -r, -er and -ier + than (for one syllable adjectives)</p>
+    <p>Turkey is colder than Cyprus in the winter.</p>
+  </div>
+  <p><strong>With one-syllable adjectives that end in “-ed” in comparatives, we use more:</strong></p>
+  <ul>
+    <li>more bored</li>
+    <li>more pleased</li>
+    <li>more shocked</li>
+    <li>more stressed</li>
+    <li>more tired</li>
+  </ul>
+  <p><strong>For more than one syllable adjectives we use:</strong> more + adjective + than</p>
+  <p>The weather is more boring than it was yesterday.</p>
+  <p>The book is more expensive than the pen.</p>
+  <p><strong>Superlatives:</strong> for one syllable adjectives → the tallest, for more than one syllable adjectives → the most beautiful.</p>
+</div>
+<div class="content-card">
+  <h3>A bit and much + comparative adjectives</h3>
+  <p>Use <strong>a bit + comparative adjective</strong> to say that there is a small difference between two things/people/places.</p>
+  <p><em>Tom is a bit taller than Terry.</em></p>
+  <p>Use <strong>much + comparative adjective</strong> to say that there is a large difference.</p>
+  <p><em>iPhones are much more expensive than Redmi.</em></p>
+  <p><em>The exam was much easier than it was last year.</em></p>
+</div>
+`,
+    keyPoints: [
+      "Adjective + singular noun kullanıldığında a/an gerekir.",
+      "Singular countable noun için one, plural countable noun için ones kullanılır.",
+      "a bit küçük farkı, much büyük farkı anlatır."
+    ],
+    quiz: [
+      {
+        question: "Doğru cümleyi seç.",
+        options: ["She's a person very ambitious.", "She's a very ambitious person.", "She's very ambitious person."],
+        answer: 1,
+        explanation: "Adjective ismin önüne gelir ve tekil isimde article gerekir."
+      },
+      {
+        question: '"That\'s the ___ film I\'ve ever seen." (bad)',
+        options: ["most bad", "worst", "baddest"],
+        answer: 1,
+        explanation: "Bad kelimesinin düzensiz superlative formu worst'tür."
+      },
+      {
+        question: '"Cats are ___ selfish than dogs." (büyük fark)',
+        options: ["a bit more", "much more", "the most"],
+        answer: 1,
+        explanation: "Büyük fark için much more kullanılır."
+      }
+    ]
+  },
+  {
+    id: "presenttenses",
+    unit: "Unit 2A",
+    title: "Present Tenses",
+    subtitle: "Stative verbs · future arrangements · timetables",
+    time: 34,
+    difficulty: "medium",
+    summaryHtml: `
+<div class="content-card">
+  <h3>Action vs. Non-Action (Stative) Verbs</h3>
+  <p><strong>These verbs describe states, feelings, thoughts, or possession. They are not normally used in the Present Continuous. We use the Present Simple instead.</strong></p>
+  <p><strong>Common stative verbs include:</strong></p>
+  <div class="keypoint-list">
+    <div class="keypoint-item">agree · be · believe · belong · depend (on) · forget · hate · hear</div>
+    <div class="keypoint-item">know · like · look like · love · matter · mean · need · prefer</div>
+    <div class="keypoint-item">realize · recognize · remember · seem · suppose · want</div>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Some verbs can be both action and stative</h3>
+  <p>Some verbs can be both action and stative, depending on the context. Their meaning changes based on how they are used.</p>
+  <div class="source-panel">
+    <p><strong>have</strong>: I have a car. → State of possession – Present Simple</p>
+    <p><strong>have</strong>: I am having lunch. → An action – Present Continuous</p>
+    <p><strong>think</strong>: I think it’s a good idea. → Opinion – Present Simple</p>
+    <p><strong>think</strong>: I am thinking about moving abroad. → Process of thinking – Present Continuous</p>
+    <p><strong>see</strong>: I see what you mean. → Understanding – Present Simple</p>
+    <p><strong>see</strong>: I am seeing the dentist tomorrow. → Planned appointment – Present Continuous</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Present Continuous for Future Arrangements</h3>
+  <p>We use the Present Continuous to talk about future events that have already been arranged or planned.</p>
+  <p>We’re flying to Istanbul this weekend.</p>
+  <p>I’m meeting my friends for dinner tonight.</p>
+</div>
+<div class="content-card">
+  <h3>Present Simple for Timetabled Events</h3>
+  <p>The Present Simple is used to talk about future events that are on a schedule or timetable, such as transportation or programs.</p>
+  <p>The flight departs at 12 o’clock tomorrow.</p>
+  <p>What time does Jane arrive in London?</p>
+</div>
+`,
+    keyPoints: [
+      "Stative verbs normalde Present Continuous ile kullanılmaz.",
+      "have / think / see fiilleri anlamına göre stative veya action olabilir.",
+      "Arranged future için Present Continuous, timetable future için Present Simple kullanılır."
+    ],
+    quiz: [
+      {
+        question: 'The flight ________ at 6.50 in the morning.',
+        options: ["leaves", "is leaving", "leave"],
+        answer: 0,
+        explanation: "Timetable olduğu için Present Simple daha uygundur."
+      },
+      {
+        question: 'We ________ in an airport hotel tonight.',
+        options: ["stay", "are staying", "stays"],
+        answer: 1,
+        explanation: "Önceden ayarlanmış planlarda Present Continuous kullanılır."
+      },
+      {
+        question: 'I ________ of going on a safari next year.',
+        options: ["think", "am thinking", "thinking"],
+        answer: 1,
+        explanation: "Burada düşünme süreci anlatıldığı için continuous uygundur."
+      }
+    ]
+  },
+  {
+    id: "possessives",
+    unit: "Unit 2B",
+    title: "Possessives",
+    subtitle: "'s · plural possessives · two names · of · own",
+    time: 28,
+    difficulty: "easy",
+    summaryHtml: `
+<div class="content-card">
+  <h3>Possessive 's</h3>
+  <p>We use <strong>('s)</strong> to show that something belongs to someone.</p>
+  <ul>
+    <li>Lara’s backpack is on the chair.</li>
+    <li>This is Tom’s car.</li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Plural possessives</h3>
+  <p>When the noun is plural and ends with <strong>s</strong>, just add an apostrophe (’).</p>
+  <ul>
+    <li>The teachers’ room is upstairs.</li>
+  </ul>
+  <p>Irregular plurals that don’t end in s use <strong>'s</strong>.</p>
+  <ul>
+    <li>Children’s playground is closed today.</li>
+    <li>Women’s voices were heard outside.</li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Two names</h3>
+  <p>If two people share one thing, add ’s to the second name only.</p>
+  <p><em>Emma and Mia’s house is very modern.</em></p>
+  <p>If they don’t share, add ’s to both:</p>
+  <p><em>Emma’s and Mia’s bags are different.</em></p>
+</div>
+<div class="content-card">
+  <h3>Of structure and own</h3>
+  <p>We use <strong>of</strong> for non-living things.</p>
+  <ul>
+    <li>The door of the car was open.</li>
+    <li>The end of the movie was surprising.</li>
+  </ul>
+  <p>Use <strong>own</strong> to emphasize possession.</p>
+  <ul>
+    <li>She has her own room.</li>
+    <li>They started their own company.</li>
+  </ul>
+</div>
+`,
+    keyPoints: [
+      "Plural noun -s ile bitiyorsa sadece apostrophe eklenir: teachers'.",
+      "Shared item varsa sadece ikinci isme 's gelir.",
+      "Non-living things için of yapısı kullanılabilir."
+    ],
+    quiz: [
+      {
+        question: 'What\'s ________ where Suzy works?',
+        options: ["the name of the shop", "the shop's name", "shop of the name"],
+        answer: 0,
+        explanation: "Cansız yapı için of kullanımı daha uygundur."
+      },
+      {
+        question: "That's ________ over there.",
+        options: ["the car of my friend", "my friend's car", "my friend car"],
+        answer: 1,
+        explanation: "Kişi sahipliğinde possessive 's daha doğaldır."
+      },
+      {
+        question: '________ names are Peter and Michael.',
+        options: ["My brother's", "My brothers'", "My brothers"],
+        answer: 1,
+        explanation: "İki erkek kardeş olduğundan plural possessive gerekir."
+      }
+    ]
+  },
+  {
+    id: "pasttenses",
+    unit: "Unit 3A",
+    title: "Past Tenses & Used To",
+    subtitle: "Past Simple · Past Continuous · Used to",
+    time: 34,
+    difficulty: "medium",
+    summaryHtml: `
+<div class="content-card">
+  <h3>Past Simple</h3>
+  <p>We use the past simple to talk about finished actions that happened in the past.</p>
+  <div class="source-panel">
+    <p><strong>Form:</strong> Subject Pronoun + was/were + adjective/noun</p>
+    <p><strong>Form:</strong> Subject Pronoun + Verb 2 (regular or irregular)</p>
+    <p>She was tired after the long trip.</p>
+    <p>They were at the museum yesterday.</p>
+    <p>I visited my grandparents last weekend.</p>
+    <p>He wrote a fantastic story when he was younger.</p>
+  </div>
+  <div class="warning-box">
+    <p><strong>NOTE:</strong> We do NOT use Verb 2 in questions or negatives!</p>
+    <p>Not correct: Did you went to school yesterday?</p>
+    <p>Correct: Did you go to school yesterday?</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Past Continuous</h3>
+  <p>We use the past continuous to describe an action that was interrupted by another action or an action that was happening at a specific time in the past.</p>
+  <p><strong>Form:</strong> Subject Pronoun + was/were + verb-ing</p>
+  <ul>
+    <li>I was reading a book when the phone rang.</li>
+    <li>She was cooking dinner at 6 PM.</li>
+    <li>They were playing football while it started raining.</li>
+    <li>What were you doing at 10 o’clock last night?</li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Used to</h3>
+  <p>We use <strong>used to</strong> to talk about things we did regularly in the past but don’t do anymore.</p>
+  <ul>
+    <li>Positive: Subject + used to + verb 1</li>
+    <li>Negative: Subject + didn’t use to + verb 1</li>
+    <li>Question: Did + subject + use to + verb 1</li>
+  </ul>
+  <div class="warning-box">
+    <p>Don't use “used to” for short-term past events.</p>
+    <p>Incorrect: I used to live in Italy (for only two months).</p>
+    <p>Correct: I lived in Italy for two months.</p>
+  </div>
+  <p>We can also use an adverb of frequency + Verb 2 instead of used to:</p>
+  <ul>
+    <li>Tom often walked to school.</li>
+    <li>I never liked broccoli, but now I love it.</li>
+    <li>We sometimes visited our cousins on weekends.</li>
+  </ul>
+</div>
+`,
+    keyPoints: [
+      "Soru ve olumsuzda Verb 2 kullanılmaz.",
+      "Past Continuous geçmişte devam eden veya bölünen eylemler için kullanılır.",
+      "didn't use to doğru formdur; kısa süreli geçmiş olaylarda used to kullanılmaz."
+    ],
+    quiz: [
+      {
+        question: 'Where did you ________ on holiday when you were young?',
+        options: ["use to go", "used to go", "goes"],
+        answer: 0,
+        explanation: "Did ile birlikte fiil yalın formda gelir: use to go."
+      },
+      {
+        question: 'This time last week I ________ on a beach.',
+        options: ["sat", "was sitting", "sit"],
+        answer: 1,
+        explanation: "Belirli geçmiş an vurgusu olduğu için Past Continuous uygundur."
+      },
+      {
+        question: 'Sorry, I didn\'t hear what you said, I ________ the news.',
+        options: ["was watching", "watched", "watch"],
+        answer: 0,
+        explanation: "Devam eden eylem Past Continuous ile verilir."
+      }
+    ]
+  },
+  {
+    id: "prepositions",
+    unit: "Unit 3B",
+    title: "Prepositions",
+    subtitle: "Place · movement · dependent prepositions",
+    time: 32,
+    difficulty: "medium",
+    summaryHtml: `
+<div class="content-card">
+  <h3>Prepositions of place</h3>
+  <p>Prepositions of place describe the location or position of something about something else.</p>
+  <p>The books are on the shelf. / The chair is in front of the desk.</p>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Preposition</th><th>Example</th></tr></thead><tbody><tr><td>in</td><td>The shoes are in the closet.</td></tr><tr><td>on</td><td>The laptop is on the table.</td></tr><tr><td>under</td><td>The cat is under the bed.</td></tr><tr><td>next to</td><td>The school is next to the hospital.</td></tr><tr><td>in front of</td><td>The car is in front of the garage.</td></tr><tr><td>behind</td><td>The park is behind the library.</td></tr><tr><td>between</td><td>The sofa is between the two chairs.</td></tr><tr><td>on the left / on the right</td><td>The pharmacy is on the left of the bank.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>Prepositions of movement</h3>
+  <p>These prepositions describe movements from one place to another. There is movement.</p>
+  <p>He walked across the street. / The dog ran towards the boy. / We cycled along the river.</p>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Preposition</th><th>Usage &amp; Example</th></tr></thead><tbody><tr><td>to</td><td>Movement to a place – I’m going to the gym.</td></tr><tr><td>through</td><td>Inside an enclosed space – The car drove through the tunnel.</td></tr><tr><td>across</td><td>From one side to the other – She swam across the lake.</td></tr><tr><td>along</td><td>Following a line/path – We walked along the beach.</td></tr><tr><td>over</td><td>Above something – The plane flew over the city.</td></tr><tr><td>under</td><td>Beneath something – They crawled under the fence.</td></tr><tr><td>into</td><td>Entering a space – He went into the room.</td></tr><tr><td>out of</td><td>Exiting a space – She came out of the shop.</td></tr><tr><td>up</td><td>Movement upward – They climbed up the stairs.</td></tr><tr><td>down</td><td>Movement downward – He ran down the hill.</td></tr><tr><td>past</td><td>Moving by something – We walked past the bakery.</td></tr><tr><td>towards</td><td>In the direction of – The child ran towards her mother.</td></tr></tbody></table></div>
+  <div class="warning-box">
+    <p>"The dog ran towards me." (It didn’t reach me.)</p>
+    <p>"The dog ran to me." (It reached me.)</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Dependent prepositions</h3>
+  <p>Some verbs and adjectives must be followed by specific prepositions.</p>
+  <h4 class="mini-title">After verbs</h4>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Verb + Preposition</th><th>Example</th></tr></thead><tbody><tr><td>wait for</td><td>She’s waiting for the bus.</td></tr><tr><td>believe in</td><td>I believe in myself.</td></tr><tr><td>ask for</td><td>He asked for a refund.</td></tr><tr><td>rely on</td><td>You can rely on me.</td></tr><tr><td>argue about</td><td>They argued about politics.</td></tr><tr><td>apply for</td><td>I applied for the job.</td></tr><tr><td>pay for</td><td>She paid for the tickets.</td></tr><tr><td>talk about</td><td>We talked about the movie.</td></tr></tbody></table></div>
+  <h4 class="mini-title">After adjectives</h4>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Adjective + Preposition</th><th>Example</th></tr></thead><tbody><tr><td>good at</td><td>He’s good at painting.</td></tr><tr><td>interested in</td><td>She’s interested in science.</td></tr><tr><td>tired of</td><td>I’m tired of waiting.</td></tr><tr><td>proud of</td><td>They’re proud of their son.</td></tr><tr><td>angry with/at</td><td>I’m angry with him / angry at the delay.</td></tr><tr><td>worried about</td><td>He’s worried about the exam.</td></tr><tr><td>ready for</td><td>We’re ready for the trip.</td></tr><tr><td>different from</td><td>This song is different from the original.</td></tr></tbody></table></div>
+  <div class="info-box">
+    <p><strong>Use verb + ing after prepositions:</strong> I’m looking forward to seeing you. / She believes in working hard.</p>
+  </div>
+  <div class="warning-box">
+    <p><strong>Verbs that don’t need prepositions:</strong> ask, discuss, enter, marry</p>
+    <p>We discussed the problem. / He entered the room. / She married him.</p>
+  </div>
+</div>
+`,
+    keyPoints: [
+      "towards yönü gösterir, to hedefe ulaşıldığını gösterir.",
+      "Prepositions sonrası verb + ing çok önemlidir.",
+      "discuss, enter, marry gibi fiiller ekstra preposition almaz."
+    ],
+    quiz: [
+      {
+        question: 'The mouse ran ________ the stairs, ________ the corridor, and ________ the kitchen.',
+        options: ["into / across / down", "down / along / into", "under / along / across"],
+        answer: 1,
+        explanation: "Sıralı hareket anlatımında down, along ve into en doğal seçimdir."
+      },
+      {
+        question: 'I\'m tired ________ all this work - I\'m ready ________ a holiday!',
+        options: ["of / for", "from / to", "about / with"],
+        answer: 0,
+        explanation: "tired of ve ready for sabit yapılardır."
+      },
+      {
+        question: 'We need to discuss ________ the problems with our IT department.',
+        options: ["about", "[-]", "for"],
+        answer: 1,
+        explanation: "Discuss fiili preposition istemez."
+      }
+    ]
+  },
+  {
+    id: "futureforms",
+    unit: "Unit 4A",
+    title: "Future Forms",
+    subtitle: "Will · be going to · present continuous · future in the past",
+    time: 32,
+    difficulty: "medium",
+    summaryHtml: `
+<div class="content-card">
+  <h3>Will / won’t + Verb 1</h3>
+  <p><strong>When do we use it?</strong></p>
+  <ul>
+    <li>Predictions (based on beliefs or opinions): I think it will rain tomorrow.</li>
+    <li>Future facts (unchangeable future events): The sun will rise at 6:45 AM.</li>
+    <li>Instant decisions: I’m tired. I’ll go to bed now.</li>
+    <li>Promises: I won’t tell anyone your secret.</li>
+    <li>Offers & suggestions: Shall I help you with your bags? / Shall we go out tonight?</li>
+  </ul>
+  <div class="info-box">
+    <p><strong>Positive:</strong> Subject + will + verb1</p>
+    <p><strong>Negative:</strong> Subject + won’t + verb1</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Be going to + verb 1</h3>
+  <ul>
+    <li>For planned actions (decided before the moment of speaking): I’m going to start a new course next month.</li>
+    <li>For predictions with evidence: Look at those dark clouds! It’s going to rain.</li>
+  </ul>
+  <div class="info-box">
+    <p><strong>Positive:</strong> Subject + am/is/are + going to + verb1</p>
+    <p><strong>Negative:</strong> Subject + am/is/are + not + going to + verb1</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Present Continuous for future arrangements</h3>
+  <p>Scheduled plans with a specific time or arrangement:</p>
+  <ul>
+    <li>I’m meeting my friend at 6 PM.</li>
+    <li>We’re flying to Italy next week.</li>
+    <li>She’s having dinner with her boss tomorrow.</li>
+  </ul>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Form</th><th>Used for</th><th>Example</th></tr></thead><tbody><tr><td>Will</td><td>Instant decisions, promises, predictions</td><td>I’ll call you later.</td></tr><tr><td>Be Going to</td><td>Plans and evidence-based predictions</td><td>It’s going to snow. Look at the sky!</td></tr><tr><td>Present Continuous</td><td>Arranged events or appointments</td><td>I’m seeing the doctor on Friday.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>Future in the past</h3>
+  <div class="warning-box">
+    <p><strong>We always use was / were going to to talk about failed plans.</strong></p>
+    <p>I was going to visit my uncle but he was abroad.</p>
+    <p>They were going to meet in café but he had an important meeting so they postponed it.</p>
+  </div>
+</div>
+`,
+    keyPoints: [
+      "will anlık karar, söz verme ve opinion-based prediction için kullanılır.",
+      "be going to plan ve evidence-based prediction için kullanılır.",
+      "was / were going to gerçekleşmeyen geçmiş planları anlatır."
+    ],
+    quiz: [
+      {
+        question: 'A: Is that the doorbell? B: Yes, it is. ________.',
+        options: ["I'm going to get it", "I'll get it", "I get it"],
+        answer: 1,
+        explanation: "Kapı çalınca o anda verilen karar will ile kurulur."
+      },
+      {
+        question: 'A: What are your plans for the weekend? B: ________ lots of gardening.',
+        options: ["I'm going to do", "I'll do", "I do"],
+        answer: 0,
+        explanation: "Önceden planlanmış niyetlerde going to kullanılır."
+      },
+      {
+        question: 'This cardboard box is empty. ________ put it in the recycling bin?',
+        options: ["Will I", "Shall I", "Do I"],
+        answer: 1,
+        explanation: "Teklif ve öneri sorularında Shall I kullanılır."
+      }
+    ]
+  },
+  {
+    id: "conditionals12",
+    unit: "Unit 4B",
+    title: "1st & 2nd Conditionals",
+    subtitle: "Real future · unreal present/future · would vs could · unless",
+    time: 40,
+    difficulty: "hard",
+    summaryHtml: `
+<div class="content-card">
+  <h3>First Conditional</h3>
+  <p>We use the First Conditional to talk about real or likely situations in the future. These are possible things that might happen.</p>
+  <div class="info-box">
+    <p><strong>Structure:</strong> If + Present Simple, will + Verb1</p>
+    <p>If it rains, we will stay at home.</p>
+    <p>If I study hard, I will pass the exam.</p>
+    <p>She will miss the bus if she doesn’t hurry.</p>
+  </div>
+  <p><strong>Key points:</strong></p>
+  <ul>
+    <li>The if part is in present simple.</li>
+    <li>The result uses will + verb.</li>
+    <li>You can change the order: We will stay at home if it rains.</li>
+    <li>In the other clause, we can also use imperatives or can + verb1.</li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Second Conditional</h3>
+  <p>We use the Second Conditional to talk about hypothetical situations — things that probably won’t happen, or are imaginary.</p>
+  <div class="info-box">
+    <p><strong>Structure:</strong> If + Past Simple, would + Verb1</p>
+    <p>If I won the lottery, I would travel the world.</p>
+    <p>She would be happy if she got the job.</p>
+    <p>If I were you, I wouldn’t do that.</p>
+  </div>
+  <div class="warning-box">
+    <p>With I / he / she / it we often use <strong>were</strong> instead of was in formal English.</p>
+    <p>If I were rich, I would buy a mansion.</p>
+  </div>
+  <p>The if part uses past simple, but it’s not about the past — it’s about unreal or imagined situations.</p>
+</div>
+<div class="content-card">
+  <h3>1st vs 2nd Conditional</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Condition</th><th>If Clause</th><th>Main Clause</th><th>Example</th></tr></thead><tbody><tr><td>1st</td><td>If + present simple</td><td>will + verb1</td><td>If I study, I will pass the exam.</td></tr><tr><td>2nd</td><td>If + past simple</td><td>would + verb1</td><td>If I studied, I would pass the exam (but I don&#x27;t).</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>Would vs Could</h3>
+  <p><strong>Would</strong> expresses result or consequence. <strong>Could</strong> expresses possibility or ability.</p>
+  <div class="source-panel">
+    <p>If I had more money, I would buy a new phone.</p>
+    <p>If I spoke Spanish, I could work in Spain.</p>
+  </div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>If Clause (Past Simple)</th><th>Main Clause – Using Would</th><th>Main Clause – Using Could</th></tr></thead><tbody><tr><td>If I had a car</td><td>I would drive to work.</td><td>I could drive to the countryside.</td></tr><tr><td>If she knew the answer</td><td>She would tell you.</td><td>She could help you with your homework.</td></tr><tr><td>If we had more free time</td><td>We would travel more.</td><td>We could learn a new language.</td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word</th><th>Function</th><th>Meaning</th></tr></thead><tbody><tr><td>Would</td><td>Result or consequence</td><td>What someone would do in that situation.</td></tr><tr><td>Could</td><td>Possibility or ability</td><td>What someone would be able to do.</td></tr></tbody></table></div>
+</div>
+`,
+    keyPoints: [
+      "First Conditional: If + Present Simple, will + Verb1.",
+      "Second Conditional: If + Past Simple, would + Verb1.",
+      "Would sonuç bildirir, could ise possibility / ability bildirir."
+    ],
+    quiz: [
+      {
+        question: 'If it ________ tomorrow, we will stay at home.',
+        options: ["rains", "will rain", "rained"],
+        answer: 0,
+        explanation: "If clause içinde Present Simple kullanılır."
+      },
+      {
+        question: 'If I ________ the lottery, I would travel the world.',
+        options: ["win", "won", "will win"],
+        answer: 1,
+        explanation: "Second conditional yapısında if clause Past Simple olur."
+      },
+      {
+        question: 'We can\'t help you ________ you tell us what the problem is.',
+        options: ["if", "unless", "because"],
+        answer: 1,
+        explanation: "Unless = if not anlamı verir."
+      }
+    ]
+  },
+  {
+    id: "perfect",
+    unit: "Unit 5A",
+    title: "Present Perfect Simple",
+    subtitle: "Have/has + V3 · for/since · just/yet/already",
+    time: 28,
+    difficulty: "medium",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Kullanım alanları</h3>
+        <ul>
+          <li>Hayat deneyimleri: <em>Have you ever been...?</em></li>
+          <li>Yeni olmuş haber: <em>He's just sent me a text.</em></li>
+          <li>Already / yet / just kullanımları.</li>
+        </ul>
+      </div>
+      <div class="content-card">
+        <h3>Past Simple ile farkı</h3>
+        <div class="warning-box">
+          <p>Eğer cümlede <strong>yesterday, last week, in 2020</strong> gibi kesin geçmiş zaman ifadesi varsa Past Simple kullanılır.</p>
+        </div>
+      </div>
+    `,
+    keyPoints: [
+      "Have/has + V3 temel yapıdır.",
+      "Yet genelde olumsuz ve sorularda kullanılır.",
+      "Specific past time varsa Present Perfect kullanılmaz."
+    ],
+    quiz: [
+      {
+        question: 'Oh no! We\'re late! The film ________.',
+        options: ["has already started", "hasn't started yet", "started yesterday"],
+        answer: 0,
+        explanation: "Beklenenden önce gerçekleşen eylem için already uygundur."
+      },
+      {
+        question: 'I ________ to Canada, but I never went to the USA.',
+        options: ["never went", "have been", "am"],
+        answer: 1,
+        explanation: "Belirsiz yaşam deneyimi olduğu için have been kullanılır."
+      },
+      {
+        question: 'They got married in May, so they ________ for six months.',
+        options: ["are married", "have been married", "married"],
+        answer: 1,
+        explanation: "Şimdiye kadar süren durumlarda have been married kullanılır."
+      }
+    ]
+  },
+  {
+    id: "perfectcont",
+    unit: "Unit 5B",
+    title: "Present Perfect Continuous",
+    subtitle: "Have been + V-ing · recent activity · visible result",
+    time: 28,
+    difficulty: "medium",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Ne anlatır?</h3>
+        <p>Yakın geçmişte başlayıp etkisi şimdi süren veya görünür sonuç bırakan eylemleri anlatır.</p>
+        <div class="info-box">
+          <p><em>I've been working in the garden.</em> → şu an yorgun görünmemin sebebi bu.</p>
+        </div>
+      </div>
+      <div class="content-card">
+        <h3>Simple ile farkı</h3>
+        <p>Simple daha çok sonuç veya tamamlanmış deneyimlere gider; continuous ise sürece odaklanır.</p>
+        <div class="warning-box">
+          <p>Stative verbs genelde continuous almaz: <em>I've known them for 10 years.</em></p>
+        </div>
+      </div>
+    `,
+    keyPoints: [
+      "Have/has been + V-ing kullanılır.",
+      "Lately / recently ile sık görülür.",
+      "Know, believe gibi stative verbs continuous almaz."
+    ],
+    quiz: [
+      {
+        question: 'I ________ too hard lately.',
+        options: ["am working", "have been working", "worked"],
+        answer: 1,
+        explanation: "Lately ile süreklilik vurgusu olduğu için Present Perfect Continuous kullanılır."
+      },
+      {
+        question: 'Ania is really tired - she ________ a lot for work since February.',
+        options: ["is travelling", "has been travelling", "travelled"],
+        answer: 1,
+        explanation: "Since February süregelen eylem verdiği için bu yapı uygundur."
+      },
+      {
+        question: 'At last! I ________ for you for an hour!',
+        options: ["am waiting", "have been waiting", "waited"],
+        answer: 1,
+        explanation: "For an hour + şimdiye kadar süren bekleme continuous ister."
+      }
+    ]
+  },
+  {
+    id: "modals",
+    unit: "Unit 6A",
+    title: "Modals of Obligation",
+    subtitle: "Have to · must · needn't · mustn't · should",
+    time: 26,
+    difficulty: "medium",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Zorunluluk ve tavsiye</h3>
+        <p><strong>Have to</strong> dış kural, <strong>must</strong> çoğu zaman iç zorunluluk, <strong>should</strong> tavsiye verir.</p>
+      </div>
+      <div class="content-card">
+        <h3>En kritik fark</h3>
+        <div class="warning-box">
+          <p><strong>mustn't</strong> = yasak</p>
+          <p><strong>don't have to</strong> = yapmak zorunda değilsin</p>
+        </div>
+      </div>
+    `,
+    keyPoints: [
+      "Geçmiş zorunluluk için had to kullanılır.",
+      "mustn't ile don't have to karıştırılmamalıdır.",
+      "Advice için should / ought to kullanılır."
+    ],
+    quiz: [
+      {
+        question: 'I ________ buy a new fridge last week.',
+        options: ["had to", "must", "mustn't"],
+        answer: 0,
+        explanation: "Geçmiş zorunluluk had to ile verilir."
+      },
+      {
+        question: 'We ________ be at the airport until 5.00. Our flight isn\'t until 7.00.',
+        options: ["mustn't", "don't have to", "should"],
+        answer: 1,
+        explanation: "Gerekli değil anlamı için don't have to kullanılır."
+      },
+      {
+        question: 'You ________ spill anything on the sofa - it\'s leather.',
+        options: ["mustn't", "don't have to", "can"],
+        answer: 0,
+        explanation: "Burada yasak / güçlü uyarı vardır, mustn't gerekir."
+      }
+    ]
+  },
+  {
+    id: "ability",
+    unit: "Unit 6B",
+    title: "Can / Could / Be able to",
+    subtitle: "Ability · permission · specific past success",
+    time: 24,
+    difficulty: "medium",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Genel fark</h3>
+        <p><strong>Can</strong> şimdiki yetenek veya izin, <strong>could</strong> geçmiş genel yetenek, <strong>be able to</strong> ise can'in kullanılamadığı tense'lerde ve özel durumlarda kullanılır.</p>
+      </div>
+      <div class="content-card">
+        <h3>Özel geçmiş başarı</h3>
+        <div class="warning-box">
+          <p>Geçmişte tek ve zor bir durumda başarı anlatıyorsan genelde <strong>was / were able to</strong> veya <strong>managed to</strong> kullanılır; could değil.</p>
+        </div>
+      </div>
+    `,
+    keyPoints: [
+      "She could swim at three = general past ability.",
+      "I was able to fix it = specific successful occasion.",
+      "Future formda won't be able to kullanılabilir."
+    ],
+    quiz: [
+      {
+        question: 'I\'m afraid it\'s broken and I ________ mend it.',
+        options: ["won't can", "won't be able to", "couldn't to"],
+        answer: 1,
+        explanation: "Future structure için be able to gerekir."
+      },
+      {
+        question: 'He loves music - he ________ play the violin when he was four!',
+        options: ["managed to", "could", "is able to"],
+        answer: 1,
+        explanation: "Genel geçmiş yetenek anlatıldığı için could uygundur."
+      },
+      {
+        question: 'I got a puncture, but I ________ change the wheel myself.',
+        options: ["could", "was able to", "can"],
+        answer: 1,
+        explanation: "Tek olayda başarı olduğu için was able to daha doğrudur."
+      }
+    ]
+  },
+  {
+    id: "phrasal",
+    unit: "Unit 7A",
+    title: "Phrasal Verbs",
+    subtitle: "No object · separable · inseparable",
+    time: 30,
+    difficulty: "hard",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Türler</h3>
+        <p>Bazı phrasal verbs nesne almaz; bazıları ayrılabilir; bazıları asla ayrılamaz.</p>
+      </div>
+      <div class="content-card">
+        <h3>Zamir kuralı</h3>
+        <div class="warning-box">
+          <p>Ayrılabilen phrasal verb'de nesne zamirse mutlaka araya girer.</p>
+          <p><strong>Correct:</strong> turn it off</p>
+          <p><strong>Wrong:</strong> turn off it</p>
+        </div>
+      </div>
+    `,
+    keyPoints: [
+      "Separable type 2 yapılarda it / them fiil ile particle arasına gelir.",
+      "Inseparable phrasal verbs parçalanmaz: get on with, look forward to.",
+      "Phrasal verbs anlamı literal olmayabilir; kalıp olarak çalışılmalıdır."
+    ],
+    quiz: [
+      {
+        question: 'The pasta was cold, so I ________.',
+        options: ["sent back it", "sent it back", "sent it"],
+        answer: 1,
+        explanation: "Pronoun, separable phrasal verb'de araya girer."
+      },
+      {
+        question: 'They ________.',
+        options: ["live off their parents", "live their parents off", "live of their parents"],
+        answer: 0,
+        explanation: "Live off inseparable bir yapıdır."
+      },
+      {
+        question: 'Your phone\'s ringing. Quick, ________ ! (turn off)',
+        options: ["turn off it", "turn it off", "it turn off"],
+        answer: 1,
+        explanation: "Pronoun it, turn ve off arasına gelir."
+      }
+    ]
+  },
+  {
+    id: "verbpatterns",
+    unit: "Unit 7B",
+    title: "Verb Patterns",
+    subtitle: "to-infinitive · bare infinitive · gerund",
+    time: 30,
+    difficulty: "hard",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Hangi fiilden sonra ne gelir?</h3>
+        <p>Bazı fiiller <strong>to + infinitive</strong>, bazıları <strong>-ing</strong>, modals ise bare infinitive alır.</p>
+        <div class="info-box">
+          <p><strong>want / decide / need</strong> → to-infinitive</p>
+          <p><strong>enjoy / avoid / finish / hate</strong> → gerund</p>
+        </div>
+      </div>
+      <div class="content-card">
+        <h3>Let ve make</h3>
+        <div class="warning-box">
+          <p><strong>let / make + object + bare infinitive</strong></p>
+          <p>They made us work late. / His parents let him go.</p>
+        </div>
+      </div>
+    `,
+    keyPoints: [
+      "Enjoy, avoid, finish gibi fiiller genelde -ing alır.",
+      "Want, decide, hope gibi fiiller to-infinitive alır.",
+      "Let ve make sonrası to kullanılmaz."
+    ],
+    quiz: [
+      {
+        question: 'We really enjoy ________ to concerts. (go)',
+        options: ["to go", "going", "go"],
+        answer: 1,
+        explanation: "Enjoy fiili gerund alır."
+      },
+      {
+        question: 'I hate ________ to visit my family more often... (not be able)',
+        options: ["not to be able", "not being able", "to not able"],
+        answer: 1,
+        explanation: "Hate fiili gerund yapısıyla kullanılır."
+      },
+      {
+        question: 'Karen\'s teacher let her ________ early.',
+        options: ["leave", "to leave", "leaving"],
+        answer: 0,
+        explanation: "Let sonrası bare infinitive gelir."
+      }
+    ]
+  },
+  {
+    id: "causative",
+    unit: "Unit 8A",
+    title: "Have Something Done",
+    subtitle: "Causative structure · get something done",
+    time: 22,
+    difficulty: "medium",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Temel yapı</h3>
+        <div class="info-box">
+          <p><strong>have + object + V3</strong></p>
+        </div>
+        <p>İşi kendin yapmadığında, birine yaptırdığında bu yapı kullanılır.</p>
+      </div>
+      <div class="content-card">
+        <h3>Anlam farkı</h3>
+        <p><em>I cleaned my car.</em> = kendim yaptım.</p>
+        <p><em>I had my car cleaned.</em> = başkasına yaptırdım.</p>
+      </div>
+    `,
+    keyPoints: [
+      "Have my hair cut = saçımı kestirdim.",
+      "Get something done de benzer anlam verir.",
+      "Yapı içinde fiilin V3 hali kullanılır."
+    ],
+    quiz: [
+      {
+        question: 'I (my hair had yesterday cut). Doğru sıralama hangisi?',
+        options: ["I had cut my hair yesterday.", "I had my hair cut yesterday.", "I my hair had cut yesterday."],
+        answer: 1,
+        explanation: "Causative yapı have + object + V3 şeklindedir."
+      },
+      {
+        question: 'We (to repaired don\'t have roof the need). Doğru sıralama hangisi?',
+        options: ["We don't have to repaired need the roof.", "We don't need to have the roof repaired.", "We need repaired roof don't have."],
+        answer: 1,
+        explanation: "Doğru causative yapı repaired ile kurulmalıdır."
+      },
+      {
+        question: 'He\'s (have to his taken going photo). Doğru sıralama hangisi?',
+        options: ["He's going to have his photo taken.", "He's having to his photo taken going.", "He's going have his photo took."],
+        answer: 0,
+        explanation: "Going to + have + object + V3 doğru yapıdır."
+      }
+    ]
+  },
+  {
+    id: "passive",
+    unit: "Unit 8B",
+    title: "Passive Voice",
+    subtitle: "Am/is/are/was/were/been + V3",
+    time: 30,
+    difficulty: "hard",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Passive ne zaman kullanılır?</h3>
+        <p>Eylemi yapan kişi bilinmiyorsa, önemli değilse veya odak eylemse passive kullanılır.</p>
+      </div>
+      <div class="content-card">
+        <h3>Zamanlara göre passive</h3>
+        <ul>
+          <li>Present Simple: is / are + V3</li>
+          <li>Past Simple: was / were + V3</li>
+          <li>Present Continuous: is / are being + V3</li>
+          <li>Present Perfect: has / have been + V3</li>
+          <li>Future: will be + V3</li>
+        </ul>
+      </div>
+    `,
+    keyPoints: [
+      "Passive odaklı cümlelerde agent sonradan by ile gelebilir.",
+      "Rice is grown in Valencia passive örneğidir.",
+      "Tense değişse de asıl mantık be + V3'tür."
+    ],
+    quiz: [
+      {
+        question: 'The Guggenheim Museum in Bilbao ________ in 1997. (open)',
+        options: ["opened", "was opened", "is opened"],
+        answer: 1,
+        explanation: "Geçmişte açıldığı için Past Simple Passive gerekir."
+      },
+      {
+        question: 'A new shopping centre ________ in the town centre at the moment. (build)',
+        options: ["is building", "is being built", "was built"],
+        answer: 1,
+        explanation: "Şu anda yapım halinde olduğu için Present Continuous Passive kullanılır."
+      },
+      {
+        question: 'They grow rice in Valencia. Passive karşılığı hangisi?',
+        options: ["Rice is grown in Valencia.", "Rice was grown in Valencia.", "Rice grows in Valencia."],
+        answer: 0,
+        explanation: "Active Present Simple'ın passive karşılığı is grown olur."
+      }
+    ]
+  },
+  {
+    id: "reported",
+    unit: "Unit 9A",
+    title: "Reported Speech",
+    subtitle: "Statements · questions · imperatives · backshift",
+    time: 32,
+    difficulty: "hard",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Backshift</h3>
+        <p>Direct speech reported speech'e çevrilirken zaman çoğu durumda bir adım geri gider: <strong>will → would</strong>, <strong>can → could</strong>, <strong>Present Simple → Past Simple</strong>.</p>
+      </div>
+      <div class="content-card">
+        <h3>Reported questions</h3>
+        <div class="warning-box">
+          <p>Reported question içinde <strong>do / did / does</strong> kullanılmaz.</p>
+          <p>Kelime sırası düz cümle olur: <em>She asked me where I lived.</em></p>
+        </div>
+      </div>
+    `,
+    keyPoints: [
+      "Yes / no questions için if / whether kullanılır.",
+      "Imperatives: told / asked + object + to infinitive.",
+      "Soru işareti reported clause içinde kaybolur."
+    ],
+    quiz: [
+      {
+        question: '"I can\'t find my purse." → She said that ________.',
+        options: ["she can't find her purse", "she couldn't find her purse", "she couldn't found her purse"],
+        answer: 1,
+        explanation: "Can geçmişe kayınca could olur."
+      },
+      {
+        question: '"Where do you live?" → He asked me ________.',
+        options: ["where did I live", "where I lived", "where do I live"],
+        answer: 1,
+        explanation: "Reported question'da normal word order kullanılır."
+      },
+      {
+        question: '"Please fill in the application form." → They asked us ________.',
+        options: ["to fill in the application form", "fill in the application form", "filled in the application form"],
+        answer: 0,
+        explanation: "Requests, asked + object + to infinitive ile aktarılır."
+      }
+    ]
+  },
+  {
+    id: "conditionals3",
+    unit: "Unit 9B",
+    title: "3rd Conditional",
+    subtitle: "Past Perfect · regret · hypothetical past",
+    time: 30,
+    difficulty: "hard",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Third Conditional</h3>
+        <div class="info-box">
+          <p><strong>If + had V3, would have + V3</strong></p>
+        </div>
+        <p>Geçmişte gerçekleşmeyen durumlar ve pişmanlıklar için kullanılır.</p>
+      </div>
+      <div class="content-card">
+        <h3>Past Perfect</h3>
+        <p>Geçmişte iki olay varsa daha önce olanı göstermek için Past Perfect kullanılabilir.</p>
+      </div>
+    `,
+    keyPoints: [
+      "If I'd known, I would have called gibi yapılar third conditional'dır.",
+      "Past Perfect = had + V3.",
+      "Gerçekleşmemiş geçmiş alternatiflerini anlatır."
+    ],
+    quiz: [
+      {
+        question: 'If we ________ the bus, we ________ home till midnight. (miss / not get)',
+        options: ["'d missed / wouldn't have got", "missed / wouldn't get", "had missed / won't get"],
+        answer: 0,
+        explanation: "Third conditional yapısı had + V3 ve would have + V3 ister."
+      },
+      {
+        question: 'If they ________ to the wedding, they ________.',
+        options: ["were invited / would have gone", "had been invited / would have gone", "invite / will go"],
+        answer: 1,
+        explanation: "Passive third conditional için had been invited doğrudur."
+      },
+      {
+        question: 'When she woke up, the house was empty - he ________.',
+        options: ["went", "had gone", "was going"],
+        answer: 1,
+        explanation: "Daha önce gerçekleşen olay Past Perfect ile verilir."
+      }
+    ]
+  },
+  {
+    id: "auxiliaries",
+    unit: "Unit 10A",
+    title: "Be / Do / Have",
+    subtitle: "Main verbs vs auxiliary verbs",
+    time: 22,
+    difficulty: "medium",
+    summaryHtml: `
+      <div class="content-card">
+        <h3>Temel mantık</h3>
+        <p>Bu üç fiil İngilizcede hem ana fiil hem yardımcı fiil olarak kullanılabilir.</p>
+        <ul>
+          <li><strong>Be</strong>: continuous, passive veya durum anlatabilir.</li>
+          <li><strong>Do</strong>: question / negative yardımcı fiili olabilir veya yapmak anlamına gelebilir.</li>
+          <li><strong>Have</strong>: possession veya perfect tense yardımcı fiili olabilir.</li>
+        </ul>
+      </div>
+      <div class="content-card">
+        <h3>Neden önemli?</h3>
+        <p>Sınavlarda doğru auxiliary seçimi tense yapısını belirler. Bu yüzden özellikle soru kurulumunda çok önemlidir.</p>
+      </div>
+    `,
+    keyPoints: [
+      "Does he like...? ve Is he feeling...? farklı yardımcı fiiller kullanır.",
+      "Have been doing perfect continuous yapıdır.",
+      "Do, ana fiil ve yardımcı fiil olarak farklı görevlerde bulunabilir."
+    ],
+    quiz: [
+      {
+        question: '________ he like living in the UK, or ________ he feeling homesick?',
+        options: ["Does / is", "Is / does", "Do / are"],
+        answer: 0,
+        explanation: "Like için does, feeling için is gerekir."
+      },
+      {
+        question: 'A: ________ you miss the beginning of the film? B: No, luckily it ________ started yet.',
+        options: ["Have / hasn't", "Did / hadn't", "Did / hasn't"],
+        answer: 2,
+        explanation: "Miss past simple ile sorulur; film henüz başlamamış anlamı için hasn't started yet uygundur."
+      },
+      {
+        question: 'What ________ you been ________ since I last saw you?',
+        options: ["have / doing", "are / doing", "did / do"],
+        answer: 0,
+        explanation: "Present Perfect Continuous yapısı have been doing şeklindedir."
+      }
+    ]
+  }
+];
+
+const RECAP_CARDS = [
+  { title: "Stative verbs", rule: "know, want, need, like gibi fiiller genelde -ing almaz." },
+  { title: "Timetable future", rule: "Ulaşım ve program saatlerinde Present Simple kullanılır." },
+  { title: "mustn't vs don't have to", rule: "mustn't = yasak, don't have to = zorunlu değil." },
+  { title: "one / ones", rule: "Tekrarı önlemek için singular one, plural ones kullanılır." },
+  { title: "unless", rule: "unless = if not." },
+  { title: "Reported questions", rule: "do / does / did kalkar, word order düz cümle olur." },
+  { title: "Causative", rule: "have + object + V3 = başkasına yaptırmak." },
+  { title: "Passive", rule: "Tüm passive yapıların çekirdeği be + V3 mantığıdır." },
+  { title: "Specific past success", rule: "Tek ve zor geçmiş başarıda was/were able to kullanılır." },
+  { title: "Third conditional", rule: "If + had V3, would have + V3." }
+];
+
+const TOTAL = TOPICS.length;
+const QUESTION_BANK = TOPICS.flatMap((topic) =>
+  topic.quiz.map((question, index) => ({
+    ...question,
+    topicId: topic.id,
+    topicTitle: topic.title,
+    unit: topic.unit,
+    uid: `${topic.id}-${index}`
+  }))
+);
+
+const progressRef = doc(db, "progress", "ravza");
+let activeExam = null;
+let examTimer = null;
+
+function safeText(text) {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function getStudyKey(id) {
+  return `eul_study_${id}`;
+}
+
+function getQuizKey(id) {
+  return `eul_quiz_${id}`;
+}
+
+function isStudyDone(id) {
+  return localStorage.getItem(getStudyKey(id)) === "true";
+}
+
+function isQuizDone(id) {
+  return localStorage.getItem(getQuizKey(id)) === "true";
+}
+
+function setStudyDone(id, value) {
+  localStorage.setItem(getStudyKey(id), value ? "true" : "false");
+}
+
+function setQuizDone(id, value) {
+  localStorage.setItem(getQuizKey(id), value ? "true" : "false");
+}
+
+function getBestExam() {
+  return Number(localStorage.getItem("eul_best_exam") || 0);
+}
+
+function setBestExam(value) {
+  localStorage.setItem("eul_best_exam", String(value));
+}
+
+function getExamHistory() {
+  try {
+    const raw = localStorage.getItem("eul_exam_history");
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setExamHistory(history) {
+  localStorage.setItem("eul_exam_history", JSON.stringify(history.slice(0, 5)));
+}
+
+function countStudyDone() {
+  return TOPICS.filter((topic) => isStudyDone(topic.id)).length;
+}
+
+function countQuizDone() {
+  return TOPICS.filter((topic) => isQuizDone(topic.id)).length;
+}
+
+function formatPercent(score, total) {
+  return total === 0 ? 0 : Math.round((score / total) * 100);
+}
+
+function formatDateTime(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleString("tr-TR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function shuffle(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 function initTheme() {
-  const saved = localStorage.getItem('eul_theme');
-  if (saved === 'dark') applyDark(true);
+  const saved = localStorage.getItem("eul_theme");
+  if (saved === "dark") applyDark(true);
 }
 
 function applyDark(isDark) {
-  document.body.classList.toggle('dark', isDark);
-  const btn = document.getElementById('theme-switch');
-  if (btn) btn.setAttribute('aria-label', isDark ? 'Gündüz moduna geç' : 'Karanlık moda geç');
-  const topBtn = document.getElementById('topbar-theme-btn');
-  if (topBtn) topBtn.textContent = isDark ? '☀️' : '🌙';
+  document.body.classList.toggle("dark", isDark);
+  const btn = document.getElementById("theme-switch");
+  if (btn) {
+    btn.setAttribute("aria-label", isDark ? "Gündüz moduna geç" : "Karanlık moda geç");
+  }
+  const topBtn = document.getElementById("topbar-theme-btn");
+  if (topBtn) {
+    topBtn.textContent = isDark ? "☀️" : "🌙";
+  }
 }
 
 function toggleTheme() {
-  const isDark = !document.body.classList.contains('dark');
+  const isDark = !document.body.classList.contains("dark");
   applyDark(isDark);
-  localStorage.setItem('eul_theme', isDark ? 'dark' : 'light');
+  localStorage.setItem("eul_theme", isDark ? "dark" : "light");
 }
 
-/* ══════════════════════════════
-   NAVIGATION
-══════════════════════════════ */
 function navigate(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-  
+  document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
+  document.querySelectorAll(".nav-links button").forEach((button) => button.classList.remove("active"));
+
   const page = document.getElementById(pageId);
-  const btn  = document.getElementById('nav-' + pageId);
-  
-  if (page) page.classList.add('active');
-  if (btn)  btn.classList.add('active');
-  
-  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
-  window.scrollTo(0, 0);
+  if (page) {
+    page.classList.add("active");
+  }
+
+  const navMap = {
+    dashboard: "nav-dashboard",
+    studyhub: "nav-studyhub",
+    studydetail: "nav-studyhub",
+    quizhub: "nav-quizhub",
+    quizdetail: "nav-quizhub",
+    examcenter: "nav-examcenter",
+    recap: "nav-recap"
+  };
+
+  const navButton = document.getElementById(navMap[pageId]);
+  if (navButton) {
+    navButton.classList.add("active");
+  }
+
+  if (window.innerWidth <= 768) {
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar) sidebar.classList.remove("open");
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function toggleMenu() {
-  document.getElementById('sidebar').classList.toggle('open');
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) sidebar.classList.toggle("open");
 }
 
-function searchTopics() {
-  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+function searchTopics(event) {
+  if (event?.key && event.key !== "Enter") return;
+  const input = document.getElementById("searchInput");
+  if (!input) return;
+  const q = input.value.trim().toLowerCase();
   if (q.length < 2) return;
-  document.querySelectorAll('.searchable').forEach(sec => {
-    if (sec.innerText.toLowerCase().includes(q)) navigate(sec.id);
-  });
-}
 
-/* ══════════════════════════════
-   PROGRESS TRACKER
-══════════════════════════════ */
-function markDone(topic) {
-  const btn = document.querySelector('#' + topic + ' .mark-complete');
-  if (!btn) return;
-  
-  const key    = 'eul_done_' + topic;
-  const isDone = localStorage.getItem(key) === 'true';
-  
-  if (isDone) {
-    localStorage.setItem(key, 'false');
-    btn.classList.remove('done');
-    btn.innerHTML = '✅ Tamamladım';
-  } else {
-    localStorage.setItem(key, 'true');
-    btn.classList.add('done');
-    btn.innerHTML = '☑️ Tamamlandı';
+  const found = TOPICS.find((topic) =>
+    topic.title.toLowerCase().includes(q) ||
+    topic.subtitle.toLowerCase().includes(q) ||
+    topic.unit.toLowerCase().includes(q) ||
+    topic.keyPoints.some((point) => point.toLowerCase().includes(q))
+  );
+
+  if (found) {
+    openStudyTopic(found.id);
+    return;
   }
-  updateProgress();
+
+  if (q.includes("sınav") || q.includes("exam")) {
+    navigate("examcenter");
+    return;
+  }
+
+  if (q.includes("quiz")) {
+    navigate("quizhub");
+    return;
+  }
+
+  navigate("studyhub");
 }
 
-function updateProgress() {
-  const count = ALL_TOPICS.filter(t => localStorage.getItem('eul_done_' + t) === 'true').length;
-  const pct   = (count / TOTAL) * 100;
-  
-  document.getElementById('main-progress').style.width = pct + '%';
-  document.getElementById('progress-text').innerText   = count + '/' + TOTAL + ' Konu Tamamlandı';
-}
+async function loadProgressFromFirebase() {
+  try {
+    const snap = await getDoc(progressRef);
+    if (!snap.exists()) return;
 
-function initProgress() {
-  ALL_TOPICS.forEach(topic => {
-    if (localStorage.getItem('eul_done_' + topic) === 'true') {
-      const btn = document.querySelector('#' + topic + ' .mark-complete');
-      if (btn) { btn.classList.add('done'); btn.innerHTML = '☑️ Tamamlandı'; }
+    const data = snap.data();
+
+    if (data.completedStudy) {
+      Object.entries(data.completedStudy).forEach(([topicId, value]) => {
+        setStudyDone(topicId, Boolean(value));
+      });
     }
-  });
-  updateProgress();
+
+    if (data.completedQuiz) {
+      Object.entries(data.completedQuiz).forEach(([topicId, value]) => {
+        setQuizDone(topicId, Boolean(value));
+      });
+    }
+
+    if (!data.completedStudy && data.completed) {
+      Object.entries(data.completed).forEach(([topicId, value]) => {
+        setStudyDone(topicId, Boolean(value));
+      });
+    }
+
+    if (typeof data.bestExam === "number") {
+      setBestExam(data.bestExam);
+    }
+
+    if (Array.isArray(data.examHistory)) {
+      setExamHistory(data.examHistory);
+    }
+  } catch (error) {
+    console.error("Firebase progress okunamadı:", error);
+  }
 }
 
-/* ══════════════════════════════
-   QUIZ CHECKER
-══════════════════════════════ */
-function checkQuiz(quizId) {
-  const container = document.getElementById(quizId);
-  const questions = container.querySelectorAll('.question');
-  let score = 0;
+async function saveProgressToFirebase() {
+  try {
+    const completedStudy = {};
+    const completedQuiz = {};
 
-  questions.forEach(q => {
-    // Reset colors
-    q.querySelectorAll('label').forEach(l => { 
-      l.style.background = ''; 
-      l.style.borderColor = ''; 
+    TOPICS.forEach((topic) => {
+      completedStudy[topic.id] = isStudyDone(topic.id);
+      completedQuiz[topic.id] = isQuizDone(topic.id);
     });
-    
-    const selected = q.querySelector('input[type="radio"]:checked');
-    if (!selected) return;
-    
-    const lbl = selected.parentElement;
-    if (selected.value === 'correct') {
-      score++;
-      lbl.style.background  = '#d1fae5';
-      lbl.style.borderColor = '#10b981';
-      // Dark mode compatibility will fall back nicely if CSS vars aren't directly injected here
-    } else {
-      lbl.style.background  = '#fee2e2';
-      lbl.style.borderColor = '#ef4444';
-      
-      const correct = q.querySelector('input[value="correct"]');
-      if (correct) {
-        correct.parentElement.style.background  = '#d1fae5';
-        correct.parentElement.style.borderColor = '#10b981';
+
+    await setDoc(
+      progressRef,
+      {
+        completed: completedStudy,
+        completedStudy,
+        completedQuiz,
+        bestExam: getBestExam(),
+        examHistory: getExamHistory(),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error("Firebase progress kaydedilemedi:", error);
+  }
+}
+
+function updateDashboardStats() {
+  const studyCount = countStudyDone();
+  const quizCount = countQuizDone();
+  const bestExam = getBestExam();
+  const studyPercent = formatPercent(studyCount, TOTAL);
+  const quizPercent = formatPercent(quizCount, TOTAL);
+  const latestExam = getExamHistory()[0];
+
+  const statStudy = document.getElementById("stat-study-complete");
+  const statQuiz = document.getElementById("stat-quiz-complete");
+  const statBest = document.getElementById("stat-best-exam");
+  const statBank = document.getElementById("stat-question-bank");
+
+  if (statStudy) statStudy.textContent = `${studyCount}/${TOTAL}`;
+  if (statQuiz) statQuiz.textContent = `${quizCount}/${TOTAL}`;
+  if (statBest) statBest.textContent = `${bestExam}%`;
+  if (statBank) statBank.textContent = String(QUESTION_BANK.length);
+
+  const studyFill = document.getElementById("study-progress-fill");
+  const studyLabel = document.getElementById("study-progress-label");
+  const studyText = document.getElementById("study-progress-text");
+  if (studyFill) studyFill.style.width = `${studyPercent}%`;
+  if (studyLabel) studyLabel.textContent = `${studyPercent}%`;
+  if (studyText) studyText.textContent = `${studyCount} / ${TOTAL} çalışma tamamlandı`;
+
+  const quizFill = document.getElementById("quiz-progress-fill");
+  const quizLabel = document.getElementById("quiz-progress-label");
+  const quizText = document.getElementById("quiz-progress-text");
+  if (quizFill) quizFill.style.width = `${quizPercent}%`;
+  if (quizLabel) quizLabel.textContent = `${quizPercent}%`;
+  if (quizText) quizText.textContent = `${quizCount} / ${TOTAL} quiz tamamlandı`;
+
+  const latestExamBox = document.getElementById("latest-exam-box");
+  if (latestExamBox) {
+    latestExamBox.innerHTML = latestExam
+      ? `<strong>${safeText(latestExam.label)}</strong><br>${latestExam.score}/${latestExam.total} doğru · ${latestExam.percentage}%<br><small>${safeText(formatDateTime(latestExam.date))}</small>`
+      : "Henüz bir sınav sonucu yok.";
+  }
+
+  const examBankCount = document.getElementById("exam-bank-count");
+  const examBestInline = document.getElementById("exam-best-inline");
+  const examLastInline = document.getElementById("exam-last-inline");
+  if (examBankCount) examBankCount.textContent = String(QUESTION_BANK.length);
+  if (examBestInline) examBestInline.textContent = `${bestExam}%`;
+  if (examLastInline) {
+    examLastInline.textContent = latestExam ? `${latestExam.score}/${latestExam.total}` : "—";
+  }
+}
+
+function renderStudyHub(filterText = "") {
+  const grid = document.getElementById("studyHubGrid");
+  if (!grid) return;
+  const q = filterText.trim().toLowerCase();
+
+  const filtered = TOPICS.filter((topic) =>
+    topic.title.toLowerCase().includes(q) ||
+    topic.subtitle.toLowerCase().includes(q) ||
+    topic.unit.toLowerCase().includes(q)
+  );
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-grid">Bu aramaya uygun konu bulunamadı.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered
+    .map((topic) => {
+      const done = isStudyDone(topic.id);
+      const difficultyLabel = topic.difficulty === "easy" ? "Kolay" : topic.difficulty === "medium" ? "Orta" : "Zor";
+      return `
+        <article class="topic-card">
+          <div class="topic-card-top">
+            <span class="unit-badge">${safeText(topic.unit)}</span>
+            <span class="status-chip ${done ? "done" : "waiting"}">${done ? "Tamamlandı" : "Bekliyor"}</span>
+          </div>
+          <div>
+            <h3 class="topic-title">${safeText(topic.title)}</h3>
+            <p>${safeText(topic.subtitle)}</p>
+          </div>
+          <div class="topic-meta">
+            <span class="difficulty-chip ${topic.difficulty}">${difficultyLabel}</span>
+            <span class="status-chip ready">${topic.time} dk</span>
+          </div>
+          <p class="helper-line">Bu bölüm yalnızca konu çalışmak için tasarlandı. Quiz kısmı ayrı sayfadadır.</p>
+          <div class="topic-actions">
+            <button class="primary-btn" onclick="openStudyTopic('${topic.id}')">Konuya Git</button>
+            <button class="mark-btn ${done ? "done" : ""}" onclick="toggleStudyDone('${topic.id}')">${done ? "☑️ Tamamlandı" : "✅ Çalışmayı Bitirdim"}</button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderQuizHub(filterText = "") {
+  const grid = document.getElementById("quizHubGrid");
+  if (!grid) return;
+  const q = filterText.trim().toLowerCase();
+
+  const filtered = TOPICS.filter((topic) =>
+    topic.title.toLowerCase().includes(q) ||
+    topic.subtitle.toLowerCase().includes(q) ||
+    topic.unit.toLowerCase().includes(q)
+  );
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-grid">Bu aramaya uygun quiz bulunamadı.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered
+    .map((topic) => {
+      const quizDone = isQuizDone(topic.id);
+      const studyDone = isStudyDone(topic.id);
+      return `
+        <article class="topic-card">
+          <div class="topic-card-top">
+            <span class="unit-badge quiz-badge">${safeText(topic.unit)}</span>
+            <span class="status-chip ${quizDone ? "done" : "ready"}">${quizDone ? "Çözüldü" : "Hazır"}</span>
+          </div>
+          <div>
+            <h3 class="topic-title">${safeText(topic.title)} Quiz</h3>
+            <p>${topic.quiz.length} soru · ${safeText(topic.subtitle)}</p>
+          </div>
+          <div class="topic-meta">
+            <span class="status-chip ${studyDone ? "done" : "waiting"}">${studyDone ? "Konu çalışıldı" : "Önce konu çalış"}</span>
+          </div>
+          <p class="helper-line">Quiz ekranı, çalışma notlarından ayrı tutuldu. Böylece soru çözme daha temiz ve odaklı olur.</p>
+          <div class="topic-actions">
+            <button class="primary-btn soft" onclick="openQuizTopic('${topic.id}')">Quiz Çöz</button>
+            <button class="mark-btn ${quizDone ? "done" : ""}" onclick="toggleQuizDone('${topic.id}')">${quizDone ? "☑️ Quiz Bitti" : "✅ Quiz Tamamlandı"}</button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function openStudyTopic(topicId) {
+  const topic = TOPICS.find((item) => item.id === topicId);
+  if (!topic) return;
+
+  const container = document.getElementById("studyDetailContent");
+  if (!container) return;
+
+  const done = isStudyDone(topic.id);
+  const difficultyLabel = topic.difficulty === "easy" ? "Kolay" : topic.difficulty === "medium" ? "Orta" : "Zor";
+
+  container.innerHTML = `
+    <div class="detail-shell">
+      <div class="detail-hero">
+        <div class="detail-topbar">
+          <button class="ghost-btn" onclick="navigate('studyhub')">← Çalışma Merkezine Dön</button>
+          <div class="topic-meta">
+            <span class="unit-badge">${safeText(topic.unit)}</span>
+            <span class="difficulty-chip ${topic.difficulty}">${difficultyLabel}</span>
+            <span class="status-chip ${done ? "done" : "waiting"}">${done ? "Tamamlandı" : "Çalışılıyor"}</span>
+          </div>
+        </div>
+        <h2 class="detail-title">${safeText(topic.title)}</h2>
+        <p class="detail-subtitle">${safeText(topic.subtitle)}</p>
+      </div>
+
+      <div class="detail-grid">
+        <div class="study-content">
+          ${topic.summaryHtml}
+          <div class="content-card">
+            <h3>Kritik noktalar</h3>
+            <div class="keypoint-list">
+              ${topic.keyPoints.map((point) => `<div class="keypoint-item">${safeText(point)}</div>`).join("")}
+            </div>
+          </div>
+        </div>
+
+        <aside class="study-sidebar">
+          <div class="side-card">
+            <h3>Çalışma kartı</h3>
+            <p><strong>Tahmini süre:</strong> ${topic.time} dakika</p>
+            <p><strong>Seviye:</strong> ${difficultyLabel}</p>
+            <p><strong>Sonraki adım:</strong> Konuyu bitirince ilgili quiz sayfasına geç.</p><p><strong>Not:</strong> Uygun olan konularda verdiğin kaynak metinleri doğrudan bu sayfaya işlendi.</p>
+            <div class="topic-actions" style="margin-top:14px">
+              <button class="mark-btn ${done ? "done" : ""}" onclick="toggleStudyDone('${topic.id}', true)">${done ? "☑️ Tamamlandı" : "✅ Çalışmayı Bitirdim"}</button>
+              <button class="secondary-btn" onclick="openQuizTopic('${topic.id}')">İlgili Quize Geç</button>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>Nasıl tekrar edilmeli?</h3>
+            <ul>
+              <li>Kuralı sesli oku.</li>
+              <li>Örnek cümleyi kendin yeniden kur.</li>
+              <li>Karıştığın noktayı küçük not halinde yaz.</li>
+              <li>Ardından quiz sayfasına geç.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  `;
+
+  navigate("studydetail");
+}
+
+function openQuizTopic(topicId) {
+  const topic = TOPICS.find((item) => item.id === topicId);
+  if (!topic) return;
+
+  const container = document.getElementById("quizDetailContent");
+  if (!container) return;
+
+  const quizDone = isQuizDone(topic.id);
+  const studyDone = isStudyDone(topic.id);
+
+  container.innerHTML = `
+    <div class="quiz-shell">
+      <div class="quiz-hero">
+        <div class="quiz-topbar">
+          <button class="ghost-btn" onclick="navigate('quizhub')">← Quiz Merkezine Dön</button>
+          <div class="topic-meta">
+            <span class="unit-badge quiz-badge">${safeText(topic.unit)}</span>
+            <span class="status-chip ${quizDone ? "done" : "ready"}">${quizDone ? "Daha önce çözüldü" : "Hazır"}</span>
+          </div>
+        </div>
+        <h2 class="quiz-title">${safeText(topic.title)} Quiz</h2>
+        <p class="quiz-subtitle">${topic.quiz.length} soruluk ayrı quiz alanı. Notlar çalışma merkezinde kaldı; burada sadece soru çözersin.</p>
+      </div>
+
+      <div class="quiz-layout">
+        <div class="quiz-form">
+          ${topic.quiz.map((q, index) => `
+            <div class="question-card" data-question-index="${index}">
+              <div class="question-meta">Soru ${index + 1}</div>
+              <div class="question-title">${safeText(q.question)}</div>
+              <div class="option-list">
+                ${q.options.map((option, optionIndex) => `
+                  <label class="option-item">
+                    <input type="radio" name="quiz-${topic.id}-${index}" value="${optionIndex}">
+                    ${safeText(option)}
+                  </label>
+                `).join("")}
+              </div>
+            </div>
+          `).join("")}
+
+          <div class="topic-actions">
+            <button class="check-btn" onclick="submitTopicQuiz('${topic.id}')">Cevapları Kontrol Et</button>
+            <button class="ghost-btn" onclick="openStudyTopic('${topic.id}')">Konuya Geri Dön</button>
+          </div>
+
+          <div id="quiz-result-${topic.id}" class="quiz-result"></div>
+        </div>
+
+        <aside class="quiz-sidebar">
+          <div class="side-card">
+            <h3>Quiz notu</h3>
+            <p>${studyDone ? "Bu konunun çalışma kısmı tamamlanmış görünüyor. Şimdi soru çözmeye hazırsın." : "Öneri: Önce konu anlatımını çalışıp sonra bu quiz'e gir. Böylece daha verimli olur."}</p>
+            <div class="topic-actions" style="margin-top:14px">
+              <button class="mark-btn ${quizDone ? "done" : ""}" onclick="toggleQuizDone('${topic.id}', true)">${quizDone ? "☑️ Quiz Tamamlandı" : "✅ Quiz Bitti"}</button>
+            </div>
+          </div>
+          <div class="side-card">
+            <h3>Odak noktaları</h3>
+            <ul>
+              ${topic.keyPoints.map((point) => `<li>${safeText(point)}</li>`).join("")}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  `;
+
+  navigate("quizdetail");
+}
+
+function submitTopicQuiz(topicId) {
+  const topic = TOPICS.find((item) => item.id === topicId);
+  if (!topic) return;
+
+  let score = 0;
+  const explanations = [];
+
+  topic.quiz.forEach((question, questionIndex) => {
+    const wrapper = document.querySelector(`#quizDetailContent .question-card[data-question-index="${questionIndex}"]`);
+    if (!wrapper) return;
+
+    const labels = wrapper.querySelectorAll(".option-item");
+    labels.forEach((label) => label.classList.remove("correct", "wrong"));
+
+    const selected = wrapper.querySelector(`input[name="quiz-${topic.id}-${questionIndex}"]:checked`);
+    const correctIndex = question.answer;
+
+    labels.forEach((label, labelIndex) => {
+      const radio = label.querySelector("input");
+      radio.disabled = true;
+      if (labelIndex === correctIndex) {
+        label.classList.add("correct");
       }
+    });
+
+    if (selected && Number(selected.value) === correctIndex) {
+      score += 1;
+      explanations.push(`<li><strong>Soru ${questionIndex + 1}:</strong> Doğru. ${safeText(question.explanation)}</li>`);
+    } else {
+      if (selected) {
+        selected.closest(".option-item")?.classList.add("wrong");
+      }
+      explanations.push(`<li><strong>Soru ${questionIndex + 1}:</strong> ${safeText(question.explanation)}</li>`);
     }
   });
 
-  const res = container.querySelector('.quiz-result');
-  res.classList.remove('success', 'error');
-  
-  if (score === questions.length) {
-    res.innerHTML = '🎉 Mükemmel Ravza! Hepsini doğru yaptın (' + score + '/' + questions.length + ')! 💗';
-    res.classList.add('success');
-  } else {
-    res.innerHTML = 'Biraz daha dikkat etmelisin 💪 Puanın: ' + score + '/' + questions.length + '. Yeşil olanlar doğru cevaplar.';
-    res.classList.add('error');
-  }
-  res.style.display = 'block';
+  const result = document.getElementById(`quiz-result-${topic.id}`);
+  if (!result) return;
+
+  const percent = formatPercent(score, topic.quiz.length);
+  setQuizDone(topic.id, true);
+
+  result.className = `quiz-result show ${score === topic.quiz.length ? "success" : "error"}`;
+  result.innerHTML = `
+    <h3 class="result-title">Quiz Sonucu</h3>
+    <p><strong>Puan:</strong> ${score}/${topic.quiz.length} · ${percent}%</p>
+    <p>${score === topic.quiz.length ? "Harika! Bu quiz'i tamamen doğru çözdün." : "Quiz tamamlandı. Aşağıdaki açıklamaları gözden geçirip tekrar denemek istersen sayfayı yenileyebilirsin."}</p>
+    <ul style="padding-left:18px; margin-top:8px; display:grid; gap:8px;">
+      ${explanations.join("")}
+    </ul>
+  `;
+
+  updateDashboardStats();
+  renderQuizHub(document.getElementById("quizFilter")?.value || "");
+  saveProgressToFirebase();
 }
 
-/* ══════════════════════════════
-   INIT
-══════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
+function toggleStudyDone(topicId, rerender = false) {
+  setStudyDone(topicId, !isStudyDone(topicId));
+  updateDashboardStats();
+  renderStudyHub(document.getElementById("studyFilter")?.value || "");
+  if (rerender) openStudyTopic(topicId);
+  saveProgressToFirebase();
+}
+
+function toggleQuizDone(topicId, rerender = false) {
+  setQuizDone(topicId, !isQuizDone(topicId));
+  updateDashboardStats();
+  renderQuizHub(document.getElementById("quizFilter")?.value || "");
+  if (rerender) openQuizTopic(topicId);
+  saveProgressToFirebase();
+}
+
+function renderRecap() {
+  const recapGrid = document.getElementById("recapGrid");
+  if (!recapGrid) return;
+  recapGrid.innerHTML = RECAP_CARDS.map((card) => `
+    <div class="flashcard">
+      <strong>📌 ${safeText(card.title)}</strong>
+      <span class="fc-rule">${safeText(card.rule)}</span>
+    </div>
+  `).join("");
+}
+
+function startExam(questionCount, durationMinutes) {
+  const selectedQuestions = shuffle(QUESTION_BANK).slice(0, questionCount).map((item, index) => ({
+    ...item,
+    uid: `${item.uid}-${Date.now()}-${index}`
+  }));
+
+  activeExam = {
+    label: questionCount === 10 ? "Mini Sınav" : questionCount === 20 ? "Orta Sınav" : "Tam Sınav",
+    durationMinutes,
+    questions: selectedQuestions,
+    startedAt: Date.now(),
+    endsAt: Date.now() + durationMinutes * 60 * 1000,
+    submitted: false
+  };
+
+  renderActiveExam();
+  navigate("examcenter");
+
+  if (examTimer) clearInterval(examTimer);
+  examTimer = setInterval(updateExamTimer, 1000);
+  updateExamTimer();
+}
+
+function updateExamTimer() {
+  if (!activeExam || activeExam.submitted) return;
+  const timerEl = document.getElementById("exam-timer");
+  if (!timerEl) return;
+
+  const remaining = activeExam.endsAt - Date.now();
+  if (remaining <= 0) {
+    timerEl.textContent = "Süre doldu";
+    submitExam(true);
+    return;
+  }
+
+  const totalSeconds = Math.floor(remaining / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  timerEl.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function renderActiveExam() {
+  const workspace = document.getElementById("examWorkspace");
+  if (!workspace) return;
+
+  if (!activeExam) {
+    workspace.innerHTML = `
+      <div class="empty-state">
+        <h3>Henüz aktif bir sınav yok</h3>
+        <p>Yukarıdan bir sınav türü seçip karışık grammar sınavını başlatabilirsin.</p>
+      </div>
+    `;
+    return;
+  }
+
+  workspace.innerHTML = `
+    <div class="exam-header">
+      <div class="exam-info">
+        <h3 class="section-title">${safeText(activeExam.label)}</h3>
+        <p>${activeExam.questions.length} karışık soru · ${activeExam.durationMinutes} dakika süre</p>
+      </div>
+      <div class="timer-pill">⏱️ <span id="exam-timer">--:--</span></div>
+    </div>
+
+    <div class="exam-content">
+      ${activeExam.questions.map((question, questionIndex) => `
+        <div class="question-card" data-exam-question="${questionIndex}">
+          <div class="question-meta">${safeText(question.unit)} · ${safeText(question.topicTitle)} · Soru ${questionIndex + 1}</div>
+          <div class="question-title">${safeText(question.question)}</div>
+          <div class="option-list">
+            ${question.options.map((option, optionIndex) => `
+              <label class="option-item">
+                <input type="radio" name="exam-question-${questionIndex}" value="${optionIndex}">
+                ${safeText(option)}
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")}
+
+      <div class="topic-actions">
+        <button class="check-btn" onclick="submitExam(false)">Sınavı Bitir</button>
+        <button class="ghost-btn" onclick="cancelExam()">Sınavı İptal Et</button>
+      </div>
+    </div>
+  `;
+}
+
+function cancelExam() {
+  if (examTimer) clearInterval(examTimer);
+  activeExam = null;
+  renderActiveExam();
+}
+
+function submitExam(autoSubmitted = false) {
+  if (!activeExam || activeExam.submitted) return;
+  if (examTimer) clearInterval(examTimer);
+
+  const results = activeExam.questions.map((question, index) => {
+    const selected = document.querySelector(`input[name="exam-question-${index}"]:checked`);
+    const selectedIndex = selected ? Number(selected.value) : null;
+    return {
+      ...question,
+      index,
+      selectedIndex,
+      isCorrect: selectedIndex === question.answer
+    };
+  });
+
+  const score = results.filter((item) => item.isCorrect).length;
+  const percentage = formatPercent(score, results.length);
+
+  const topicStats = {};
+  results.forEach((item) => {
+    if (!topicStats[item.topicTitle]) {
+      topicStats[item.topicTitle] = { correct: 0, total: 0 };
+    }
+    topicStats[item.topicTitle].total += 1;
+    if (item.isCorrect) topicStats[item.topicTitle].correct += 1;
+  });
+
+  const history = getExamHistory();
+  history.unshift({
+    label: activeExam.label,
+    score,
+    total: results.length,
+    percentage,
+    date: new Date().toISOString()
+  });
+  setExamHistory(history);
+
+  if (percentage > getBestExam()) {
+    setBestExam(percentage);
+  }
+
+  activeExam.submitted = true;
+
+  const workspace = document.getElementById("examWorkspace");
+  if (!workspace) return;
+
+  workspace.innerHTML = `
+    <div class="result-box">
+      <h3 class="result-title">${safeText(activeExam.label)} Sonucu</h3>
+      <p>${autoSubmitted ? "Süre dolduğu için sınav otomatik olarak gönderildi." : "Sınav başarıyla tamamlandı."}</p>
+
+      <div class="result-main">
+        <div class="result-stat">
+          <span>Doğru sayısı</span>
+          <strong>${score}/${results.length}</strong>
+        </div>
+        <div class="result-stat">
+          <span>Yüzde</span>
+          <strong>${percentage}%</strong>
+        </div>
+        <div class="result-stat">
+          <span>En iyi derece</span>
+          <strong>${getBestExam()}%</strong>
+        </div>
+      </div>
+
+      <div>
+        <h3>Konu bazlı performans</h3>
+        <div class="topic-score-grid">
+          ${Object.entries(topicStats).map(([topicTitle, stats]) => `
+            <div class="topic-score-card">
+              <h4>${safeText(topicTitle)}</h4>
+              <p>${stats.correct}/${stats.total} doğru · ${formatPercent(stats.correct, stats.total)}%</p>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div>
+        <h3>Cevap inceleme</h3>
+        <div class="review-grid">
+          ${results.map((item) => `
+            <div class="review-card">
+              <h4>${safeText(item.unit)} · ${safeText(item.topicTitle)} · Soru ${item.index + 1}</h4>
+              <p>${safeText(item.question)}</p>
+              <p class="review-answer"><strong>Senin cevabın:</strong> ${item.selectedIndex === null ? "Boş" : safeText(item.options[item.selectedIndex])}</p>
+              <p class="review-answer"><strong>Doğru cevap:</strong> ${safeText(item.options[item.answer])}</p>
+              <p>${safeText(item.explanation)}</p>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="topic-actions">
+        <button class="primary-btn dark" onclick="startExam(${results.length}, ${activeExam.durationMinutes})">Aynı Türde Yeni Sınav</button>
+        <button class="ghost-btn" onclick="navigate('quizhub')">Quiz Merkezine Git</button>
+      </div>
+    </div>
+  `;
+
+  activeExam = null;
+  updateDashboardStats();
+  saveProgressToFirebase();
+}
+
+window.navigate = navigate;
+window.toggleMenu = toggleMenu;
+window.searchTopics = searchTopics;
+window.toggleTheme = toggleTheme;
+window.renderStudyHub = renderStudyHub;
+window.renderQuizHub = renderQuizHub;
+window.openStudyTopic = openStudyTopic;
+window.openQuizTopic = openQuizTopic;
+window.submitTopicQuiz = submitTopicQuiz;
+window.toggleStudyDone = toggleStudyDone;
+window.toggleQuizDone = toggleQuizDone;
+window.startExam = startExam;
+window.submitExam = submitExam;
+window.cancelExam = cancelExam;
+
+document.addEventListener("DOMContentLoaded", async () => {
   initTheme();
-  initProgress();
+  await loadProgressFromFirebase();
+  renderStudyHub();
+  renderQuizHub();
+  renderRecap();
+  renderActiveExam();
+  updateDashboardStats();
 });

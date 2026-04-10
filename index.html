@@ -1,1111 +1,270 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ravza 💗 | EUL Grammar Portalı</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ravza 💗 | EUL Study System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<nav class="sidebar" id="sidebar">
-  <div class="logo">
-    <span class="logo-hearts">♡ ♡ ♡</span>
-    <h2>EUL Prep.</h2>
-    <p>Ravza'nın Özel Notları 💗</p>
-  </div>
-  <ul class="nav-links">
-    <li><button onclick="navigate('dashboard')" class="active" id="nav-dashboard"><span class="nav-icon">🏠</span>Ana Sayfa</button></li>
-    <li><button onclick="navigate('wordlist1a')" id="nav-wordlist1a"><span class="nav-icon">🔤</span>Kelime Listesi (1A)</button></li>
-    <li><button onclick="navigate('adjectives')" id="nav-adjectives"><span class="nav-icon">📝</span>Sıfatlar (1B)</button></li>
-    <li><button onclick="navigate('presenttenses')" id="nav-presenttenses"><span class="nav-icon">⏱️</span>Present Tenses (2A)</button></li>
-    <li><button onclick="navigate('possessives')" id="nav-possessives"><span class="nav-icon">🔑</span>İyelik / Possessives (2B)</button></li>
-    <li><button onclick="navigate('pasttenses')" id="nav-pasttenses"><span class="nav-icon">⏳</span>Past Tenses (3A)</button></li>
-    <li><button onclick="navigate('prepositions')" id="nav-prepositions"><span class="nav-icon">📍</span>Prepositions (3B)</button></li>
-    <li><button onclick="navigate('futureforms')" id="nav-futureforms"><span class="nav-icon">🔮</span>Future Forms (4A)</button></li>
-    <li><button onclick="navigate('conditionals12')" id="nav-conditionals12"><span class="nav-icon">🔀</span>1st &amp; 2nd Conditionals (4B)</button></li>
-    <li><button onclick="navigate('perfect')" id="nav-perfect"><span class="nav-icon">📘</span>Present Perfect Simple (5A)</button></li>
-    <li><button onclick="navigate('perfectcont')" id="nav-perfectcont"><span class="nav-icon">📘</span>Present Perfect Cont. (5B)</button></li>
-    <li><button onclick="navigate('modals')" id="nav-modals"><span class="nav-icon">⚠️</span>Modals: Obligation (6A)</button></li>
-    <li><button onclick="navigate('ability')" id="nav-ability"><span class="nav-icon">💪</span>Can / Could / Able to (6B)</button></li>
-    <li><button onclick="navigate('phrasal')" id="nav-phrasal"><span class="nav-icon">🔗</span>Phrasal Verbs (7A)</button></li>
-    <li><button onclick="navigate('verbpatterns')" id="nav-verbpatterns"><span class="nav-icon">🔄</span>Verb Patterns (7B)</button></li>
-    <li><button onclick="navigate('causative')" id="nav-causative"><span class="nav-icon">🔧</span>Have Something Done (8A)</button></li>
-    <li><button onclick="navigate('passive')" id="nav-passive"><span class="nav-icon">🏛️</span>Passive Voice (8B)</button></li>
-    <li><button onclick="navigate('reported')" id="nav-reported"><span class="nav-icon">💬</span>Reported Speech (9A)</button></li>
-    <li><button onclick="navigate('conditionals3')" id="nav-conditionals3"><span class="nav-icon">⏪</span>3rd Conditional (9B)</button></li>
-    <li><button onclick="navigate('auxiliaries')" id="nav-auxiliaries"><span class="nav-icon">ℹ️</span>Be / Do / Have (10A)</button></li>
-    <li><button onclick="navigate('compare')" id="nav-compare"><span class="nav-icon">⚖️</span>Karışanlar Arenası</button></li>
-    <li><button onclick="navigate('recap')" id="nav-recap"><span class="nav-icon">⚡</span>Hızlı Tekrar</button></li>
-  </ul>
-
-  <div class="sidebar-theme">
-    <div class="theme-switch-label">
-      <span class="icon">☀️</span>
-      <span>Tema</span>
+  <nav class="sidebar" id="sidebar">
+    <div class="logo">
+      <span class="logo-hearts">♡ ♡ ♡</span>
+      <h2>EUL Prep.</h2>
+      <p>Ravza'nın daha düzenli çalışma alanı 💗</p>
     </div>
-    <button
-      class="theme-switch"
-      id="theme-switch"
-      onclick="toggleTheme()"
-      aria-label="Karanlık moda geç"
-      title="Gündüz / Gece modu">
-    </button>
-    <div class="theme-switch-label">
-      <span class="icon">🌙</span>
-    </div>
-  </div>
 
-  <div class="sidebar-footer">Yusuf'un sana özel hediyesi <span>♡</span></div>
-</nav>
+    <ul class="nav-links">
+      <li><button onclick="navigate('dashboard')" id="nav-dashboard" class="active"><span class="nav-icon">🏠</span>Ana Sayfa</button></li>
+      <li><button onclick="navigate('studyhub')" id="nav-studyhub"><span class="nav-icon">📚</span>Çalışma Merkezi</button></li>
+      <li><button onclick="navigate('quizhub')" id="nav-quizhub"><span class="nav-icon">📝</span>Quiz Merkezi</button></li>
+      <li><button onclick="navigate('examcenter')" id="nav-examcenter"><span class="nav-icon">🎯</span>Sınav Merkezi</button></li>
+      <li><button onclick="navigate('recap')" id="nav-recap"><span class="nav-icon">⚡</span>Hızlı Tekrar</button></li>
+    </ul>
 
-<main class="main-content">
-  <header class="topbar">
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Konu ara… (örn: passive, reported)" onkeyup="searchTopics()">
-    </div>
-    <div class="topbar-right">
+    <div class="sidebar-theme">
+      <div class="theme-switch-label">
+        <span class="icon">☀️</span>
+        <span>Tema</span>
+      </div>
       <button
-        class="topbar-theme-btn"
-        id="topbar-theme-btn"
+        class="theme-switch"
+        id="theme-switch"
         onclick="toggleTheme()"
-        title="Gündüz / Gece modu">🌙</button>
-      <div class="topbar-badge">Başarılar Ravza! ✨</div>
+        aria-label="Karanlık moda geç"
+        title="Gündüz / Gece modu"></button>
+      <div class="theme-switch-label">
+        <span class="icon">🌙</span>
+      </div>
     </div>
-  </header>
 
-  <div class="content-wrapper">
+    <div class="sidebar-footer">Yusuf'tan Ravza'ya özel çalışma sistemi <span>♡</span></div>
+  </nav>
 
-    <section id="dashboard" class="page active">
-      <div class="hero">
-        <h1>Harika gidiyorsun, Ravza! 💙</h1>
-        <p>EUL hazırlık sınavı için ihtiyacın olan tüm grammar konuları burada. Oxford English File kitabından derlenen gerçek sınav pratikleriyle tamamen hazırsın. Sana inanıyorum! ♡</p>
-        <div class="hero-hearts">♡  ♡  ♡  ♡  ♡</div>
+  <main class="main-content">
+    <header class="topbar">
+      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Konu ara… örn: passive, possessives, conditionals" onkeyup="searchTopics(event)">
       </div>
-      <div class="progress-card">
-        <h3>Çalışma İlerlemen</h3>
-        <div class="progress-bar-bg"><div class="progress-fill" id="main-progress"></div></div>
-        <p class="progress-text" id="progress-text">0/19 Konu Tamamlandı</p>
+      <div class="topbar-right">
+        <button class="topbar-theme-btn" id="topbar-theme-btn" onclick="toggleTheme()" title="Gündüz / Gece modu">🌙</button>
+        <div class="topbar-badge">Çalış • Çöz • Sınan ✨</div>
       </div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-num">19</div><div class="stat-label">Grammar Konusu</div></div>
-        <div class="stat-card"><div class="stat-num">19</div><div class="stat-label">Gerçek Sınav Quizi</div></div>
-        <div class="stat-card"><div class="stat-num">27+</div><div class="stat-label">Kelime Kartı</div></div>
-        <div class="stat-card"><div class="stat-num">♡</div><div class="stat-label">Yusuf'dan</div></div>
-      </div>
-      <div class="dash-grid">
-        <div class="dash-card" onclick="navigate('wordlist1a')"><div class="dc-icon">🔤</div><h4>Kelime Listesi (1A)</h4><p>27 akademik kelime: tanım ve örnek cümlelerle Unit 1A kelime listesi.</p></div>
-        <div class="dash-card" onclick="navigate('presenttenses')"><div class="dc-icon">⏱️</div><h4>Present Tenses (2A)</h4><p>Action vs Non-action verbs. Gelecek planları ve timetable kuralı.</p></div>
-        <div class="dash-card" onclick="navigate('pasttenses')"><div class="dc-icon">⏳</div><h4>Past Tenses (3A)</h4><p>Past Simple, Past Continuous ve "used to" arasındaki ince farklar.</p></div>
-        <div class="dash-card" onclick="navigate('conditionals12')"><div class="dc-icon">🔀</div><h4>Conditionals</h4><p>1., 2. ve 3. koşul cümlelerinin tam rehberi. Unless kullanımı dahil.</p></div>
-        <div class="dash-card" onclick="navigate('verbpatterns')"><div class="dc-icon">🔄</div><h4>Verb Patterns (7B)</h4><p>Hangi fiil TO alır, hangisi -ING alır? Let ve Make kuralları.</p></div>
-        <div class="dash-card" onclick="navigate('causative')"><div class="dc-icon">🔧</div><h4>Have Something Done (8A)</h4><p>Başkasına iş yaptırma: I had my hair cut mantığı ve Passive farkı.</p></div>
-        <div class="dash-card" onclick="navigate('passive')"><div class="dc-icon">🏛️</div><h4>Passive Voice (8B)</h4><p>Tüm zamanların passive halleri. Sınavların vazgeçilmez konusu.</p></div>
-        <div class="dash-card" onclick="navigate('reported')"><div class="dc-icon">💬</div><h4>Reported Speech (9A)</h4><p>Soru cümleleri nasıl aktarılır? Zaman kayması (backshift) kuralları.</p></div>
-        <div class="dash-card" onclick="navigate('compare')"><div class="dc-icon">⚖️</div><h4>Karışanlar Arenası</h4><p>Sınavda en çok tuzağa düşülen ikililer yan yana karşılaştırma.</p></div>
-        <div class="dash-card" onclick="navigate('recap')"><div class="dc-icon">⚡</div><h4>Hızlı Tekrar</h4><p>Sınava 10 dakika kala bakman gereken altın değerinde özet kurallar.</p></div>
-      </div>
-    </section>
+    </header>
 
-    <section id="wordlist1a" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 1A</span>
-          <h2>Kelime Listesi</h2>
-          <p class="subtitle">27 Akademik Kelime · Tanım · Örnek Cümle</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('wordlist1a')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>Kelimeler ve Anlamları</h3>
-        <table class="grammar-table">
-          <tr><th>Kelime / İfade</th><th>Tanım (TR)</th><th>Örnek Cümle</th></tr>
-          <tr><td><strong>Researchers</strong></td><td>Araştırmacılar</td><td><em>Researchers are working on new ways to reduce air pollution.</em></td></tr>
-          <tr><td><strong>Evidence</strong></td><td>Kanıt</td><td><em>There is strong evidence that exercise improves mental health.</em></td></tr>
-          <tr><td><strong>Survey</strong></td><td>Anket</td><td><em>The teacher did a survey to find out students' favourite books.</em></td></tr>
-          <tr><td><strong>The average</strong></td><td>Ortalama</td><td><em>The average score in the exam was 75.</em></td></tr>
-          <tr><td><strong>Scale</strong></td><td>Ölçek</td><td><em>The pain is measured on a scale from 1 to 10.</em></td></tr>
-          <tr><td><strong>Rank</strong></td><td>Sıralamak</td><td><em>Students were ranked according to their test results.</em></td></tr>
-          <tr><td><strong>Likely</strong></td><td>Muhtemel</td><td><em>It is likely that it will rain tomorrow.</em></td></tr>
-          <tr><td><strong>Overall</strong></td><td>Genel olarak</td><td><em>Overall, the project was a success.</em></td></tr>
-          <tr><td><strong>Beyond</strong></td><td>Ötesinde</td><td><em>His kindness goes beyond what we imagined.</em></td></tr>
-          <tr><td><strong>Stand out</strong></td><td>Göze çarpmak</td><td><em>Her bright dress made her stand out in the crowd.</em></td></tr>
-          <tr><td><strong>Maiden name</strong></td><td>Kız soyadı</td><td><em>She still uses her maiden name at work.</em></td></tr>
-          <tr><td><strong>Celebrity</strong></td><td>Ünlü</td><td><em>The restaurant is popular with celebrities.</em></td></tr>
-        </table>
-        <div class="quiz-container" id="quiz-wordlist1a">
-          <h3>📝 Workbook Practice: Word List 1A</h3>
-          <div class="question">
-            <p>1. "There is strong ___ that exercise improves mental health."</p>
-            <label><input type="radio" name="wq1" value="wrong"> a) survey</label>
-            <label><input type="radio" name="wq1" value="correct"> b) evidence</label>
-            <label><input type="radio" name="wq1" value="wrong"> c) proof</label>
-          </div>
-          <div class="question">
-            <p>2. "Her bright dress made her ___ in the crowd."</p>
-            <label><input type="radio" name="wq2" value="correct"> a) stand out</label>
-            <label><input type="radio" name="wq2" value="wrong"> b) go about</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-wordlist1a')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="adjectives" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 1B</span>
-          <h2>Adjectives (Sıfatlar)</h2>
-          <p class="subtitle">One/ones · Comparatives · Superlatives · A bit / Much</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('adjectives')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1. Sıfat Kullanımı</h3>
-        <div class="info-box">
-          <p>⚠️ Sıfat + İsim kullanıldığında tekillerde A/AN şarttır!</p>
-          <p>She is a beautiful girl. ✅ (NOT She is beautiful girl ❌)</p>
-        </div>
-        <h3>2. One / Ones</h3>
-        <p>Tekrarı önlemek için kullanılır. Tekil isim yerine <strong>one</strong>, çoğul yerine <strong>ones</strong>.</p>
-        <div class="info-box">
-          <p>A: Which pen? B: The blue <strong>one</strong>. (pen = singular)</p>
-          <p>A: Which books? B: The red <strong>ones</strong>. (books = plural)</p>
-        </div>
-        <h3>3. Comparatives & Superlatives</h3>
-        <table class="grammar-table">
-          <tr><th>Adjective</th><th>Comparative (Kıyas)</th><th>Superlative (En)</th></tr>
-          <tr><td>tall (tek hece)</td><td>tall<strong>er</strong> than</td><td><strong>the</strong> tall<strong>est</strong></td></tr>
-          <tr><td>bored (-ed sıfatlar)</td><td><strong>more</strong> bored than</td><td><strong>the most</strong> bored</td></tr>
-          <tr><td>dangerous (çok hece)</td><td><strong>more</strong> dangerous</td><td><strong>the most</strong> dangerous</td></tr>
-          <tr><td>good (düzensiz)</td><td><strong>better</strong></td><td><strong>the best</strong></td></tr>
-        </table>
-        <div class="warning-box">
-          <strong>⚠️ A bit & Much</strong><br>
-          Küçük fark → It's <strong>a bit</strong> cloudier today. <br>
-          Büyük fark → Your job is <strong>much</strong> more stressful than mine.
-        </div>
-        <div class="quiz-container" id="quiz-adjectives">
-          <h3>📝 Workbook Practice: Adjectives</h3>
-          <div class="question">
-            <p>1. Doğru olanı seç (Circle the correct form):</p>
-            <label><input type="radio" name="aq1" value="wrong"> a) She's a person very ambitious.</label>
-            <label><input type="radio" name="aq1" value="correct"> b) She's a very ambitious person.</label>
-          </div>
-          <div class="question">
-            <p>2. "That's the ___ film I've ever seen." (bad)</p>
-            <label><input type="radio" name="aq2" value="wrong"> a) most bad</label>
-            <label><input type="radio" name="aq2" value="correct"> b) worst</label>
-          </div>
-          <div class="question">
-            <p>3. "Cats are ___ selfish than dogs." (büyük fark)</p>
-            <label><input type="radio" name="aq3" value="wrong"> a) a bit more</label>
-            <label><input type="radio" name="aq3" value="correct"> b) much more</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-adjectives')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="presenttenses" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 2A</span>
-          <h2>Present Tenses</h2>
-          <p class="subtitle">Action / Non-Action Verbs · Future Arrangements · Timetables</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('presenttenses')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1. Action vs Non-Action (Stative) Verbs</h3>
-        <p>Bazı fiiller durum, his veya sahiplik bildirir. Bu fiiller <strong>-ing almazlar! (Present Continuous ile KULLANILMAZLAR)</strong></p>
-        <div class="formula-box">
-          <p>Stative Verbs:</p>
-          <div class="formula">agree, believe, belong, hate, know, like, love, need, prefer, realize, remember, suppose, want</div>
-        </div>
-        <div class="warning-box">
-          <strong>⚠️ Dikkat: Anlama Göre Değişenler!</strong><br>
-          <strong>HAVE:</strong> I <em>have</em> a car (Sahiplik = Stative). / I <em>am having</em> a shower (Eylem = Action).<br>
-          <strong>THINK:</strong> I <em>think</em> it's a good idea (Fikir). / I <em>am thinking</em> about moving (Düşünme eylemi).
+    <div class="content-wrapper">
+      <section id="dashboard" class="page active">
+        <div class="hero">
+          <h1>Çalışma, quiz ve sınav artık ayrı alanlarda 💙</h1>
+          <p>Bu sürümde konuları önce düzenli şekilde çalışabilir, sonra her konu için ayrı quiz çözebilir ve en sonda karışık deneme sınavına girebilirsin. Daha planlı ve daha rahat bir akış oluşturuldu.</p>
+          <div class="hero-hearts">♡  ♡  ♡  ♡  ♡</div>
         </div>
 
-        <h3>2. Gelecek Planları (Future Arrangements)</h3>
-        <p>Kişisel olarak planlanmış ve ayarlanmış gelecek olayları için <strong>Present Continuous (am/is/are + V-ing)</strong> kullanılır.</p>
-        <div class="info-box">
-          <p>I'<strong>m leaving</strong> tomorrow and I'm coming back on Tuesday.</p>
-          <p>We'<strong>re seeing</strong> our grandparents this weekend.</p>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num" id="stat-study-complete">0/19</div>
+            <div class="stat-label">Tamamlanan Çalışma</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-quiz-complete">0/19</div>
+            <div class="stat-label">Tamamlanan Quiz</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-best-exam">0%</div>
+            <div class="stat-label">En İyi Sınav Sonucu</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-question-bank">0</div>
+            <div class="stat-label">Toplam Soru Havuzu</div>
+          </div>
         </div>
 
-        <h3>3. Timetable Future (Zaman Çizelgeleri)</h3>
-        <p>Ulaşım (uçak, tren vb.), sinema, ders saatleri gibi kişisel olmayan sabit zaman çizelgeleri için <strong>Present Simple</strong> kullanılır.</p>
-        <div class="info-box">
-          <p>The train <strong>leaves</strong> at 6.30 in the morning.</p>
-          <p>What time <strong>does</strong> your flight <strong>arrive</strong>?</p>
+        <div class="progress-shell">
+          <div class="progress-card">
+            <div class="progress-card-head">
+              <h3>Çalışma ilerlemesi</h3>
+              <span id="study-progress-label">0%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-fill" id="study-progress-fill"></div></div>
+            <p class="progress-text" id="study-progress-text">0 / 19 çalışma tamamlandı</p>
+          </div>
+          <div class="progress-card">
+            <div class="progress-card-head">
+              <h3>Quiz ilerlemesi</h3>
+              <span id="quiz-progress-label">0%</span>
+            </div>
+            <div class="progress-bar-bg alt"><div class="progress-fill alt" id="quiz-progress-fill"></div></div>
+            <p class="progress-text" id="quiz-progress-text">0 / 19 quiz tamamlandı</p>
+          </div>
         </div>
 
-        <div class="quiz-container" id="quiz-presenttenses">
-          <h3>📝 Workbook Practice: Present Tenses</h3>
-          <div class="question">
-            <p>1. The flight ________ at 6.50 in the morning.</p>
-            <label><input type="radio" name="ptq1" value="correct"> a) leaves (timetable)</label>
-            <label><input type="radio" name="ptq1" value="wrong"> b) is leaving</label>
+        <div class="panel-grid">
+          <div class="feature-panel">
+            <div class="panel-badge">1. ADIM</div>
+            <h3>Çalışma Merkezi</h3>
+            <p>Konu anlatımları burada. Her konuda özet, kritik kurallar, mini notlar ve çalışma tamamlama butonu var.</p>
+            <button class="primary-btn" onclick="navigate('studyhub')">Çalışmaya Git</button>
           </div>
-          <div class="question">
-            <p>2. We ________ in an airport hotel tonight. (£200 a night!)</p>
-            <label><input type="radio" name="ptq2" value="wrong"> a) stay</label>
-            <label><input type="radio" name="ptq2" value="correct"> b) 're staying (arrangement)</label>
-          </div>
-          <div class="question">
-            <p>3. ________ Andrew's sister?</p>
-            <label><input type="radio" name="ptq3" value="wrong"> a) Are you knowing</label>
-            <label><input type="radio" name="ptq3" value="correct"> b) Do you know (stative verb)</label>
-          </div>
-          <div class="question">
-            <p>4. I ________ of going on a safari next year.</p>
-            <label><input type="radio" name="ptq4" value="correct"> a) 'm thinking (eylem/süreç)</label>
-            <label><input type="radio" name="ptq4" value="wrong"> b) think</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-presenttenses')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
 
-    <section id="possessives" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 2B</span>
-          <h2>Possessives (İyelik)</h2>
-          <p class="subtitle">'s · Plural possessives · Two names · Of · Own</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('possessives')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1. Possessive 's & Çoğul İyelik</h3>
-        <div class="info-box">
-          <p><strong>Tekil:</strong> This is Tom<strong>'s</strong> car.</p>
-          <p><strong>Düzenli Çoğul (-s ile biten):</strong> The teacher<strong>s'</strong> room is upstairs.</p>
-          <p><strong>Düzensiz Çoğul:</strong> The children<strong>'s</strong> playground.</p>
-        </div>
-        <h3>2. İki İsim (Two Names)</h3>
-        <div class="warning-box">
-          <strong>Paylaşılan tek bir şeyse</strong> → sadece ikinci isme 's: Emma and Mia<strong>'s</strong> house is modern. ✅<br>
-          <strong>Ayrı ayrı şeylerse</strong> → her ikisine 's: Emma<strong>'s</strong> and Mia<strong>'s</strong> bags are different. ✅
-        </div>
-        <h3>3. "Of" Yapısı</h3>
-        <p>Cansız nesnelerin sahipliği için kullanılır.</p>
-        <div class="info-box">
-          <p>The door <strong>of</strong> the car was open. (NOT the car's door)</p>
-          <p>The top <strong>of</strong> the building. (NOT the building's top)</p>
+          <div class="feature-panel">
+            <div class="panel-badge quiz">2. ADIM</div>
+            <h3>Quiz Merkezi</h3>
+            <p>Konu çalıştıktan sonra sadece quiz odaklı ayrı sayfaya geçebilirsin. Böylece not ve soru birbirine karışmaz.</p>
+            <button class="primary-btn soft" onclick="navigate('quizhub')">Quizlere Git</button>
+          </div>
+
+          <div class="feature-panel">
+            <div class="panel-badge exam">3. ADIM</div>
+            <h3>Sınav Merkezi</h3>
+            <p>Karışık soru havuzundan mini, orta veya tam deneme başlat. Süre, skor ve cevap inceleme ekranı var.</p>
+            <button class="primary-btn dark" onclick="navigate('examcenter')">Sınava Başla</button>
+          </div>
         </div>
 
-        <div class="quiz-container" id="quiz-possessives">
-          <h3>📝 Workbook Practice: Possessives</h3>
-          <div class="question">
-            <p>1. What's ________ where Suzy works?</p>
-            <label><input type="radio" name="pq1" value="correct"> a) the name of the shop (cansız)</label>
-            <label><input type="radio" name="pq1" value="wrong"> b) the shop's name</label>
+        <div class="dashboard-grid">
+          <div class="dashboard-card">
+            <h3>Bugünkü önerilen akış</h3>
+            <ol class="dashboard-steps">
+              <li>Önce 2 konu çalış</li>
+              <li>Sonra o 2 konunun quizini çöz</li>
+              <li>Günün sonunda mini deneme yap</li>
+            </ol>
           </div>
-          <div class="question">
-            <p>2. That's ________ over there.</p>
-            <label><input type="radio" name="pq2" value="wrong"> a) the car of my friend</label>
-            <label><input type="radio" name="pq2" value="correct"> b) my friend's car (canlı)</label>
-          </div>
-          <div class="question">
-            <p>3. ________ names are Peter and Michael.</p>
-            <label><input type="radio" name="pq3" value="wrong"> a) My brother's</label>
-            <label><input type="radio" name="pq3" value="correct"> b) My brothers' (çoğul -s sonrasına kesme)</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-possessives')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
 
-    <section id="pasttenses" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 3A</span>
-          <h2>Past Tenses & Used To</h2>
-          <p class="subtitle">Past Simple · Past Continuous · Past Habits</p>
+          <div class="dashboard-card">
+            <h3>Son sınav özeti</h3>
+            <div id="latest-exam-box" class="empty-mini">Henüz bir sınav sonucu yok.</div>
+          </div>
         </div>
-        <button class="mark-complete" onclick="markDone('pasttenses')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1. Past Simple</h3>
-        <p>Geçmişte <strong>tamamlanmış</strong> eylemler için kullanılır. (Verb 2)</p>
-        <div class="info-box">
-          <p>When I was young, I <strong>loved</strong> playing outside.</p>
-          <p>Where <strong>did</strong> you go to school? (NOT did you went ❌)</p>
+      </section>
+
+      <section id="studyhub" class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <span class="unit-badge">STUDY HUB</span>
+            <h2>Çalışma Merkezi</h2>
+            <p class="subtitle">Konu anlatımı ve çalışma takibi burada.</p>
+          </div>
         </div>
 
-        <h3>2. Past Continuous</h3>
-        <p>Geçmişte belli bir anda devam eden veya <strong>başka bir eylem tarafından bölünen</strong> eylemler için.</p>
-        <div class="formula-box">
-          <div class="formula">was / were + V-ing</div>
-        </div>
-        <div class="info-box">
-          <p>I <strong>was watching</strong> TV when you arrived.</p>
-          <p>He was texting a friend when the accident <strong>happened</strong>. (Uzun eylem continuous, kısa eylem simple)</p>
+        <div class="hub-toolbar">
+          <input type="text" id="studyFilter" class="hub-search" placeholder="Çalışma merkezinde konu ara…" oninput="renderStudyHub(this.value)">
+          <div class="hub-legend">
+            <span><i class="dot success"></i> Tamamlandı</span>
+            <span><i class="dot neutral"></i> Bekliyor</span>
+          </div>
         </div>
 
-        <h3>3. Used to</h3>
-        <p>Geçmişteki <strong>alışkanlıklar</strong> veya şu an geçerli olmayan uzun süreli durumlar için.</p>
-        <div class="warning-box">
-          ✅ I <strong>used to</strong> live in Rome.<br>
-          ❌ They didn't <strong>used to</strong> live in London. (Doğrusu: <strong>didn't use to</strong>)<br>
-          ⚠️ Ne kadar süre yapıldığını belirtiyorsan "used to" kullanılmaz! (NOT I used to live in Rome for ten years ❌ -> I lived in Rome for ten years ✅)
+        <div id="studyHubGrid" class="hub-grid"></div>
+      </section>
+
+      <section id="studydetail" class="page">
+        <div id="studyDetailContent"></div>
+      </section>
+
+      <section id="quizhub" class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <span class="unit-badge quiz-badge">QUIZ HUB</span>
+            <h2>Quiz Merkezi</h2>
+            <p class="subtitle">Sadece soru çözmeye odaklanan ayrı alan.</p>
+          </div>
         </div>
 
-        <div class="quiz-container" id="quiz-pasttenses">
-          <h3>📝 Workbook Practice: Past Tenses</h3>
-          <div class="question">
-            <p>1. Where did you ________ on holiday when you were young?</p>
-            <label><input type="radio" name="pastq1" value="correct"> a) use to go</label>
-            <label><input type="radio" name="pastq1" value="wrong"> b) used to go</label>
+        <div class="hub-toolbar">
+          <input type="text" id="quizFilter" class="hub-search" placeholder="Quiz merkezinde konu ara…" oninput="renderQuizHub(this.value)">
+          <div class="hub-legend">
+            <span><i class="dot success"></i> Bitti</span>
+            <span><i class="dot exam"></i> Hazır</span>
           </div>
-          <div class="question">
-            <p>2. This time last week I ________ on a beach.</p>
-            <label><input type="radio" name="pastq2" value="wrong"> a) sat</label>
-            <label><input type="radio" name="pastq2" value="correct"> b) was sitting (spesifik geçmiş an)</label>
-          </div>
-          <div class="question">
-            <p>3. We used to ________ going to concerts when we were students.</p>
-            <label><input type="radio" name="pastq3" value="wrong"> a) loving</label>
-            <label><input type="radio" name="pastq3" value="correct"> b) love (used to + V1)</label>
-          </div>
-          <div class="question">
-            <p>4. Sorry, I didn't hear what you said, I ________ the news.</p>
-            <label><input type="radio" name="pastq4" value="correct"> a) was watching</label>
-            <label><input type="radio" name="pastq4" value="wrong"> b) watched</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-pasttenses')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="prepositions" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 3B</span>
-          <h2>Prepositions (Edatlar)</h2>
-          <p class="subtitle">Place · Movement · Dependent Prepositions</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('prepositions')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1. Place & Movement</h3>
-        <table class="grammar-table">
-          <tr><th>Kategori</th><th>Edatlar & Örnekler</th></tr>
-          <tr><td><strong>Place (Yer)</strong></td><td>in, on, under, in front of. <em>She sat in the square.</em></td></tr>
-          <tr><td><strong>Movement (Hareket)</strong></td><td>over, across, through, along. <em>The plane flew over the city.</em></td></tr>
-        </table>
-        
-        <h3>2. Dependent Prepositions</h3>
-        <div class="info-box">
-          <p>wait <strong>for</strong>, worried <strong>about</strong>, good <strong>at</strong>, tired <strong>of</strong>, proud <strong>of</strong>.</p>
-        </div>
-        <div class="warning-box">
-          <strong>⚠️ Edattan Sonra -ING Gelir!</strong><br>
-          I'm looking forward to <strong>seeing</strong> you. (NOT to see)<br><br>
-          <strong>⚠️ Edat ALMAYAN Fiiller (Sınav Tuzağı):</strong><br>
-          ask, discuss, enter, marry, tell → <em>We discussed the situation. (NOT discussed about)</em>
         </div>
 
-        <div class="quiz-container" id="quiz-prepositions">
-          <h3>📝 Workbook Practice: Prepositions</h3>
-          <div class="question">
-            <p>1. The mouse ran ________ the stairs, ________ the corridor, and ________ the kitchen.</p>
-            <label><input type="radio" name="prepq1" value="wrong"> a) into / across / down</label>
-            <label><input type="radio" name="prepq1" value="correct"> b) down / along / into</label>
-          </div>
-          <div class="question">
-            <p>2. I'm tired ________ all this work - I'm ready ________ a holiday!</p>
-            <label><input type="radio" name="prepq2" value="correct"> a) of / for</label>
-            <label><input type="radio" name="prepq2" value="wrong"> b) from / to</label>
-          </div>
-          <div class="question">
-            <p>3. We need to discuss ________ the problems with our IT department.</p>
-            <label><input type="radio" name="prepq3" value="wrong"> a) about</label>
-            <label><input type="radio" name="prepq3" value="correct"> b) [-] (no preposition)</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-prepositions')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
+        <div id="quizHubGrid" class="hub-grid"></div>
+      </section>
 
-    <section id="futureforms" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 4A</span>
-          <h2>Future Forms</h2>
-          <p class="subtitle">Will / Shall · Be Going To · Future in the Past</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('futureforms')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>Will / Shall vs Be Going To</h3>
-        <table class="grammar-table">
-          <tr><th>Form</th><th>Kullanım Alanı</th><th>Örnek</th></tr>
-          <tr><td><strong>will / won't</strong></td><td>Anlık kararlar, sözler, kontrol dışı gerçekler.</td><td><em>I'll have a coffee. / I won't do it again.</em></td></tr>
-          <tr><td><strong>be going to</strong></td><td>Önceden yapılmış planlar, kanıta dayalı tahminler.</td><td><em>Look at the clouds! It's going to rain.</em></td></tr>
-          <tr><td><strong>shall I / we</strong></td><td>Teklif ve öneri sormak için (sadece I ve We ile).</td><td><em>Shall I cook dinner tonight?</em></td></tr>
-        </table>
-        
-        <div class="warning-box">
-          <strong>⚠️ The Future in the Past (Geçmişte Gelecek)</strong><br>
-          Gerçekleşmeyen planlar için <strong>was/were going to</strong> kullanılır.<br>
-          <em>I was going to call you, but I forgot.</em>
+      <section id="quizdetail" class="page">
+        <div id="quizDetailContent"></div>
+      </section>
+
+      <section id="examcenter" class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <span class="unit-badge exam-badge">EXAM HUB</span>
+            <h2>Sınav Merkezi</h2>
+            <p class="subtitle">Karışık deneme sınavı, süre takibi ve sonuç analizi.</p>
+          </div>
         </div>
 
-        <div class="quiz-container" id="quiz-futureforms">
-          <h3>📝 Workbook Practice: Future Forms</h3>
-          <div class="question">
-            <p>1. A: Is that the doorbell? B: Yes, it is. ________.</p>
-            <label><input type="radio" name="ffq1" value="wrong"> a) I'm going to get it</label>
-            <label><input type="radio" name="ffq1" value="correct"> b) I'll get it (anlık karar)</label>
+        <div class="exam-modes">
+          <div class="exam-mode-card">
+            <div class="mode-top">
+              <span class="mode-chip">Mini</span>
+              <strong>10 soru</strong>
+            </div>
+            <p>Hızlı tekrar sonrası ideal. Süre: 8 dakika.</p>
+            <button class="primary-btn" onclick="startExam(10, 8)">Mini Sınav Başlat</button>
           </div>
-          <div class="question">
-            <p>2. A: What are your plans for the weekend? B: ________ lots of gardening.</p>
-            <label><input type="radio" name="ffq2" value="correct"> a) I'm going to do (plan)</label>
-            <label><input type="radio" name="ffq2" value="wrong"> b) I'll do</label>
-          </div>
-          <div class="question">
-            <p>3. This cardboard box is empty. ________ put it in the recycling bin?</p>
-            <label><input type="radio" name="ffq3" value="wrong"> a) Will I</label>
-            <label><input type="radio" name="ffq3" value="correct"> b) Shall I (teklif/soru)</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-futureforms')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
 
-    <section id="conditionals12" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 4B</span>
-          <h2>1st & 2nd Conditionals</h2>
-          <p class="subtitle">Gerçek Olasılıklar vs Hayali Durumlar</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('conditionals12')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1st Conditional (Gerçekçi Gelecek)</h3>
-        <div class="formula-box"><div class="formula">If + Present Simple , will/won't + V1</div></div>
-        <div class="info-box">
-          <p>If I <strong>have</strong> time, I'<strong>ll write</strong> my CV tonight.</p>
+          <div class="exam-mode-card">
+            <div class="mode-top">
+              <span class="mode-chip mid">Orta</span>
+              <strong>20 soru</strong>
+            </div>
+            <p>Günlük genel kontrol için iyi. Süre: 15 dakika.</p>
+            <button class="primary-btn soft" onclick="startExam(20, 15)">Orta Sınav Başlat</button>
+          </div>
+
+          <div class="exam-mode-card">
+            <div class="mode-top">
+              <span class="mode-chip full">Tam</span>
+              <strong>30 soru</strong>
+            </div>
+            <p>Daha ciddi deneme için. Süre: 25 dakika.</p>
+            <button class="primary-btn dark" onclick="startExam(30, 25)">Tam Sınav Başlat</button>
+          </div>
         </div>
 
-        <h3>2nd Conditional (Hayali Durumlar)</h3>
-        <div class="formula-box"><div class="formula">If + Past Simple , would/wouldn't + V1</div></div>
-        <div class="info-box">
-          <p>If I <strong>had</strong> more money, I <strong>wouldn't need</strong> to work overtime.</p>
-        </div>
-        <div class="warning-box">
-          <strong>⚠️ Tavsiye verirken:</strong> If I <strong>were</strong> you... (was değil!)<br>
-          <strong>Unless = If... not:</strong> I won't go <strong>unless</strong> you go too. (=if you don't go)
+        <div id="examMetaBox" class="exam-meta-box">
+          <div class="exam-meta-item">
+            <span>Hazır soru havuzu</span>
+            <strong id="exam-bank-count">0</strong>
+          </div>
+          <div class="exam-meta-item">
+            <span>En iyi derece</span>
+            <strong id="exam-best-inline">0%</strong>
+          </div>
+          <div class="exam-meta-item">
+            <span>Son sonuç</span>
+            <strong id="exam-last-inline">—</strong>
+          </div>
         </div>
 
-        <div class="quiz-container" id="quiz-cond12">
-          <h3>📝 Workbook Practice: 1st & 2nd Cond.</h3>
-          <div class="question">
-            <p>1. If I go to university, I ________ engineering.</p>
-            <label><input type="radio" name="c12q1" value="wrong"> a) 'd study</label>
-            <label><input type="radio" name="c12q1" value="correct"> b) 'll study (1st conditional)</label>
+        <div id="examWorkspace" class="exam-workspace">
+          <div class="empty-state">
+            <h3>Henüz aktif bir sınav yok</h3>
+            <p>Yukarıdan bir sınav türü seçip karışık grammar sınavını başlatabilirsin.</p>
           </div>
-          <div class="question">
-            <p>2. If she ________ her own car, she wouldn't need to borrow yours.</p>
-            <label><input type="radio" name="c12q2" value="correct"> a) had (2nd conditional)</label>
-            <label><input type="radio" name="c12q2" value="wrong"> b) has</label>
-          </div>
-          <div class="question">
-            <p>3. We can't help you ________ you tell us what the problem is.</p>
-            <label><input type="radio" name="c12q3" value="wrong"> a) if</label>
-            <label><input type="radio" name="c12q3" value="correct"> b) unless</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-cond12')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="perfect" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 5A</span>
-          <h2>Present Perfect Simple</h2>
-          <p class="subtitle">Have/has + V3 · For/Since · Just/Yet/Already</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('perfect')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>Ne Zaman Kullanılır?</h3>
-        <table class="grammar-table">
-          <tr><th>Kullanım</th><th>Örnek</th></tr>
-          <tr><td>Geçmiş deneyimler (zaman belirsiz)</td><td><em>Have you ever watched a foreign TV series?</em></td></tr>
-          <tr><td>Yeni olmuş, taze haber (just)</td><td><em>He's just sent me a text.</em></td></tr>
-          <tr><td>Beklenenden erken (already)</td><td><em>I've already finished it.</em></td></tr>
-          <tr><td>Henüz olmamış / Soru (yet)</td><td><em>I haven't talked to her yet.</em></td></tr>
-        </table>
-        
-        <div class="warning-box">
-          <strong>⚠️ Geçmiş Zaman Kelimesi Varsa → Past Simple!</strong><br>
-          ✅ I <strong>watched</strong> six episodes <em>last weekend</em>.<br>
-          ❌ I have watched six episodes last weekend.
-        </div>
-        
-        <div class="quiz-container" id="quiz-perfect">
-          <h3>📝 Workbook Practice: Perfect Simple</h3>
-          <div class="question">
-            <p>1. Oh no! We're late! The film ________.</p>
-            <label><input type="radio" name="pfq1" value="correct"> a) has already started</label>
-            <label><input type="radio" name="pfq1" value="wrong"> b) hasn't started yet</label>
+      <section id="recap" class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <span class="unit-badge">FAST RECAP</span>
+            <h2>Hızlı Tekrar Alanı</h2>
+            <p class="subtitle">Sınav öncesi en kritik kuralların kısa özeti.</p>
           </div>
-          <div class="question">
-            <p>2. I ________ to Canada, but I never went to the USA.</p>
-            <label><input type="radio" name="pfq2" value="wrong"> a) never went</label>
-            <label><input type="radio" name="pfq2" value="correct"> b) 've been (yaşam tecrübesi)</label>
-          </div>
-          <div class="question">
-            <p>3. They got married in May, so they ________ for six months.</p>
-            <label><input type="radio" name="pfq3" value="wrong"> a) 're married</label>
-            <label><input type="radio" name="pfq3" value="correct"> b) 've been married</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-perfect')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="perfectcont" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 5B</span>
-          <h2>Present Perfect Continuous</h2>
-          <p class="subtitle">Have been + V-ing · Süreklilik ve Görünür Sonuçlar</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('perfectcont')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>Kullanım Alanları</h3>
-        <p><strong>1. Tekrarlanan ve devam eden eylemler (lately / recently):</strong><br>
-        <em>She's been going for a walk every morning this week.</em></p>
-        
-        <p><strong>2. Gözle görülür fiziksel sonuç bırakan eylemler:</strong><br>
-        A: You look tired. B: I've been working in the garden. (Eylem bitmiş olsa da izi taze)</p>
-
-        <div class="warning-box">
-          <strong>⚠️ Stative Verbs Continuous Olmaz!</strong><br>
-          I've known them for 10 years. (NOT I've been knowing them ❌)<br><br>
-          <strong>Work ve Live İstisnası:</strong><br>
-          Bu iki fiil Simple ve Continuous ile aynı anlamda kullanılabilir.<br>
-          <em>I've lived here = I've been living here.</em>
         </div>
 
-        <div class="quiz-container" id="quiz-perfectcont">
-          <h3>📝 Workbook Practice: Perfect Continuous</h3>
-          <div class="question">
-            <p>1. I ________ too hard lately.</p>
-            <label><input type="radio" name="pcq1" value="wrong"> a) 'm working</label>
-            <label><input type="radio" name="pcq1" value="correct"> b) 've been working</label>
-          </div>
-          <div class="question">
-            <p>2. Ania is really tired - she ________ a lot for work since February.</p>
-            <label><input type="radio" name="pcq2" value="wrong"> a) 's travelling</label>
-            <label><input type="radio" name="pcq2" value="correct"> b) 's been travelling</label>
-          </div>
-          <div class="question">
-            <p>3. At last! I ________ for you for an hour!</p>
-            <label><input type="radio" name="pcq3" value="wrong"> a) 'm waiting</label>
-            <label><input type="radio" name="pcq3" value="correct"> b) 've been waiting</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-perfectcont')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
+        <div id="recapGrid" class="flashcard-grid"></div>
+      </section>
+    </div>
+  </main>
 
-    <section id="modals" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 6A</span>
-          <h2>Modals</h2>
-          <p class="subtitle">Obligation, Necessity, Prohibition, Advice</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('modals')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <table class="grammar-table">
-          <tr><th>Tür</th><th>Modals</th><th>Örnek</th></tr>
-          <tr><td><strong>Obligation (Zorunluluk)</strong></td><td>have to, must, need to</td><td><em>I have to start work at 9.00. (Dış kural)<br>I must remember... (İç zorunluluk)</em></td></tr>
-          <tr><td><strong>No Obligation (Gereklilik Yok)</strong></td><td>don't have to, needn't</td><td><em>You don't have to pay me now.</em></td></tr>
-          <tr><td><strong>Prohibition (Yasak!)</strong></td><td>mustn't</td><td><em>You mustn't drive. You've been drinking.</em></td></tr>
-          <tr><td><strong>Advice (Tavsiye)</strong></td><td>should, ought to</td><td><em>You should try that restaurant.</em></td></tr>
-        </table>
-        
-        <div class="warning-box">
-          <strong>⚠️ En Büyük Sınav Tuzağı: mustn't vs don't have to</strong><br>
-          <strong>mustn't:</strong> Yapılması tehlikeli veya yasak! (Don't drive!)<br>
-          <strong>don't have to:</strong> Yapmak zorunda değilsin, istersen yap.
-        </div>
-
-        <div class="quiz-container" id="quiz-modals">
-          <h3>📝 Workbook Practice: Modals</h3>
-          <div class="question">
-            <p>1. I ________ buy a new fridge last week.</p>
-            <label><input type="radio" name="mq1" value="correct"> a) had to (geçmiş zaman)</label>
-            <label><input type="radio" name="mq1" value="wrong"> b) must</label>
-          </div>
-          <div class="question">
-            <p>2. We ________ be at the airport until 5.00. Our flight isn't until 7.00.</p>
-            <label><input type="radio" name="mq2" value="wrong"> a) mustn't</label>
-            <label><input type="radio" name="mq2" value="correct"> b) don't have to (zorunlu değiliz)</label>
-          </div>
-          <div class="question">
-            <p>3. You ________ spill anything on the sofa - it's leather.</p>
-            <label><input type="radio" name="mq3" value="correct"> a) mustn't (yasak/zararlı)</label>
-            <label><input type="radio" name="mq3" value="wrong"> b) don't have to</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-modals')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="ability" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 6B</span>
-          <h2>Can, Could, Be able to</h2>
-          <p class="subtitle">Ability, Possibility, Permission, Deduction</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('ability')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>Temel Kurallar</h3>
-        <p><strong>Can:</strong> Şimdiki yetenek veya izin. (<em>I can sew.</em>)<br>
-        <strong>Could:</strong> Geçmişteki <em>genel</em> yetenek. (<em>She could swim when she was three.</em>)<br>
-        <strong>Be able to:</strong> Can'in olmadığı zaman formlarında kullanılır (Future, Perfect, Infinitive). (<em>I'd love to be able to ski.</em>)</p>
-        
-        <div class="warning-box">
-          <strong>⚠️ Geçmişte Tek, Spesifik Bir Olayda Başarı!</strong><br>
-          Geçmişte başardığımız zor, tekil bir olay için <strong>could kullanılmaz</strong>! <strong>was/were able to</strong> veya <strong>managed to</strong> kullanılır.<br>
-          <em>I couldn't find the book, but in the end I <strong>was able to</strong> buy it online. ✅ (NOT I could buy it ❌)</em>
-        </div>
-
-        <div class="quiz-container" id="quiz-ability">
-          <h3>📝 Workbook Practice: Can / Could / Able to</h3>
-          <div class="question">
-            <p>1. I'm afraid it's broken and I ________ mend it.</p>
-            <label><input type="radio" name="abq1" value="wrong"> a) won't can</label>
-            <label><input type="radio" name="abq1" value="correct"> b) won't be able to (gelecek form)</label>
-          </div>
-          <div class="question">
-            <p>2. He loves music - he ________ play the violin when he was four!</p>
-            <label><input type="radio" name="abq2" value="wrong"> a) managed to</label>
-            <label><input type="radio" name="abq2" value="correct"> b) could (genel geçmiş yetenek)</label>
-          </div>
-          <div class="question">
-            <p>3. I got a puncture, but I ________ change the wheel myself.</p>
-            <label><input type="radio" name="abq3" value="wrong"> a) could</label>
-            <label><input type="radio" name="abq3" value="correct"> b) was able to (tek/zor olayda başarı)</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-ability')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="phrasal" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 7A</span>
-          <h2>Phrasal Verbs</h2>
-          <p class="subtitle">Type 1 (No object) · Type 2 (Separable) · Type 3 (Inseparable)</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('phrasal')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1. Type 1: No Object</h3>
-        <p>Nesne almazlar, parçalanamazlar. <em>(get up, set off, take off)</em></p>
-        
-        <h3>2. Type 2: Separable (Ayrılabilir)</h3>
-        <p>Nesne alan ve fiil ile edatı arasına nesne girebilen phrasal verb'lerdir. <em>(fill in, put away, switch off)</em></p>
-        <div class="warning-box">
-          <strong>⚠️ En Kritik Kural: ZAMİR KURALI!</strong><br>
-          Eğer nesne bir zamirse (it, them), DAİMA fiil ile edatın arasına girmek zorundadır.<br>
-          ✅ I switched <strong>it</strong> off.<br>
-          ❌ I switched off it.
-        </div>
-
-        <h3>3. Type 3: Inseparable (Ayrılamaz)</h3>
-        <p>Nesne almalarına rağmen asla ayrılamazlar. Zamir gelse bile sona gelir. <em>(take after, get on with, look forward to)</em><br>
-        ✅ We take after him. (NOT We take him after ❌)</p>
-
-        <div class="quiz-container" id="quiz-phrasal">
-          <h3>📝 Workbook Practice: Phrasal Verbs</h3>
-          <div class="question">
-            <p>1. The pasta was cold, so I ________.</p>
-            <label><input type="radio" name="phq1" value="wrong"> a) sent back it</label>
-            <label><input type="radio" name="phq1" value="correct"> b) sent it back</label>
-          </div>
-          <div class="question">
-            <p>2. They ________.</p>
-            <label><input type="radio" name="phq2" value="correct"> a) live off their parents (inseparable)</label>
-            <label><input type="radio" name="phq2" value="wrong"> b) live their parents off</label>
-          </div>
-          <div class="question">
-            <p>3. Your phone's ringing. Quick, ________ ! (turn off)</p>
-            <label><input type="radio" name="phq3" value="wrong"> a) turn off it</label>
-            <label><input type="radio" name="phq3" value="correct"> b) turn it off</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-phrasal')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="verbpatterns" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 7B</span>
-          <h2>Verb Patterns</h2>
-          <p class="subtitle">Infinitive with TO · Bare Infinitive · Gerund (-ing)</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('verbpatterns')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <table class="grammar-table">
-          <tr><th>Form</th><th>Yaygın Fiiller</th><th>Örnek</th></tr>
-          <tr><td><strong>+ TO (Infinitive)</strong></td><td>want, need, try, decide, hope, refuse</td><td><em>Mandy agreed <strong>to come</strong>.</em></td></tr>
-          <tr><td><strong>+ -ING (Gerund)</strong></td><td>enjoy, finish, hate, give up, avoid</td><td><em>They enjoy <strong>watching</strong> films.</em></td></tr>
-          <tr><td><strong>Bare (Yalın)</strong></td><td>can, must, should (modals)</td><td><em>He can <strong>speak</strong> five languages.</em></td></tr>
-        </table>
-        
-        <div class="warning-box">
-          <strong>⚠️ Let ve Make Kuralları (Sınav Tuzağı!)</strong><br>
-          "Let" ve "Make" fiilleri kendilerinden sonra gelen nesneyle <strong>TO almadan</strong> yalın kullanılır!<br>
-          ✅ Our boss makes us <strong>work</strong> late. (NOT to work)<br>
-          ✅ His parents let him <strong>go</strong> to the concert. (NOT to go)
-        </div>
-
-        <div class="quiz-container" id="quiz-verbpatterns">
-          <h3>📝 Workbook Practice: Verb Patterns</h3>
-          <div class="question">
-            <p>1. We really enjoy ________ to concerts. (go)</p>
-            <label><input type="radio" name="vpq1" value="wrong"> a) to go</label>
-            <label><input type="radio" name="vpq1" value="correct"> b) going</label>
-          </div>
-          <div class="question">
-            <p>2. I hate ________ to visit my family more often... (not be able)</p>
-            <label><input type="radio" name="vpq2" value="wrong"> a) not to be able</label>
-            <label><input type="radio" name="vpq2" value="correct"> b) not being able (hate + ing)</label>
-          </div>
-          <div class="question">
-            <p>3. Karen's teacher allowed her to leave early. = Karen's teacher let her ________ early.</p>
-            <label><input type="radio" name="vpq3" value="correct"> a) leave (let + bare inf)</label>
-            <label><input type="radio" name="vpq3" value="wrong"> b) to leave</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-verbpatterns')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="causative" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 8A</span>
-          <h2>Have Something Done</h2>
-          <p class="subtitle">Başkasına İş Yaptırmak (Causative)</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('causative')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <div class="formula-box"><div class="formula">HAVE + OBJECT (Nesne) + V3 (Past Participle)</div></div>
-        
-        <p>İşi kendimiz yapmadığımızda, paramızla veya rica ederek başkasına yaptırdığımızda bu yapıyı kullanırız.</p>
-        
-        <div class="info-box">
-          <p><strong>Kendim yaptım:</strong> I cleaned my car yesterday.</p>
-          <p><strong>Yaptırttım:</strong> I <strong>had my car cleaned</strong> yesterday. (= I paid someone to clean it)</p>
-          <p><em>Not: "Have" yerine "Get" de kullanılabilir. (I'm going to get my hair cut.)</em></p>
-        </div>
-
-        <div class="quiz-container" id="quiz-causative">
-          <h3>📝 Workbook Practice: Causative</h3>
-          <div class="question">
-            <p>1. I (my hair had yesterday cut). Doğru sıralama:</p>
-            <label><input type="radio" name="cq1" value="wrong"> a) I had cut my hair yesterday.</label>
-            <label><input type="radio" name="cq1" value="correct"> b) I had my hair cut yesterday.</label>
-          </div>
-          <div class="question">
-            <p>2. We (to repaired don't have roof the need). Doğru sıralama:</p>
-            <label><input type="radio" name="cq2" value="wrong"> a) We don't have to repaired need the roof.</label>
-            <label><input type="radio" name="cq2" value="correct"> b) We don't need to have the roof repaired.</label>
-          </div>
-          <div class="question">
-            <p>3. He's (have to his taken going photo). Doğru sıralama:</p>
-            <label><input type="radio" name="cq3" value="correct"> a) He's going to have his photo taken.</label>
-            <label><input type="radio" name="cq3" value="wrong"> b) He's having to his photo taken going.</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-causative')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="passive" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 8B</span>
-          <h2>The Passive</h2>
-          <p class="subtitle">Edilgen Çatı (Am/is/are/was/were/been + V3)</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('passive')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <p>Eylemi yapan kişi bilinmediğinde, önemli olmadığında veya asıl odak eylemin kendisiyse Passive (Edilgen) yapı kullanılır.</p>
-        
-        <table class="grammar-table">
-          <tr><th>Zaman</th><th>Yapı</th><th>Örnek</th></tr>
-          <tr><td>Present Simple</td><td>is / are + V3</td><td>The site <strong>is visited</strong> by thousands.</td></tr>
-          <tr><td>Present Continuous</td><td>is / are <strong>being</strong> + V3</td><td>The castle <strong>is being restored</strong>.</td></tr>
-          <tr><td>Past Simple</td><td>was / were + V3</td><td>10,000 soldiers <strong>were killed</strong>.</td></tr>
-          <tr><td>Present Perfect</td><td>has / have <strong>been</strong> + V3</td><td>The body <strong>has never been found</strong>.</td></tr>
-          <tr><td>Will</td><td>will <strong>be</strong> + V3</td><td>When will the museum <strong>be built</strong>?</td></tr>
-        </table>
-        
-        <div class="warning-box">
-          Eylemi kimin yaptığını vurgulamak istersen cümlenin sonunda <strong>by</strong> kullanırsın.<br>
-          <em>The Sagrada Familia was designed <strong>by</strong> Antoni Gaudi.</em>
-        </div>
-
-        <div class="quiz-container" id="quiz-passive">
-          <h3>📝 Workbook Practice: Passive</h3>
-          <div class="question">
-            <p>1. The Guggenheim Museum in Bilbao ________ in 1997. (open)</p>
-            <label><input type="radio" name="pasq1" value="wrong"> a) opened</label>
-            <label><input type="radio" name="pasq1" value="correct"> b) was opened (Past Simple Passive)</label>
-          </div>
-          <div class="question">
-            <p>2. A new shopping centre ________ in the town centre at the moment. (build)</p>
-            <label><input type="radio" name="pasq2" value="wrong"> a) is building</label>
-            <label><input type="radio" name="pasq2" value="correct"> b) is being built (Present Cont. Passive)</label>
-          </div>
-          <div class="question">
-            <p>3. They grow rice in Valencia. (Active) -> Passive:</p>
-            <label><input type="radio" name="pasq3" value="correct"> a) Rice is grown in Valencia.</label>
-            <label><input type="radio" name="pasq3" value="wrong"> b) Rice was grown in Valencia.</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-passive')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="reported" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 9A</span>
-          <h2>Reported Speech</h2>
-          <p class="subtitle">Dolaylı Anlatım · Statements · Questions · Imperatives</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('reported')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>1. Statements (Zaman Kayması - Backshift)</h3>
-        <table class="grammar-table">
-          <tr><th>Doğrudan Söylem (Direct)</th><th>Dolaylı Aktarım (Reported)</th></tr>
-          <tr><td>Present Simple (I have)</td><td>Past Simple (He said he <strong>had</strong>)</td></tr>
-          <tr><td>Present Cont. (I am leaving)</td><td>Past Cont. (He said he <strong>was leaving</strong>)</td></tr>
-          <tr><td>Past Simple / Perfect</td><td>Past Perfect (He said he <strong>had seen</strong>)</td></tr>
-          <tr><td>will / can / must</td><td>would / could / had to</td></tr>
-        </table>
-        
-        <h3>2. Reported Questions (Sınav Tuzağı!)</h3>
-        <div class="warning-box">
-          <strong>⚠️ Soruları aktarırken:</strong><br>
-          1. DO / DOES / DID kullanılmaz!<br>
-          2. Soru işareti kullanılmaz!<br>
-          3. Özne fiilden önce gelir (Düz cümle sırası).<br>
-          <em>"Where do you live?" → She asked me where I lived. ✅ (NOT where did I live ❌)</em><br>
-          Evet/Hayır sorularında <strong>if / whether</strong> kullanılır.<br>
-          <em>"Are you coming?" → She asked him <strong>if</strong> he was coming.</em>
-        </div>
-
-        <h3>3. Imperatives (Emir/Rica)</h3>
-        <p>"Wait in the car" → She <strong>told me to wait</strong> in the car.<br>
-        "Don't forget" → He <strong>told me not to forget</strong>.</p>
-
-        <div class="quiz-container" id="quiz-reported">
-          <h3>📝 Workbook Practice: Reported Speech</h3>
-          <div class="question">
-            <p>1. "I can't find my purse." → She said (that) ________.</p>
-            <label><input type="radio" name="rq1" value="wrong"> a) she can't find her purse</label>
-            <label><input type="radio" name="rq1" value="correct"> b) she couldn't find her purse</label>
-          </div>
-          <div class="question">
-            <p>2. "Where do you live?" → He asked me ________.</p>
-            <label><input type="radio" name="rq2" value="wrong"> a) where did I live</label>
-            <label><input type="radio" name="rq2" value="correct"> b) where I lived</label>
-          </div>
-          <div class="question">
-            <p>3. "Please fill in the application form." → They asked us ________.</p>
-            <label><input type="radio" name="rq3" value="correct"> a) to fill in the application form</label>
-            <label><input type="radio" name="rq3" value="wrong"> b) fill in the application form</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-reported')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="conditionals3" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 9B</span>
-          <h2>3rd Conditional & Past Perfect</h2>
-          <p class="subtitle">Geçmişte Hayali Durumlar · Past Perfect</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('conditionals3')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <h3>Third Conditional (Pişmanlık / Geçmiş Hayal)</h3>
-        <div class="formula-box"><div class="formula">If + Past Perfect (had V3) , would have + V3</div></div>
-        
-        <div class="info-box">
-          <p>If I'<strong>d known</strong> his number, I <strong>would have called</strong> him.</p>
-          <p>What <strong>would we have done</strong> if we'<strong>d missed</strong> the flight?</p>
-        </div>
-        
-        <h3>Past Perfect (had + V3) Kullanımları</h3>
-        <p>Geçmişte yaşanmış iki olaydan <strong>daha önce olanı</strong> belirtmek için kullanılır.</p>
-        <p><em>When we arrived at the departure gate, the flight <strong>had already closed</strong>. (Biz gelmeden önce kapanmıştı)</em></p>
-
-        <div class="quiz-container" id="quiz-cond3">
-          <h3>📝 Workbook Practice: 3rd Conditional</h3>
-          <div class="question">
-            <p>1. If we ________ the bus, we ________ home till midnight. (miss, not get)</p>
-            <label><input type="radio" name="c3q1" value="correct"> a) 'd missed / wouldn't have got</label>
-            <label><input type="radio" name="c3q1" value="wrong"> b) missed / wouldn't get</label>
-          </div>
-          <div class="question">
-            <p>2. If they ________ to the wedding, they ________ . (invite, go)</p>
-            <label><input type="radio" name="c3q2" value="wrong"> a) were invited / would have gone</label>
-            <label><input type="radio" name="c3q2" value="correct"> b) had been invited / would have gone</label>
-          </div>
-          <div class="question">
-            <p>3. When she woke up, the house was empty - he ________ . (go)</p>
-            <label><input type="radio" name="c3q3" value="wrong"> a) went</label>
-            <label><input type="radio" name="c3q3" value="correct"> b) 'd gone (had gone)</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-cond3')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="auxiliaries" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <span class="unit-badge">UNIT 10A</span>
-          <h2>Be, Do & Have</h2>
-          <p class="subtitle">Main Verbs vs Auxiliary Verbs</p>
-        </div>
-        <button class="mark-complete" onclick="markDone('auxiliaries')">✅ Tamamladım</button>
-      </div>
-      <div class="topic-content">
-        <p>İngilizcedeki en temel üç fiil hem "Ana Fiil" (Main Verb) hem de "Yardımcı Fiil" (Auxiliary) olarak kullanılabilir.</p>
-        <table class="grammar-table">
-          <tr><th>Fiil</th><th>Main Verb Olarak</th><th>Auxiliary (Yardımcı) Olarak</th></tr>
-          <tr><td><strong>BE</strong></td><td>I <strong>was</strong> very sensitive. (Durum)</td><td>I'<strong>m</strong> sitting on the bus. (Continuous)<br>My car <strong>has been</strong> stolen. (Passive)</td></tr>
-          <tr><td><strong>DO</strong></td><td>I <strong>did</strong> my homework. (Yapmak)</td><td>She <strong>doesn't</strong> speak English. (Olumsuz/Soru)</td></tr>
-          <tr><td><strong>HAVE</strong></td><td>I <strong>have</strong> a sister. (Sahiplik)<br>I'<strong>m having</strong> a shower. (Eylem)</td><td>They'<strong>ve</strong> bought a new car. (Perfect Tense)</td></tr>
-        </table>
-
-        <div class="quiz-container" id="quiz-auxiliaries">
-          <h3>📝 Workbook Practice: Be, Do, Have</h3>
-          <div class="question">
-            <p>1. ________ he like living in the UK, or ________ he feeling homesick?</p>
-            <label><input type="radio" name="auxq1" value="correct"> a) Does / is</label>
-            <label><input type="radio" name="auxq1" value="wrong"> b) Is / does</label>
-          </div>
-          <div class="question">
-            <p>2. A: ________ you miss the beginning of the film? B: No, luckily it ________ started yet.</p>
-            <label><input type="radio" name="auxq2" value="wrong"> a) Have / hasn't</label>
-            <label><input type="radio" name="auxq2" value="correct"> b) Did / hadn't (Past simple & Past perfect)</label>
-          </div>
-          <div class="question">
-            <p>3. What ________ you been ________ since I last saw you?</p>
-            <label><input type="radio" name="auxq3" value="correct"> a) have / doing</label>
-            <label><input type="radio" name="auxq3" value="wrong"> b) are / doing</label>
-          </div>
-          <button class="check-btn" onclick="checkQuiz('quiz-auxiliaries')">Cevapları Kontrol Et</button>
-          <div class="quiz-result"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="compare" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <h2>⚖️ Karışanlar Arenası</h2>
-          <p class="subtitle">Sınavda en çok tuzağa düşülen ikililer</p>
-        </div>
-      </div>
-      <div class="topic-content">
-        <table class="compare-table">
-          <tr><th>İkili</th><th>En Kritik Fark</th><th>Doğru Örnek</th></tr>
-          <tr><td><strong>will vs be going to</strong></td><td>will = anlık karar. going to = plan / kanıtlı tahmin.</td><td><em>I'll get it! / I'm going to start a course.</em></td></tr>
-          <tr><td><strong>towards vs to</strong></td><td>towards = hedefe doğru (ulaşmayabilir). to = ulaştı.</td><td><em>The dog ran towards me. / The dog ran to me.</em></td></tr>
-          <tr><td><strong>PP Simple vs Past Simple</strong></td><td>Zaman kelimesi (yesterday, last week) → Past Simple!</td><td><em>I finished it <strong>yesterday</strong>. / I've <strong>just</strong> finished it.</em></td></tr>
-          <tr><td><strong>mustn't vs don't have to</strong></td><td>mustn't = YASAK · don't have to = zorunluluk yok.</td><td><em>You mustn't smoke here! / You don't have to come early.</em></td></tr>
-          <tr><td><strong>1st vs 2nd Conditional</strong></td><td>1st = gerçek olasılık. 2nd = hayali durum.</td><td><em>If I have time, I'll help. / If I had time, I'd help.</em></td></tr>
-          <tr><td><strong>could vs was able to</strong></td><td>could = genel yetenek. was able to = tek zor olayda başarı.</td><td><em>She could swim at 3. / I was able to buy it online.</em></td></tr>
-          <tr><td><strong>to+inf vs -ing</strong></td><td>want/need → to. enjoy/hate → -ing. let/make+obj → bare inf!</td><td><em>I want <strong>to go</strong>. / I enjoy <strong>going</strong>. / She let him <strong>go</strong>.</em></td></tr>
-        </table>
-      </div>
-    </section>
-
-    <section id="recap" class="page searchable">
-      <div class="page-header">
-        <div class="page-header-left">
-          <h2>⚡ Sınav Öncesi Hızlı Tekrar</h2>
-          <p class="subtitle">Sınava son 15 dakika kala mutlaka gözden geçir!</p>
-        </div>
-      </div>
-      <div class="topic-content">
-        <div class="flashcard-grid">
-          <div class="flashcard">📌 <strong>Stative verbs ASLA -ing almaz!</strong><div class="fc-rule">know, want, need, like, love, believe, hate, prefer.</div></div>
-          <div class="flashcard">📌 <strong>Phrasal verb + zamir → ARASINA girer!</strong><div class="fc-rule">Turn it off ✅ · Turn off it ❌</div></div>
-          <div class="flashcard">📌 <strong>Reported questions → do/did KULLANILMAZ!</strong><div class="fc-rule">"Where do you live?" → She asked me where I lived. ✅</div></div>
-          <div class="flashcard">📌 <strong>Geçmişte tek başarı → was/were able to!</strong><div class="fc-rule">Tek bir zor olayda could değil was able to kullanılır.</div></div>
-          <div class="flashcard">📌 <strong>mustn't ≠ don't have to!</strong><div class="fc-rule">mustn't = YASAK. don't have to = istersen yap.</div></div>
-          <div class="flashcard">📌 <strong>Causative = have + obj + V3</strong><div class="fc-rule">"I had my car washed" = yaptırttım, kendim değil.</div></div>
-          <div class="flashcard">📌 <strong>"If I were you…" → were, was değil!</strong><div class="fc-rule">If I <strong>were</strong> you, I'd apologize. ✅</div></div>
-          <div class="flashcard">📌 <strong>let / make + obj + bare infinitive!</strong><div class="fc-rule">His parents let him <strong>go</strong>. (to go değil)</div></div>
-          <div class="flashcard">📌 <strong>Edat sonrası → -ing!</strong><div class="fc-rule">looking forward to <strong>seeing</strong> · tired of <strong>waiting</strong></div></div>
-          <div class="flashcard">📌 <strong>was/were going to = gerçekleşmeyen plan</strong><div class="fc-rule">I was going to visit but he was abroad.</div></div>
-        </div>
-        <div class="section-divider">♡ · · · ♡ · · · ♡</div>
-        <div class="hero" style="margin-top:0">
-          <h1 style="font-size:20px">Sınava girdiğinde sakin ol, Ravza! 💙</h1>
-          <p>Bu sayfadaki her kuralı gözden geçirdiysen hiçbir şeyden korkma. Harika bir İngilizce temelin oluştu. Seninle gurur duyuyorum. Başarılar! ♡</p>
-        </div>
-      </div>
-    </section>
-
-  </div>
-</main>
-
-<script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

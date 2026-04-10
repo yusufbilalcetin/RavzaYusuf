@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS Panel | EUL Grammar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<script src="admin-guard.js"></script>
+</head>
+<body>
+
+<aside class="admin-sidebar">
+    <div class="admin-brand">
+        <h1>PORTAL CMS</h1>
+        <p>Premium Yönetim Sistemi</p>
+    </div>
+    <ul class="admin-tabs">
+        <li><button class="tab-btn active" data-tab="tab-general">Genel Ayarlar</button></li>
+        <li><button class="tab-btn" data-tab="tab-dash">Dashboard Yönetimi</button></li>
+        <li><button class="tab-btn" data-tab="tab-pages">Sayfa & İçerik Yönetimi</button></li>
+        <li><button class="tab-btn" data-tab="tab-theme">Tema Tasarımı</button></li>
+    </ul>
+    <div class="admin-actions">
+        <a href="index.html" target="_blank" class="btn btn-outline">Siteyi Aç 👁️</a>
+        <button id="btn-global-save" class="btn btn-primary">💾 Tümünü Kaydet</button>
+    </div>
+</aside>
+
+<main class="admin-main">
+    <div class="panel-header">
+        <h2>İçerik Stüdyosu</h2>
+        <span id="status-badge" class="status-badge">Veriler Yüklendi</span>
+    </div>
+
+    <section id="tab-general" class="tab-content active">
+        <div class="card">
+            <h3>Site Kimliği</h3>
+            <div class="form-grid">
+                <div class="form-group"><label>Site Başlığı</label><input type="text" id="g-title"></div>
+                <div class="form-group"><label>Alt Başlık</label><input type="text" id="g-subtitle"></div>
+                <div class="form-group"><label>Topbar Rozeti</label><input type="text" id="g-badge"></div>
+                <div class="form-group"><label>Footer Yazısı</label><input type="text" id="g-footer"></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Karşılama Ekranı (Hero)</h3>
+            <div class="form-group"><label>Ana Başlık</label><input type="text" id="g-heroTitle"></div>
+            <div class="form-group full"><label>Açıklama</label><textarea id="g-heroDesc" rows="3"></textarea></div>
+        </div>
+    </section>
+
+    <section id="tab-dash" class="tab-content">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <h3>Dashboard İstatistikleri</h3>
+                <button id="add-stat-btn" class="btn btn-small">+ İstatistik Ekle</button>
+            </div>
+            <div id="stat-list-container"></div>
+        </div>
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <h3>Dashboard Yönlendirme Kartları</h3>
+                <button id="add-dashcard-btn" class="btn btn-small">+ Kart Ekle</button>
+            </div>
+            <div id="dashcard-list-container"></div>
+        </div>
+    </section>
+
+    <section id="tab-pages" class="tab-content">
+        <div class="layout-split">
+            <div class="list-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="font-size:16px; margin:0;">Konu Sayfaları</h3>
+                    <button id="add-page-btn" class="btn btn-small">+ Yeni</button>
+                </div>
+                <ul id="pages-list" class="item-list"></ul>
+            </div>
+
+            <div class="card" id="page-editor-panel" style="display:none; margin:0;">
+                <h3>Sayfa Ayarları</h3>
+                <div class="form-grid mb-4">
+                    <div class="form-group"><label>Sayfa ID (İngilizce/Boşluksuz)</label><input type="text" id="p-id"></div>
+                    <div class="form-group"><label>Menü & Sayfa Başlığı</label><input type="text" id="p-title"></div>
+                    <div class="form-group"><label>İkon (Emoji)</label><input type="text" id="p-icon"></div>
+                    <div class="form-group"><label>Ünite Etiketi (Örn: UNIT 1A)</label><input type="text" id="p-badge"></div>
+                    <div class="form-group full"><label>Açıklama Metni</label><input type="text" id="p-desc"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:20px; margin-top:20px;">
+                    <h3>İçerik Blokları</h3>
+                    <button id="add-block-btn" class="btn btn-small">+ Blok Ekle</button>
+                </div>
+                <div id="blocks-container" style="margin-top:15px;"></div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:20px; margin-top:20px;">
+                    <h3>Bölüm Sonu Testi (Quiz)</h3>
+                    <button id="add-quiz-btn" class="btn btn-small">+ Soru Ekle</button>
+                </div>
+                <div id="quiz-container" style="margin-top:15px;"></div>
+
+                <div style="border-top:1px solid #e2e8f0; padding-top:20px; margin-top:30px;">
+                    <button id="delete-page-btn" class="btn btn-danger" style="width:100%;">Bu Sayfayı Tamamen Sil</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-theme" class="tab-content">
+        <div class="card">
+            <h3>Tema Renk Yönetimi (CSS Tokens)</h3>
+            <p style="font-size:13px; color:#64748b; margin-bottom:20px;">Hex kodlarını girerek tüm sitenin rengini değiştirebilirsiniz.</p>
+            <div class="form-grid">
+                <div class="form-group"><label>Navy (Ana Koyu Renk)</label><input type="color" id="t-navy"></div>
+                <div class="form-group"><label>Pink (Vurgu Rengi)</label><input type="color" id="t-pink"></div>
+                <div class="form-group"><label>Pink Bright</label><input type="color" id="t-pink-bright"></div>
+                <div class="form-group"><label>Background (Arkaplan)</label><input type="color" id="t-bg"></div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script type="module" src="admin.js"></script>
+</body>
+</html>
