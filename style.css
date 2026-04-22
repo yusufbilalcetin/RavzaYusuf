@@ -2982,3 +2982,207 @@ body.dark .exam-nav-btn.exam-nav-arrow {
   color: var(--pink-bright);
   border-color: rgba(212,102,156,.32);
 }
+
+/* ================= EXAM ACTION ROW ================= */
+.exam-shell-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+.exam-shell-actions > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.exam-prev-btn { justify-self: start; }
+.exam-next-btn,
+.exam-finish-btn { justify-self: end; }
+
+.exam-cancel-row {
+  width: 100%;
+  margin-top: 14px;
+}
+
+/* Sınavı İptal Et — ayrı satır, tam genişlik */
+.exam-cancel-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0;
+  padding: 14px 20px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(239, 68, 68, .28);
+  background: rgba(239, 68, 68, .08);
+  color: #dc2626;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: .2s ease;
+  letter-spacing: -.01em;
+  min-height: 48px;
+  touch-action: manipulation;
+}
+.exam-cancel-btn:hover {
+  background: rgba(239, 68, 68, .14);
+  border-color: rgba(239, 68, 68, .4);
+  transform: translateY(-1px);
+}
+body.dark .exam-cancel-btn {
+  background: rgba(239, 68, 68, .1);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, .32);
+}
+
+/* ================= CANCEL EXAM DIALOG ================= */
+.exam-cancel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 12, 18, .58);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .22s ease, visibility .22s ease;
+  z-index: 200;
+}
+.exam-cancel-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.exam-cancel-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -48%) scale(.96);
+  width: min(440px, calc(100vw - 32px));
+  padding: 28px;
+  border-radius: 24px;
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 32px 80px rgba(15, 23, 42, .28);
+  z-index: 210;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .22s ease, visibility .22s ease, transform .22s ease;
+  text-align: center;
+}
+.exam-cancel-dialog.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.exam-cancel-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, .14), rgba(245, 158, 11, .14));
+  border: 1px solid rgba(239, 68, 68, .22);
+  animation: examCancelPulse 2s ease-in-out infinite;
+}
+@keyframes examCancelPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.exam-cancel-dialog h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--navy);
+  margin-bottom: 10px;
+  letter-spacing: -.02em;
+}
+body.dark .exam-cancel-dialog h3 { color: var(--pink-bright); }
+
+.exam-cancel-dialog p {
+  color: var(--text-light);
+  line-height: 1.7;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.exam-cancel-dialog p strong {
+  color: #dc2626;
+  font-weight: 800;
+}
+body.dark .exam-cancel-dialog p strong { color: #fca5a5; }
+
+.exam-cancel-actions {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.exam-cancel-actions > * {
+  flex: 1 1 0;
+}
+
+.exam-cancel-confirm {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  min-height: 48px;
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .2s ease;
+  box-shadow: 0 14px 30px rgba(239, 68, 68, .28);
+  touch-action: manipulation;
+}
+.exam-cancel-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(239, 68, 68, .35);
+}
+
+/* Modal açıkken arkayı kilitle */
+body.modal-open { overflow: hidden; }
+
+/* Mobilde dialog ve aksiyonlar */
+@media (max-width: 768px) {
+  .exam-shell-actions {
+    flex-direction: row;
+    gap: 10px;
+  }
+  .exam-shell-actions > * {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  .exam-cancel-dialog {
+    padding: 22px;
+    width: calc(100vw - 24px);
+    border-radius: 22px;
+  }
+  .exam-cancel-dialog h3 { font-size: 20px; }
+  .exam-cancel-actions {
+    flex-direction: column-reverse;
+  }
+  .exam-cancel-actions > * { width: 100%; }
+}
+
+@media (max-width: 768px) {
+  .exam-cancel-row {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .exam-shell-actions {
+    flex-direction: column;
+  }
+  .exam-shell-actions > * { flex: 1 1 100%; }
+
+  .exam-cancel-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+}

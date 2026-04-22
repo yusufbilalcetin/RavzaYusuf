@@ -4634,12 +4634,62 @@ document.addEventListener("keydown", (event) => {
     return buttons.join("");
   }
 
+  let isExamCancelDialogOpen = false;
+
+  function syncExamCancelDialogState() {
+    document.body.classList.toggle("modal-open", !!isExamCancelDialogOpen);
+  }
+
+  function buildCancelExamDialog() {
+    return `
+      <div class="exam-cancel-backdrop ${isExamCancelDialogOpen ? "open" : ""}" onclick="closeCancelExamDialog()"></div>
+      <div class="exam-cancel-dialog ${isExamCancelDialogOpen ? "open" : ""}" role="dialog" aria-modal="true" aria-labelledby="examCancelTitle" aria-describedby="examCancelDesc">
+        <div class="exam-cancel-icon">⚠️</div>
+        <h3 id="examCancelTitle">Sınavı İptal Et</h3>
+        <p id="examCancelDesc">
+          Sınavı iptal etmek istediğine emin misin?
+          <strong>İptal edersen mevcut sınav ilerlemen kaybolabilir.</strong>
+        </p>
+        <div class="exam-cancel-actions">
+          <button type="button" class="ghost-btn" onclick="closeCancelExamDialog()">Vazgeç</button>
+          <button type="button" class="exam-cancel-confirm" onclick="confirmCancelExam()">Evet, İptal Et</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function openCancelExamDialog() {
+    if (!activeExam) return;
+    isExamCancelDialogOpen = true;
+    syncExamCancelDialogState();
+    renderEnhancedActiveExam();
+  }
+
+  function closeCancelExamDialog() {
+    isExamCancelDialogOpen = false;
+    syncExamCancelDialogState();
+    renderEnhancedActiveExam();
+  }
+
+  function confirmCancelExam() {
+    isExamCancelDialogOpen = false;
+    syncExamCancelDialogState();
+
+    if (examTimer) clearInterval(examTimer);
+    activeExam = null;
+    setExamLiveState(false);
+    renderEnhancedActiveExam();
+    updateDashboardStats();
+  }
+
   function renderEnhancedActiveExam() {
     const workspace = document.getElementById("examWorkspace");
     if (!workspace) return;
 
     if (!activeExam || !activeExam.questions?.length) {
       setExamLiveState(false);
+      isExamCancelDialogOpen = false;
+      syncExamCancelDialogState();
       workspace.innerHTML = `
         <div class="empty-state exam-empty-state">
           <h3>Henüz aktif bir sınav yok</h3>
@@ -4655,6 +4705,7 @@ document.addEventListener("keydown", (event) => {
     const currentAnswer = activeExam.answers?.[activeExam.currentIndex] ?? null;
     const answeredCount = getAnsweredCount();
     const blankCount = activeExam.questions.length - answeredCount;
+    const isLastQuestion = activeExam.currentIndex >= activeExam.questions.length - 1;
 
     workspace.innerHTML = `
       <div class="exam-shell premium-exam-shell">
@@ -4702,24 +4753,28 @@ document.addEventListener("keydown", (event) => {
           <div class="exam-shell-actions">
             <button
               type="button"
-              class="ghost-btn"
+              class="ghost-btn exam-prev-btn"
               ${activeExam.currentIndex === 0 ? "disabled" : ""}
               onclick="goToExamQuestion(${activeExam.currentIndex - 1})">
               ← Önceki Soru
             </button>
 
-            <div class="exam-shell-actions-right">
-              <button type="button" class="ghost-btn" onclick="cancelEnhancedExam()">Sınavı İptal Et</button>
-              ${activeExam.currentIndex < activeExam.questions.length - 1
-                ? `<button type="button" class="secondary-btn" onclick="goToExamQuestion(${activeExam.currentIndex + 1})">Sonraki Soru →</button>`
-                : `<button type="button" class="check-btn" onclick="submitEnhancedExam(false)">Sınavı Bitir</button>`
-              }
-            </div>
+            ${!isLastQuestion
+              ? `<button type="button" class="secondary-btn exam-next-btn" onclick="goToExamQuestion(${activeExam.currentIndex + 1})">Sonraki Soru →</button>`
+              : `<button type="button" class="check-btn exam-finish-btn" onclick="submitEnhancedExam(false)">Sınavı Bitir</button>`
+            }
+          </div>
+
+          <div class="exam-cancel-row">
+            <button type="button" class="exam-cancel-btn" onclick="openCancelExamDialog()">Sınavı İptal Et</button>
           </div>
         </div>
       </div>
+
+      ${buildCancelExamDialog()}
     `;
 
+    syncExamCancelDialogState();
     updateExamTimer();
   }
 
@@ -4914,6 +4969,9 @@ document.addEventListener("keydown", (event) => {
   function submitEnhancedExam(autoSubmitted = false) {
     if (!activeExam || activeExam.submitted) return;
 
+    isExamCancelDialogOpen = false;
+    syncExamCancelDialogState();
+
     const blankIndexes = getBlankIndexes();
     if (!autoSubmitted && blankIndexes.length > 0) {
       const confirmMessage = `${blankIndexes.length} soru boş bırakıldı.\n\nTamam dersen sınav bitecek.\nİptal dersen boş sorulara döneceksin.`;
@@ -4971,10 +5029,7 @@ document.addEventListener("keydown", (event) => {
   }
 
   function cancelEnhancedExam() {
-    if (examTimer) clearInterval(examTimer);
-    activeExam = null;
-    setExamLiveState(false);
-    renderEnhancedActiveExam();
+    openCancelExamDialog();
   }
 
   function retryLastExam() {
@@ -4984,6 +5039,9 @@ document.addEventListener("keydown", (event) => {
 
   function startWrongRetryExam(limit = 5) {
     if (!lastExamSession) return;
+
+    isExamCancelDialogOpen = false;
+    syncExamCancelDialogState();
     const wrongQuestions = lastExamSession.results.filter((item) => item.status !== "correct");
     if (!wrongQuestions.length) {
       alert("Yanlış veya boş soru bulunmuyor.");
@@ -5034,6 +5092,9 @@ document.addEventListener("keydown", (event) => {
   }
 
   function enhancedStartExam(questionCount, durationMinutes) {
+    isExamCancelDialogOpen = false;
+    syncExamCancelDialogState();
+
     const selectedQuestions = buildExamQuestions(questionCount);
 
     activeExam = {
@@ -5084,6 +5145,9 @@ document.addEventListener("keydown", (event) => {
   window.selectExamAnswer = selectExamAnswer;
   window.submitEnhancedExam = submitEnhancedExam;
   window.cancelEnhancedExam = cancelEnhancedExam;
+  window.openCancelExamDialog = openCancelExamDialog;
+  window.closeCancelExamDialog = closeCancelExamDialog;
+  window.confirmCancelExam = confirmCancelExam;
   window.showExamResultFilter = showExamResultFilter;
   window.retryLastExam = retryLastExam;
   window.openWeakTopicFromLastExam = openWeakTopicFromLastExam;
