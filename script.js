@@ -628,7 +628,7 @@ const TOPICS = [
 </div>
 <div class="content-card">
   <h3>1st vs 2nd Conditional</h3>
-  <div class="table-wrap"><table class="source-table"><thead><tr><th>Condition</th><th>If Clause</th><th>Main Clause</th><th>Example</th></tr></thead><tbody><tr><td>1st</td><td>If + present simple</td><td>will + verb1</td><td>If I study, I will pass the exam.</td></tr><tr><td>2nd</td><td>If + past simple</td><td>would + verb1</td><td>If I studied, I would pass the exam (but I don&#x27;t).</td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Condition</th><th>If Clause</th><th>Main Clause</th><th>Example</th></tr></thead><tbody><tr><td>1st</td><td>If + present simple</td><td>will + verb1</td><td>If I study, I will pass the exam.</td></tr><tr><td>2nd</td><td>If + past simple</td><td>would + verb1</td><td>If I studied, I would pass the exam (but I don't).</td></tr></tbody></table></div>
 </div>
 <div class="content-card">
   <h3>Would vs Could</h3>
@@ -2414,8 +2414,37 @@ let activeMemoryPracticeQuestion = null;
 let lastMemoryPracticeKey = "";
 let activeRecapUnits = [...new Set(RECAP_CARDS.map((card) => card.unit))];
 
+function decodeHtmlEntities(text) {
+  let output = String(text ?? "");
+
+  const decodeOnce = (value) => {
+    if (typeof document === "undefined") {
+      return String(value)
+        .replaceAll("&amp;", "&")
+        .replaceAll("&#39;", "'")
+        .replaceAll("&#x27;", "'")
+        .replaceAll("&apos;", "'")
+        .replaceAll("&quot;", '"')
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">");
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = value;
+    return textarea.value;
+  };
+
+  for (let i = 0; i < 3; i += 1) {
+    const decoded = decodeOnce(output);
+    if (decoded === output) break;
+    output = decoded;
+  }
+
+  return output;
+}
+
 function safeText(text) {
-  return String(text)
+  return decodeHtmlEntities(text)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
