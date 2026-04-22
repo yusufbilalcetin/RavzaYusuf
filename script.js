@@ -1193,8 +1193,18 @@ const TOPICS = [
 
 const makeQuestion = (question, options, answer, explanation) => ({ question, options, answer, explanation });
 
+const TOPIC_ID_ALIASES = {
+  unit6b: "ability",
+  phrasalverbs: "phrasal"
+};
+
+function resolveTopicId(id) {
+  return TOPIC_ID_ALIASES[id] || id;
+}
+
 function getTopicById(id) {
-  return TOPICS.find((topic) => topic.id === id);
+  const resolvedId = resolveTopicId(id);
+  return TOPICS.find((topic) => topic.id === resolvedId);
 }
 
 function appendTopicHtml(id, html) {
@@ -1207,6 +1217,42 @@ function addTopicQuestions(id, questions) {
   const topic = getTopicById(id);
   if (!topic) return;
   topic.quiz.push(...questions);
+}
+
+function updateTopicData(id, updates) {
+  const topic = getTopicById(id);
+  if (!topic) return;
+  Object.assign(topic, updates);
+}
+
+function stripHtml(html = "") {
+  return String(html).replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ");
+}
+
+function normalizeSearchText(value = "") {
+  return String(value)
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+function getTopicSearchIndex(topic) {
+  return normalizeSearchText(
+    [
+      topic.title,
+      topic.subtitle,
+      topic.unit,
+      ...(topic.keyPoints || []),
+      stripHtml(topic.summaryHtml || ""),
+      ...((topic.searchAliases || []))
+    ].join(" ")
+  );
+}
+
+function matchesTopicSearch(topic, query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return true;
+  return getTopicSearchIndex(topic).includes(normalizedQuery);
 }
 
 const STUDY_ENHANCEMENTS = {
@@ -1510,6 +1556,147 @@ const EXTRA_QUIZ_QUESTIONS = {
 
 Object.entries(EXTRA_QUIZ_QUESTIONS).forEach(([id, questions]) => addTopicQuestions(id, questions));
 
+const TOPIC_OVERRIDES = {
+  ability: {
+    subtitle: "Can / Could / Be able to · deduction modals",
+    keyPoints: [
+      "Use can for present ability, could for past general ability, and be able to for all tenses.",
+      "For a single successful action in the past, was / were able to is usually better than could.",
+      "For deduction, can't shows impossibility, must shows certainty, and might / could show possibility."
+    ],
+    searchAliases: [
+      "unit6b",
+      "unit 6b",
+      "can could able to",
+      "can could be able to",
+      "deduction",
+      "must cant might could",
+      "being able to"
+    ]
+  },
+  phrasal: {
+    subtitle: "Type 1 · Type 2 · Type 3 · pronoun rule",
+    keyPoints: [
+      "Type 1 phrasal verbs do not take an object and stay inseparable: go away, eat out, get up.",
+      "Type 2 phrasal verbs take an object and can separate: turn off the lights / turn the lights off.",
+      "Type 3 phrasal verbs take an object but stay inseparable: look for the keys, look after her children."
+    ],
+    searchAliases: [
+      "phrasal",
+      "phrasal verb",
+      "phrasal verbs",
+      "phrasalverbs",
+      "separable",
+      "inseparable",
+      "call her back",
+      "look after",
+      "look forward to"
+    ]
+  }
+};
+
+Object.entries(TOPIC_OVERRIDES).forEach(([id, updates]) => updateTopicData(id, updates));
+
+const SUPPLEMENTAL_STUDY_CONTENT = {
+  ability: `
+<div class="content-card">
+  <h3>Unit 6B overview</h3>
+  <p><strong>Can</strong> is used for present ability, <strong>could</strong> is used for past general ability, and <strong>be able to</strong> is the flexible form we can use in different tenses.</p>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Meaning / time</th><th>Form</th><th>Example</th></tr></thead><tbody><tr><td>Present ability</td><td>can + verb1</td><td>She can swim very well.</td></tr><tr><td>Past ability</td><td>could + verb1</td><td>When I was 5, I could dance very well.</td></tr><tr><td>Present simple</td><td>am / is / are able to + verb1</td><td>They are able to speak Japanese.</td></tr><tr><td>Past simple</td><td>was / were able to + verb1</td><td>She was able to speak Arabic five years ago.</td></tr><tr><td>Future</td><td>will be able to + verb1</td><td>She will be able to join us tomorrow.</td></tr><tr><td>Present perfect</td><td>have / has been able to + verb1</td><td>I have been able to drive since 2011.</td></tr><tr><td>Gerund</td><td>being able to + verb1</td><td>I like being able to read quickly.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>Be able to across tenses</h3>
+  <ul>
+    <li>Use <strong>be able to</strong> when <strong>can</strong> is not possible in the tense you need.</li>
+    <li><strong>Can + verb1</strong> and <strong>could + verb1</strong> are simple and common, but they do not cover every tense.</li>
+    <li>For a specific successful action in the past, <strong>was / were able to</strong> is usually more accurate than <strong>could</strong>.</li>
+    <li>Example: <em>I got a puncture, but I was able to change the wheel myself.</em></li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Deduction modals</h3>
+  <p>We use deduction modals to show how certain we are about something from the evidence we have.</p>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Modal</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td>can't + verb1</td><td>We are sure something is not true.</td><td>She can't be Kate. She is in Italy.</td></tr><tr><td>must + verb1</td><td>We are sure something is true.</td><td>He must be at home. The lights are on.</td></tr><tr><td>might + verb1</td><td>It is possible.</td><td>She might be at home now.</td></tr><tr><td>could + verb1</td><td>Positive possibility.</td><td>It could be the right answer.</td></tr></tbody></table></div>
+  <div class="info-box">
+    <p><strong>After can't / must / might / could, use verb1.</strong></p>
+    <p><strong>Correct:</strong> He must be tired. / She can't be at school.</p>
+    <p><strong>Wrong:</strong> He must is tired. / She can't to be at school.</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Common mistakes to avoid</h3>
+  <div class="warning-box">
+    <p><strong>Wrong:</strong> She can join us tomorrow after work.</p>
+    <p><strong>Correct:</strong> She will be able to join us tomorrow after work.</p>
+    <p><strong>Wrong:</strong> I like can read quickly.</p>
+    <p><strong>Correct:</strong> I like being able to read quickly.</p>
+    <p><strong>Wrong:</strong> He must is at home.</p>
+    <p><strong>Correct:</strong> He must be at home.</p>
+  </div>
+</div>
+`,
+  phrasal: `
+<div class="content-card">
+  <h3>What is a phrasal verb?</h3>
+  <p>A <strong>phrasal verb</strong> is a <strong>verb + particle</strong>. The particle can be a preposition or an adverb.</p>
+  <p>Examples: <em>get off the bus</em>, <em>look for something</em>.</p>
+</div>
+<div class="content-card">
+  <h3>Type 1, Type 2, Type 3</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Type</th><th>Rule</th><th>Examples</th></tr></thead><tbody><tr><td>Type 1</td><td>No object, inseparable</td><td>go away, eat out, get up</td></tr><tr><td>Type 2</td><td>Takes an object, separable</td><td>turn off the lights / turn the lights off; turn down the music / turn the music down</td></tr><tr><td>Type 3</td><td>Takes an object, inseparable</td><td>look for the keys, get on the bus, look after her children, look forward to her wedding day</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>Separable vs inseparable</h3>
+  <ul>
+    <li><strong>Separable:</strong> the object can go after the particle or between the verb and particle.</li>
+    <li><strong>Examples:</strong> turn off the lights / turn the lights off, turn down the music / turn the music down.</li>
+    <li><strong>Inseparable:</strong> the object stays after the whole phrasal verb.</li>
+    <li><strong>Examples:</strong> look for the keys, get on the bus, look after her children, look forward to her wedding day.</li>
+  </ul>
+</div>
+<div class="content-card">
+  <h3>Pronoun rule</h3>
+  <div class="warning-box">
+    <p>If the object is a pronoun in a <strong>separable</strong> phrasal verb, it must go between the verb and particle.</p>
+    <p><strong>Correct:</strong> call her back / turn it off / turn it down</p>
+    <p><strong>Wrong:</strong> call back her / turn off it / turn down it</p>
+  </div>
+</div>
+<div class="content-card">
+  <h3>Useful examples</h3>
+  <div class="keypoint-list">
+    <div class="keypoint-item">go away · eat out · get up</div>
+    <div class="keypoint-item">turn off the lights / turn the lights off</div>
+    <div class="keypoint-item">turn down the music / turn the music down</div>
+    <div class="keypoint-item">call her back</div>
+    <div class="keypoint-item">look for the keys · get on the bus</div>
+    <div class="keypoint-item">look after her children · look forward to her wedding day</div>
+  </div>
+</div>
+`
+};
+
+Object.entries(SUPPLEMENTAL_STUDY_CONTENT).forEach(([id, html]) => appendTopicHtml(id, html));
+
+const SUPPLEMENTAL_QUIZ_QUESTIONS = {
+  ability: [
+    makeQuestion('When I was 5, I ________ dance very well.', ["could", "can", "will be able to"], 0, "Use could for past general ability."),
+    makeQuestion('She ________ join us tomorrow after work.', ["can", "will be able to", "is able to"], 1, "Use will be able to for future ability."),
+    makeQuestion("He ________ be at home; the lights are on.", ["must", "can't", "won't"], 0, "Must shows a strong deduction from evidence."),
+    makeQuestion("She ________ be Kate. She is in Italy.", ["must", "could", "can't"], 2, "Can't shows that something is impossible or not true."),
+    makeQuestion('I like ________ quickly in exams.', ["can read", "being able to read", "to can read"], 1, "After like here, use the gerund form being able to.")
+  ],
+  phrasal: [
+    makeQuestion('"Turn ___ the music, please." Which particle completes the phrasal verb?', ["off", "after", "for"], 0, "Turn off means stop the sound or power."),
+    makeQuestion("Why is 'I'll call her back' correct?", ["Because pronouns must go between the verb and particle in separable phrasal verbs.", "Because back must always come before the object.", "Because call back is an inseparable phrasal verb."], 0, "Call back is separable, so the pronoun goes in the middle."),
+    makeQuestion("What does 'look after' mean?", ["take care of", "search for", "return"], 0, "Look after means take care of someone or something."),
+    makeQuestion("Which phrasal verb is separable?", ["look after", "turn down", "look for"], 1, "Turn down can separate: turn the music down."),
+    makeQuestion("Which sentence is wrong?", ["Turn the lights off.", "Look for the keys.", "Call back her."], 2, "With a pronoun, use call her back.")
+  ]
+};
+
+Object.entries(SUPPLEMENTAL_QUIZ_QUESTIONS).forEach(([id, questions]) => addTopicQuestions(id, questions));
+
 const MEMORIZATION_CARDS = [
   { id: "mem-1", front: "Researchers", back: "Araştırmacılar" },
   { id: "mem-2", front: "Evidence", back: "Kanıt" },
@@ -1718,6 +1905,23 @@ const EXTRA_MEMORIZATION_CARDS = [
 ];
 
 MEMORIZATION_CARDS.splice(28, MEMORIZATION_CARDS.length - 28, ...EXTRA_MEMORIZATION_CARDS);
+
+const ADDITIONAL_MEMORY_CARDS = [
+  { id: "mem-115", front: "Phrasal verb", back: "verb + particle" },
+  { id: "mem-116", front: "Type 1", back: "no object / inseparable" },
+  { id: "mem-117", front: "Type 2", back: "takes an object / separable" },
+  { id: "mem-118", front: "Type 3", back: "takes an object / inseparable" },
+  { id: "mem-119", front: "Call her back", back: "pronoun goes between verb and particle" },
+  { id: "mem-120", front: "Can", back: "present ability / permission" },
+  { id: "mem-121", front: "Could", back: "past general ability" },
+  { id: "mem-122", front: "Be able to", back: "used across different tenses" },
+  { id: "mem-123", front: "Must", back: "strong deduction / sure it is true" },
+  { id: "mem-124", front: "Can't", back: "impossible / sure it is not true" },
+  { id: "mem-125", front: "Might / Could", back: "possibility" },
+  { id: "mem-126", front: "Being able to", back: "gerund form after like / love / enjoy" }
+];
+
+MEMORIZATION_CARDS.push(...ADDITIONAL_MEMORY_CARDS);
 
 const RECAP_CARDS = [
   {
@@ -2145,6 +2349,51 @@ const EXTRA_RECAP_CARDS = [
 
 RECAP_CARDS.push(...EXTRA_RECAP_CARDS);
 
+const ADDITIONAL_RECAP_CARDS = [
+  {
+    unit: "6B",
+    title: "Can / Could / Be able to",
+    formula: "can + verb1 / could + verb1 / be able to + verb1",
+    rule: "Use can for present ability, could for past general ability, and be able to when you need other tenses.",
+    example: "She can swim. / When I was 5, I could dance well. / She will be able to join us tomorrow.",
+    trap: "Future ability takes will be able to, not will can.",
+    compare: "general past ability -> could / single successful past action -> was-were able to",
+    checklist: ["present = can", "past general = could", "future-present perfect-gerund = be able to"]
+  },
+  {
+    unit: "6B",
+    title: "Deduction Modals",
+    formula: "can't / must / might / could + verb1",
+    rule: "Use can't for impossible, must for certainty, and might / could for possibility.",
+    example: "She can't be Kate. / He must be at home. / She might be at home now.",
+    trap: "After these modals, always use verb1: must be, can't be, might go.",
+    compare: "can't = not true / must = sure / might-could = maybe",
+    checklist: ["look at the evidence", "choose certainty level", "keep the base verb after the modal"]
+  },
+  {
+    unit: "7A",
+    title: "Phrasal Verb Types",
+    formula: "type 1 / type 2 / type 3",
+    rule: "Type 1 has no object, type 2 is separable with an object, and type 3 takes an object but stays inseparable.",
+    example: "go away / turn the lights off / look after her children",
+    trap: "Do not separate inseparable phrasal verbs like look after or look forward to.",
+    compare: "type 2 can separate / type 1 and type 3 do not",
+    checklist: ["is there an object", "can the object move", "is the phrasal verb fixed"]
+  },
+  {
+    unit: "7A",
+    title: "Pronoun Rule",
+    formula: "call her back / turn it off",
+    rule: "With a pronoun in a separable phrasal verb, put the pronoun between the verb and particle.",
+    example: "call her back / turn it off / turn it down",
+    trap: "call back her and turn off it are wrong.",
+    compare: "noun object can move either way / pronoun object must stay in the middle",
+    checklist: ["if the object is a pronoun", "use the middle position", "check whether the phrasal verb is separable"]
+  }
+];
+
+RECAP_CARDS.push(...ADDITIONAL_RECAP_CARDS);
+
 const TOTAL = TOPICS.length;
 const QUESTION_BANK = TOPICS.flatMap((topic) =>
   topic.quiz.map((question, index) => ({
@@ -2159,6 +2408,7 @@ const QUESTION_BANK = TOPICS.flatMap((topic) =>
 const progressRef = doc(db, "progress", "ravza");
 let activeExam = null;
 let examTimer = null;
+let memoryHubSection = "all";
 let memoryPracticeMode = "en-tr";
 let activeMemoryPracticeQuestion = null;
 let lastMemoryPracticeKey = "";
@@ -2174,11 +2424,11 @@ function safeText(text) {
 }
 
 function getStudyKey(id) {
-  return `eul_study_${id}`;
+  return `eul_study_${resolveTopicId(id)}`;
 }
 
 function getQuizKey(id) {
-  return `eul_quiz_${id}`;
+  return `eul_quiz_${resolveTopicId(id)}`;
 }
 
 function isStudyDone(id) {
@@ -2354,12 +2604,7 @@ function searchTopics(event) {
   const q = input.value.trim().toLowerCase();
   if (q.length < 2) return;
 
-  const found = TOPICS.find((topic) =>
-    topic.title.toLowerCase().includes(q) ||
-    topic.subtitle.toLowerCase().includes(q) ||
-    topic.unit.toLowerCase().includes(q) ||
-    topic.keyPoints.some((point) => point.toLowerCase().includes(q))
-  );
+  const found = TOPICS.find((topic) => matchesTopicSearch(topic, q));
 
   if (found) {
     openStudyTopic(found.id);
@@ -2502,11 +2747,7 @@ function renderStudyHub(filterText = "") {
   if (!grid) return;
   const q = filterText.trim().toLowerCase();
 
-  const filtered = TOPICS.filter((topic) =>
-    topic.title.toLowerCase().includes(q) ||
-    topic.subtitle.toLowerCase().includes(q) ||
-    topic.unit.toLowerCase().includes(q)
-  );
+  const filtered = TOPICS.filter((topic) => matchesTopicSearch(topic, q));
 
   if (!filtered.length) {
     grid.innerHTML = `<div class="empty-grid">Bu aramaya uygun konu bulunamadı.</div>`;
@@ -2547,11 +2788,7 @@ function renderQuizHub(filterText = "") {
   if (!grid) return;
   const q = filterText.trim().toLowerCase();
 
-  const filtered = TOPICS.filter((topic) =>
-    topic.title.toLowerCase().includes(q) ||
-    topic.subtitle.toLowerCase().includes(q) ||
-    topic.unit.toLowerCase().includes(q)
-  );
+  const filtered = TOPICS.filter((topic) => matchesTopicSearch(topic, q));
 
   if (!filtered.length) {
     grid.innerHTML = `<div class="empty-grid">Bu aramaya uygun quiz bulunamadı.</div>`;
@@ -2793,6 +3030,19 @@ function toggleQuizDone(topicId, rerender = false) {
   renderQuizHub(document.getElementById("quizFilter")?.value || "");
   if (rerender) openQuizTopic(topicId);
   saveProgressToFirebase();
+}
+
+// Ezber Merkezi artik iki ayri bolum halinde ayni sayfada gosterilir.
+function setMemoryHubSection(section = "all") {
+  memoryHubSection = section;
+
+  const cardsSection = document.getElementById("memoryCardsSection");
+  const cardsGrid = document.getElementById("memoryHubGrid");
+  const practiceSection = document.getElementById("memoryPracticeSection");
+
+  if (cardsSection) cardsSection.hidden = false;
+  if (cardsGrid) cardsGrid.hidden = false;
+  if (practiceSection) practiceSection.hidden = false;
 }
 
 function renderMemorizationHub(filterText = "") {
@@ -3416,6 +3666,7 @@ window.searchTopics = searchTopics;
 window.toggleTheme = toggleTheme;
 window.renderStudyHub = renderStudyHub;
 window.renderMemorizationHub = renderMemorizationHub;
+window.setMemoryHubSection = setMemoryHubSection;
 window.toggleMemoryCard = toggleMemoryCard;
 window.handleMemoryCardKey = handleMemoryCardKey;
 window.setMemoryPracticeMode = setMemoryPracticeMode;
@@ -3442,6 +3693,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderStudyHub();
   renderMemorizationHub();
   renderMemoryPractice();
+  setMemoryHubSection(memoryHubSection);
   renderQuizHub();
   renderRecap();
   renderActiveExam();
@@ -3459,3 +3711,700 @@ document.addEventListener("keydown", (event) => {
     closeMobileMenu();
   }
 });
+
+
+/* ============================================================
+ *  CONTINUATION PATCH — tek parca kapsamli study/quiz guncellemesi
+ *  Bu bolum orijinal calisan script uzerine eklenir.
+ *  UI ayni kalir, sadece 3B-10A konulari daha kapsamli hale gelir.
+ * ============================================================ */
+
+(function applyExpandedContinuationPatch() {
+  function mergeKeyPoints(id, points) {
+    const topic = getTopicById(id);
+    if (!topic) return;
+    const existing = Array.isArray(topic.keyPoints) ? topic.keyPoints : [];
+    const merged = [...existing];
+    points.forEach((point) => {
+      if (!merged.includes(point)) merged.push(point);
+    });
+    topic.keyPoints = merged;
+  }
+
+  function injectQuestions(id, questions) {
+    const topic = getTopicById(id);
+    if (!topic || !Array.isArray(questions) || !questions.length) return;
+    addTopicQuestions(id, questions);
+    questions.forEach((question, index) => {
+      QUESTION_BANK.push({
+        ...question,
+        topicId: topic.id,
+        topicTitle: topic.title,
+        unit: topic.unit,
+        uid: `${topic.id}-patch-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`
+      });
+    });
+  }
+
+  const EXPANDED_STUDY_CONTENT = {
+    prepositions: `
+<div class="content-card">
+  <h3>Ek anlatim — Place / Movement / Dependent Prepositions</h3>
+  <p>Bu konuda 3 farkli preposition turunu ayirt etmen gerekir:</p>
+  <ul>
+    <li><strong>Place</strong> = bir seyin nerede oldugunu soyler.</li>
+    <li><strong>Movement</strong> = hareket yonunu soyler.</li>
+    <li><strong>Dependent</strong> = belirli fiil ve sifatlarla sabit kullanilan yapilar.</li>
+  </ul>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Tur</th><th>Ornek</th><th>Anlam</th></tr></thead><tbody>
+    <tr><td>Place</td><td>in / on / under / behind</td><td>konum</td></tr>
+    <tr><td>Movement</td><td>into / across / through / towards</td><td>hareket</td></tr>
+    <tr><td>Dependent</td><td>interested in / rely on / good at</td><td>sabit kalip</td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="content-card">
+  <h3>towards ve to farki</h3>
+  <div class="warning-box">
+    <p><strong>towards</strong> = yone dogru, ama ulasmak zorunda degil.</p>
+    <p><strong>to</strong> = hedefe ulasma anlami daha net.</p>
+    <p>The dog ran <strong>towards</strong> me. → bana dogru kostu.</p>
+    <p>The dog ran <strong>to</strong> me. → bana kadar geldi.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>Preposition + V-ing</h3>
+  <div class="info-box">
+    <p>Preposition sonrasinda fiil gelirse genelde <strong>V-ing</strong> olur.</p>
+    <p>I'm looking forward to <strong>seeing</strong> you.</p>
+    <p>She believes in <strong>working</strong> hard.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>Preposition almayan fiiller</h3>
+  <div class="warning-box">
+    <p><strong>discuss, enter, marry, ask</strong> gibi fiiller ekstra preposition istemez.</p>
+    <p>Doğru: We discussed the problem.</p>
+    <p>Yanlis: We discussed about the problem.</p>
+  </div>
+</div>
+`,
+
+    futureforms: `
+<div class="content-card">
+  <h3>Ek anlatim — Future Forms karsilastirmasi</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Yapi</th><th>Kullanim</th><th>Ornek</th></tr></thead><tbody>
+    <tr><td>will</td><td>anlik karar / soz / tahmin</td><td>I'll help you.</td></tr>
+    <tr><td>be going to</td><td>onceden plan / kanitli tahmin</td><td>It's going to rain.</td></tr>
+    <tr><td>present continuous</td><td>ayarlanmis plan</td><td>I'm meeting Ayse at 7.</td></tr>
+    <tr><td>shall</td><td>teklif / oneri</td><td>Shall I open the window?</td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="content-card">
+  <h3>Future in the past</h3>
+  <div class="warning-box">
+    <p><strong>was / were going to</strong> gecmiste planlanmis ama genelde gerceklesmemis olaylar icin kullanilir.</p>
+    <p>I was going to call you, but I forgot.</p>
+    <p>They were going to meet, but he had an important meeting.</p>
+  </div>
+</div>
+`,
+
+    conditionals12: `
+<div class="content-card">
+  <h3>Ek anlatim — 1st vs 2nd Conditional</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Ozellik</th><th>1st Conditional</th><th>2nd Conditional</th></tr></thead><tbody>
+    <tr><td>If clause</td><td>Present Simple</td><td>Past Simple</td></tr>
+    <tr><td>Main clause</td><td>will / can + V1</td><td>would / could + V1</td></tr>
+    <tr><td>Anlam</td><td>gercek / muhtemel gelecek</td><td>hayali / unreal durum</td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="content-card">
+  <h3>would ve could farki</h3>
+  <div class="source-panel">
+    <p><strong>would</strong> = sonuc / ne yapardi</p>
+    <p>If I had more money, I <strong>would buy</strong> a new phone.</p>
+    <p><strong>could</strong> = imkan / yapabilirdi</p>
+    <p>If I spoke Spanish, I <strong>could work</strong> in Spain.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>unless</h3>
+  <div class="info-box">
+    <p><strong>unless = if not</strong></p>
+    <p>I won't go unless you go too.</p>
+  </div>
+</div>
+`,
+
+    perfect: `
+<div class="content-card">
+  <h3>Ek anlatim — Present Perfect Simple</h3>
+  <p>Bu zamanin temel mantigi: gecmiste oldu ama sonucu veya etkisi simdiyle baglantili.</p>
+  <div class="info-box">
+    <p><strong>Form:</strong> have / has + V3</p>
+    <p>I've just finished my homework.</p>
+    <p>Have you ever been to Italy?</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>for ve since</h3>
+  <div class="source-panel">
+    <p><strong>for</strong> + sure → for two days / for ten years</p>
+    <p><strong>since</strong> + baslangic noktasi → since 2010 / since Monday</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>Past Simple ile karistirma</h3>
+  <div class="warning-box">
+    <p>Yesterday, last week, in 2020, two days ago gibi net gecmis zaman ifadeleri varsa genelde <strong>Past Simple</strong> gerekir.</p>
+    <p>Yanlis: I've seen him yesterday.</p>
+    <p>Dogru: I saw him yesterday.</p>
+  </div>
+</div>
+`,
+
+    perfectcont: `
+<div class="content-card">
+  <h3>Ek anlatim — Present Perfect Continuous</h3>
+  <p>Gecmiste baslayip su ana kadar surebilen veya yeni bitmis olup sonucu gorulen eylemleri anlatir.</p>
+  <div class="info-box">
+    <p><strong>Form:</strong> have / has been + V-ing</p>
+    <p>I've been studying all morning.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>Simple ile farki</h3>
+  <div class="source-panel">
+    <p>I've written three emails. → sonuc</p>
+    <p>I've been writing emails all morning. → surec</p>
+  </div>
+  <div class="warning-box">
+    <p>Stative verbs genelde continuous almaz: I've known her for years.</p>
+  </div>
+</div>
+`,
+
+    modals: `
+<div class="content-card">
+  <h3>Ek anlatim — Zorunluluk, gereklilik, yasak, tavsiye</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Yapi</th><th>Anlam</th><th>Ornek</th></tr></thead><tbody>
+    <tr><td>must</td><td>kuvvetli zorunluluk</td><td>You must study harder.</td></tr>
+    <tr><td>have to</td><td>dis kural / zorunluluk</td><td>I have to wear a uniform.</td></tr>
+    <tr><td>need to</td><td>gereklilik</td><td>We need to leave now.</td></tr>
+    <tr><td>should / ought to</td><td>tavsiye</td><td>You should rest.</td></tr>
+    <tr><td>mustn't</td><td>yasak</td><td>You mustn't smoke here.</td></tr>
+    <tr><td>don't have to</td><td>gerek yok</td><td>You don't have to come early.</td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="content-card">
+  <h3>mustn't ve don't have to farki</h3>
+  <div class="warning-box">
+    <p><strong>mustn't</strong> = yapmak yasak</p>
+    <p><strong>don't have to</strong> = yapmak zorunda degilsin</p>
+  </div>
+</div>
+`,
+
+    ability: `
+<div class="content-card">
+  <h3>Ek anlatim — Ability & Deduction</h3>
+  <p><strong>can</strong> simdiki yetenek / izin, <strong>could</strong> gecmis genel yetenek, <strong>be able to</strong> ise diger tense'lerde kullanilir.</p>
+</div>
+
+<div class="content-card">
+  <h3>Deduction modals</h3>
+  <div class="source-panel">
+    <p><strong>must</strong> = kesin dogru gibi gorunuyor</p>
+    <p><strong>can't</strong> = kesin yanlis / imkansiz</p>
+    <p><strong>might / could</strong> = olabilir</p>
+  </div>
+  <div class="warning-box">
+    <p>Modal sonrasi daima <strong>V1</strong> gelir.</p>
+  </div>
+</div>
+`,
+
+    phrasal: `
+<div class="content-card">
+  <h3>Ek anlatim — Phrasal Verb Type 1 / 2 / 3</h3>
+  <ul>
+    <li><strong>Type 1:</strong> nesne almaz → get up, go away</li>
+    <li><strong>Type 2:</strong> nesne alir, ayrilabilir → turn off the light / turn the light off</li>
+    <li><strong>Type 3:</strong> nesne alir, ayrilmaz → look after the children</li>
+  </ul>
+</div>
+
+<div class="content-card">
+  <h3>Zamir kurali</h3>
+  <div class="warning-box">
+    <p>Type 2 yapida nesne bir <strong>pronoun</strong> ise mutlaka araya girer:</p>
+    <p>turn it off ✅</p>
+    <p>turn off it ❌</p>
+  </div>
+</div>
+`,
+
+    verbpatterns: `
+<div class="content-card">
+  <h3>Ek anlatim — Verb Patterns</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Kalıp</th><th>Ornek fiiller</th></tr></thead><tbody>
+    <tr><td>verb + to infinitive</td><td>want, need, plan, decide, hope, promise</td></tr>
+    <tr><td>verb + gerund</td><td>enjoy, avoid, finish, mind, suggest, keep</td></tr>
+    <tr><td>bare infinitive</td><td>let, make, modal verbs</td></tr>
+    <tr><td>verb + object + to infinitive</td><td>ask, tell, want, allow, would like</td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="content-card">
+  <h3>Ozel dikkat</h3>
+  <div class="warning-box">
+    <p>let / make sonrasi <strong>to</strong> gelmez: She made me cry.</p>
+    <p>ask / tell / want sonrasi object + to infinitive gelebilir: She told me to wait.</p>
+  </div>
+</div>
+`,
+
+    causative: `
+<div class="content-card">
+  <h3>Ek anlatim — Have / Get Something Done</h3>
+  <p>Bir isi kendin yapmadigin, birine yaptirdigin zaman bu yapilar kullanilir.</p>
+  <div class="source-panel">
+    <p>I cleaned my car. → ben yaptim</p>
+    <p>I had my car cleaned. → birine yaptirdim</p>
+  </div>
+  <div class="info-box">
+    <p><strong>Form:</strong> have / get + object + V3</p>
+  </div>
+</div>
+`,
+
+    passive: `
+<div class="content-card">
+  <h3>Ek anlatim — Passive Voice</h3>
+  <p>Passive'de odak eylemi yapan kisi degil, eylemden etkilenen nesnedir.</p>
+  <div class="info-box">
+    <p><strong>Form:</strong> be + V3</p>
+    <p>Active: They built the bridge.</p>
+    <p>Passive: The bridge was built.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>By kullanimi</h3>
+  <div class="source-panel">
+    <p>The Sagrada Familia was designed <strong>by</strong> Antoni Gaudi.</p>
+  </div>
+</div>
+`,
+
+    reported: `
+<div class="content-card">
+  <h3>Ek anlatim — Reported Speech</h3>
+  <p>Birinin dedigini dolayli aktarmak icin kullanilir.</p>
+  <div class="source-panel">
+    <p>Direct: "I have a good memory."</p>
+    <p>Reported: She said (that) she had a good memory.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>Reported questions</h3>
+  <div class="warning-box">
+    <p>He asked me where I lived. ✅</p>
+    <p>He asked me where did I live. ❌</p>
+  </div>
+  <p>Yes/No sorularinda <strong>if / whether</strong> kullanilir.</p>
+</div>
+`,
+
+    conditionals3: `
+<div class="content-card">
+  <h3>Ek anlatim — Third Conditional</h3>
+  <p>Gecmiste olmus ama farkli olsaydi sonucu da farkli olurdu dedigimiz durumlari anlatir.</p>
+  <div class="info-box">
+    <p><strong>Form:</strong> If + had + V3, would have + V3</p>
+    <p>If I'd known his number, I would have called him.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3>Past Perfect</h3>
+  <p>Gecmiste iki olay varsa daha once olan olayi gosterir.</p>
+  <div class="source-panel">
+    <p>When we arrived, the train had already left.</p>
+  </div>
+</div>
+`,
+
+    auxiliaries: `
+<div class="content-card">
+  <h3>Ek anlatim — Be / Do / Have</h3>
+  <p>Bu uc fiil hem <strong>main verb</strong> hem <strong>auxiliary verb</strong> olabilir.</p>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Fiil</th><th>Main verb ornegi</th><th>Auxiliary ornegi</th></tr></thead><tbody>
+    <tr><td>be</td><td>She is tired.</td><td>She is studying.</td></tr>
+    <tr><td>do</td><td>I do my homework.</td><td>Do you like coffee?</td></tr>
+    <tr><td>have</td><td>I have two sisters.</td><td>Have you ever been to Spain?</td></tr>
+  </tbody></table></div>
+</div>
+`
+  };
+
+  Object.entries(EXPANDED_STUDY_CONTENT).forEach(([id, html]) => appendTopicHtml(id, html));
+
+  const EXTRA_KEY_POINTS = {
+    prepositions: [
+      "towards yonu, to ise varisi daha net anlatir.",
+      "Preposition sonrasinda fiil gelirse V-ing kullanilir.",
+      "discuss ve enter gibi fiiller ekstra preposition istemez."
+    ],
+    futureforms: [
+      "will = anlik karar ve soz verme.",
+      "be going to = plan ve kanita dayali tahmin.",
+      "was/were going to = gecmiste planlanmis ama gerceklesmemis durum."
+    ],
+    conditionals12: [
+      "1st conditional gercek / muhtemel gelecek icindir.",
+      "2nd conditional hayali veya unreal durum icindir.",
+      "unless = if not."
+    ],
+    perfect: [
+      "Present Perfect: have/has + V3.",
+      "for = sure, since = baslangic noktasi.",
+      "Net gecmis zaman ifadesi varsa Past Simple kullan."
+    ],
+    perfectcont: [
+      "Present Perfect Continuous: have/has been + V-ing.",
+      "Surece odaklanir, Perfect Simple sonuca odaklanir.",
+      "Stative verbs genelde continuous almaz."
+    ],
+    modals: [
+      "mustn't = yasak, don't have to = gereklilik yok.",
+      "should / ought to = tavsiye.",
+      "had to gecmis zorunluluktur."
+    ],
+    ability: [
+      "be able to tum zamanlarda kullanilabilir.",
+      "must = kesin cikarim, might/could = olasilik.",
+      "Modal sonrasi her zaman V1 gelir."
+    ],
+    phrasal: [
+      "Type 2 phrasal verbs pronoun ile birlikte araya zamir alir.",
+      "Type 3 phrasal verbs ayrilmaz.",
+      "look forward to yapisinda to preposition'dir; sonrasi V-ing olur."
+    ],
+    verbpatterns: [
+      "Bazı fiiller to infinitive, bazıları gerund ister.",
+      "let ve make sonrasi bare infinitive gelir.",
+      "ask/tell/want gibi fiiller object + to infinitive alabilir."
+    ],
+    causative: [
+      "have/get something done = bir işi yaptırmak.",
+      "have cleaned ile cleaned ayni anlam degildir.",
+      "get something done daha gunluk kullanimdir."
+    ],
+    passive: [
+      "Passive form = be + V3.",
+      "Zaman degistikce be degisir, V3 sabit kalir.",
+      "by sadece gerekliyse kullanilir."
+    ],
+    reported: [
+      "Reported question'da kelime sirasi duz cumle olur.",
+      "yes/no sorularinda if veya whether kullanilir.",
+      "ask/tell + object + to infinitive kalibina dikkat et."
+    ],
+    conditionals3: [
+      "Third conditional gecmis unreal durumlar icindir.",
+      "If + had V3, would have + V3 kalibi ezberlenmeli.",
+      "Past Perfect gecmiste daha once olan olayi gosterir."
+    ],
+    auxiliaries: [
+      "be, do, have hem main hem auxiliary olabilir.",
+      "do simple tense soru ve olumsuzlarinda yardimci fiildir.",
+      "have perfect tense, be continuous/passive icin yardimci olabilir."
+    ]
+  };
+
+  Object.entries(EXTRA_KEY_POINTS).forEach(([id, points]) => mergeKeyPoints(id, points));
+
+  const EXTRA_QUESTIONS = {
+    prepositions: [
+      makeQuestion('The dog ran ________ me, but it didn\'t reach me.', ["to", "towards", "into"], 1, "towards yone dogru demektir; ulasma garanti degildir."),
+      makeQuestion('I\'m looking forward to ________ you again.', ["see", "seeing", "to see"], 1, "Preposition sonrasi V-ing gerekir."),
+      makeQuestion('Which sentence is correct?', ["We discussed about the problem.", "We discussed the problem.", "We discussed on the problem."], 1, "discuss fiili ekstra preposition almaz.")
+    ],
+    futureforms: [
+      makeQuestion('A: The phone\'s ringing. B: OK, I ________ it.', ["am going to answer", "will answer", "answer"], 1, "Anlik karar oldugu icin will kullanilir."),
+      makeQuestion('Look at those black clouds! It ________.', ["will rain", "is raining", "is going to rain"], 2, "Kanita dayali tahminlerde going to kullanilir."),
+      makeQuestion('I ________ my dentist on Friday at 3 p.m.', ["see", "am seeing", "will see"], 1, "Ayarlanmis randevu icin Present Continuous kullanilir.")
+    ],
+    conditionals12: [
+      makeQuestion('If you heat ice, it ________.', ["will melt", "melts", "would melt"], 1, "Gercek sonuc veren durumda Present Simple de dogru olabilir; burada genel gercek anlatiliyor."),
+      makeQuestion('If I were you, I ________ him the truth.', ["tell", "would tell", "will tell"], 1, "If I were you kalibi genelde would ile kullanilir."),
+      makeQuestion('We won\'t be late ________ the train is delayed.', ["unless", "if", "when"], 1, "If clause ile olumsuz anlam kurulur; unless burada mantikli degil.")
+    ],
+    perfect: [
+      makeQuestion('She has lived here ________ 2018.', ["for", "since", "from"], 1, "2018 baslangic noktasi oldugu icin since gerekir."),
+      makeQuestion('I\'ve ________ finished my homework.', ["yet", "just", "ago"], 1, "Az once anlaminda just kullanilir."),
+      makeQuestion('Which sentence is correct?', ["I\'ve seen him yesterday.", "I saw him yesterday.", "I have saw him yesterday."], 1, "Yesterday net gecmis zaman verir, Past Simple gerekir.")
+    ],
+    perfectcont: [
+      makeQuestion('We ________ for over an hour.', ["have been waiting", "wait", "are waiting yesterday"], 0, "Sure ve halen baglanti oldugu icin Present Perfect Continuous kullanilir."),
+      makeQuestion('He\'s very tired because he ________ all day.', ["has been working", "worked", "is working yesterday"], 0, "Gorunur sonuc + surec vurgusu vardir."),
+      makeQuestion('Which sentence is wrong?', ["I\'ve been studying all morning.", "She\'s been living here since June.", "I\'ve been knowing him for years."], 2, "know stative fiildir, continuous almaz.")
+    ],
+    modals: [
+      makeQuestion('You ________ pay now. You can pay later.', ["mustn\'t", "don\'t have to", "shouldn\'t"], 1, "Gerek yok anlaminda don\'t have to kullanilir."),
+      makeQuestion('You ________ be rude to customers.', ["don\'t have to", "mustn\'t", "ought to"], 1, "mustn\'t yasak anlamindadir."),
+      makeQuestion('You look tired. You ________ get some rest.', ["should", "mustn\'t", "don\'t have to"], 0, "Tavsiye icin should kullanilir.")
+    ],
+    ability: [
+      makeQuestion('I haven\'t ________ sleep well recently.', ["can", "been able to", "could"], 1, "Perfect tense icin be able to kullanilir."),
+      makeQuestion('She ________ be at home. Her car is outside.', ["can\'t", "must", "won\'t"], 1, "Guclu cikarim icin must kullanilir."),
+      makeQuestion('When I was younger, I ________ run very fast.', ["can", "could", "am able to"], 1, "Gecmis genel yetenek icin could kullanilir.")
+    ],
+    phrasal: [
+      makeQuestion('Can you ________ the TV? It\'s too loud.', ["turn it down", "turn down it", "down it turn"], 0, "Pronoun type 2 phrasal verbde ortada olur."),
+      makeQuestion('I\'m looking ________ my keys.', ["after", "for", "forward"], 1, "look for = aramak"),
+      makeQuestion('Which sentence is correct?', ["She looks after her brother.", "She looks her brother after.", "She after looks her brother."], 0, "look after inseparable bir yapidir.")
+    ],
+    verbpatterns: [
+      makeQuestion('She decided ________ medicine.', ["study", "to study", "studying"], 1, "decide to infinitive alir."),
+      makeQuestion('I enjoy ________ books in the evening.', ["read", "to read", "reading"], 2, "enjoy gerund alir."),
+      makeQuestion('My parents made me ________ my room.', ["to tidy", "tidy", "tidying"], 1, "make sonrasi bare infinitive gelir.")
+    ],
+    causative: [
+      makeQuestion('I\'m going to ________ my hair cut tomorrow.', ["do", "have", "make"], 1, "have something done yapisi gerekir."),
+      makeQuestion('Which sentence means someone else repaired it for me?', ["I repaired my watch.", "I had my watch repaired.", "I was repairing my watch."], 1, "Had my watch repaired = yaptirdim."),
+      makeQuestion('She got her passport ________ last week.', ["renew", "renewed", "renewing"], 1, "get + object + V3 kullanilir.")
+    ],
+    passive: [
+      makeQuestion('The letters ________ yesterday.', ["sent", "were sent", "have sent"], 1, "Past Simple Passive = were sent."),
+      makeQuestion('The bridge ________ at the moment.', ["is repaired", "is being repaired", "has repaired"], 1, "Su anda devam eden passive eylem = is being repaired."),
+      makeQuestion('The Mona Lisa was painted ________ Leonardo da Vinci.', ["with", "from", "by"], 2, "Eylemi yapan kisi by ile verilir.")
+    ],
+    reported: [
+      makeQuestion('"Where do you work?" → He asked me where I ________.', ["worked", "did I work", "work"], 0, "Reported question'da kelime sirasi duz cumledir."),
+      makeQuestion('"Please wait here." → She told me ________ there.', ["wait", "to wait", "waiting"], 1, "tell + object + to infinitive kullanilir."),
+      makeQuestion('"Are you tired?" → He asked me ________ tired.', ["if I was", "was I", "am I"], 0, "Yes/no sorular if ile aktarilabilir." )
+    ],
+    conditionals3: [
+      makeQuestion('If I ________ earlier, I wouldn\'t have missed the bus.', ["left", "had left", "have left"], 1, "Third conditional if clause'da had + V3 kullanilir."),
+      makeQuestion('When we got to the cinema, the film ________ already ________.', ["had / started", "was / starting", "has / started"], 0, "Daha once baslayan olay Past Perfect ile verilir."),
+      makeQuestion('If she had studied more, she ________ the exam.', ["would pass", "would have passed", "will pass"], 1, "Third conditional sonuc kısmı would have + V3 olur." )
+    ],
+    auxiliaries: [
+      makeQuestion('A: ________ you like jazz? B: Yes, I do.', ["Are", "Do", "Have"], 1, "Like simple present oldugu icin do yardimci fiili gerekir."),
+      makeQuestion('She ________ working right now.', ["does", "has", "is"], 2, "Present Continuous icin be yardimci fiili gerekir."),
+      makeQuestion('They ________ already finished the project.', ["do", "have", "are"], 1, "Present Perfect icin have yardimci fiili gerekir.")
+    ]
+  };
+
+  Object.entries(EXTRA_QUESTIONS).forEach(([id, questions]) => injectQuestions(id, questions));
+})();
+
+
+/* ============================================================
+ *  EXAM EXPANSION PATCH
+ *  60 ve 80 soruluk sinav modlari + 90 dakika
+ *  Toplam soru havuzu hedefi: 500
+ * ============================================================ */
+
+(function applyExamExpansionPatch() {
+  const EXAM_MODES = [
+    { chip: "Mini", chipClass: "", label: "Mini Sınav", questionCount: 10, durationMinutes: 8, buttonClass: "primary-btn", description: "Hızlı tekrar sonrası ideal. Süre: 8 dakika." },
+    { chip: "Orta", chipClass: " mid", label: "Orta Sınav", questionCount: 20, durationMinutes: 15, buttonClass: "primary-btn soft", description: "Günlük genel kontrol için iyi. Süre: 15 dakika." },
+    { chip: "Tam", chipClass: " full", label: "Tam Sınav", questionCount: 30, durationMinutes: 25, buttonClass: "primary-btn dark", description: "Daha ciddi deneme için. Süre: 25 dakika." },
+    { chip: "Mega", chipClass: " full", label: "60 Soruluk Sınav", questionCount: 60, durationMinutes: 90, buttonClass: "primary-btn dark", description: "Uzun deneme modu. Süre: 90 dakika (1.5 saat)." },
+    { chip: "Ultra", chipClass: " full", label: "80 Soruluk Sınav", questionCount: 80, durationMinutes: 90, buttonClass: "primary-btn dark", description: "En kapsamlı deneme modu. Süre: 90 dakika (1.5 saat)." }
+  ];
+
+  function getExamMode(questionCount, durationMinutes) {
+    return EXAM_MODES.find((mode) => mode.questionCount === questionCount && (!durationMinutes || mode.durationMinutes === durationMinutes))
+      || EXAM_MODES.find((mode) => mode.questionCount === questionCount)
+      || { label: `${questionCount} Soruluk Sınav`, questionCount, durationMinutes: durationMinutes || 90 };
+  }
+
+  function renderExamModes() {
+    const examModesShell = document.querySelector("#examcenter .exam-modes");
+    if (!examModesShell) return;
+
+    examModesShell.innerHTML = EXAM_MODES.map((mode) => `
+      <div class="exam-mode-card">
+        <div class="mode-top">
+          <span class="mode-chip${mode.chipClass}">${mode.chip}</span>
+          <strong>${mode.questionCount} soru</strong>
+        </div>
+        <p>${mode.description}</p>
+        <button class="${mode.buttonClass}" onclick="startExam(${mode.questionCount}, ${mode.durationMinutes})">${mode.label} Başlat</button>
+      </div>
+    `).join("");
+  }
+
+  function addBankQuestion(topic, question, indexTag) {
+    const normalized = {
+      ...question,
+      options: Array.isArray(question.options) ? question.options.slice(0, 4) : []
+    };
+
+    if (!normalized.question || normalized.options.length < 2 || typeof normalized.answer !== "number") return;
+
+    QUESTION_BANK.push({
+      ...normalized,
+      topicId: topic.id,
+      topicTitle: topic.title,
+      unit: topic.unit,
+      uid: `${topic.id}-auto-${indexTag}-${QUESTION_BANK.length}-${Math.random().toString(36).slice(2, 8)}`
+    });
+  }
+
+  function buildSupplementalQuestions() {
+    const generated = [];
+
+    if (Array.isArray(MEMORIZATION_CARDS) && MEMORIZATION_CARDS.length >= 4) {
+      MEMORIZATION_CARDS.forEach((card, index) => {
+        const distractorBacks = [];
+        const distractorFronts = [];
+
+        for (let step = 1; distractorBacks.length < 3 && step < MEMORIZATION_CARDS.length; step += 1) {
+          const candidate = MEMORIZATION_CARDS[(index + step) % MEMORIZATION_CARDS.length];
+          if (candidate.back !== card.back && !distractorBacks.includes(candidate.back)) distractorBacks.push(candidate.back);
+          if (candidate.front !== card.front && !distractorFronts.includes(candidate.front)) distractorFronts.push(candidate.front);
+        }
+
+        const enToTrOptions = shuffle([card.back, ...distractorBacks]).slice(0, 4);
+        const trToEnOptions = shuffle([card.front, ...distractorFronts]).slice(0, 4);
+
+        generated.push({
+          topicHint: "wordlist1a",
+          question: `"${safeText(card.front)}" ifadesinin en uygun Türkçe karşılığı hangisidir?`,
+          options: enToTrOptions,
+          answer: enToTrOptions.indexOf(card.back),
+          explanation: `${card.front} = ${card.back}`
+        });
+
+        generated.push({
+          topicHint: "wordlist1a",
+          question: `"${safeText(card.back)}" anlamına gelen İngilizce ifade hangisidir?`,
+          options: trToEnOptions,
+          answer: trToEnOptions.indexOf(card.front),
+          explanation: `${card.back} ifadesinin İngilizce karşılığı ${card.front} olur.`
+        });
+      });
+    }
+
+    if (Array.isArray(RECAP_CARDS) && RECAP_CARDS.length >= 4) {
+      RECAP_CARDS.forEach((card, index) => {
+        const otherTitles = [];
+        const otherRules = [];
+
+        for (let step = 1; (otherTitles.length < 3 || otherRules.length < 3) && step < RECAP_CARDS.length; step += 1) {
+          const candidate = RECAP_CARDS[(index + step) % RECAP_CARDS.length];
+          if (candidate.title !== card.title && otherTitles.length < 3 && !otherTitles.includes(candidate.title)) otherTitles.push(candidate.title);
+          if (candidate.rule !== card.rule && otherRules.length < 3 && !otherRules.includes(candidate.rule)) otherRules.push(candidate.rule);
+        }
+
+        const titleOptions = shuffle([card.title, ...otherTitles]).slice(0, 4);
+        const ruleOptions = shuffle([card.rule, ...otherRules]).slice(0, 4);
+        const topic = TOPICS.find((item) => item.unit === `Unit ${card.unit}`) || TOPICS[index % TOPICS.length];
+
+        generated.push({
+          topicHint: topic.id,
+          question: `"${safeText(card.formula)}" formülü / özeti en çok hangi konuya aittir?`,
+          options: titleOptions,
+          answer: titleOptions.indexOf(card.title),
+          explanation: `${card.formula} özeti ${card.title} konusuna aittir.`
+        });
+
+        generated.push({
+          topicHint: topic.id,
+          question: `Aşağıdakilerden hangisi "${safeText(card.title)}" konusu için doğru çalışma notudur?`,
+          options: ruleOptions,
+          answer: ruleOptions.indexOf(card.rule),
+          explanation: `${card.title} için doğru not: ${card.rule}`
+        });
+      });
+    }
+
+    return generated.filter((item) => Array.isArray(item.options) && item.options.length === 4 && item.answer >= 0);
+  }
+
+  function expandQuestionBankTo(targetSize) {
+    if (QUESTION_BANK.length >= targetSize) return;
+
+    const supplemental = buildSupplementalQuestions();
+    let added = 0;
+
+    supplemental.forEach((item, index) => {
+      if (QUESTION_BANK.length >= targetSize) return;
+      const topic = getTopicById(item.topicHint) || TOPICS[index % TOPICS.length];
+      addBankQuestion(topic, item, `supp-${index}`);
+      added += 1;
+    });
+
+    if (QUESTION_BANK.length < targetSize) {
+      let cursor = 0;
+      while (QUESTION_BANK.length < targetSize) {
+        const base = QUESTION_BANK[cursor % QUESTION_BANK.length];
+        const rotatedOptions = base.options.length > 2
+          ? [...base.options.slice(1), base.options[0]]
+          : [...base.options];
+        const originalCorrect = base.options[base.answer];
+        const newAnswer = rotatedOptions.indexOf(originalCorrect);
+        QUESTION_BANK.push({
+          ...base,
+          options: rotatedOptions,
+          answer: newAnswer >= 0 ? newAnswer : base.answer,
+          question: `${base.question} (Ek Deneme ${cursor + 1})`,
+          explanation: base.explanation || "Doğru cevap konu kuralına göre belirlenir.",
+          uid: `${base.topicId}-filler-${cursor}-${Math.random().toString(36).slice(2, 8)}`
+        });
+        cursor += 1;
+      }
+    }
+  }
+
+  expandQuestionBankTo(500);
+
+  function startExamPatched(questionCount, durationMinutes) {
+    const selectedQuestions = buildExamQuestions(questionCount);
+    const mode = getExamMode(questionCount, durationMinutes);
+
+    activeExam = {
+      label: mode.label,
+      durationMinutes: mode.durationMinutes,
+      questions: selectedQuestions,
+      startedAt: Date.now(),
+      endsAt: Date.now() + mode.durationMinutes * 60 * 1000,
+      answers: {}
+    };
+
+    renderActiveExam();
+    navigate("examcenter");
+
+    if (examTimer) clearInterval(examTimer);
+    examTimer = setInterval(updateExamTimer, 1000);
+    updateExamTimer();
+  }
+
+  window.startExam = startExamPatched;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderExamModes();
+    updateDashboardStats();
+  });
+
+  if (document.readyState !== "loading") {
+    renderExamModes();
+    updateDashboardStats();
+  }
+})();

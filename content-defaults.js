@@ -10,6 +10,8 @@ export const SOURCE_LIBRARY = {
   prepositions3B: { title: "Prepositions", file: "GRAMMAR BANK- INTER-PLUS 3B.docx", kind: "docx" },
   futureForms4A: { title: "Future Forms", file: "FUTURE FORMS- 4B INTER-PLUS.docx", kind: "docx" },
   conditionals4B: { title: "First and Second Conditionals", file: "First and Second Conditional-4B GRAMMAR.docx", kind: "docx" },
+  unit6B: { title: "Unit 6B", file: "UNIT 6B - Interplus  Can,could,able to- Deduction.docx", kind: "docx" },
+  phrasalVerbs7A: { title: "Phrasal Verbs", file: "Phrasal Verbs.pptx", kind: "pptx" },
   workbook1B: { title: "Workbook Vocabulary / Highlighted Words", file: "Vocabulary_List 1B Workbook.pdf", kind: "pdf" },
   photoPack: { title: "Oxford Grammar Bank Photo Pack", file: "WhatsApp Image 2026-04-06 ...", kind: "jpeg" }
 };
@@ -143,7 +145,7 @@ export const COLLECTION_BLUEPRINTS = {
   portal_exams_draft: { id: "exam-mini-core-review", slug: "mini-core-review", title: "Mini Core Review", type: "mini", mode: "pool", durationMinutes: 12, questionCount: 8, topicIds: ["topic-1b-adjectives", "topic-2a-present-tenses"], status: "draft", createdAt: "serverTimestamp()", updatedAt: "serverTimestamp()", publishedAt: null },
   portal_exams_published: { id: "exam-mini-core-review", status: "published", publishedAt: "serverTimestamp()" },
   progress: { id: "device_xxxxx", studyCompleted: { "topic-2a-present-tenses": true }, quizAttempts: { "quiz-present-tenses-core": { bestScore: 75, lastScore: 75, completedAt: "ISO string" } }, examAttempts: [{ examId: "exam-mini-core-review", score: 80, total: 10, completedAt: "ISO string" }], updatedAt: "serverTimestamp()" },
-  admin_meta: { id: "portal", publishVersion: 2, lastPublishedAt: "serverTimestamp()", lastPublishedSummary: { topics: 10, quizzes: 9, exams: 3 }, draftCounts: { topics: 10, quizzes: 9, exams: 3 }, updatedAt: "serverTimestamp()" },
+  admin_meta: { id: "portal", publishVersion: 2, lastPublishedAt: "serverTimestamp()", lastPublishedSummary: { topics: 12, quizzes: 12, exams: 3 }, draftCounts: { topics: 12, quizzes: 12, exams: 3 }, updatedAt: "serverTimestamp()" },
   assets: { id: "asset-hero-01", title: "Workbook screenshot", type: "image", storagePath: "portal-assets/workbook-01.jpg", createdAt: "serverTimestamp()", updatedAt: "serverTimestamp()" }
 };
 
@@ -516,6 +518,125 @@ export const DEFAULT_TOPICS = [
       ]),
       resource([SOURCE_LIBRARY.workbook1B.file, SOURCE_LIBRARY.photoPack.file], "Add exact workbook pages or storage links later if you upload the media into Firebase Storage.")
     ]
+  }),
+  topic({
+    id: "topic-6b-ability-deduction",
+    slug: "6b-ability-deduction",
+    unit: "6B",
+    title: "Unit 6B: Can / Could / Be able to & Deduction",
+    subtitle: "Ability forms across tenses and deduction modals",
+    category: "Grammar",
+    level: "Pre-intermediate",
+    estimatedMinutes: 32,
+    order: 11,
+    sourceRefs: [SOURCE_LIBRARY.unit6B.file],
+    tags: ["6b", "ability", "deduction", "modals", "be-able-to"],
+    blocks: [
+      h("Unit 6B: Can / Could / Be able to & Deduction"),
+      info("Use can for present ability, could for past general ability, and be able to when you need other tenses such as future, present perfect or gerund forms."),
+      table("Ability forms", ["Time / use", "Form", "Example"], [
+        ["present ability", "can + verb1", "She can swim."],
+        ["past general ability", "could + verb1", "When I was 5, I could dance very well."],
+        ["present simple", "am / is / are able to + verb1", "They are able to speak Japanese."],
+        ["past simple", "was / were able to + verb1", "She was able to speak Arabic five years ago."],
+        ["future", "will be able to + verb1", "She will be able to join us tomorrow."],
+        ["present perfect", "have / has been able to + verb1", "I have been able to drive since 2011."],
+        ["gerund", "being able to + verb1", "I like being able to read quickly."]
+      ]),
+      formula("Deduction modals", "can't / must / might / could + verb1", [
+        "can't = you are sure something is not true",
+        "must = you are sure something is true",
+        "might / could = positive possibility",
+        "After all four, use verb1."
+      ]),
+      compare("Could or was / were able to?", "Could", "Was / were able to", [
+        { point: "main use", left: "general past ability", right: "single successful action in the past" },
+        { point: "example", left: "He could play the violin when he was four.", right: "I was able to change the wheel myself." }
+      ]),
+      flash("Fast recall cards", [
+        { front: "can", back: "present ability / permission" },
+        { front: "could", back: "past general ability" },
+        { front: "be able to", back: "used across tenses" },
+        { front: "must", back: "strong deduction" },
+        { front: "can't", back: "impossible deduction" },
+        { front: "might / could", back: "possibility" }
+      ]),
+      warn("Do not say will can or must is. Use will be able to for future ability, and use verb1 after deduction modals: must be, can't be, might go."),
+      ex("Core examples", [
+        "She can swim.",
+        "When I was 5, I could dance very well.",
+        "She will be able to join us tomorrow.",
+        "I have been able to drive since 2011.",
+        "I like being able to read quickly.",
+        "He must be at home; the lights are on.",
+        "She can't be Kate. She is in Italy."
+      ]),
+      quote(SOURCE_LIBRARY.unit6B.file, "We use can for abilities. The past form of can is could. We can use be able to in all forms. Modals of deduction are used to say how certain we are about something based on the information we have."),
+      mini([
+        q("mq-6b-1", "When I was 5, I ____ dance very well.", ["can", "could", "will be able to"], 1, "Use could for past general ability."),
+        q("mq-6b-2", "She ____ join us tomorrow after work.", ["can", "will be able to", "could"], 1, "Use will be able to for future ability."),
+        q("mq-6b-3", "He ____ be at home; the lights are on.", ["must", "can't", "mightn't"], 0, "Must shows strong certainty from evidence.")
+      ]),
+      resource([SOURCE_LIBRARY.unit6B.file], "Use the Unit 6B source file to expand examples or add workbook-style tasks later.")
+    ]
+  }),
+  topic({
+    id: "topic-7a-phrasal-verbs",
+    slug: "7a-phrasal-verbs",
+    unit: "7A",
+    title: "Phrasal Verbs",
+    subtitle: "Type 1, Type 2, Type 3 and the pronoun rule",
+    category: "Grammar",
+    level: "Pre-intermediate",
+    estimatedMinutes: 30,
+    order: 12,
+    sourceRefs: [SOURCE_LIBRARY.phrasalVerbs7A.file],
+    tags: ["7a", "phrasal-verbs", "separable", "inseparable"],
+    blocks: [
+      h("Phrasal Verbs"),
+      info("A phrasal verb is a verb plus a particle. The particle can be a preposition or an adverb."),
+      table("Three core types", ["Type", "Rule", "Examples"], [
+        ["Type 1", "no object, inseparable", "go away, eat out, get up"],
+        ["Type 2", "takes an object, separable", "turn off the lights / turn the lights off; turn down the music / turn the music down"],
+        ["Type 3", "takes an object, inseparable", "look for the keys, get on the bus, look after her children, look forward to her wedding day"]
+      ]),
+      formula("Pronoun rule", "verb + pronoun + particle", [
+        "With a pronoun in a separable phrasal verb, the pronoun goes between the verb and particle.",
+        "call her back",
+        "turn it off",
+        "turn it down"
+      ]),
+      compare("Separable or inseparable?", "Separable", "Inseparable", [
+        { point: "object position", left: "turn off the lights / turn the lights off", right: "look for the keys" },
+        { point: "pronoun rule", left: "call her back", right: "look after her children" }
+      ]),
+      flash("Fast recall cards", [
+        { front: "Type 1", back: "no object / inseparable" },
+        { front: "Type 2", back: "takes an object / separable" },
+        { front: "Type 3", back: "takes an object / inseparable" },
+        { front: "call her back", back: "pronoun in the middle" }
+      ]),
+      warn("Do not say call back her or turn off it. With pronouns in separable phrasal verbs, use the middle position. Do not separate look for, look after or look forward to."),
+      ex("Useful examples", [
+        "go away",
+        "eat out",
+        "get up",
+        "turn off the lights / turn the lights off",
+        "turn down the music / turn the music down",
+        "call her back",
+        "look for the keys",
+        "get on the bus",
+        "look after her children",
+        "look forward to her wedding day"
+      ]),
+      quote(SOURCE_LIBRARY.phrasalVerbs7A.file, "Phrasal verb = verb + particle. Some are separable, some are inseparable. If the object is a pronoun, it comes between the verb and particle in separable phrasal verbs."),
+      mini([
+        q("mq-7a-1", "Which sentence is correct?", ["I'll call back her.", "I'll call her back.", "I'll her call back."], 1, "With a pronoun, use the middle position."),
+        q("mq-7a-2", "What does look after mean?", ["search for", "take care of", "remove"], 1, "Look after means take care of."),
+        q("mq-7a-3", "Which phrasal verb is separable?", ["turn down", "look for", "get on"], 0, "Turn down can separate: turn the music down.")
+      ]),
+      resource([SOURCE_LIBRARY.phrasalVerbs7A.file], "Use the slides to add more phrasal verb examples or image-based prompts if needed.")
+    ]
   })
 ];
 
@@ -659,6 +780,40 @@ export const DEFAULT_QUIZZES = [
       q("q-work-2", "Choose the best advice sentence.", ["If I was you, I would revise more.", "If I were you, I would revise more.", "If I am you, I will revise more."], 1, "The formal pattern is If I were you, I would...", "workbook"),
       q("q-work-3", "Choose the correct comparison.", ["much more expensive", "much expensiver", "the more expensive"], 0, "Use much more + adjective for a big difference with a longer adjective.", "workbook")
     ]
+  }),
+  quiz({
+    id: "quiz-6b-ability-deduction",
+    slug: "6b-ability-deduction",
+    topicId: "topic-6b-ability-deduction",
+    title: "Unit 6B Quiz",
+    description: "Ability forms and deduction modals from Unit 6B.",
+    order: 11,
+    questionTime: 50,
+    questions: [
+      q("q-6b-1", "When I was 5, I ____ dance very well.", ["can", "could", "am able to"], 1, "Use could for past general ability.", "6b"),
+      q("q-6b-2", "She ____ join us tomorrow after work.", ["can", "will be able to", "could"], 1, "Use will be able to for future ability.", "6b"),
+      q("q-6b-3", "I like ____ quickly in exams.", ["can read", "being able to read", "to can read"], 1, "Use the gerund form being able to after like here.", "6b"),
+      q("q-6b-4", "He ____ be at home; the lights are on.", ["must", "can't", "should"], 0, "Must shows a strong deduction from evidence.", "6b"),
+      q("q-6b-5", "She ____ be Kate. She is in Italy.", ["must", "could", "can't"], 2, "Can't shows that something is impossible.", "6b"),
+      q("q-6b-6", "Which sentence is correct?", ["I have can drive since 2011.", "I have been able to drive since 2011.", "I am being able to drive since 2011."], 1, "Present perfect uses have / has been able to.", "6b")
+    ]
+  }),
+  quiz({
+    id: "quiz-7a-phrasal-verbs",
+    slug: "7a-phrasal-verbs",
+    topicId: "topic-7a-phrasal-verbs",
+    title: "Phrasal Verbs Quiz",
+    description: "Type 1, Type 2, Type 3 and pronoun placement.",
+    order: 12,
+    questionTime: 50,
+    questions: [
+      q("q-7a-1", "Turn ___ the music, please.", ["off", "after", "for"], 0, "Turn off means stop the music or power.", "phrasal-verbs"),
+      q("q-7a-2", "Which sentence is correct?", ["I'll call back her.", "I'll call her back.", "I'll her call back."], 1, "With a pronoun, use the middle position.", "phrasal-verbs"),
+      q("q-7a-3", "What does look after mean?", ["take care of", "search for", "remove"], 0, "Look after means take care of.", "phrasal-verbs"),
+      q("q-7a-4", "Which phrasal verb is separable?", ["look after", "turn down", "look for"], 1, "Turn down can separate: turn the music down.", "phrasal-verbs"),
+      q("q-7a-5", "Which sentence is wrong?", ["Turn the lights off.", "Look for the keys.", "Call back her."], 2, "With a pronoun, use call her back.", "phrasal-verbs"),
+      q("q-7a-6", "Which type is look for the keys?", ["Type 1", "Type 2", "Type 3"], 2, "Look for takes an object but stays inseparable.", "phrasal-verbs")
+    ]
   })
 ];
 
@@ -684,7 +839,7 @@ export const DEFAULT_EXAMS = [
     mode: "pool",
     durationMinutes: 20,
     questionCount: 14,
-    topicIds: ["topic-1b-adjectives", "topic-2a-present-tenses", "topic-2b-possessives", "topic-3a-past-tenses", "topic-3b-prepositions", "topic-4a-future-forms", "topic-4b-conditionals"],
+    topicIds: ["topic-1b-adjectives", "topic-2a-present-tenses", "topic-2b-possessives", "topic-3a-past-tenses", "topic-3b-prepositions", "topic-4a-future-forms", "topic-4b-conditionals", "topic-6b-ability-deduction", "topic-7a-phrasal-verbs"],
     order: 2
   }),
   exam({

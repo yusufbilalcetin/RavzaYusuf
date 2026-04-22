@@ -1241,12 +1241,17 @@ body.dark .mini-title { color: var(--pink-bright); }
     flex: 1 1 100%;
   }
   .memory-practice-head,
-  .memory-practice-footer {
+  .memory-practice-footer,
+  .memory-section-head {
     align-items: stretch;
+  }
+  .memory-view-switch {
+    width: 100%;
   }
   .memory-mode-switch {
     width: 100%;
   }
+  .memory-view-btn,
   .memory-mode-btn,
   .memory-next-btn {
     width: 100%;
@@ -1394,9 +1399,71 @@ body.dark .memory-face strong {
   border-radius: 22px;
 }
 
+.memory-view-switch {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.memory-view-btn {
+  border: 1.5px solid var(--card-border);
+  background: var(--input-bg);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 11px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s ease;
+}
+.memory-view-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--pink);
+}
+.memory-view-btn.active {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(15,23,42,.14);
+}
+
+.memory-section-shell {
+  display: grid;
+  gap: 14px;
+  margin: 8px 0 24px;
+}
+.memory-cards-section {
+  margin-top: 4px;
+}
+.memory-cards-shell {
+  padding: 24px;
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 20px;
+}
+.memory-toolbar {
+  margin-bottom: 0;
+}
+.memory-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.memory-section-title {
+  margin: 10px 0 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--navy);
+}
+body.dark .memory-section-title { color: var(--pink-bright); }
+
 /* Ezber Merkezi icindeki 4 sikli rastgele calisma alani */
 .memory-practice-shell {
-  margin-bottom: 24px;
+  margin-bottom: 0;
   padding: 24px;
   background: var(--white);
   border: 1px solid var(--card-border);

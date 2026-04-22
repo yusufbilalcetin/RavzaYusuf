@@ -180,36 +180,58 @@
           <div class="page-header-left">
             <span class="unit-badge memory-badge">MEMORY HUB</span>
             <h2>Ezber Merkezi</h2>
-            <p class="subtitle">Kartın ön yüzünde İngilizcesi, tıklayınca arka yüzde Türkçesi açılır.</p>
+            <p class="subtitle">Ezber Merkezi iki ayrı bölümden oluşur: üstte 4 şıklı çalışma alanı, altta kart çevirme bölümü.</p>
           </div>
         </div>
 
-        <div class="hub-toolbar">
-          <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
-          <div class="hub-legend">
-            <span><i class="dot exam"></i> Tıkla ve çevir</span>
-            <span><i class="dot success"></i> İngilizce → Türkçe</span>
-          </div>
-        </div>
-
-        <div class="memory-practice-shell">
-          <div class="memory-practice-head">
+        <div id="memoryPracticeSection" class="memory-section-shell">
+          <div class="memory-section-head">
             <div>
-              <span class="unit-badge quiz-badge">PRACTICE</span>
-              <h3 class="memory-practice-title">4 Sikli Kelime Calismasi</h3>
+              <span class="unit-badge quiz-badge">MEMORY PRACTICE</span>
+              <h3 class="memory-section-title">4 Şıklı Kelime Çalışması</h3>
               <p class="helper-line">Sorular mevcut Ezber Merkezi kelimelerinden rastgele gelir.</p>
             </div>
+          </div>
 
-            <div class="memory-mode-switch" role="tablist" aria-label="Kelime calisma modu">
-              <button type="button" id="memoryModeEnTr" class="memory-mode-btn active" onclick="setMemoryPracticeMode('en-tr')">Ingilizce -> Turkce</button>
-              <button type="button" id="memoryModeTrEn" class="memory-mode-btn" onclick="setMemoryPracticeMode('tr-en')">Turkce -> Ingilizce</button>
+          <div class="memory-practice-shell">
+            <div class="memory-practice-head">
+              <div>
+                <span class="unit-badge quiz-badge">PRACTICE</span>
+                <h3 class="memory-practice-title">Kelime Test Bölümü</h3>
+                <p class="helper-line">Önce doğru anlamı seç, ardından sonraki kelimeye geç.</p>
+              </div>
+
+              <div class="memory-mode-switch" role="tablist" aria-label="Kelime calisma modu">
+                <button type="button" id="memoryModeEnTr" class="memory-mode-btn active" onclick="setMemoryPracticeMode('en-tr')">Ingilizce -> Turkce</button>
+                <button type="button" id="memoryModeTrEn" class="memory-mode-btn" onclick="setMemoryPracticeMode('tr-en')">Turkce -> Ingilizce</button>
+              </div>
+            </div>
+
+            <div id="memoryPracticeCard" class="memory-practice-card"></div>
+          </div>
+        </div>
+
+        <div id="memoryCardsSection" class="memory-section-shell memory-cards-section">
+          <div class="memory-section-head">
+            <div>
+              <span class="unit-badge memory-badge">FLASHCARDS</span>
+              <h3 class="memory-section-title">Kart Çevirme Bölümü</h3>
+              <p class="helper-line">Kartın ön yüzünde İngilizcesi, tıklayınca arka yüzde Türkçesi açılır.</p>
             </div>
           </div>
 
-          <div id="memoryPracticeCard" class="memory-practice-card"></div>
-        </div>
+          <div class="memory-cards-shell">
+            <div class="hub-toolbar memory-toolbar">
+              <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
+              <div class="hub-legend">
+                <span><i class="dot exam"></i> Tıkla ve çevir</span>
+                <span><i class="dot success"></i> İngilizce → Türkçe</span>
+              </div>
+            </div>
 
-        <div id="memoryHubGrid" class="memory-grid"></div>
+            <div id="memoryHubGrid" class="memory-grid"></div>
+          </div>
+        </div>
       </section>
 
       <section id="quizhub" class="page">
