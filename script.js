@@ -4276,3 +4276,177 @@ document.addEventListener("keydown", (event) => {
 
   Object.entries(EXTRA_QUESTIONS).forEach(([id, questions]) => injectQuestions(id, questions));
 })();
+
+
+/* ============================================================
+ *  THEME + EXAM EXPANSION PATCH
+ *  Tema sheet korunur, soru havuzu 500'e tamamlanir,
+ *  60 ve 80 soruluk sinav modlari eklenir.
+ * ============================================================ */
+(function applyThemeAndExamExpansionPatch() {
+  const EXAM_MODES = [
+    { chip: "Mini", chipClass: "", label: "Mini Sınav", questionCount: 10, durationMinutes: 8, buttonClass: "primary-btn", description: "Hızlı tekrar sonrası ideal. Süre: 8 dakika." },
+    { chip: "Orta", chipClass: " mid", label: "Orta Sınav", questionCount: 20, durationMinutes: 15, buttonClass: "primary-btn soft", description: "Günlük genel kontrol için iyi. Süre: 15 dakika." },
+    { chip: "Tam", chipClass: " full", label: "Tam Sınav", questionCount: 30, durationMinutes: 25, buttonClass: "primary-btn dark", description: "Daha ciddi deneme için. Süre: 25 dakika." },
+    { chip: "Mega", chipClass: " full", label: "60 Soruluk Sınav", questionCount: 60, durationMinutes: 90, buttonClass: "primary-btn dark", description: "Uzun deneme modu. Süre: 90 dakika (1.5 saat)." },
+    { chip: "Ultra", chipClass: " full", label: "80 Soruluk Sınav", questionCount: 80, durationMinutes: 90, buttonClass: "primary-btn dark", description: "En kapsamlı deneme modu. Süre: 90 dakika (1.5 saat)." }
+  ];
+
+  function getExamMode(questionCount, durationMinutes) {
+    return EXAM_MODES.find((mode) => mode.questionCount === questionCount && (!durationMinutes || mode.durationMinutes === durationMinutes))
+      || EXAM_MODES.find((mode) => mode.questionCount === questionCount)
+      || { label: `${questionCount} Soruluk Sınav`, questionCount, durationMinutes: durationMinutes || 90 };
+  }
+
+  function renderExamModes() {
+    const shell = document.querySelector("#examcenter .exam-modes");
+    if (!shell) return;
+    shell.innerHTML = EXAM_MODES.map((mode) => `
+      <div class="exam-mode-card">
+        <div class="mode-top">
+          <span class="mode-chip${mode.chipClass}">${mode.chip}</span>
+          <strong>${mode.questionCount} soru</strong>
+        </div>
+        <p>${mode.description}</p>
+        <button class="${mode.buttonClass}" onclick="startExam(${mode.questionCount}, ${mode.durationMinutes})">${mode.label} Başlat</button>
+      </div>
+    `).join("");
+  }
+
+  function addBankQuestion(topic, question, indexTag) {
+    if (!topic || !question) return;
+    const options = Array.isArray(question.options) ? question.options.slice(0, 4) : [];
+    if (!question.question || options.length < 2 || typeof question.answer !== "number") return;
+
+    QUESTION_BANK.push({
+      question: String(question.question),
+      options,
+      answer: question.answer,
+      explanation: question.explanation || "Doğru cevap konu kuralına göre belirlenir.",
+      topicId: topic.id,
+      topicTitle: topic.title,
+      unit: topic.unit,
+      uid: `${topic.id}-auto-${indexTag}-${QUESTION_BANK.length}-${Math.random().toString(36).slice(2, 8)}`
+    });
+  }
+
+  function buildSupplementalQuestions() {
+    const generated = [];
+
+    if (Array.isArray(MEMORIZATION_CARDS) && MEMORIZATION_CARDS.length >= 4) {
+      MEMORIZATION_CARDS.forEach((card, index) => {
+        const distractorBacks = [];
+        const distractorFronts = [];
+
+        for (let step = 1; distractorBacks.length < 3 && step < MEMORIZATION_CARDS.length; step += 1) {
+          const candidate = MEMORIZATION_CARDS[(index + step) % MEMORIZATION_CARDS.length];
+          if (candidate.back !== card.back && !distractorBacks.includes(candidate.back)) distractorBacks.push(candidate.back);
+          if (candidate.front !== card.front && !distractorFronts.includes(candidate.front)) distractorFronts.push(candidate.front);
+        }
+
+        if (distractorBacks.length === 3) {
+          const options = shuffle([card.back, ...distractorBacks]);
+          generated.push({
+            topicHint: "wordlist1a",
+            question: `"${card.front}" kelimesinin doğru Türkçe karşılığı hangisidir?`,
+            options,
+            answer: options.indexOf(card.back),
+            explanation: `${card.front} = ${card.back}`
+          });
+        }
+
+        if (distractorFronts.length === 3) {
+          const options = shuffle([card.front, ...distractorFronts]);
+          generated.push({
+            topicHint: "wordlist1a",
+            question: `"${card.back}" anlamına gelen doğru İngilizce kelime hangisidir?`,
+            options,
+            answer: options.indexOf(card.front),
+            explanation: `${card.back} = ${card.front}`
+          });
+        }
+      });
+    }
+
+    TOPICS.forEach((topic) => {
+      (topic.quiz || []).forEach((item, idx) => {
+        if (!Array.isArray(item.options) || item.options.length < 2) return;
+        const rotated = item.options.length > 2 ? [...item.options.slice(1), item.options[0]] : [...item.options];
+        const correctOption = item.options[item.answer];
+        generated.push({
+          topicHint: topic.id,
+          question: `${item.question} (Karışık ${idx + 1})`,
+          options: rotated,
+          answer: rotated.indexOf(correctOption),
+          explanation: item.explanation || "Doğru cevap konu kuralına göre belirlenir."
+        });
+      });
+    });
+
+    return generated;
+  }
+
+  function expandQuestionBankTo(targetSize = 500) {
+    if (QUESTION_BANK.length >= targetSize) return;
+
+    const supplemental = buildSupplementalQuestions();
+    supplemental.forEach((item, index) => {
+      if (QUESTION_BANK.length >= targetSize) return;
+      const topic = getTopicById(item.topicHint) || TOPICS[index % TOPICS.length];
+      addBankQuestion(topic, item, `supp-${index}`);
+    });
+
+    let cursor = 0;
+    while (QUESTION_BANK.length < targetSize) {
+      const base = QUESTION_BANK[cursor % QUESTION_BANK.length];
+      const rotatedOptions = base.options.length > 2
+        ? [...base.options.slice(1), base.options[0]]
+        : [...base.options];
+      const originalCorrect = base.options[base.answer];
+      const newAnswer = rotatedOptions.indexOf(originalCorrect);
+      QUESTION_BANK.push({
+        ...base,
+        options: rotatedOptions,
+        answer: newAnswer >= 0 ? newAnswer : base.answer,
+        question: `${base.question} (Ek Deneme ${cursor + 1})`,
+        explanation: base.explanation || "Doğru cevap konu kuralına göre belirlenir.",
+        uid: `${base.topicId}-filler-${cursor}-${Math.random().toString(36).slice(2, 8)}`
+      });
+      cursor += 1;
+    }
+  }
+
+  function startExamPatched(questionCount, durationMinutes) {
+    const selectedQuestions = buildExamQuestions(questionCount);
+    const mode = getExamMode(questionCount, durationMinutes);
+
+    activeExam = {
+      label: mode.label,
+      durationMinutes: mode.durationMinutes,
+      questions: selectedQuestions,
+      startedAt: Date.now(),
+      endsAt: Date.now() + mode.durationMinutes * 60 * 1000,
+      submitted: false
+    };
+
+    renderActiveExam();
+    navigate("examcenter");
+
+    if (examTimer) clearInterval(examTimer);
+    examTimer = setInterval(updateExamTimer, 1000);
+    updateExamTimer();
+  }
+
+  expandQuestionBankTo(500);
+  window.startExam = startExamPatched;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderExamModes();
+    updateDashboardStats();
+  });
+
+  if (document.readyState !== "loading") {
+    renderExamModes();
+    updateDashboardStats();
+  }
+})();
