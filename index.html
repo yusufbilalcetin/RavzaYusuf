@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ravza 💗 | EUL Study System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
     <div class="logo">
       <span class="logo-hearts">♡ ♡ ♡</span>
@@ -45,23 +44,14 @@
 
     <div class="sidebar-footer">Yusuf'tan Ravza'ya özel çalışma sistemi <span>♡</span></div>
   </nav>
-
   <button class="sidebar-backdrop" id="sidebar-backdrop" aria-label="Menüyü kapat" onclick="closeMobileMenu()"></button>
 
-  <!-- Main -->
   <main class="main-content">
     <header class="topbar">
-      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menüyü aç">☰</button>
-
+      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
       <div class="search-bar">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Konu ara… örn: passive, possessives, conditionals"
-          onkeyup="searchTopics(event)"
-          enterkeyhint="search">
+        <input type="text" id="searchInput" placeholder="Konu ara… örn: passive, possessives, conditionals" onkeyup="searchTopics(event)">
       </div>
-
       <div class="topbar-right">
         <button class="theme-open-btn" id="theme-open-btn" type="button" onclick="openThemeSheet()" title="Tema Seç">
           <span class="theme-open-icon">✨</span>
@@ -78,11 +68,8 @@
       </div>
     </header>
 
-    <!-- Theme Sheet Backdrop -->
     <button class="theme-sheet-backdrop" id="theme-sheet-backdrop" aria-label="Tema panelini kapat" onclick="closeThemeSheet()"></button>
-
-    <!-- Theme Sheet -->
-    <aside class="theme-sheet" id="theme-sheet" aria-hidden="true" role="dialog" aria-label="Tema seçici">
+    <aside class="theme-sheet" id="theme-sheet" aria-hidden="true">
       <div class="theme-sheet-head">
         <div>
           <span class="unit-badge quiz-badge">TEMA</span>
@@ -149,10 +136,8 @@
       </div>
     </aside>
 
-    <!-- Content -->
-    <div class="content-wrapper">
 
-      <!-- DASHBOARD -->
+    <div class="content-wrapper">
       <section id="dashboard" class="page active">
         <div class="hero">
           <h1>Çalışma, quiz ve sınav artık ayrı alanlarda 💙</h1>
@@ -245,7 +230,6 @@
         </div>
       </section>
 
-      <!-- STUDY HUB -->
       <section id="studyhub" class="page">
         <div class="page-header">
           <div class="page-header-left">
@@ -266,12 +250,10 @@
         <div id="studyHubGrid" class="hub-grid"></div>
       </section>
 
-      <!-- STUDY DETAIL -->
       <section id="studydetail" class="page">
         <div id="studyDetailContent"></div>
       </section>
 
-      <!-- MEMORY HUB -->
       <section id="memoryhub" class="page">
         <div class="page-header">
           <div class="page-header-left">
@@ -299,8 +281,8 @@
               </div>
 
               <div class="memory-mode-switch" role="tablist" aria-label="Kelime calisma modu">
-                <button type="button" id="memoryModeEnTr" class="memory-mode-btn active" onclick="setMemoryPracticeMode('en-tr')">İngilizce → Türkçe</button>
-                <button type="button" id="memoryModeTrEn" class="memory-mode-btn" onclick="setMemoryPracticeMode('tr-en')">Türkçe → İngilizce</button>
+                <button type="button" id="memoryModeEnTr" class="memory-mode-btn active" onclick="setMemoryPracticeMode('en-tr')">Ingilizce -> Turkce</button>
+                <button type="button" id="memoryModeTrEn" class="memory-mode-btn" onclick="setMemoryPracticeMode('tr-en')">Turkce -> Ingilizce</button>
               </div>
             </div>
 
@@ -331,7 +313,6 @@
         </div>
       </section>
 
-      <!-- QUIZ HUB -->
       <section id="quizhub" class="page">
         <div class="page-header">
           <div class="page-header-left">
@@ -352,12 +333,10 @@
         <div id="quizHubGrid" class="hub-grid"></div>
       </section>
 
-      <!-- QUIZ DETAIL -->
       <section id="quizdetail" class="page">
         <div id="quizDetailContent"></div>
       </section>
 
-      <!-- EXAM CENTER -->
       <section id="examcenter" class="page">
         <div class="page-header">
           <div class="page-header-left">
@@ -419,18 +398,17 @@
         </div>
       </section>
 
-      <!-- RECAP -->
       <section id="recap" class="page">
         <div class="page-header">
           <div class="page-header-left">
             <span class="unit-badge">FAST RECAP</span>
             <h2>Hızlı Tekrar Alanı</h2>
-            <p class="subtitle">Sınav öncesi en kritik kurallar, formüller ve sık yapılan hatalar tek yerde.</p>
+            <p class="subtitle">Sinav oncesi en kritik kurallar, formuller ve sik yapilan hatalar tek yerde.</p>
           </div>
         </div>
 
         <div class="recap-toolbar">
-          <input type="text" id="recapFilter" class="hub-search" placeholder="Kural, ünite veya kalıp ara… örnek: passive / 4B / for vs since" oninput="renderRecap()">
+          <input type="text" id="recapFilter" class="hub-search" placeholder="Kural, unite veya kalip ara... ornek: passive / 4B / for vs since" oninput="renderRecap()">
           <div class="recap-actions">
             <span id="recapCount" class="recap-meta-pill">0 kart</span>
             <button type="button" class="recap-reset" onclick="resetRecapFilters()">Filtreleri Temizle</button>
@@ -440,8 +418,7 @@
         <div id="recapUnits" class="recap-filter-shell"></div>
         <div id="recapGrid" class="flashcard-grid"></div>
       </section>
-
-    </div><!-- /content-wrapper -->
+    </div>
   </main>
 
   <script type="module" src="script.js"></script>

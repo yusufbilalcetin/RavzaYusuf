@@ -4492,3 +4492,634 @@ document.addEventListener("keydown", (event) => {
 
   syncViewportState();
 })();
+
+
+
+/* =========================================================
+   EXAM FLOW EXPERIENCE PATCH
+   Sinav baslat -> direkt aktif sinav alani
+   Dogru / yanlis / bos durum renkleri
+   Otomatik sonuc + sonraki adimlar
+   ========================================================= */
+(function applyExamFlowExperiencePatch() {
+  let lastExamSession = null;
+
+  function getExamLabel(questionCount) {
+    if (questionCount === 10) return "Mini Sınav";
+    if (questionCount === 20) return "Orta Sınav";
+    if (questionCount === 30) return "Tam Sınav";
+    if (questionCount === 60) return "60 Soruluk Sınav";
+    if (questionCount === 80) return "80 Soruluk Sınav";
+    return `${questionCount} Soruluk Sınav`;
+  }
+
+  function getExamCenterSection() {
+    return document.getElementById("examcenter");
+  }
+
+  function setExamLiveState(isLive) {
+    const section = getExamCenterSection();
+    if (!section) return;
+    section.classList.toggle("exam-live-state", !!isLive);
+  }
+
+  function scrollExamWorkspaceIntoView() {
+    const workspace = document.getElementById("examWorkspace");
+    if (!workspace) return;
+    workspace.scrollIntoView({ behavior: "smooth", block: "start" });
+    workspace.setAttribute("tabindex", "-1");
+    setTimeout(() => {
+      try { workspace.focus({ preventScroll: true }); } catch (e) {}
+    }, 120);
+  }
+
+  function getAnsweredCount() {
+    if (!activeExam || !Array.isArray(activeExam.answers)) return 0;
+    return activeExam.answers.filter((value) => value !== null && value !== undefined).length;
+  }
+
+  function getBlankIndexes() {
+    if (!activeExam || !Array.isArray(activeExam.answers)) return [];
+    return activeExam.answers
+      .map((value, index) => (value === null || value === undefined ? index : null))
+      .filter((value) => value !== null);
+  }
+
+  function goToExamQuestion(index) {
+    if (!activeExam) return;
+    const nextIndex = Math.max(0, Math.min(index, activeExam.questions.length - 1));
+    activeExam.currentIndex = nextIndex;
+    renderEnhancedActiveExam();
+    scrollExamWorkspaceIntoView();
+  }
+
+  function selectExamAnswer(questionIndex, optionIndex) {
+    if (!activeExam || activeExam.submitted) return;
+    if (!Array.isArray(activeExam.answers)) activeExam.answers = Array(activeExam.questions.length).fill(null);
+    activeExam.answers[questionIndex] = optionIndex;
+    renderEnhancedActiveExam();
+  }
+
+  function buildQuestionNavButtons(resultMap = null) {
+    if (!activeExam) return "";
+
+    // Her sayfada kaç soru gösterilsin? 5, 6, 10 yapabilirsin.
+    const PAGE_SIZE = 10;
+
+    const total = activeExam.questions.length;
+    const currentIndex = activeExam.currentIndex ?? 0;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const currentPage = Math.floor(currentIndex / PAGE_SIZE);
+    const pageStart = currentPage * PAGE_SIZE;
+    const pageEnd = Math.min(pageStart + PAGE_SIZE, total);
+
+    const buttons = [];
+
+    // ‹ Önceki grup (önceki sayfanın son sorusuna atlar)
+    if (totalPages > 1 && currentPage > 0) {
+      const prevTarget = pageStart - 1;
+      buttons.push(`
+        <button
+          type="button"
+          class="exam-nav-btn exam-nav-arrow"
+          onclick="goToExamQuestion(${prevTarget})"
+          aria-label="Önceki sorular">
+          <span>‹</span>
+        </button>
+      `);
+    }
+
+    // Aktif gruptaki soru numaraları
+    for (let i = pageStart; i < pageEnd; i++) {
+      const isActive = i === currentIndex;
+      const selectedIndex = activeExam.answers?.[i] ?? null;
+
+      let stateClass = "is-empty";
+      let stateLabel = "Boş";
+
+      if (resultMap && resultMap[i]) {
+        const status = resultMap[i].status;
+        stateClass = `is-${status}`;
+        stateLabel = status === "correct" ? "Doğru" : status === "wrong" ? "Yanlış" : "Boş";
+      } else if (selectedIndex !== null) {
+        stateClass = "is-answered";
+        stateLabel = "Cevaplandı";
+      }
+
+      buttons.push(`
+        <button
+          type="button"
+          class="exam-nav-btn ${stateClass} ${isActive ? "is-current" : ""}"
+          onclick="goToExamQuestion(${i})"
+          aria-label="Soru ${i + 1} - ${stateLabel}">
+          <span>${i + 1}</span>
+        </button>
+      `);
+    }
+
+    // › Sonraki grup (sonraki sayfanın ilk sorusuna atlar)
+    if (totalPages > 1 && currentPage < totalPages - 1) {
+      const nextTarget = pageEnd;
+      buttons.push(`
+        <button
+          type="button"
+          class="exam-nav-btn exam-nav-arrow"
+          onclick="goToExamQuestion(${nextTarget})"
+          aria-label="Sonraki sorular">
+          <span>›</span>
+        </button>
+      `);
+    }
+
+    return buttons.join("");
+  }
+
+  function renderEnhancedActiveExam() {
+    const workspace = document.getElementById("examWorkspace");
+    if (!workspace) return;
+
+    if (!activeExam || !activeExam.questions?.length) {
+      setExamLiveState(false);
+      workspace.innerHTML = `
+        <div class="empty-state exam-empty-state">
+          <h3>Henüz aktif bir sınav yok</h3>
+          <p>Yukarıdan bir sınav türü seç ve direkt aktif sınav ekranına geç.</p>
+        </div>
+      `;
+      return;
+    }
+
+    setExamLiveState(true);
+
+    const currentQuestion = activeExam.questions[activeExam.currentIndex] || activeExam.questions[0];
+    const currentAnswer = activeExam.answers?.[activeExam.currentIndex] ?? null;
+    const answeredCount = getAnsweredCount();
+    const blankCount = activeExam.questions.length - answeredCount;
+
+    workspace.innerHTML = `
+      <div class="exam-shell premium-exam-shell">
+        <div class="exam-shell-head">
+          <div class="exam-shell-main">
+            <span class="unit-badge exam-badge">AKTİF SINAV</span>
+            <h3 class="section-title">${safeText(activeExam.label)}</h3>
+            <p>${activeExam.questions.length} soru · ${activeExam.durationMinutes} dakika · Direkt aktif sınav ekranı</p>
+          </div>
+
+          <div class="exam-shell-side">
+            <div class="timer-pill">⏱️ <span id="exam-timer">--:--</span></div>
+            <div class="exam-progress-mini">
+              <span><strong>${answeredCount}</strong> cevaplandı</span>
+              <span><strong>${blankCount}</strong> boş</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="exam-nav-grid" aria-label="Soru navigasyonu">
+          ${buildQuestionNavButtons()}
+        </div>
+
+        <div class="exam-focus-card">
+          <div class="exam-focus-top">
+            <div class="question-meta">${safeText(currentQuestion.unit)} · ${safeText(currentQuestion.topicTitle)} · Soru ${activeExam.currentIndex + 1}</div>
+            <div class="question-step-badge">${activeExam.currentIndex + 1} / ${activeExam.questions.length}</div>
+          </div>
+
+          <div class="exam-question-title">${safeText(currentQuestion.question)}</div>
+
+          <div class="exam-options">
+            ${currentQuestion.options.map((option, optionIndex) => `
+              <button
+                type="button"
+                class="exam-option-btn ${currentAnswer === optionIndex ? "selected" : ""}"
+                onclick="selectExamAnswer(${activeExam.currentIndex}, ${optionIndex})"
+                aria-pressed="${currentAnswer === optionIndex ? "true" : "false"}">
+                <span class="exam-option-letter">${String.fromCharCode(65 + optionIndex)}</span>
+                <span class="exam-option-text">${safeText(option)}</span>
+              </button>
+            `).join("")}
+          </div>
+
+          <div class="exam-shell-actions">
+            <button
+              type="button"
+              class="ghost-btn"
+              ${activeExam.currentIndex === 0 ? "disabled" : ""}
+              onclick="goToExamQuestion(${activeExam.currentIndex - 1})">
+              ← Önceki Soru
+            </button>
+
+            <div class="exam-shell-actions-right">
+              <button type="button" class="ghost-btn" onclick="cancelEnhancedExam()">Sınavı İptal Et</button>
+              ${activeExam.currentIndex < activeExam.questions.length - 1
+                ? `<button type="button" class="secondary-btn" onclick="goToExamQuestion(${activeExam.currentIndex + 1})">Sonraki Soru →</button>`
+                : `<button type="button" class="check-btn" onclick="submitEnhancedExam(false)">Sınavı Bitir</button>`
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    updateExamTimer();
+  }
+
+  function buildResultsFromActiveExam() {
+    return activeExam.questions.map((question, index) => {
+      const selectedIndex = activeExam.answers?.[index] ?? null;
+      const status = selectedIndex === null ? "empty" : selectedIndex === question.answer ? "correct" : "wrong";
+      return {
+        ...question,
+        index,
+        selectedIndex,
+        status,
+        isCorrect: status === "correct",
+        isEmpty: status === "empty",
+        isWrong: status === "wrong"
+      };
+    });
+  }
+
+  function getWeakestTopic(results) {
+    const topicMap = {};
+
+    results.forEach((item) => {
+      if (!topicMap[item.topicId]) {
+        topicMap[item.topicId] = {
+          topicId: item.topicId,
+          topicTitle: item.topicTitle,
+          unit: item.unit,
+          total: 0,
+          wrong: 0,
+          empty: 0,
+          correct: 0
+        };
+      }
+
+      const target = topicMap[item.topicId];
+      target.total += 1;
+      if (item.status === "wrong") target.wrong += 1;
+      if (item.status === "empty") target.empty += 1;
+      if (item.status === "correct") target.correct += 1;
+    });
+
+    return Object.values(topicMap).sort((a, b) => {
+      const aPenalty = (a.wrong * 2) + a.empty;
+      const bPenalty = (b.wrong * 2) + b.empty;
+      if (bPenalty !== aPenalty) return bPenalty - aPenalty;
+      return b.total - a.total;
+    })[0] || null;
+  }
+
+  function renderExamResultView(filter = "all") {
+    const workspace = document.getElementById("examWorkspace");
+    if (!workspace || !lastExamSession) return;
+
+    setExamLiveState(false);
+
+    const { label, durationMinutes, results, score, total, percentage, autoSubmitted, blankCount, wrongCount, weakestTopic } = lastExamSession;
+
+    const resultMap = {};
+    results.forEach((item) => {
+      resultMap[item.index] = { status: item.status };
+    });
+
+    const filteredResults = results.filter((item) => {
+      if (filter === "wrong") return item.status === "wrong";
+      if (filter === "empty") return item.status === "empty";
+      if (filter === "correct") return item.status === "correct";
+      return true;
+    });
+
+    const weaknessText = weakestTopic
+      ? `${safeText(weakestTopic.topicTitle)} (${weakestTopic.wrong} yanlış${weakestTopic.empty ? `, ${weakestTopic.empty} boş` : ""})`
+      : "Belirgin bir zayıf konu bulunamadı.";
+
+    workspace.innerHTML = `
+      <div class="result-box premium-result-box">
+        <div class="result-box-top">
+          <div>
+            <span class="unit-badge exam-badge">SINAV SONUCU</span>
+            <h3 class="result-title">${safeText(label)} Sonucu</h3>
+            <p>${autoSubmitted ? "Süre dolduğu için sınav otomatik olarak gönderildi." : "Sınav tamamlandı ve sonuç ekranı otomatik olarak açıldı."}</p>
+          </div>
+
+          <div class="result-score-circle">
+            <strong>${percentage}%</strong>
+            <span>Başarı</span>
+          </div>
+        </div>
+
+        <div class="result-main premium-result-main">
+          <div class="result-stat success">
+            <span>Doğru</span>
+            <strong>${score}</strong>
+          </div>
+          <div class="result-stat danger">
+            <span>Yanlış</span>
+            <strong>${wrongCount}</strong>
+          </div>
+          <div class="result-stat neutral">
+            <span>Boş</span>
+            <strong>${blankCount}</strong>
+          </div>
+          <div class="result-stat">
+            <span>Sınav Türü</span>
+            <strong>${total} Soru</strong>
+          </div>
+        </div>
+
+        <div class="result-insight-card">
+          <h4>Kısa yorum</h4>
+          <p>${blankCount > 0
+            ? `Bu sınavda ${blankCount} soruyu boş bıraktın. Önce boşları ve yanlışları tekrar etmek faydalı olur.`
+            : wrongCount > 0
+            ? `Yanlışlarını inceleyip zayıf olduğun konuya dönersen sonraki sınavda skorun hızlı artar.`
+            : `Harika! Tüm soruları doğru yaptın. Şimdi istersen daha büyük bir sınav çözebilirsin.`
+          }</p>
+          <p><strong>Zayıf konu önerisi:</strong> ${weaknessText}</p>
+        </div>
+
+        <div class="exam-nav-grid result-nav-grid" aria-label="Sonuç soru navigasyonu">
+          ${results.map((item) => `
+            <button
+              type="button"
+              class="exam-nav-btn is-${item.status}"
+              onclick="showExamResultFilter('${item.status === "wrong" ? "wrong" : item.status === "correct" ? "correct" : "empty"}')"
+              aria-label="Soru ${item.index + 1} - ${item.status === "correct" ? "Doğru" : item.status === "wrong" ? "Yanlış" : "Boş"}">
+              <span>${item.index + 1}</span>
+            </button>
+          `).join("")}
+        </div>
+
+        <div class="result-action-row">
+          <button type="button" class="primary-btn dark" onclick="showExamResultFilter('wrong')">Yanlışlarımı Gör</button>
+          <button type="button" class="secondary-btn" onclick="retryLastExam()">Tekrar Sınavı Çöz</button>
+          <button type="button" class="ghost-btn" onclick="openWeakTopicFromLastExam()">Zayıf Konuyu Aç</button>
+          <button type="button" class="ghost-btn" onclick="navigate('memoryhub')">Ezber Merkezine Git</button>
+        </div>
+
+        <div class="result-action-row secondary">
+          <button type="button" class="ghost-btn" onclick="showExamResultFilter('all')">Tüm Sonuçları Göster</button>
+          <button type="button" class="ghost-btn" onclick="showExamResultFilter('empty')">Boşları Gör</button>
+          <button type="button" class="ghost-btn" onclick="startWrongRetryExam(5)">Yanlışlardan 5 Soru</button>
+          <button type="button" class="ghost-btn" onclick="startWrongRetryExam(10)">Yanlışlardan 10 Soru</button>
+        </div>
+
+        <div class="result-review-shell">
+          <div class="result-review-head">
+            <h4>${filter === "wrong" ? "Yanlış Soruların" : filter === "empty" ? "Boş Bıraktığın Sorular" : filter === "correct" ? "Doğru Soruların" : "Cevap İnceleme"}</h4>
+            <span>${filteredResults.length} soru</span>
+          </div>
+
+          <div class="review-grid">
+            ${filteredResults.length ? filteredResults.map((item) => `
+              <div class="review-card review-card-${item.status}">
+                <div class="review-card-top">
+                  <span class="review-status-chip review-status-${item.status}">
+                    ${item.status === "correct" ? "Doğru" : item.status === "wrong" ? "Yanlış" : "Boş"}
+                  </span>
+                  <strong>${safeText(item.unit)} · ${safeText(item.topicTitle)} · Soru ${item.index + 1}</strong>
+                </div>
+                <p class="review-question">${safeText(item.question)}</p>
+
+                <div class="review-answer-row review-answer-${item.status}">
+                  <strong>Senin cevabın:</strong>
+                  <span>${item.selectedIndex === null ? "Boş" : safeText(item.options[item.selectedIndex])}</span>
+                </div>
+
+                <div class="review-answer-row review-answer-correct">
+                  <strong>Doğru cevap:</strong>
+                  <span>${safeText(item.options[item.answer])}</span>
+                </div>
+
+                <p class="review-explanation">${safeText(item.explanation)}</p>
+
+                <div class="review-card-actions">
+                  <button type="button" class="ghost-btn small" onclick="openStudyTopic('${item.topicId}')">Konuyu Aç</button>
+                  <button type="button" class="ghost-btn small" onclick="navigate('memoryhub')">Ezber Merkezi</button>
+                </div>
+              </div>
+            `).join("") : `
+              <div class="empty-state compact">
+                <h3>Bu filtrede soru yok</h3>
+                <p>Farklı bir filtre seçerek sonuçlarını inceleyebilirsin.</p>
+              </div>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function submitEnhancedExam(autoSubmitted = false) {
+    if (!activeExam || activeExam.submitted) return;
+
+    const blankIndexes = getBlankIndexes();
+    if (!autoSubmitted && blankIndexes.length > 0) {
+      const confirmMessage = `${blankIndexes.length} soru boş bırakıldı.\n\nTamam dersen sınav bitecek.\nİptal dersen boş sorulara döneceksin.`;
+      const confirmed = window.confirm(confirmMessage);
+      if (!confirmed) {
+        activeExam.currentIndex = blankIndexes[0];
+        renderEnhancedActiveExam();
+        scrollExamWorkspaceIntoView();
+        return;
+      }
+    }
+
+    if (examTimer) clearInterval(examTimer);
+
+    const results = buildResultsFromActiveExam();
+    const score = results.filter((item) => item.isCorrect).length;
+    const blankCount = results.filter((item) => item.isEmpty).length;
+    const wrongCount = results.filter((item) => item.isWrong).length;
+    const percentage = formatPercent(score, results.length);
+    const weakestTopic = getWeakestTopic(results);
+
+    const history = getExamHistory();
+    history.unshift({
+      label: activeExam.label,
+      score,
+      total: results.length,
+      percentage,
+      date: new Date().toISOString()
+    });
+    setExamHistory(history);
+
+    if (percentage > getBestExam()) {
+      setBestExam(percentage);
+    }
+
+    lastExamSession = {
+      label: activeExam.label,
+      durationMinutes: activeExam.durationMinutes,
+      total: results.length,
+      score,
+      wrongCount,
+      blankCount,
+      percentage,
+      results,
+      autoSubmitted,
+      weakestTopic
+    };
+
+    activeExam.submitted = true;
+    activeExam = null;
+
+    renderExamResultView("all");
+    updateDashboardStats();
+    saveProgressToFirebase();
+  }
+
+  function cancelEnhancedExam() {
+    if (examTimer) clearInterval(examTimer);
+    activeExam = null;
+    setExamLiveState(false);
+    renderEnhancedActiveExam();
+  }
+
+  function retryLastExam() {
+    if (!lastExamSession) return;
+    window.startExam(lastExamSession.total, lastExamSession.durationMinutes);
+  }
+
+  function startWrongRetryExam(limit = 5) {
+    if (!lastExamSession) return;
+    const wrongQuestions = lastExamSession.results.filter((item) => item.status !== "correct");
+    if (!wrongQuestions.length) {
+      alert("Yanlış veya boş soru bulunmuyor.");
+      return;
+    }
+
+    const selected = shuffle(wrongQuestions.slice()).slice(0, Math.min(limit, wrongQuestions.length)).map((item) => ({
+      question: item.question,
+      options: item.options.slice(),
+      answer: item.answer,
+      explanation: item.explanation,
+      topicId: item.topicId,
+      topicTitle: item.topicTitle,
+      unit: item.unit,
+      uid: item.uid || `${item.topicId}-retry-${item.index}`
+    }));
+
+    activeExam = {
+      label: `Yanlışlardan ${selected.length} Soru`,
+      durationMinutes: Math.max(5, Math.min(20, selected.length * 2)),
+      questions: selected,
+      answers: Array(selected.length).fill(null),
+      currentIndex: 0,
+      startedAt: Date.now(),
+      endsAt: Date.now() + Math.max(5, Math.min(20, selected.length * 2)) * 60 * 1000,
+      submitted: false
+    };
+
+    navigate("examcenter");
+    if (examTimer) clearInterval(examTimer);
+    examTimer = setInterval(updateExamTimer, 1000);
+    renderEnhancedActiveExam();
+    updateExamTimer();
+    scrollExamWorkspaceIntoView();
+  }
+
+  function openWeakTopicFromLastExam() {
+    if (!lastExamSession?.weakestTopic?.topicId) {
+      navigate("studyhub");
+      return;
+    }
+    openStudyTopic(lastExamSession.weakestTopic.topicId);
+  }
+
+  function showExamResultFilter(filter = "all") {
+    renderExamResultView(filter);
+    scrollExamWorkspaceIntoView();
+  }
+
+  function enhancedStartExam(questionCount, durationMinutes) {
+    const selectedQuestions = buildExamQuestions(questionCount);
+
+    activeExam = {
+      label: getExamLabel(questionCount),
+      durationMinutes,
+      questions: selectedQuestions,
+      answers: Array(selectedQuestions.length).fill(null),
+      currentIndex: 0,
+      startedAt: Date.now(),
+      endsAt: Date.now() + durationMinutes * 60 * 1000,
+      submitted: false
+    };
+
+    navigate("examcenter");
+    if (examTimer) clearInterval(examTimer);
+    examTimer = setInterval(updateExamTimer, 1000);
+    renderEnhancedActiveExam();
+    updateExamTimer();
+    scrollExamWorkspaceIntoView();
+  }
+
+  // Dashboard son sinav kutusunu daha yonlendirici hale getir
+  const originalUpdateDashboardStats = updateDashboardStats;
+  updateDashboardStats = function patchedUpdateDashboardStats() {
+    originalUpdateDashboardStats();
+
+    const latestExamBox = document.getElementById("latest-exam-box");
+    if (!latestExamBox) return;
+
+    if (lastExamSession) {
+      latestExamBox.innerHTML = `
+        <strong>${safeText(lastExamSession.label)}</strong><br>
+        ${lastExamSession.score}/${lastExamSession.total} doğru · ${lastExamSession.percentage}%<br>
+        <small>${lastExamSession.wrongCount} yanlış · ${lastExamSession.blankCount} boş</small>
+        <div class="latest-exam-actions">
+          <button type="button" class="ghost-btn small" onclick="navigate('examcenter'); showExamResultFilter('wrong')">Yanlışları Aç</button>
+          <button type="button" class="ghost-btn small" onclick="retryLastExam()">Tekrar Çöz</button>
+        </div>
+      `;
+    }
+  };
+
+  window.startExam = enhancedStartExam;
+  window.renderActiveExam = renderEnhancedActiveExam;
+  window.submitExam = submitEnhancedExam;
+  window.cancelExam = cancelEnhancedExam;
+  window.goToExamQuestion = goToExamQuestion;
+  window.selectExamAnswer = selectExamAnswer;
+  window.submitEnhancedExam = submitEnhancedExam;
+  window.cancelEnhancedExam = cancelEnhancedExam;
+  window.showExamResultFilter = showExamResultFilter;
+  window.retryLastExam = retryLastExam;
+  window.openWeakTopicFromLastExam = openWeakTopicFromLastExam;
+  window.startWrongRetryExam = startWrongRetryExam;
+
+  if (document.readyState !== "loading") {
+    renderEnhancedActiveExam();
+    updateDashboardStats();
+  } else {
+    document.addEventListener("DOMContentLoaded", () => {
+      renderEnhancedActiveExam();
+      updateDashboardStats();
+    });
+  }
+})();
+
+
+
+/* =========================================================
+   MOBILE EXAM UX PATCH
+   ========================================================= */
+(function applyMobileExamUxPatch() {
+  function syncMobileUiState() {
+    if (window.innerWidth > 1024) {
+      closeMobileMenu();
+    }
+  }
+
+  window.addEventListener("orientationchange", () => {
+    setTimeout(syncMobileUiState, 120);
+  });
+
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) {
+    searchInput.setAttribute("enterkeyhint", "search");
+  }
+
+  syncMobileUiState();
+})();
