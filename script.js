@@ -4450,3 +4450,45 @@ document.addEventListener("keydown", (event) => {
     updateDashboardStats();
   }
 })();
+
+
+
+/* =========================================================
+   MOBILE RESPONSIVE UX PATCH
+   ========================================================= */
+(function applyMobileResponsiveUxPatch() {
+  const sheet = document.getElementById("theme-sheet");
+  const backdrop = document.getElementById("theme-sheet-backdrop");
+  const searchInput = document.getElementById("searchInput");
+
+  function syncViewportState() {
+    if (window.innerWidth > 1024) {
+      closeMobileMenu();
+    }
+    if (window.innerWidth > 768 && sheet && !sheet.classList.contains("open")) {
+      document.body.classList.remove("nav-open");
+    }
+  }
+
+  window.addEventListener("orientationchange", () => {
+    setTimeout(syncViewportState, 120);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!sheet || !backdrop) return;
+    const openBtn = document.getElementById("theme-open-btn");
+    const clickedInsideSheet = sheet.contains(event.target);
+    const clickedOpenBtn = openBtn && openBtn.contains(event.target);
+    const clickedBackdrop = backdrop.contains(event.target);
+
+    if (sheet.classList.contains("open") && !clickedInsideSheet && !clickedOpenBtn && clickedBackdrop) {
+      closeThemeSheet();
+    }
+  });
+
+  if (searchInput) {
+    searchInput.setAttribute("enterkeyhint", "search");
+  }
+
+  syncViewportState();
+})();
