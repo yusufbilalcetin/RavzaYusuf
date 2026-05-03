@@ -135,22 +135,42 @@ body[data-theme-style="klasik-koyu"] {
   --pink: #d4669c;
   --pink-bright: #e879a0;
 }
-body[data-theme-style="gun-isigi"] {
-  --navy: #a35f76;
-  --navy-mid: #f6dde6;
-  --navy-light: #d88ca7;
-  --pink: #d4669c;
-  --pink-bright: #e879a0;
-  --bg: #fff8fb;
+body[data-theme-style="pembe-tema"] {
+  --navy: #7b1731;
+  --navy-mid: #9a2b55;
+  --navy-light: #c94f7c;
+  --pink: #d85f93;
+  --pink-bright: #ef8bb3;
+  --pink-pale: #fde7f1;
+  --bg: #fff4f8;
   --white: #ffffff;
-  --text: #453440;
-  --text-light: #8d6c7c;
-  --card-border: #f0dce6;
-  --input-bg: #fff2f7;
-  --input-brd: #f0d8e4;
-  --table-row: #fffafd;
-  --table-hover: #fff3f8;
-  --shadow: 0 10px 26px rgba(148, 90, 118, .10);
+  --text: #3f1f2d;
+  --text-light: #765367;
+  --card-border: #efc9d8;
+  --input-bg: #fff8fb;
+  --input-brd: #eab8cc;
+  --table-row: #fff7fb;
+  --table-hover: #ffeef6;
+  --shadow: 0 12px 32px rgba(123, 23, 49, .10);
+}
+
+body.dark[data-theme-style="pembe-tema"] {
+  --navy: #5a1027;
+  --navy-mid: #7d1d3d;
+  --navy-light: #b83265;
+  --pink: #f06f9e;
+  --pink-bright: #ff9fc0;
+  --pink-pale: #321421;
+  --bg: #10070c;
+  --white: #1d1017;
+  --text: #f8eaf0;
+  --text-light: #dfbdca;
+  --card-border: #4a2030;
+  --input-bg: #29161f;
+  --input-brd: #5a2a3b;
+  --table-row: #211019;
+  --table-hover: #2d1621;
+  --shadow: 0 16px 40px rgba(0, 0, 0, .42);
 }
 
 /* ================= RESET + TEMEL ================= */
@@ -635,7 +655,12 @@ body.dark .theme-sheet-head h3 { color: var(--pink-bright); }
 .preview-orman-yesili { background: linear-gradient(135deg, #0c1f18 0%, #1d4d37 55%, #10271d 100%); }
 .preview-mor-isik { background: linear-gradient(135deg, #170827 0%, #4d1682 55%, #25053e 100%); }
 .preview-klasik-koyu { background: linear-gradient(135deg, #111827 0%, #1f2937 55%, #0f172a 100%); }
-.preview-gun-isigi { background: linear-gradient(135deg, #f8e8ef 0%, #ffffff 45%, #fff3f8 100%); }
+.preview-pembe-tema {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 159, 192, .85), transparent 18%),
+    radial-gradient(circle at 80% 72%, rgba(216, 95, 147, .35), transparent 24%),
+    linear-gradient(135deg, #fff4f8 0%, #ffd8e8 46%, #f3a1c0 100%);
+}
 .theme-choice-meta { display: grid; gap: 4px; }
 .theme-choice-meta strong { color: var(--text); font-size: 15px; }
 .theme-choice-meta small { color: var(--text-light); line-height: 1.5; }
@@ -4538,613 +4563,443 @@ body.dark .scroll-top-btn {
   }
 }
 
-/* ============================================================
-   FINAL STABLE FIX — Flashcard sticky arama + mobil yukarı butonu
-   Amaç: Arayüz temiz kalsın; arama barı Hacıbey kategori barı gibi
-   aşağı kaydırınca topbar altında sabit kalsın.
-   ============================================================ */
-#memoryhub,
-#memoryCardsSection,
-#memoryCardsSection .memory-section-shell,
-#memoryCardsSection .memory-cards-shell {
-  overflow: visible !important;
+/* =========================================================
+   FINAL RESPONSIVE + PEMBE TEMA + OKUNABİLİRLİK DÜZELTMELERİ
+   Bu blok mevcut sistemi bozmadan en alttan güvenli override sağlar.
+   ========================================================= */
+
+/* Eski Gün Işığı localStorage/tema kalıntıları görünürse Pembe Tema gibi davranır. */
+body[data-theme-style="gun-isigi"] {
+  --navy: #7b1731;
+  --navy-mid: #9a2b55;
+  --navy-light: #c94f7c;
+  --pink: #d85f93;
+  --pink-bright: #ef8bb3;
+  --pink-pale: #fde7f1;
+  --bg: #fff4f8;
+  --white: #ffffff;
+  --text: #3f1f2d;
+  --text-light: #765367;
+  --card-border: #efc9d8;
+  --input-bg: #fff8fb;
+  --input-brd: #eab8cc;
+  --table-row: #fff7fb;
+  --table-hover: #ffeef6;
+  --shadow: 0 12px 32px rgba(123, 23, 49, .10);
 }
 
-#memoryCardsSection .memory-cards-shell {
-  position: relative !important;
-}
-
-#memoryCardsSection .memory-search-sticky {
-  position: sticky !important;
-  top: var(--memory-search-top, 86px) !important;
-  z-index: 1300 !important;
-  display: grid !important;
-  grid-template-columns: 1fr !important;
-  gap: 0 !important;
-  width: 100% !important;
-  margin: -4px 0 14px !important;
-  padding: 8px 0 10px !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  isolation: isolate !important;
-}
-
-#memoryCardsSection .memory-search-sticky::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 -14px !important;
-  z-index: -1 !important;
-  border-radius: 0 0 20px 20px !important;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--bg) 98%, transparent),
-      color-mix(in srgb, var(--bg) 86%, transparent)
-    ) !important;
-  border-bottom: 1px solid color-mix(in srgb, var(--card-border) 72%, transparent) !important;
-  box-shadow: 0 12px 26px rgba(126, 32, 70, .07) !important;
-  backdrop-filter: blur(18px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(1.15) !important;
-}
-
-#memoryCardsSection .memory-search-sticky .hub-legend {
-  display: none !important;
-}
-
-#memoryCardsSection .memory-search-sticky .hub-search,
-#memoryCardsSection .memory-search-sticky input {
-  width: 100% !important;
-  min-height: 52px !important;
-  height: 52px !important;
-  border-radius: 999px !important;
-  padding: 0 18px !important;
-  border: 1.5px solid color-mix(in srgb, var(--pink) 34%, var(--card-border) 66%) !important;
-  background: color-mix(in srgb, var(--white) 94%, transparent) !important;
-  color: var(--text) !important;
-  box-shadow: 0 10px 24px rgba(126, 32, 70, .08) !important;
-  outline: none !important;
-}
-
-#memoryCardsSection .memory-search-sticky .hub-search:focus,
-#memoryCardsSection .memory-search-sticky input:focus {
-  border-color: var(--pink) !important;
-  box-shadow: 0 0 0 4px rgba(212, 102, 156, .12), 0 12px 26px rgba(126, 32, 70, .10) !important;
-}
-
-body.dark #memoryCardsSection .memory-search-sticky::before {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(15, 8, 11, .96),
-      rgba(15, 8, 11, .84)
-    ) !important;
-  border-bottom-color: rgba(255,255,255,.08) !important;
-  box-shadow: 0 14px 30px rgba(0,0,0,.28) !important;
-}
-
-body.dark #memoryCardsSection .memory-search-sticky .hub-search,
-body.dark #memoryCardsSection .memory-search-sticky input {
-  background: rgba(25, 16, 20, .94) !important;
-  color: var(--text) !important;
-  border-color: rgba(255, 157, 184, .30) !important;
-}
-
-#scrollTopBtn.scroll-top-btn {
-  position: fixed !important;
-  right: 18px !important;
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-  width: 56px !important;
-  height: 56px !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  z-index: 2147483000 !important;
-  display: grid !important;
-  place-items: center !important;
-  padding: 0 !important;
-  color: #fff !important;
-  background: linear-gradient(135deg, var(--pink), var(--pink-bright)) !important;
-  box-shadow: 0 18px 44px rgba(139, 23, 68, .34) !important;
-  font-size: 25px !important;
-  font-weight: 900 !important;
-  line-height: 1 !important;
-  cursor: pointer !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-  transform: translateY(12px) scale(.94) !important;
-  transition: opacity .22s ease, visibility .22s ease, transform .22s ease !important;
-  -webkit-tap-highlight-color: transparent !important;
-}
-
-#scrollTopBtn.scroll-top-btn.show {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  transform: translateY(0) scale(1) !important;
-}
-
-#scrollTopBtn.scroll-top-btn:hover {
-  transform: translateY(-3px) scale(1.04) !important;
-}
-
-@media (max-width: 768px) {
-  #memoryCardsSection .memory-search-sticky {
-    top: var(--memory-search-top-mobile, 70px) !important;
-    margin: -2px 0 12px !important;
-    padding: 7px 0 9px !important;
-  }
-
-  #memoryCardsSection .memory-search-sticky::before {
-    inset: 0 -12px !important;
-    border-radius: 0 0 18px 18px !important;
-  }
-
-  #memoryCardsSection .memory-search-sticky .hub-search,
-  #memoryCardsSection .memory-search-sticky input {
-    min-height: 50px !important;
-    height: 50px !important;
-    font-size: 15px !important;
-    padding-inline: 16px !important;
-  }
-
-  #scrollTopBtn.scroll-top-btn {
-    right: 14px !important;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-    width: 52px !important;
-    height: 52px !important;
-    font-size: 23px !important;
-  }
-}
-
-@media (max-width: 420px) {
-  #memoryCardsSection .memory-search-sticky {
-    top: var(--memory-search-top-mobile, 64px) !important;
-  }
-
-  #scrollTopBtn.scroll-top-btn {
-    right: 12px !important;
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
-    width: 50px !important;
-    height: 50px !important;
-  }
-}
-
-/* ============================================================
-   HACIBEY STYLE FOLLOW BAR + FLASHCARD FAVORITE FILTER
-   - Arama barı scroll ile topbar altında takip eder.
-   - Kalp/Favoriler butonu sadece favori flashcardları filtreler.
-   ============================================================ */
-.memory-search-spacer {
-  display: none;
+/* Geniş ekranlarda sağdaki boşluğu azalt, içerik daha iyi yayılsın. */
+.content-wrapper {
   width: 100%;
-  pointer-events: none;
+  max-width: min(100%, 1560px);
+  margin-inline: auto;
+  padding: clamp(16px, 2vw, 34px);
+  padding-bottom: max(34px, env(safe-area-inset-bottom));
 }
-.memory-search-spacer.active { display: block; }
 
-#memoryCardsSection .memory-search-row {
+@media (min-width: 1280px) {
+  .content-wrapper { max-width: min(100%, 1640px); }
+  .stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .panel-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hub-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .exam-modes { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .memory-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .flashcard-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 900px) and (max-width: 1279px) {
+  .content-wrapper { padding: 24px; }
+  .exam-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hub-grid,
+  .panel-grid,
+  .flashcard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 640px) and (max-width: 899px) {
+  .exam-modes,
+  .stats-row,
+  .panel-grid,
+  .dashboard-grid,
+  .hub-grid,
+  .flashcard-grid,
+  .progress-shell { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.exam-modes,
+.exam-meta-box,
+.exam-workspace {
+  width: 100%;
+}
+
+.exam-mode-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 190px;
+}
+.exam-mode-card p { flex: 1; }
+.exam-mode-card .primary-btn { align-self: flex-start; }
+.mode-chip.mega,
+.mode-chip.ultra { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+
+.exam-meta-box {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.empty-state {
+  min-height: clamp(110px, 14vw, 160px);
+  display: grid;
+  place-items: center;
+  align-content: center;
+}
+
+/* Tüm tema ve kartlarda yazı okunabilirliği. */
+body[data-theme-style] .content-card,
+body[data-theme-style] .dashboard-card,
+body[data-theme-style] .feature-panel,
+body[data-theme-style] .topic-card,
+body[data-theme-style] .exam-mode-card,
+body[data-theme-style] .exam-meta-box,
+body[data-theme-style] .empty-state,
+body[data-theme-style] .memory-cards-shell,
+body[data-theme-style] .memory-practice-shell,
+body[data-theme-style] .question-card,
+body[data-theme-style] .typing-card,
+body[data-theme-style] .weak-word-card,
+body[data-theme-style] .matching-card {
+  color: var(--text);
+}
+
+body[data-theme-style] .content-card p,
+body[data-theme-style] .dashboard-card p,
+body[data-theme-style] .feature-panel p,
+body[data-theme-style] .topic-card p,
+body[data-theme-style] .exam-mode-card p,
+body[data-theme-style] .helper-line,
+body[data-theme-style] .subtitle,
+body[data-theme-style] .progress-text,
+body[data-theme-style] .empty-mini,
+body[data-theme-style] .fc-rule,
+body[data-theme-style] .fc-trap,
+body[data-theme-style] .fc-checklist,
+body[data-theme-style] .memory-face small,
+body[data-theme-style] .memory-face em {
+  color: var(--text-light);
+}
+
+body[data-theme-style] .fc-example,
+body[data-theme-style] .option-item,
+body[data-theme-style] .matching-card,
+body[data-theme-style] .typing-card,
+body[data-theme-style] .weak-word-card,
+body[data-theme-style] .source-table td,
+body[data-theme-style] .question-title,
+body[data-theme-style] .dashboard-steps,
+body[data-theme-style] .content-card li {
+  color: var(--text);
+}
+
+body[data-theme-style] .fc-compare,
+body[data-theme-style] .recap-meta-pill,
+body[data-theme-style] .recap-dropdown-copy strong,
+body[data-theme-style] .source-table th,
+body[data-theme-style] .content-card strong,
+body[data-theme-style] .side-card strong,
+body[data-theme-style] .quiz-sidebar strong {
+  color: var(--navy);
+}
+
+body.dark[data-theme-style] .fc-compare,
+body.dark[data-theme-style] .recap-meta-pill,
+body.dark[data-theme-style] .recap-dropdown-copy strong,
+body.dark[data-theme-style] .source-table th,
+body.dark[data-theme-style] .content-card strong,
+body.dark[data-theme-style] .side-card strong,
+body.dark[data-theme-style] .quiz-sidebar strong {
+  color: var(--pink-bright);
+}
+
+.hub-search::placeholder,
+.search-bar input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--text) 62%, transparent);
+  opacity: 1;
+}
+
+/* Flashcard okunabilirliği ve mobil kart oranları. */
+.memory-front strong {
+  color: #7b1731;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.memory-front small,
+.memory-front em { color: #735062; }
+.memory-back strong {
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,.25);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.memory-back small,
+.memory-back em { color: rgba(255,255,255,.90); }
+body.dark .memory-front strong { color: #ffe6ee; }
+body.dark .memory-front small,
+body.dark .memory-front em { color: #e4bac8; }
+
+.memory-fav-btn,
+.favorite-btn,
+.memory-favorite-btn {
+  z-index: 5;
+  color: var(--pink);
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(212,102,156,.18);
+  box-shadow: 0 10px 24px rgba(126,32,70,.16);
+}
+body.dark .memory-fav-btn,
+body.dark .favorite-btn,
+body.dark .memory-favorite-btn {
+  color: var(--pink-bright);
+  background: rgba(25,16,22,.92);
+  border-color: rgba(255,255,255,.10);
+}
+
+/* Flashcard arama barı: sayfanın en üstünde ince, cam efektli sticky alan. */
+#memoryhub,
+.memory-cards-section,
+.memory-cards-shell,
+.memory-section-shell {
+  overflow: visible;
+}
+.memory-search-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border-radius: 22px;
+  background: rgba(255, 247, 251, 0.90);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border: 1px solid rgba(212, 102, 156, 0.22);
+  box-shadow: 0 12px 30px rgba(126, 32, 70, 0.10);
+}
+.memory-search-row,
+.memory-search-inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
   gap: 10px;
+  align-items: center;
   width: 100%;
 }
-
-#memoryCardsSection .memory-search-sticky.is-scroll-following {
-  position: fixed !important;
-  top: var(--memory-search-top, 86px) !important;
-  left: var(--memory-search-left, 16px) !important;
-  width: var(--memory-search-width, calc(100vw - 32px)) !important;
-  z-index: 2147482600 !important;
-  margin: 0 !important;
-  padding: 8px 0 10px !important;
+.memory-search-sticky .hub-search {
+  min-height: 48px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.86);
+  color: var(--text);
 }
-
+.memory-search-sticky .hub-legend {
+  margin-top: 8px;
+  padding-inline: 4px;
+}
 .memory-favorite-filter-btn {
-  min-height: 52px;
-  height: 52px;
-  border: 1.5px solid color-mix(in srgb, var(--pink) 30%, var(--card-border) 70%);
-  border-radius: 999px;
-  padding: 0 15px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(212,102,156,.24);
+  background: rgba(255,255,255,.78);
+  color: var(--navy);
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  background: color-mix(in srgb, var(--white) 92%, transparent);
-  color: var(--navy);
-  font-weight: 900;
-  font-size: 13px;
-  white-space: nowrap;
+  gap: 8px;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(126, 32, 70, .07);
-  transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
-  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 8px 22px rgba(126,32,70,.08);
 }
-.memory-favorite-filter-btn:hover { transform: translateY(-1px); border-color: var(--pink); }
 .memory-favorite-filter-btn.active,
 .memory-favorite-filter-btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
   color: #fff;
   border-color: transparent;
-  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
-  box-shadow: 0 14px 28px rgba(212, 102, 156, .24);
 }
-.memory-favorite-filter-btn .fav-filter-icon {
-  font-size: 17px;
-  line-height: 1;
+body.dark .memory-search-sticky {
+  background: rgba(20, 12, 18, 0.90);
+  border-color: rgba(255,255,255,.10);
 }
-.memory-favorite-filter-btn.active .fav-filter-icon,
-.memory-favorite-filter-btn[aria-pressed="true"] .fav-filter-icon {
-  content: "❤️";
-}
-
+body.dark .memory-search-sticky .hub-search,
 body.dark .memory-favorite-filter-btn {
-  color: #ffe3ea;
-  background: rgba(25, 16, 20, .94);
-  border-color: rgba(255, 157, 184, .30);
-  box-shadow: 0 12px 24px rgba(0,0,0,.24);
+  background: rgba(35, 24, 32, 0.92);
+  color: var(--text);
 }
-body.dark .memory-favorite-filter-btn.active,
-body.dark .memory-favorite-filter-btn[aria-pressed="true"] {
-  color: #fff;
-  background: linear-gradient(135deg, #7d1935, #de5f7f);
+
+.scroll-top-btn {
+  z-index: 99999 !important;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+}
+
+/* Tablet ve mobil özel ayarlar */
+@media (max-width: 1024px) {
+  .detail-grid,
+  .quiz-layout { grid-template-columns: 1fr; }
+  .topbar { padding-inline: 18px; }
+  .topbar-right { gap: 8px; }
+  .topbar-badge { display: none; }
 }
 
 @media (max-width: 768px) {
-  #memoryCardsSection .memory-search-row {
-    grid-template-columns: minmax(0, 1fr) 50px;
+  .content-wrapper {
+    padding: 18px;
+  }
+  .page-header {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+  .hero {
+    padding: 28px 22px;
+    border-radius: 24px;
+  }
+  .hero h1 { font-size: clamp(1.65rem, 8vw, 2.2rem); }
+  .exam-modes,
+  .exam-meta-box,
+  .stats-row,
+  .panel-grid,
+  .dashboard-grid,
+  .hub-grid,
+  .flashcard-grid,
+  .progress-shell {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .exam-mode-card,
+  .feature-panel,
+  .dashboard-card,
+  .topic-card,
+  .content-card,
+  .side-card,
+  .question-card,
+  .empty-state {
+    padding: 18px;
+    border-radius: 20px;
+  }
+  .exam-mode-card .primary-btn,
+  .topic-actions .primary-btn,
+  .topic-actions .secondary-btn,
+  .topic-actions .ghost-btn {
+    width: 100%;
+  }
+  .memory-tab-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     gap: 8px;
+    padding: 8px;
   }
-  .memory-favorite-filter-btn {
-    width: 50px;
-    min-width: 50px;
-    height: 50px;
-    min-height: 50px;
-    padding: 0;
+  .memory-tab-btn {
+    min-width: max-content;
+    flex: 0 0 auto;
+    min-height: 46px;
+    padding-inline: 14px;
   }
-  .memory-favorite-filter-btn .fav-filter-text { display: none; }
-  .memory-favorite-filter-btn .fav-filter-icon { font-size: 20px; }
+  .memory-cards-shell,
+  .memory-practice-shell {
+    padding: 14px;
+    border-radius: 20px;
+  }
+  .memory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .memory-card,
+  .memory-card-inner {
+    min-height: 166px;
+  }
+  .memory-face {
+    padding: 12px;
+    border-radius: 18px;
+  }
+  .memory-face strong {
+    font-size: clamp(1rem, 4.2vw, 1.35rem);
+    line-height: 1.18;
+  }
+  .memory-face small { font-size: 10px; }
+  .memory-face em { font-size: 11px; line-height: 1.35; }
+  .memory-fav-btn,
+  .favorite-btn,
+  .memory-favorite-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  }
+  .memory-search-sticky {
+    top: 0;
+    padding: 8px;
+    border-radius: 18px;
+  }
+  .memory-search-sticky .hub-search { min-height: 46px; }
+}
+
+@media (max-width: 520px) {
+  .content-wrapper { padding: 16px 14px; }
+  .memory-search-row,
+  .memory-search-inner { grid-template-columns: 1fr; }
+  .memory-favorite-filter-btn { width: 100%; min-height: 46px; }
+  .memory-search-sticky .hub-legend { font-size: 12px; gap: 8px; }
 }
 
 @media (max-width: 420px) {
-  #memoryCardsSection .memory-search-row {
-    grid-template-columns: minmax(0, 1fr) 48px;
-  }
-  .memory-favorite-filter-btn {
-    width: 48px;
-    min-width: 48px;
-    height: 48px;
-    min-height: 48px;
-  }
-}
-
-/* ============================================================
-   FINAL MOBILE MATCHING + CLEAN FLASHCARD STICKY SEARCH UI
-   - Kelime eşleştirme mobilde tam ekrana oturur.
-   - Flashcard arama barı Hacıbey kategori barı gibi daha temiz görünür.
-   ============================================================ */
-
-/* Flashcard sticky search: clean premium follow bar */
-#memoryCardsSection .memory-search-sticky,
-#memoryCardsSection .memory-search-sticky.is-scroll-following {
-  border-radius: 999px !important;
-  background: color-mix(in srgb, var(--white) 86%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--card-border) 70%, var(--pink) 30%) !important;
-  box-shadow: 0 16px 36px rgba(126, 32, 70, .12) !important;
-  backdrop-filter: blur(22px) saturate(1.2) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(1.2) !important;
-  padding: 8px !important;
-  isolation: isolate !important;
-}
-
-#memoryCardsSection .memory-search-sticky::before,
-#memoryCardsSection .memory-search-sticky.is-scroll-following::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: -9px !important;
-  z-index: -1 !important;
-  border-radius: 999px !important;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--bg) 82%, transparent),
-    color-mix(in srgb, var(--bg) 64%, transparent)
-  ) !important;
-  border: 1px solid color-mix(in srgb, var(--card-border) 55%, transparent) !important;
-  box-shadow: 0 10px 28px rgba(126, 32, 70, .08) !important;
-  backdrop-filter: blur(20px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(1.15) !important;
-}
-
-#memoryCardsSection .memory-search-row {
-  grid-template-columns: minmax(0, 1fr) auto !important;
-  gap: 8px !important;
-  align-items: center !important;
-}
-
-#memoryCardsSection .memory-search-sticky .hub-search,
-#memoryCardsSection .memory-search-sticky input {
-  height: 48px !important;
-  min-height: 48px !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  padding: 0 18px !important;
-  background: color-mix(in srgb, var(--input-bg) 88%, var(--white) 12%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.58) !important;
-}
-
-#memoryCardsSection .memory-search-sticky .hub-search:focus,
-#memoryCardsSection .memory-search-sticky input:focus {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.58),
-    0 0 0 3px rgba(212,102,156,.14) !important;
-}
-
-#memoryCardsSection .memory-favorite-filter-btn {
-  height: 48px !important;
-  min-height: 48px !important;
-  border-radius: 999px !important;
-  border: 0 !important;
-  background: color-mix(in srgb, var(--pink-pale) 78%, var(--white) 22%) !important;
-  color: var(--navy) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.52) !important;
-}
-
-#memoryCardsSection .memory-favorite-filter-btn.active,
-#memoryCardsSection .memory-favorite-filter-btn[aria-pressed="true"] {
-  background: linear-gradient(135deg, var(--pink), var(--pink-bright)) !important;
-  color: #fff !important;
-  box-shadow: 0 12px 28px rgba(212,102,156,.24) !important;
-}
-
-body.dark #memoryCardsSection .memory-search-sticky,
-body.dark #memoryCardsSection .memory-search-sticky.is-scroll-following {
-  background: rgba(25, 16, 20, .88) !important;
-  border-color: rgba(255,255,255,.08) !important;
-  box-shadow: 0 18px 38px rgba(0,0,0,.30) !important;
-}
-
-body.dark #memoryCardsSection .memory-search-sticky::before,
-body.dark #memoryCardsSection .memory-search-sticky.is-scroll-following::before {
-  background: rgba(15, 8, 11, .62) !important;
-  border-color: rgba(255,255,255,.06) !important;
-}
-
-/* Matching desktop cleanup */
-.matching-shell {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-.matching-scroll {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: visible !important;
-}
-
-.matching-board {
-  width: 100% !important;
-  max-width: 100% !important;
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-  gap: 14px !important;
-  align-items: start !important;
-}
-
-.matching-card {
-  min-width: 0 !important;
-  width: 100% !important;
-  min-height: 56px !important;
-  padding: 12px 14px !important;
-  border-radius: 16px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  text-align: center !important;
-  line-height: 1.35 !important;
-  word-break: break-word !important;
-}
-
-/* Mobile: matching full viewport fit */
-@media (max-width: 768px) {
-  #memoryMatchingSection.memory-section-shell {
-    width: calc(100vw - 24px) !important;
-    max-width: calc(100vw - 24px) !important;
-    margin-left: calc(50% - 50vw + 12px) !important;
-    margin-right: calc(50% - 50vw + 12px) !important;
-  }
-
-  #memoryMatchingSection .memory-section-head {
-    padding: 0 2px !important;
-  }
-
-  .matching-shell {
-    border-radius: 18px !important;
-    padding: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: 0 !important;
-  }
-
-  .matching-toolbar {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-    align-items: stretch !important;
-    margin-bottom: 12px !important;
-  }
-
-  .matching-stats {
-    display: flex !important;
-    gap: 8px !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    padding-bottom: 2px !important;
-  }
-
-  .matching-pill {
-    flex: 0 0 auto !important;
-    min-height: 34px !important;
-    padding: 8px 12px !important;
-    font-size: 13px !important;
-  }
-
-  .matching-controls {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    gap: 8px !important;
-    width: 100% !important;
-    align-items: center !important;
-  }
-
-  .matching-size-toggle {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: auto minmax(0, 1fr) !important;
-    gap: 8px !important;
-    align-items: center !important;
-  }
-
-  .matching-size-toggle select {
-    width: 100% !important;
-    min-height: 44px !important;
-    border-radius: 14px !important;
-  }
-
-  .matching-controls .ghost-btn,
-  .matching-controls button {
-    min-height: 44px !important;
-    padding: 0 14px !important;
-    border-radius: 16px !important;
-    white-space: nowrap !important;
-  }
-
-  .matching-scroll {
-    width: 100% !important;
-    overflow-x: hidden !important;
-  }
-
-  .matching-board,
-  .matching-scroll .matching-board {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-    gap: 8px !important;
-  }
-
-  .matching-column {
-    min-width: 0 !important;
-    gap: 8px !important;
-  }
-
-  .matching-column-title {
-    font-size: 11px !important;
-    margin: 0 0 4px !important;
-    letter-spacing: .08em !important;
-  }
-
-  .matching-card {
-    min-height: 52px !important;
-    padding: 9px 8px !important;
-    border-radius: 14px !important;
-    font-size: 13.5px !important;
-    font-weight: 800 !important;
-  }
-
-  /* Clean mobile sticky flashcard search */
-  #memoryCardsSection .memory-search-sticky,
-  #memoryCardsSection .memory-search-sticky.is-scroll-following {
-    width: min(var(--memory-search-width, calc(100vw - 24px)), calc(100vw - 24px)) !important;
-    max-width: calc(100vw - 24px) !important;
-    padding: 7px !important;
-  }
-
-  #memoryCardsSection .memory-search-sticky .hub-search,
-  #memoryCardsSection .memory-search-sticky input {
-    height: 46px !important;
-    min-height: 46px !important;
-    font-size: 14.5px !important;
-    padding-inline: 15px !important;
-  }
-
-  #memoryCardsSection .memory-search-row {
-    grid-template-columns: minmax(0, 1fr) 46px !important;
-    gap: 7px !important;
-  }
-
-  #memoryCardsSection .memory-favorite-filter-btn {
-    width: 46px !important;
-    min-width: 46px !important;
-    height: 46px !important;
-    min-height: 46px !important;
-    padding: 0 !important;
-  }
-}
-
-@media (max-width: 420px) {
-  .matching-board,
-  .matching-scroll .matching-board {
-    gap: 7px !important;
-  }
-
-  .matching-card {
-    min-height: 50px !important;
-    padding: 8px 6px !important;
-    border-radius: 13px !important;
-    font-size: 12.8px !important;
-  }
-
-  .matching-size-toggle span {
-    font-size: 12px !important;
-  }
-
-  #memoryCardsSection .memory-search-sticky,
-  #memoryCardsSection .memory-search-sticky.is-scroll-following {
-    padding: 6px !important;
-  }
-
-  #memoryCardsSection .memory-search-row {
-    grid-template-columns: minmax(0, 1fr) 44px !important;
-  }
-
-  #memoryCardsSection .memory-favorite-filter-btn {
-    width: 44px !important;
-    min-width: 44px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-  }
+  .memory-grid { gap: 10px; }
+  .memory-card,
+  .memory-card-inner { min-height: 154px; }
+  .memory-face { padding: 11px; }
+  .memory-face strong { font-size: clamp(.95rem, 4.6vw, 1.22rem); }
+  .page-header-left h2 { font-size: 25px; }
+  .topbar { height: 70px; padding-inline: 12px; }
+  .theme-open-btn span:not(.theme-open-icon),
+  .mode-toggle-text { display: none; }
 }
 
 
 /* ============================================================
-   YUSUF FINAL OVERRIDE — Flashcard arama barı sayfanın en üstünde takip etsin
+   TEMA PANELI / FLASHCARD STICKY ARAMA CAKISMA FIX
    ============================================================ */
-:root {
-  --safe-area-top: env(safe-area-inset-top, 0px);
+/* Flashcard arama bari normalde ustte kalir; fakat modal panellerin ustune cikmaz. */
+.memory-search-sticky {
+  z-index: 120 !important;
 }
 
-#memoryCardsSection .memory-search-sticky.is-scroll-following {
-  top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
-  z-index: 2147483000 !important;
+/* Tema paneli ve karartma katmani her zaman tum icerigin uzerinde kalir. */
+.theme-sheet-backdrop {
+  z-index: 3000 !important;
 }
 
-#memoryCardsSection .memory-search-sticky.is-scroll-following::before {
-  background: color-mix(in srgb, var(--bg) 72%, transparent) !important;
+.theme-sheet {
+  z-index: 3010 !important;
 }
 
+/* Tema paneli acikken sticky arama ve yukari cik butonu gizlenir.
+   Boylece panelin ustunden gecen arama kutusu gorunmez. */
+body.theme-sheet-open .memory-search-sticky,
+body.theme-sheet-open .scroll-top-btn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+
+/* Mobilde tema paneli alttan gelen temiz bottom-sheet gibi otursun. */
 @media (max-width: 768px) {
-  #memoryCardsSection .memory-search-sticky.is-scroll-following {
-    top: calc(env(safe-area-inset-top, 0px) + 8px) !important;
-    left: 10px !important;
-    width: calc(100vw - 20px) !important;
-  }
-}
-
-@media (max-width: 420px) {
-  #memoryCardsSection .memory-search-sticky.is-scroll-following {
-    top: calc(env(safe-area-inset-top, 0px) + 7px) !important;
-    left: 8px !important;
-    width: calc(100vw - 16px) !important;
+  .theme-sheet {
+    top: auto !important;
+    right: 12px !important;
+    left: 12px !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: min(82vh, 720px) !important;
+    border-radius: 26px !important;
+    overflow-y: auto !important;
   }
 }

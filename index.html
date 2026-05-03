@@ -132,11 +132,11 @@
           <span class="theme-choice-check" aria-hidden="true">✓</span>
         </button>
 
-        <button type="button" class="theme-choice-card" data-theme-id="gun-isigi" onclick="selectTheme('gun-isigi')">
-          <span class="theme-choice-preview preview-gun-isigi"></span>
+        <button type="button" class="theme-choice-card" data-theme-id="pembe-tema" onclick="selectTheme('pembe-tema')">
+          <span class="theme-choice-preview preview-pembe-tema"></span>
           <span class="theme-choice-meta">
-            <strong>Gün Işığı</strong>
-            <small>Ferah açık tema ile daha yumuşak bir deneyim.</small>
+            <strong>Pembe Tema</strong>
+            <small>Yumuşak pembe tonları, net kontrast ve sade romantik görünüm.</small>
           </span>
           <span class="theme-choice-check" aria-hidden="true">✓</span>
         </button>
@@ -325,20 +325,8 @@
           </div>
 
           <div class="memory-cards-shell">
-            <div class="hub-toolbar memory-toolbar memory-search-sticky" id="memorySearchSticky">
-              <div class="memory-search-row">
-                <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
-                <button
-                  type="button"
-                  id="memoryFavFilterBtn"
-                  class="memory-favorite-filter-btn"
-                  onclick="toggleFlashcardFavoriteFilter()"
-                  aria-pressed="false"
-                  title="Sadece favori kelimeleri göster">
-                  <span class="fav-filter-icon">♡</span>
-                  <span class="fav-filter-text">Favoriler</span>
-                </button>
-              </div>
+            <div class="hub-toolbar memory-toolbar memory-search-sticky">
+              <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
               <div class="hub-legend">
                 <span><i class="dot exam"></i> Tıkla ve çevir</span>
                 <span><i class="dot success"></i> İngilizce → Türkçe</span>
@@ -484,6 +472,24 @@
             </div>
             <p>Daha ciddi deneme için. Süre: 25 dakika.</p>
             <button class="primary-btn dark" onclick="startExam(30, 25)">Tam Sınav Başlat</button>
+          </div>
+
+          <div class="exam-mode-card">
+            <div class="mode-top">
+              <span class="mode-chip mega">Mega</span>
+              <strong>60 soru</strong>
+            </div>
+            <p>Uzun deneme modu. Süre: 90 dakika (1.5 saat).</p>
+            <button class="primary-btn dark" onclick="startExam(60, 90)">60 Soruluk Sınav Başlat</button>
+          </div>
+
+          <div class="exam-mode-card">
+            <div class="mode-top">
+              <span class="mode-chip ultra">Ultra</span>
+              <strong>80 soru</strong>
+            </div>
+            <p>En kapsamlı deneme modu. Süre: 90 dakika (1.5 saat).</p>
+            <button class="primary-btn dark" onclick="startExam(80, 90)">80 Soruluk Sınav Başlat</button>
           </div>
         </div>
 

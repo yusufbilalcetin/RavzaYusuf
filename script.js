@@ -2533,12 +2533,21 @@ const THEME_STYLES = [
   "orman-yesili",
   "mor-isik",
   "klasik-koyu",
-  "gun-isigi"
+  "pembe-tema"
 ];
+
+function normalizeThemeStyle(themeId) {
+  if (themeId === "gun-isigi") return "pembe-tema";
+  return THEME_STYLES.includes(themeId) ? themeId : "noel-ask";
+}
 
 function initTheme() {
   const savedMode = localStorage.getItem("eul_theme");
-  const savedStyle = localStorage.getItem("eul_theme_style") || "noel-ask";
+  const savedStyle = normalizeThemeStyle(localStorage.getItem("eul_theme_style") || "noel-ask");
+
+  if (localStorage.getItem("eul_theme_style") === "gun-isigi") {
+    localStorage.setItem("eul_theme_style", "pembe-tema");
+  }
 
   applySiteTheme(savedStyle, false);
   applyDark(savedMode === "dark");
@@ -2546,7 +2555,7 @@ function initTheme() {
 }
 
 function applySiteTheme(themeId, persist = true) {
-  const normalized = THEME_STYLES.includes(themeId) ? themeId : "noel-ask";
+  const normalized = normalizeThemeStyle(themeId);
   document.body.setAttribute("data-theme-style", normalized);
   if (persist) {
     localStorage.setItem("eul_theme_style", normalized);
@@ -2569,6 +2578,10 @@ function openThemeSheet() {
     sheet.setAttribute("aria-hidden", "false");
   }
   if (backdrop) backdrop.classList.add("open");
+
+  // Tema paneli acikken Flashcard sticky arama bari ve scroll-top butonu
+  // modalin ustune cikmasin. Bu class CSS tarafinda cakismani engeller.
+  document.body.classList.add("theme-sheet-open");
 }
 
 function closeThemeSheet() {
@@ -2579,10 +2592,14 @@ function closeThemeSheet() {
     sheet.setAttribute("aria-hidden", "true");
   }
   if (backdrop) backdrop.classList.remove("open");
+
+  document.body.classList.remove("theme-sheet-open");
 }
 
 function selectTheme(themeId) {
-  applySiteTheme(themeId);
+  applySiteTheme(normalizeThemeStyle(themeId));
+  // Tema secildikten sonra panel kapanir; sticky arama tekrar normal calisir.
+  closeThemeSheet();
 }
 
 function applyDark(isDark) {
@@ -4451,6 +4468,25 @@ document.addEventListener("keydown", (event) => {
   }
 })();
 
+
+
+/* =========================================================
+   THEME SHEET / STICKY SEARCH Z-INDEX SAFETY PATCH
+   ========================================================= */
+(function syncThemeSheetOverlayState() {
+  function sync() {
+    const sheet = document.getElementById("theme-sheet");
+    const isOpen = !!sheet && sheet.classList.contains("open");
+    document.body.classList.toggle("theme-sheet-open", isOpen);
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeThemeSheet();
+  });
+
+  document.addEventListener("DOMContentLoaded", sync);
+  if (document.readyState !== "loading") sync();
+})();
 
 
 /* =========================================================
@@ -6352,325 +6388,5 @@ document.addEventListener("keydown", (event) => {
     loadMemoryExtrasFromFirebase().finally(() => {
       requestAnimationFrame(() => requestAnimationFrame(bootstrap));
     });
-  }
-})();
-
-/* ============================================================
-   FINAL STABLE UI FIX — Sticky offset + mobil yukarı çık butonu
-   Not: Arama barı CSS sticky ile çalışır. JS sadece topbar yüksekliğini
-   ölçer ve scroll-top butonunu güvenli biçimde gösterir.
-   ============================================================ */
-(function finalStableStickyAndScrollTopFix() {
-  function getTopbarHeight() {
-    const topbar = document.querySelector(".topbar");
-    if (!topbar) return window.innerWidth <= 768 ? 62 : 78;
-    const rect = topbar.getBoundingClientRect();
-    return Math.max(58, Math.round(rect.height || topbar.offsetHeight || 78));
-  }
-
-  function updateStickyOffsets() {
-    const top = getTopbarHeight() + 8;
-    document.documentElement.style.setProperty("--memory-search-top", `${top}px`);
-    document.documentElement.style.setProperty("--memory-search-top-mobile", `${top}px`);
-  }
-
-  function getScrollTop() {
-    return Math.max(
-      window.pageYOffset || 0,
-      window.scrollY || 0,
-      document.documentElement.scrollTop || 0,
-      document.body.scrollTop || 0,
-      document.querySelector(".main-content")?.scrollTop || 0,
-      document.querySelector(".content-wrapper")?.scrollTop || 0
-    );
-  }
-
-  function setupScrollTopButton() {
-    const btn = document.getElementById("scrollTopBtn");
-    if (!btn) return;
-
-    const toggle = () => {
-      btn.classList.toggle("show", getScrollTop() > 220);
-    };
-
-    const scrollToTop = () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      document.documentElement.scrollTo?.({ top: 0, behavior: "smooth" });
-      document.body.scrollTo?.({ top: 0, behavior: "smooth" });
-      document.querySelector(".main-content")?.scrollTo?.({ top: 0, behavior: "smooth" });
-      document.querySelector(".content-wrapper")?.scrollTo?.({ top: 0, behavior: "smooth" });
-    };
-
-    if (btn.dataset.finalStableScrollReady !== "true") {
-      btn.dataset.finalStableScrollReady = "true";
-      btn.addEventListener("click", scrollToTop);
-    }
-
-    [window, document, document.documentElement, document.body, document.querySelector(".main-content"), document.querySelector(".content-wrapper")]
-      .filter(Boolean)
-      .forEach((target) => target.addEventListener?.("scroll", toggle, { passive: true }));
-
-    window.addEventListener("resize", () => {
-      updateStickyOffsets();
-      toggle();
-    }, { passive: true });
-
-    window.addEventListener("orientationchange", () => {
-      setTimeout(() => {
-        updateStickyOffsets();
-        toggle();
-      }, 180);
-    }, { passive: true });
-
-    updateStickyOffsets();
-    requestAnimationFrame(toggle);
-  }
-
-  function setup() {
-    updateStickyOffsets();
-    setupScrollTopButton();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setup);
-  } else {
-    setup();
-  }
-})();
-
-/* ============================================================
-   HACIBEY STYLE MEMORY SEARCH FOLLOW + FAVORITE FILTER
-   - Flashcard arama barı aşağı kaydırınca sayfanın en üstünde takip eder.
-   - Kalp/Favoriler butonu sadece favori flashcardları gösterir.
-   ============================================================ */
-(function hacibeyStyleMemorySearchFollowAndFavoriteFilter() {
-  const FAVORITE_KEY = "eul_favorite_words";
-  const FAVORITE_FILTER_KEY = "eul_flashcard_favorites_only";
-  let flashcardFavoritesOnly = false;
-
-  try {
-    flashcardFavoritesOnly = localStorage.getItem(FAVORITE_FILTER_KEY) === "true";
-  } catch {
-    flashcardFavoritesOnly = false;
-  }
-
-  function getTopbarHeightForFollow() {
-    // Yusuf isteği: Flashcard arama barı scroll sırasında sayfanın en üstünde dursun.
-    // Bu yüzden topbar yüksekliği kadar aşağı itmek yerine, sadece küçük güvenli boşluk bırakıyoruz.
-    // Böylece Hacıbey kategori barı gibi viewport'un üstüne yapışarak takip eder.
-    const safeInset = Number.parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue("--safe-area-top") || "0",
-      10
-    ) || 0;
-    return safeInset + (window.innerWidth <= 768 ? 8 : 10);
-  }
-
-  function getPageScrollTop() {
-    return Math.max(
-      window.pageYOffset || 0,
-      window.scrollY || 0,
-      document.documentElement.scrollTop || 0,
-      document.body.scrollTop || 0
-    );
-  }
-
-  function getFavoriteIdsForFilter() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(FAVORITE_KEY) || "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function getMemorySearchValue() {
-    return document.getElementById("memoryFilter")?.value || "";
-  }
-
-  function syncFavoriteFilterButton() {
-    const btn = document.getElementById("memoryFavFilterBtn");
-    if (!btn) return;
-    const active = !!flashcardFavoritesOnly;
-    btn.classList.toggle("active", active);
-    btn.setAttribute("aria-pressed", active ? "true" : "false");
-    const icon = btn.querySelector(".fav-filter-icon");
-    const text = btn.querySelector(".fav-filter-text");
-    if (icon) icon.textContent = active ? "❤️" : "♡";
-    if (text) text.textContent = active ? "Favoriler" : "Favoriler";
-    btn.title = active ? "Tüm kelimeleri göster" : "Sadece favori kelimeleri göster";
-  }
-
-  function applyFlashcardFavoriteFilter() {
-    const grid = document.getElementById("memoryHubGrid");
-    if (!grid) return;
-
-    syncFavoriteFilterButton();
-
-    if (!flashcardFavoritesOnly) return;
-
-    const favorites = new Set(getFavoriteIdsForFilter());
-    const cards = Array.from(grid.querySelectorAll(".memory-card[data-card-id]"));
-
-    if (!favorites.size) {
-      grid.innerHTML = `
-        <div class="empty-grid">
-          Henüz favori kelime yok. Kartların üzerindeki kalbe dokunarak favori ekleyebilirsin.
-        </div>
-      `;
-      return;
-    }
-
-    let visibleCount = 0;
-    cards.forEach((card) => {
-      const id = card.getAttribute("data-card-id");
-      const keep = favorites.has(id);
-      card.hidden = !keep;
-      if (keep) visibleCount += 1;
-    });
-
-    if (!visibleCount) {
-      grid.innerHTML = `
-        <div class="empty-grid">
-          Bu aramada favori kelime bulunamadı. Arama metnini temizleyebilir veya Favoriler filtresini kapatabilirsin.
-        </div>
-      `;
-    }
-  }
-
-  function rerenderFlashcardsAfterFilterChange() {
-    if (typeof renderMemorizationHub === "function") {
-      renderMemorizationHub(getMemorySearchValue());
-    } else if (typeof window.renderMemorizationHub === "function") {
-      window.renderMemorizationHub(getMemorySearchValue());
-    }
-    requestAnimationFrame(() => {
-      applyFlashcardFavoriteFilter();
-      updateMemorySearchFollowPosition();
-    });
-  }
-
-  window.toggleFlashcardFavoriteFilter = function toggleFlashcardFavoriteFilter() {
-    flashcardFavoritesOnly = !flashcardFavoritesOnly;
-    try {
-      localStorage.setItem(FAVORITE_FILTER_KEY, flashcardFavoritesOnly ? "true" : "false");
-    } catch {}
-    syncFavoriteFilterButton();
-    rerenderFlashcardsAfterFilterChange();
-  };
-
-  // Mevcut renderMemorizationHub fonksiyonunu bozmadan favori filtresini sonradan uygula.
-  if (typeof renderMemorizationHub === "function" && !renderMemorizationHub.__favoriteFilterWrapped) {
-    const previousRenderMemorizationHub = renderMemorizationHub;
-    renderMemorizationHub = function renderMemorizationHubWithFavoriteFilter(filterText = "") {
-      previousRenderMemorizationHub(filterText);
-      applyFlashcardFavoriteFilter();
-      requestAnimationFrame(updateMemorySearchFollowPosition);
-    };
-    renderMemorizationHub.__favoriteFilterWrapped = true;
-    window.renderMemorizationHub = renderMemorizationHub;
-  }
-
-  document.addEventListener("click", (event) => {
-    if (!event.target.closest(".memory-fav-btn")) return;
-    // Mevcut favori tıklama kodu çalıştıktan sonra filtreyi yenile.
-    setTimeout(() => {
-      if (flashcardFavoritesOnly) rerenderFlashcardsAfterFilterChange();
-      else syncFavoriteFilterButton();
-    }, 0);
-  }, true);
-
-  let followPlaceholder = null;
-
-  function ensureFollowPlaceholder(bar) {
-    if (followPlaceholder && followPlaceholder.isConnected) return followPlaceholder;
-    followPlaceholder = document.createElement("div");
-    followPlaceholder.className = "memory-search-spacer";
-    bar.parentNode.insertBefore(followPlaceholder, bar);
-    return followPlaceholder;
-  }
-
-  function isFlashcardPanelVisible(section) {
-    if (!section) return false;
-    if (section.hidden || section.classList.contains("is-hidden")) return false;
-    const style = window.getComputedStyle(section);
-    return style.display !== "none" && style.visibility !== "hidden";
-  }
-
-  function releaseMemorySearchFollow(bar, placeholder) {
-    bar.classList.remove("is-scroll-following");
-    if (placeholder) {
-      placeholder.classList.remove("active");
-      placeholder.style.height = "0px";
-    }
-  }
-
-  function updateMemorySearchFollowPosition() {
-    const section = document.getElementById("memoryCardsSection");
-    const bar = document.getElementById("memorySearchSticky") || document.querySelector("#memoryCardsSection .memory-search-sticky");
-    if (!section || !bar) return;
-
-    const placeholder = ensureFollowPlaceholder(bar);
-    const visible = isFlashcardPanelVisible(section);
-    if (!visible) {
-      releaseMemorySearchFollow(bar, placeholder);
-      return;
-    }
-
-    const topOffset = getTopbarHeightForFollow() + 8;
-    document.documentElement.style.setProperty("--memory-search-top", `${topOffset}px`);
-    document.documentElement.style.setProperty("--memory-search-top-mobile", `${topOffset}px`);
-
-    const scrollTop = getPageScrollTop();
-    const wasFixed = bar.classList.contains("is-scroll-following");
-    if (wasFixed) bar.classList.remove("is-scroll-following");
-
-    const anchorRect = placeholder.classList.contains("active")
-      ? placeholder.getBoundingClientRect()
-      : bar.getBoundingClientRect();
-    const anchorTop = anchorRect.top + scrollTop;
-    const sectionRect = section.getBoundingClientRect();
-    const sectionBottom = sectionRect.bottom + scrollTop;
-    const barHeight = Math.max(1, Math.round(bar.offsetHeight || anchorRect.height || 62));
-    const shouldFollow = scrollTop + topOffset >= anchorTop && scrollTop + topOffset + barHeight < sectionBottom - 12;
-
-    if (!shouldFollow) {
-      releaseMemorySearchFollow(bar, placeholder);
-      return;
-    }
-
-    placeholder.classList.add("active");
-    placeholder.style.height = `${barHeight}px`;
-
-    const parentRect = (bar.parentElement || section).getBoundingClientRect();
-    document.documentElement.style.setProperty("--memory-search-left", `${Math.round(parentRect.left)}px`);
-    document.documentElement.style.setProperty("--memory-search-width", `${Math.round(parentRect.width)}px`);
-    bar.classList.add("is-scroll-following");
-  }
-
-  function setupMemorySearchFollow() {
-    const bar = document.getElementById("memorySearchSticky") || document.querySelector("#memoryCardsSection .memory-search-sticky");
-    if (!bar || bar.dataset.hacibeyFollowReady === "true") return;
-    bar.dataset.hacibeyFollowReady = "true";
-    ensureFollowPlaceholder(bar);
-
-    [window, document, document.documentElement, document.body].forEach((target) => {
-      target.addEventListener?.("scroll", updateMemorySearchFollowPosition, { passive: true });
-    });
-    window.addEventListener("resize", updateMemorySearchFollowPosition, { passive: true });
-    window.addEventListener("orientationchange", () => setTimeout(updateMemorySearchFollowPosition, 180), { passive: true });
-
-    requestAnimationFrame(() => {
-      syncFavoriteFilterButton();
-      applyFlashcardFavoriteFilter();
-      updateMemorySearchFollowPosition();
-    });
-  }
-
-  window.updateMemorySearchFollowPosition = updateMemorySearchFollowPosition;
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setupMemorySearchFollow);
-  } else {
-    setupMemorySearchFollow();
   }
 })();
