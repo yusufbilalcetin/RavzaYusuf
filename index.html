@@ -1,8 +1,15 @@
+
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#7b1731" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f080b" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
   <title>Ravza 💗 | EUL Study System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -259,8 +266,26 @@
           <div class="page-header-left">
             <span class="unit-badge memory-badge">MEMORY HUB</span>
             <h2>Ezber Merkezi</h2>
-            <p class="subtitle">Ezber Merkezi iki ayrı bölümden oluşur: üstte 4 şıklı çalışma alanı, altta kart çevirme bölümü.</p>
+            <p class="subtitle">Beş farklı modda çalış: test, flashcard, eşleştirme, yazma ve zayıf kelimeler.</p>
           </div>
+        </div>
+
+        <div class="memory-tab-bar" role="tablist" aria-label="Ezber çalışma modu">
+          <button type="button" class="memory-tab-btn active" data-mem-tab="practice" onclick="setMemoryTab('practice')" role="tab">
+            <span class="memory-tab-icon">📝</span><span class="memory-tab-label">4 Şıklı Test</span>
+          </button>
+          <button type="button" class="memory-tab-btn" data-mem-tab="cards" onclick="setMemoryTab('cards')" role="tab">
+            <span class="memory-tab-icon">🃏</span><span class="memory-tab-label">Flashcard</span>
+          </button>
+          <button type="button" class="memory-tab-btn" data-mem-tab="matching" onclick="setMemoryTab('matching')" role="tab">
+            <span class="memory-tab-icon">🔗</span><span class="memory-tab-label">Eşleştirme</span>
+          </button>
+          <button type="button" class="memory-tab-btn" data-mem-tab="typing" onclick="setMemoryTab('typing')" role="tab">
+            <span class="memory-tab-icon">⌨️</span><span class="memory-tab-label">Yazma Testi</span>
+          </button>
+          <button type="button" class="memory-tab-btn" data-mem-tab="weak" onclick="setMemoryTab('weak')" role="tab">
+            <span class="memory-tab-icon">💔</span><span class="memory-tab-label">Zayıf Kelimeler</span>
+          </button>
         </div>
 
         <div id="memoryPracticeSection" class="memory-section-shell">
@@ -300,8 +325,20 @@
           </div>
 
           <div class="memory-cards-shell">
-            <div class="hub-toolbar memory-toolbar">
-              <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
+            <div class="hub-toolbar memory-toolbar memory-search-sticky" id="memorySearchSticky">
+              <div class="memory-search-row">
+                <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
+                <button
+                  type="button"
+                  id="memoryFavFilterBtn"
+                  class="memory-favorite-filter-btn"
+                  onclick="toggleFlashcardFavoriteFilter()"
+                  aria-pressed="false"
+                  title="Sadece favori kelimeleri göster">
+                  <span class="fav-filter-icon">♡</span>
+                  <span class="fav-filter-text">Favoriler</span>
+                </button>
+              </div>
               <div class="hub-legend">
                 <span><i class="dot exam"></i> Tıkla ve çevir</span>
                 <span><i class="dot success"></i> İngilizce → Türkçe</span>
@@ -309,6 +346,81 @@
             </div>
 
             <div id="memoryHubGrid" class="memory-grid"></div>
+          </div>
+        </div>
+
+        <div id="memoryMatchingSection" class="memory-section-shell" hidden>
+          <div class="memory-section-head">
+            <div>
+              <span class="unit-badge quiz-badge">MATCHING</span>
+              <h3 class="memory-section-title">Kelime Eşleştirme</h3>
+              <p class="helper-line">Sol tarafta İngilizce kelimeler, sağ tarafta Türkçe anlamlar. Önce kelimeyi, sonra doğru anlamı seç.</p>
+            </div>
+          </div>
+
+          <div class="matching-shell">
+            <div class="matching-toolbar">
+              <div class="matching-stats">
+                <span class="matching-pill"><strong id="matchingPairsLeft">0</strong> kalan</span>
+                <span class="matching-pill"><strong id="matchingWrongCount">0</strong> yanlış</span>
+                <span class="matching-pill"><strong id="matchingTimer">0:00</strong></span>
+              </div>
+              <div class="matching-controls">
+                <label class="matching-size-toggle">
+                  <span>Çift sayısı</span>
+                  <select id="matchingSizeSelect" onchange="changeMatchingSize(this.value)">
+                    <option value="6">6 çift</option>
+                    <option value="8" selected>8 çift</option>
+                    <option value="10">10 çift</option>
+                  </select>
+                </label>
+                <button type="button" class="ghost-btn small" onclick="resetMatchingGame()">🔄 Yenile</button>
+              </div>
+            </div>
+
+            <div class="matching-scroll">
+              <div id="matchingBoard" class="matching-board"></div>
+            </div>
+            <div id="matchingResult" class="matching-result" hidden></div>
+          </div>
+        </div>
+
+        <div id="memoryTypingSection" class="memory-section-shell" hidden>
+          <div class="memory-section-head">
+            <div>
+              <span class="unit-badge quiz-badge">TYPING</span>
+              <h3 class="memory-section-title">Yazma Testi</h3>
+              <p class="helper-line">Türkçe anlamı oku, İngilizce kelimeyi yaz. Türkçe klavye farkları otomatik tolere edilir.</p>
+            </div>
+          </div>
+
+          <div class="typing-shell">
+            <div class="typing-stats">
+              <span class="matching-pill">✅ <strong id="typingCorrectCount">0</strong> doğru</span>
+              <span class="matching-pill">❌ <strong id="typingWrongCount">0</strong> yanlış</span>
+              <span class="matching-pill">🔥 <strong id="typingStreak">0</strong> seri</span>
+            </div>
+
+            <div id="typingCard" class="typing-card"></div>
+          </div>
+        </div>
+
+        <div id="memoryWeakSection" class="memory-section-shell" hidden>
+          <div class="memory-section-head">
+            <div>
+              <span class="unit-badge memory-badge">WEAK WORDS</span>
+              <h3 class="memory-section-title">Zayıf Kelimeler</h3>
+              <p class="helper-line">En çok yanlış yaptığın kelimeler burada listelenir. Üzerlerine çalışmak için bir mod seç.</p>
+            </div>
+          </div>
+
+          <div class="weak-shell">
+            <div class="weak-actions">
+              <button type="button" class="primary-btn" onclick="startWeakWordPractice('practice')">📝 Zayıflarla 4 Şıklı Test</button>
+              <button type="button" class="primary-btn soft" onclick="startWeakWordPractice('typing')">⌨️ Zayıflarla Yazma Testi</button>
+              <button type="button" class="ghost-btn small" onclick="clearMemoryStats()">🗑️ İstatistikleri Sıfırla</button>
+            </div>
+            <div id="weakWordList" class="weak-words-list"></div>
           </div>
         </div>
       </section>
@@ -420,6 +532,8 @@
       </section>
     </div>
   </main>
+
+  <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Yukarı çık" title="Yukarı çık">⌃</button>
 
   <script type="module" src="script.js"></script>
 </body>

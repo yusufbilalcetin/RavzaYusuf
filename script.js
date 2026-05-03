@@ -5187,3 +5187,1490 @@ document.addEventListener("keydown", (event) => {
 
   syncMobileUiState();
 })();
+
+
+/* =========================================================
+   MEMORY HUB UPGRADE PATCH
+   - Sekme sistemi (practice / cards / matching / typing / weak)
+   - MEMORIZATION_CARDS Türkçe düzeltmesi + augment (word/meaning/example/unit/category)
+   - Kelime eşleştirme oyunu
+   - Yazma testi (normalizeTypedAnswer ile esnek kontrol)
+   - Zayıf kelimeler modu (eul_memory_stats)
+   - Bugünün 10 kelimesi
+   - Favori kelimeler (eul_favorite_words)
+   - Firestore: progress/ravza.memoryStats / favoriteWords senkronizasyonu
+   ========================================================= */
+(function applyMemoryHubUpgradePatch() {
+  // ---- 1. Türkçe anlam düzeltme haritası ----
+  // EXTRA_MEMORIZATION_CARDS ASCII'ye çevirdiği için tüm Türkçe karakterleri geri yükle.
+  // Aynı zamanda zenginleştirilmiş alan (alternativeMeanings, example, unit, category) de ekle.
+  const MEMORY_FIXES = {
+    "mem-1":  { word: "researchers", meaning: "araştırmacılar", alt: ["bilim insanları"], example: "Researchers are working on new ways to reduce air pollution.", unit: "1A", category: "Vocabulary" },
+    "mem-2":  { word: "evidence", meaning: "kanıt", alt: ["delil"], example: "There is strong evidence that exercise improves mental health.", unit: "1A", category: "Vocabulary" },
+    "mem-3":  { word: "survey", meaning: "anket", alt: ["araştırma"], example: "The teacher did a survey to find out students' favourite books.", unit: "1A", category: "Vocabulary" },
+    "mem-4":  { word: "the average", meaning: "ortalama", alt: [], example: "The average score in the exam was 75.", unit: "1A", category: "Vocabulary" },
+    "mem-5":  { word: "scale", meaning: "ölçek", alt: ["skala"], example: "The pain is measured on a scale from 1 to 10.", unit: "1A", category: "Vocabulary" },
+    "mem-6":  { word: "rank", meaning: "sıralamak", alt: ["derecelendirmek"], example: "Students were ranked according to their results.", unit: "1A", category: "Vocabulary" },
+    "mem-7":  { word: "likely", meaning: "muhtemel", alt: ["olası"], example: "It is likely that it will rain tomorrow.", unit: "1A", category: "Vocabulary" },
+    "mem-8":  { word: "overall", meaning: "genel olarak", alt: ["bütünüyle"], example: "Overall, the project was a success.", unit: "1A", category: "Vocabulary" },
+    "mem-9":  { word: "beyond", meaning: "ötesinde", alt: ["dışında"], example: "His kindness goes beyond what we imagined.", unit: "1A", category: "Vocabulary" },
+    "mem-10": { word: "create a new image", meaning: "yeni bir imaj oluşturmak", alt: [], example: "The company tried to create a new image after the scandal.", unit: "1A", category: "Phrase" },
+    "mem-11": { word: "go about", meaning: "bir işi ele almak", alt: ["bir şeye girişmek"], example: "How should we go about solving this problem?", unit: "1A", category: "Phrasal Verb" },
+    "mem-12": { word: "proof", meaning: "ispat", alt: ["kanıt"], example: "She showed proof of her identity at the airport.", unit: "1A", category: "Vocabulary" },
+    "mem-13": { word: "seek to", meaning: "amaçlamak", alt: ["çalışmak"], example: "The organization seeks to help poor communities.", unit: "1A", category: "Phrase" },
+    "mem-14": { word: "stand out", meaning: "öne çıkmak", alt: ["dikkat çekmek"], example: "Her bright dress made her stand out in the crowd.", unit: "1A", category: "Phrasal Verb" },
+    "mem-15": { word: "solicitor", meaning: "avukat", alt: ["hukuk müşaviri"], example: "He contacted a solicitor for help with his contract.", unit: "1A", category: "Vocabulary" },
+    "mem-16": { word: "for fun", meaning: "eğlence için", alt: [], example: "She paints for fun in her free time.", unit: "1A", category: "Phrase" },
+    "mem-17": { word: "birth certificate", meaning: "doğum belgesi", alt: [], example: "You need a birth certificate to apply for a passport.", unit: "1A", category: "Vocabulary" },
+    "mem-18": { word: "feel sorry", meaning: "üzülmek", alt: ["acımak"], example: "I feel sorry for him because he lost his job.", unit: "1A", category: "Phrase" },
+    "mem-19": { word: "maiden name", meaning: "kızlık soyadı", alt: [], example: "She still uses her maiden name at work.", unit: "1A", category: "Vocabulary" },
+    "mem-20": { word: "full name", meaning: "tam ad", alt: ["ad ve soyad"], example: "Please write your full name on the form.", unit: "1A", category: "Vocabulary" },
+    "mem-21": { word: "nickname", meaning: "lakap", alt: ["takma ad"], example: "His nickname at school was Ace.", unit: "1A", category: "Vocabulary" },
+    "mem-22": { word: "be named after", meaning: "adını birinden almak", alt: [], example: "She was named after her grandmother.", unit: "1A", category: "Phrase" },
+    "mem-23": { word: "initials", meaning: "baş harfler", alt: [], example: "His initials are A.K.", unit: "1A", category: "Vocabulary" },
+    "mem-24": { word: "brand name", meaning: "marka adı", alt: [], example: "This brand name is known worldwide.", unit: "1A", category: "Vocabulary" },
+    "mem-25": { word: "common", meaning: "yaygın", alt: ["sık görülen"], example: "It is common to see tourists in this area.", unit: "1A", category: "Adjective" },
+    "mem-26": { word: "old-fashioned", meaning: "eski tarz", alt: ["demode", "modası geçmiş"], example: "That style of clothing looks old-fashioned now.", unit: "1A", category: "Adjective" },
+    "mem-27": { word: "celebrity", meaning: "ünlü", alt: ["şöhret"], example: "The restaurant is popular with celebrities.", unit: "1A", category: "Vocabulary" },
+    "mem-28": { word: "suit", meaning: "yakışmak", alt: ["uygun olmak"], example: "That colour really suits you.", unit: "1A", category: "Verb" },
+    "mem-29": { word: "direct object", meaning: "doğrudan nesne", alt: ["dolaysız nesne"], example: "In 'I bought a book', a book is the direct object.", unit: "1A", category: "Grammar" },
+    "mem-30": { word: "indirect object", meaning: "dolaylı nesne", alt: [], example: "In 'I gave him a pen', him is the indirect object.", unit: "1A", category: "Grammar" },
+    "mem-31": { word: "object pronoun", meaning: "nesne zamiri", alt: [], example: "me, you, him, her, us, them.", unit: "1A", category: "Grammar" },
+    "mem-32": { word: "possessive adjective", meaning: "iyelik sıfatı", alt: [], example: "my, your, his, her, our, their.", unit: "2B", category: "Grammar" },
+    "mem-33": { word: "possessive pronoun", meaning: "iyelik zamiri", alt: [], example: "mine, yours, his, hers, ours, theirs.", unit: "2B", category: "Grammar" },
+    "mem-34": { word: "lend", meaning: "ödünç vermek", alt: ["borç vermek"], example: "Can you lend me your pen?", unit: "1A", category: "Verb" },
+    "mem-35": { word: "borrow", meaning: "ödünç almak", alt: [], example: "I borrowed a book from the library.", unit: "1A", category: "Verb" },
+    "mem-36": { word: "ambitious", meaning: "hırslı", alt: ["azimli", "tutkulu"], example: "She is a very ambitious person.", unit: "1B", category: "Adjective" },
+    "mem-37": { word: "selfish", meaning: "bencil", alt: [], example: "Cats are more selfish than dogs.", unit: "1B", category: "Adjective" },
+    "mem-38": { word: "expensive", meaning: "pahalı", alt: [], example: "iPhones are much more expensive than Redmi.", unit: "1B", category: "Adjective" },
+    "mem-39": { word: "cheap", meaning: "ucuz", alt: [], example: "I bought a cheap ticket online.", unit: "1B", category: "Adjective" },
+    "mem-40": { word: "comfortable", meaning: "rahat", alt: ["konforlu"], example: "This sofa is very comfortable.", unit: "1B", category: "Adjective" },
+    "mem-41": { word: "successful", meaning: "başarılı", alt: [], example: "She is a successful engineer.", unit: "1B", category: "Adjective" },
+    "mem-42": { word: "friendly", meaning: "dost canlısı", alt: ["arkadaş canlısı"], example: "The staff were really friendly.", unit: "1B", category: "Adjective" },
+    "mem-43": { word: "stative verb", meaning: "durum fiili", alt: [], example: "Know, want and believe are stative verbs.", unit: "2A", category: "Grammar" },
+    "mem-44": { word: "possession", meaning: "sahiplik", alt: ["sahip olma"], example: "He has many possessions.", unit: "2B", category: "Grammar" },
+    "mem-45": { word: "opinion", meaning: "görüş", alt: ["fikir"], example: "What is your opinion on this?", unit: "2A", category: "Vocabulary" },
+    "mem-46": { word: "arrangement", meaning: "önceden ayarlanmış plan", alt: ["düzenleme"], example: "I have an arrangement with the dentist.", unit: "2A", category: "Vocabulary" },
+    "mem-47": { word: "timetable", meaning: "tarife", alt: ["zaman çizelgesi"], example: "The flight timetable changed.", unit: "2A", category: "Vocabulary" },
+    "mem-48": { word: "ownership", meaning: "sahiplik", alt: ["mülkiyet"], example: "Ownership of the house is shared.", unit: "2B", category: "Vocabulary" },
+    "mem-49": { word: "share", meaning: "paylaşmak", alt: ["bölüşmek"], example: "Emma and Mia share a flat.", unit: "2B", category: "Verb" },
+    "mem-50": { word: "separate", meaning: "ayrı", alt: ["ayırmak"], example: "They have separate bedrooms.", unit: "2B", category: "Adjective" },
+    "mem-51": { word: "own", meaning: "kendine ait", alt: ["sahip olmak"], example: "She has her own room.", unit: "2B", category: "Adjective" },
+    "mem-52": { word: "colleague", meaning: "iş arkadaşı", alt: ["meslektaş"], example: "My colleague helped me with the project.", unit: "2B", category: "Vocabulary" },
+    "mem-53": { word: "bakery", meaning: "fırın", alt: [], example: "I bought fresh bread at the bakery.", unit: "3A", category: "Vocabulary" },
+    "mem-54": { word: "habit", meaning: "alışkanlık", alt: [], example: "Reading before bed is a good habit.", unit: "3A", category: "Vocabulary" },
+    "mem-55": { word: "interrupted", meaning: "bölünmüş", alt: ["kesintiye uğramış"], example: "I was reading when she interrupted me.", unit: "3A", category: "Adjective" },
+    "mem-56": { word: "background action", meaning: "arka plan eylemi", alt: [], example: "Past continuous shows a background action.", unit: "3A", category: "Grammar" },
+    "mem-57": { word: "across", meaning: "karşıya", alt: ["bir uçtan diğer uca"], example: "She swam across the lake.", unit: "3B", category: "Preposition" },
+    "mem-58": { word: "through", meaning: "içinden geçerek", alt: [], example: "The car drove through the tunnel.", unit: "3B", category: "Preposition" },
+    "mem-59": { word: "along", meaning: "boyunca", alt: [], example: "We walked along the beach.", unit: "3B", category: "Preposition" },
+    "mem-60": { word: "towards", meaning: "-e doğru", alt: [], example: "The child ran towards her mother.", unit: "3B", category: "Preposition" },
+    "mem-61": { word: "apply for", meaning: "başvurmak", alt: [], example: "She applied for the job.", unit: "3B", category: "Phrasal Verb" },
+    "mem-62": { word: "rely on", meaning: "güvenmek", alt: ["bel bağlamak"], example: "You can rely on me.", unit: "3B", category: "Phrasal Verb" },
+    "mem-63": { word: "proud of", meaning: "gurur duymak", alt: [], example: "I am proud of you.", unit: "3B", category: "Phrase" },
+    "mem-64": { word: "worried about", meaning: "endişeli olmak", alt: [], example: "She is worried about the exam.", unit: "3B", category: "Phrase" },
+    "mem-65": { word: "prediction", meaning: "tahmin", alt: [], example: "The prediction came true.", unit: "4A", category: "Vocabulary" },
+    "mem-66": { word: "promise", meaning: "söz vermek", alt: ["vaat"], example: "I promise I will call you.", unit: "4A", category: "Verb" },
+    "mem-67": { word: "offer", meaning: "teklif etmek", alt: ["teklif"], example: "I'll offer you a hand.", unit: "4A", category: "Verb" },
+    "mem-68": { word: "instant decision", meaning: "anında verilen karar", alt: [], example: "I'll get it. (instant decision with will)", unit: "4A", category: "Grammar" },
+    "mem-69": { word: "intention", meaning: "niyet", alt: ["amaç"], example: "She has good intentions.", unit: "4A", category: "Vocabulary" },
+    "mem-70": { word: "evidence-based", meaning: "kanıta dayalı", alt: [], example: "We need an evidence-based approach.", unit: "4A", category: "Adjective" },
+    "mem-71": { word: "conditional", meaning: "koşul yapısı", alt: ["şart kipi"], example: "The first conditional uses if + present simple.", unit: "4B", category: "Grammar" },
+    "mem-72": { word: "imaginary", meaning: "hayali", alt: ["gerçek dışı"], example: "The second conditional describes imaginary situations.", unit: "4B", category: "Adjective" },
+    "mem-73": { word: "consequence", meaning: "sonuç", alt: [], example: "Every action has a consequence.", unit: "4B", category: "Vocabulary" },
+    "mem-74": { word: "unless", meaning: "eğer ... değilse", alt: [], example: "Unless it rains, we will go out.", unit: "4B", category: "Conjunction" },
+    "mem-75": { word: "already", meaning: "zaten", alt: ["çoktan"], example: "I have already finished.", unit: "5A", category: "Adverb" },
+    "mem-76": { word: "yet", meaning: "henüz", alt: ["şimdiye kadar"], example: "Have you finished yet?", unit: "5A", category: "Adverb" },
+    "mem-77": { word: "recently", meaning: "yakın zamanda", alt: [], example: "I have recently moved.", unit: "5A", category: "Adverb" },
+    "mem-78": { word: "lately", meaning: "son zamanlarda", alt: [], example: "What have you been doing lately?", unit: "5B", category: "Adverb" },
+    "mem-79": { word: "since", meaning: "-den beri", alt: [], example: "I have lived here since 2010.", unit: "5A", category: "Preposition" },
+    "mem-80": { word: "obligation", meaning: "zorunluluk", alt: ["yükümlülük"], example: "You have an obligation to attend.", unit: "6A", category: "Vocabulary" },
+    "mem-81": { word: "necessity", meaning: "gereklilik", alt: ["ihtiyaç"], example: "Water is a necessity.", unit: "6A", category: "Vocabulary" },
+    "mem-82": { word: "prohibition", meaning: "yasak", alt: [], example: "There is a prohibition on smoking here.", unit: "6A", category: "Vocabulary" },
+    "mem-83": { word: "advice", meaning: "tavsiye", alt: ["öğüt"], example: "Can I give you some advice?", unit: "6A", category: "Vocabulary" },
+    "mem-84": { word: "ability", meaning: "yetenek", alt: ["beceri"], example: "She has the ability to learn quickly.", unit: "6B", category: "Vocabulary" },
+    "mem-85": { word: "permission", meaning: "izin", alt: [], example: "May I have permission to leave?", unit: "6B", category: "Vocabulary" },
+    "mem-86": { word: "deduction", meaning: "mantıksal çıkarım", alt: ["çıkarsama"], example: "He must be at home — that's a deduction.", unit: "6B", category: "Grammar" },
+    "mem-87": { word: "manage to", meaning: "başarmak", alt: ["üstesinden gelmek"], example: "I managed to finish on time.", unit: "6B", category: "Phrase" },
+    "mem-88": { word: "get up", meaning: "kalkmak", alt: [], example: "I get up at 7 every day.", unit: "7A", category: "Phrasal Verb" },
+    "mem-89": { word: "set off", meaning: "yola çıkmak", alt: ["harekete geçmek"], example: "We set off early in the morning.", unit: "7A", category: "Phrasal Verb" },
+    "mem-90": { word: "switch off", meaning: "kapatmak", alt: ["söndürmek"], example: "Please switch off the lights.", unit: "7A", category: "Phrasal Verb" },
+    "mem-91": { word: "fill in", meaning: "doldurmak", alt: [], example: "Please fill in the form.", unit: "7A", category: "Phrasal Verb" },
+    "mem-92": { word: "put away", meaning: "yerine koymak", alt: ["kaldırmak"], example: "Put away your toys.", unit: "7A", category: "Phrasal Verb" },
+    "mem-93": { word: "pay back", meaning: "geri ödemek", alt: [], example: "I will pay you back tomorrow.", unit: "7A", category: "Phrasal Verb" },
+    "mem-94": { word: "take after", meaning: "birine benzemek", alt: [], example: "She takes after her mother.", unit: "7A", category: "Phrasal Verb" },
+    "mem-95": { word: "look after", meaning: "bakmak", alt: ["ilgilenmek"], example: "She looks after her children.", unit: "7A", category: "Phrasal Verb" },
+    "mem-96": { word: "look forward to", meaning: "heyecanla beklemek", alt: ["dört gözle beklemek"], example: "I look forward to seeing you.", unit: "7A", category: "Phrasal Verb" },
+    "mem-97": { word: "give away", meaning: "bedava vermek", alt: ["dağıtmak"], example: "She gave away her old clothes.", unit: "7A", category: "Phrasal Verb" },
+    "mem-98": { word: "agree to", meaning: "kabul etmek", alt: ["razı olmak"], example: "He agreed to help us.", unit: "7B", category: "Phrase" },
+    "mem-99": { word: "decide to", meaning: "karar vermek", alt: [], example: "I decided to study harder.", unit: "7B", category: "Phrase" },
+    "mem-100": { word: "avoid", meaning: "kaçınmak", alt: ["sakınmak"], example: "She avoids eating sugar.", unit: "7B", category: "Verb" },
+    "mem-101": { word: "allow", meaning: "izin vermek", alt: [], example: "Smoking is not allowed here.", unit: "7B", category: "Verb" },
+    "mem-102": { word: "persuade", meaning: "ikna etmek", alt: ["razı etmek"], example: "She persuaded me to go.", unit: "7B", category: "Verb" },
+    "mem-103": { word: "have something done", meaning: "bir işi birine yaptırmak", alt: [], example: "I had my hair cut yesterday.", unit: "8A", category: "Grammar" },
+    "mem-104": { word: "get something done", meaning: "bir işi yaptırtmak", alt: [], example: "I got my car repaired.", unit: "8A", category: "Grammar" },
+    "mem-105": { word: "repair", meaning: "tamir etmek", alt: ["onarmak"], example: "Can you repair my watch?", unit: "8A", category: "Verb" },
+    "mem-106": { word: "redecorate", meaning: "yeniden dekore etmek", alt: [], example: "We are redecorating the kitchen.", unit: "8A", category: "Verb" },
+    "mem-107": { word: "passive voice", meaning: "edilgen yapı", alt: ["edilgen çatı"], example: "The cake was eaten by the children.", unit: "8B", category: "Grammar" },
+    "mem-108": { word: "reported speech", meaning: "dolaylı anlatım", alt: ["aktarılmış anlatım"], example: "She said that she was tired.", unit: "9A", category: "Grammar" },
+    "mem-109": { word: "whether", meaning: "olup olmadığı", alt: [], example: "I don't know whether he is coming.", unit: "9A", category: "Conjunction" },
+    "mem-110": { word: "request", meaning: "rica", alt: ["talep"], example: "Can I make a request?", unit: "9A", category: "Vocabulary" },
+    "mem-111": { word: "third conditional", meaning: "üçüncü koşul yapısı", alt: [], example: "If I had studied, I would have passed.", unit: "9B", category: "Grammar" },
+    "mem-112": { word: "regret", meaning: "pişmanlık", alt: ["pişman olmak"], example: "I regret not studying harder.", unit: "9B", category: "Vocabulary" },
+    "mem-113": { word: "auxiliary verb", meaning: "yardımcı fiil", alt: [], example: "Be, do and have are auxiliary verbs.", unit: "10A", category: "Grammar" },
+    "mem-114": { word: "main verb", meaning: "ana fiil", alt: [], example: "In 'I am running', running is the main verb.", unit: "10A", category: "Grammar" },
+    "mem-115": { word: "phrasal verb", meaning: "edatlı fiil", alt: ["fiil + edat"], example: "Look up, turn off and go away are phrasal verbs.", unit: "7A", category: "Grammar" },
+    "mem-116": { word: "type 1", meaning: "nesnesiz / ayrılmaz", alt: [], example: "Go away, eat out, get up.", unit: "7A", category: "Grammar" },
+    "mem-117": { word: "type 2", meaning: "nesneli / ayrılabilir", alt: [], example: "Turn off the lights / turn the lights off.", unit: "7A", category: "Grammar" },
+    "mem-118": { word: "type 3", meaning: "nesneli / ayrılmaz", alt: [], example: "Look for the keys.", unit: "7A", category: "Grammar" },
+    "mem-119": { word: "call her back", meaning: "zamir fiil ile edat arasına gelir", alt: [], example: "Call her back, not call back her.", unit: "7A", category: "Grammar" },
+    "mem-120": { word: "can", meaning: "şimdiki yetenek / izin", alt: ["yapabilmek"], example: "She can swim.", unit: "6B", category: "Modal" },
+    "mem-121": { word: "could", meaning: "geçmişteki genel yetenek", alt: [], example: "When I was 5, I could dance.", unit: "6B", category: "Modal" },
+    "mem-122": { word: "be able to", meaning: "yapabilmek (tüm zamanlarda)", alt: [], example: "I have been able to drive since 2011.", unit: "6B", category: "Modal" },
+    "mem-123": { word: "must", meaning: "kesinlikle öyle olmalı", alt: ["güçlü çıkarım"], example: "He must be at home; the lights are on.", unit: "6B", category: "Modal" },
+    "mem-124": { word: "can't", meaning: "imkansız / öyle olamaz", alt: [], example: "She can't be Kate. She is in Italy.", unit: "6B", category: "Modal" },
+    "mem-125": { word: "might / could", meaning: "olasılık", alt: ["belki"], example: "He might be at school.", unit: "6B", category: "Modal" },
+    "mem-126": { word: "being able to", meaning: "yapabilmek (gerund hali)", alt: [], example: "I like being able to read quickly.", unit: "6B", category: "Modal" }
+  };
+
+  // ---- 2. MEMORIZATION_CARDS'ı in-place augment et ----
+  MEMORIZATION_CARDS.forEach((card) => {
+    const fix = MEMORY_FIXES[card.id];
+    if (!fix) return;
+    card.front = fix.word.charAt(0).toUpperCase() + fix.word.slice(1);
+    card.back = fix.meaning;
+    card.word = fix.word;
+    card.meaning = fix.meaning;
+    card.alternativeMeanings = fix.alt || [];
+    card.example = fix.example || "";
+    card.unit = fix.unit || "";
+    card.category = fix.category || "";
+  });
+
+  // Eksik kartlar varsa güvence için doldur (defensive)
+  MEMORIZATION_CARDS.forEach((card) => {
+    if (!card.word) card.word = (card.front || "").toLowerCase();
+    if (!card.meaning) card.meaning = card.back || "";
+    if (!Array.isArray(card.alternativeMeanings)) card.alternativeMeanings = [];
+    if (typeof card.example !== "string") card.example = "";
+    if (typeof card.unit !== "string") card.unit = "";
+    if (typeof card.category !== "string") card.category = "";
+  });
+
+  // ---- 3. localStorage helpers ----
+  const STATS_KEY = "eul_memory_stats";
+  const FAV_KEY = "eul_favorite_words";
+  const DAILY_KEY = "eul_daily_ten";
+
+  function safeParse(raw, fallback) {
+    if (!raw) return fallback;
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed === null || parsed === undefined ? fallback : parsed;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function getMemoryStats() {
+    return safeParse(localStorage.getItem(STATS_KEY), {});
+  }
+  function saveMemoryStats(stats) {
+    try {
+      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    } catch (e) {
+      console.warn("memoryStats kaydedilemedi:", e);
+    }
+    syncMemoryStatsToFirebase(stats);
+  }
+
+  function getFavorites() {
+    const arr = safeParse(localStorage.getItem(FAV_KEY), []);
+    return Array.isArray(arr) ? arr : [];
+  }
+  function saveFavorites(list) {
+    try {
+      localStorage.setItem(FAV_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn("favorites kaydedilemedi:", e);
+    }
+    syncFavoritesToFirebase(list);
+  }
+
+  async function syncMemoryStatsToFirebase(stats) {
+    try {
+      await setDoc(progressRef, { memoryStats: stats, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (e) {
+      // sessizce localStorage'a fallback
+    }
+  }
+  async function syncFavoritesToFirebase(list) {
+    try {
+      await setDoc(progressRef, { favoriteWords: list, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (e) { /* fallback */ }
+  }
+
+  async function loadMemoryExtrasFromFirebase() {
+    try {
+      const snap = await getDoc(progressRef);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      if (data.memoryStats && typeof data.memoryStats === "object") {
+        try { localStorage.setItem(STATS_KEY, JSON.stringify(data.memoryStats)); } catch {}
+      }
+      if (Array.isArray(data.favoriteWords)) {
+        try { localStorage.setItem(FAV_KEY, JSON.stringify(data.favoriteWords)); } catch {}
+      }
+    } catch { /* offline ok */ }
+  }
+
+  // ---- 4. Mastery hesaplama ----
+  function computeMastery(stat) {
+    const total = (stat.correctCount || 0) + (stat.wrongCount || 0);
+    if (total === 0) return "weak";
+    const ratio = (stat.correctCount || 0) / total;
+    const streak = stat.streak || 0;
+    if (streak >= 5 && ratio >= 0.9) return "mastered";
+    if (streak >= 3 && ratio >= 0.75) return "strong";
+    if (ratio >= 0.6) return "medium";
+    if (ratio >= 0.3) return "learning";
+    return "weak";
+  }
+
+  function recordMemoryAttempt(cardId, isCorrect, typedAnswer) {
+    if (!cardId) return;
+    const card = MEMORIZATION_CARDS.find((c) => c.id === cardId);
+    if (!card) return;
+
+    const stats = getMemoryStats();
+    const existing = stats[cardId] || {
+      cardId,
+      word: card.word,
+      meaning: card.meaning,
+      correctCount: 0,
+      wrongCount: 0,
+      streak: 0,
+      mastery: "weak",
+      selectedWrongAnswers: [],
+      lastCorrectAt: null,
+      lastWrongAt: null
+    };
+
+    const now = new Date().toISOString();
+    if (isCorrect) {
+      existing.correctCount += 1;
+      existing.streak = (existing.streak || 0) + 1;
+      existing.lastCorrectAt = now;
+    } else {
+      existing.wrongCount += 1;
+      existing.streak = 0;
+      existing.lastWrongAt = now;
+      if (typedAnswer && existing.selectedWrongAnswers.length < 20) {
+        existing.selectedWrongAnswers.push(String(typedAnswer).slice(0, 80));
+      }
+    }
+    existing.word = card.word;
+    existing.meaning = card.meaning;
+    existing.mastery = computeMastery(existing);
+
+    stats[cardId] = existing;
+    saveMemoryStats(stats);
+  }
+
+  function clearMemoryStats() {
+    if (!confirm("Tüm kelime istatistiklerini sıfırlamak istediğinden emin misin?")) return;
+    try { localStorage.removeItem(STATS_KEY); } catch {}
+    syncMemoryStatsToFirebase({});
+    if (currentMemoryTab === "weak") renderWeakWords();
+  }
+
+  // ---- 5. Türkçe-uyumlu cevap normalizasyonu ----
+  function normalizeTypedAnswer(value) {
+    if (value === null || value === undefined) return "";
+    let s = String(value);
+    // Mojibake / unicode normalize
+    try { s = s.normalize("NFKC"); } catch {}
+    s = s.toLowerCase();
+    // Apostrof / tire varyasyonları
+    s = s.replace(/[‘’ʼ‛`´]/g, "'");
+    s = s.replace(/[–—−]/g, "-");
+    // Türkçe → ASCII eşlemeleri (klavye farkı toleransı için)
+    const map = {
+      "ı": "i", "İ": "i", "i̇": "i",
+      "ş": "s", "Ş": "s",
+      "ç": "c", "Ç": "c",
+      "ğ": "g", "Ğ": "g",
+      "ü": "u", "Ü": "u",
+      "ö": "o", "Ö": "o"
+    };
+    s = s.replace(/[ışçğüöİŞÇĞÜÖ]/g, (ch) => map[ch] || ch);
+    // Tire-boşluk normalize: "well-paid" ile "well paid" eşit kabul edilsin
+    s = s.replace(/-/g, " ");
+    // Çift boşlukları teke indir
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+  }
+
+  function checkTypedAnswer(card, typed) {
+    const target = normalizeTypedAnswer(card.word);
+    const candidate = normalizeTypedAnswer(typed);
+    if (!candidate) return false;
+    if (candidate === target) return true;
+    const accepted = (card.acceptedAnswers || []).map(normalizeTypedAnswer);
+    return accepted.includes(candidate);
+  }
+
+  // ---- 6. Tab yönetimi ----
+  let currentMemoryTab = "practice";
+
+  const TAB_TO_SECTION = {
+    practice: "memoryPracticeSection",
+    cards: "memoryCardsSection",
+    matching: "memoryMatchingSection",
+    typing: "memoryTypingSection",
+    weak: "memoryWeakSection"
+  };
+
+  function setMemoryTab(tab) {
+    if (!TAB_TO_SECTION[tab]) return;
+    currentMemoryTab = tab;
+
+    // Tüm panelleri kesin gizle: hem 'hidden' attribute hem 'is-hidden' class hem inline style
+    Object.entries(TAB_TO_SECTION).forEach(([key, sectionId]) => {
+      const el = document.getElementById(sectionId);
+      if (!el) return;
+      const shouldShow = key === tab;
+      if (shouldShow) {
+        el.hidden = false;
+        el.classList.remove("is-hidden");
+        el.style.display = "";
+        el.setAttribute("aria-hidden", "false");
+      } else {
+        el.hidden = true;
+        el.classList.add("is-hidden");
+        el.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    // Flashcard sekmesinde, eski toolbar/grid'in `hidden` attribute'unu temizle
+    // (orijinal setMemoryHubSection bunları kendi kapatmış olabilir)
+    const cardsToolbar = document.querySelector("#memoryhub > .hub-toolbar, #memoryCardsSection .hub-toolbar");
+    const cardsGrid = document.getElementById("memoryHubGrid");
+    if (tab === "cards") {
+      if (cardsToolbar) cardsToolbar.hidden = false;
+      if (cardsGrid) cardsGrid.hidden = false;
+    }
+
+    // Aktif buton stilini güncelle
+    document.querySelectorAll(".memory-tab-btn").forEach((btn) => {
+      const isActive = btn.dataset.memTab === tab;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+
+    // Eski 4-şıklı / flashcard global state'ini de senkron tut
+    // (ama setMemoryHubSection'ı çağırma — o panel görünürlüğünü tekrar değiştirir)
+    if (tab === "practice") memoryHubSection = "practice";
+    if (tab === "cards") memoryHubSection = "cards";
+
+    if (tab === "matching") {
+      if (!matchingState.cards.length) resetMatchingGame();
+    }
+    if (tab === "typing") {
+      if (!typingState.activeCard) nextTypingQuestion();
+    }
+    if (tab === "weak") renderWeakWords();
+    if (tab === "cards") renderMemorizationHub(document.getElementById("memoryFilter")?.value || "");
+  }
+
+  // ---- 7. KELİME EŞLEŞTİRME (MATCHING) ----
+  // englishOrder ve turkishOrder bir kere oluşturulur, tıklamada asla yeniden karılmaz
+  const matchingState = {
+    cards: [],            // çift listesi (her bir öğe: {id, word, meaning})
+    englishOrder: [],     // sabit sıra: [{id, label}]
+    turkishOrder: [],     // sabit sıra: [{id, label}]
+    leftSelected: null,
+    rightSelected: null,
+    matched: new Set(),
+    wrongAttempts: 0,
+    pairCount: 8,
+    startedAt: null,
+    timer: null,
+    finished: false,
+    weakOnly: false
+  };
+
+  function pickMatchingCards(count) {
+    const valid = MEMORIZATION_CARDS.filter((c) => c.word && c.meaning && c.meaning.length < 60);
+    const seenMeaning = new Set();
+    const unique = valid.filter((c) => {
+      const key = c.meaning.toLowerCase();
+      if (seenMeaning.has(key)) return false;
+      seenMeaning.add(key);
+      return true;
+    });
+    return shuffleArray(unique).slice(0, count);
+  }
+
+  function pickWeakMatchingCards(count) {
+    const stats = getMemoryStats();
+    const weakIds = Object.values(stats)
+      .filter((s) => (s.wrongCount || 0) > 0)
+      .sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0))
+      .map((s) => s.cardId);
+    const cards = weakIds
+      .map((id) => MEMORIZATION_CARDS.find((c) => c.id === id))
+      .filter(Boolean);
+    if (cards.length >= count) return cards.slice(0, count);
+    // Yeterli zayıf yoksa rastgele ile tamamla
+    const filler = pickMatchingCards(count * 2).filter((c) => !cards.find((x) => x.id === c.id));
+    return [...cards, ...filler].slice(0, count);
+  }
+
+  function startMatchingTimer() {
+    matchingState.startedAt = Date.now();
+    if (matchingState.timer) clearInterval(matchingState.timer);
+    matchingState.timer = setInterval(() => {
+      const el = document.getElementById("matchingTimer");
+      if (!el || !matchingState.startedAt) return;
+      const sec = Math.floor((Date.now() - matchingState.startedAt) / 1000);
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      el.textContent = `${m}:${String(s).padStart(2, "0")}`;
+    }, 1000);
+  }
+  function stopMatchingTimer() {
+    if (matchingState.timer) clearInterval(matchingState.timer);
+    matchingState.timer = null;
+  }
+
+  function changeMatchingSize(value) {
+    const n = Number(value) || 8;
+    matchingState.pairCount = Math.max(4, Math.min(12, n));
+    resetMatchingGame();
+  }
+
+  function resetMatchingGame() {
+    const board = document.getElementById("matchingBoard");
+    const result = document.getElementById("matchingResult");
+    if (!board) return;
+
+    // YALNIZCA reset/yenile çağrıldığında shuffle çalışır
+    matchingState.cards = matchingState.weakOnly
+      ? pickWeakMatchingCards(matchingState.pairCount)
+      : pickMatchingCards(matchingState.pairCount);
+
+    // Sıraları bir kere oluştur — sonraki tıklamalarda asla değişmez
+    matchingState.englishOrder = matchingState.cards.map((c) => ({
+      id: c.id,
+      label: c.word.charAt(0).toUpperCase() + c.word.slice(1)
+    }));
+    matchingState.turkishOrder = shuffleArray(
+      matchingState.cards.map((c) => ({ id: c.id, label: c.meaning }))
+    );
+
+    matchingState.leftSelected = null;
+    matchingState.rightSelected = null;
+    matchingState.matched = new Set();
+    matchingState.wrongAttempts = 0;
+    matchingState.finished = false;
+
+    if (result) {
+      result.hidden = true;
+      result.innerHTML = "";
+    }
+    startMatchingTimer();
+    renderMatchingBoard();
+  }
+
+  function renderMatchingBoard() {
+    const board = document.getElementById("matchingBoard");
+    if (!board) return;
+
+    // Sabit sıra üzerinden render — shuffle YOK
+    const leftItems = matchingState.englishOrder.map((c) => ({ ...c, side: "left" }));
+    const rightItems = matchingState.turkishOrder.map((c) => ({ ...c, side: "right" }));
+
+    board.innerHTML = `
+      <div class="matching-column english-column">
+        <div class="matching-column-title">İngilizce</div>
+        ${leftItems.map((c) => renderMatchingCard(c)).join("")}
+      </div>
+      <div class="matching-column turkish-column">
+        <div class="matching-column-title">Türkçe</div>
+        ${rightItems.map((c) => renderMatchingCard(c)).join("")}
+      </div>
+    `;
+
+    const left = document.getElementById("matchingPairsLeft");
+    const wrong = document.getElementById("matchingWrongCount");
+    if (left) left.textContent = String(matchingState.cards.length - matchingState.matched.size);
+    if (wrong) wrong.textContent = String(matchingState.wrongAttempts);
+  }
+
+  // Yalnızca seçim/match/wrong durumunu güncelle — DOM'u yeniden inşa etme
+  function updateMatchingCardStates() {
+    const board = document.getElementById("matchingBoard");
+    if (!board) return;
+    board.querySelectorAll("[data-match-id]").forEach((el) => {
+      const id = el.dataset.matchId;
+      const side = el.dataset.matchSide;
+      const matched = matchingState.matched.has(id);
+      const isSel =
+        (side === "left" && matchingState.leftSelected === id) ||
+        (side === "right" && matchingState.rightSelected === id);
+      el.classList.toggle("matched", matched);
+      el.classList.toggle("selected", !!isSel && !matched);
+      el.classList.remove("wrong");
+      if (matched) el.setAttribute("disabled", "true");
+      else el.removeAttribute("disabled");
+    });
+    const left = document.getElementById("matchingPairsLeft");
+    const wrong = document.getElementById("matchingWrongCount");
+    if (left) left.textContent = String(matchingState.cards.length - matchingState.matched.size);
+    if (wrong) wrong.textContent = String(matchingState.wrongAttempts);
+  }
+
+  function renderMatchingCard(card) {
+    const matched = matchingState.matched.has(card.id);
+    const isLeftSel = matchingState.leftSelected === card.id && card.side === "left";
+    const isRightSel = matchingState.rightSelected === card.id && card.side === "right";
+    let cls = "matching-card";
+    if (matched) cls += " matched";
+    if (isLeftSel || isRightSel) cls += " selected";
+    return `
+      <button type="button" class="${cls}"
+        data-match-id="${safeText(card.id)}"
+        data-match-side="${card.side}"
+        onclick="selectMatchingCard('${safeText(card.id)}','${card.side}')"
+        ${matched ? "disabled" : ""}>
+        ${safeText(card.label)}
+      </button>
+    `;
+  }
+
+  function selectMatchingCard(cardId, side) {
+    if (matchingState.matched.has(cardId)) return;
+    if (matchingState.finished) return;
+
+    if (side === "left") matchingState.leftSelected = cardId;
+    else matchingState.rightSelected = cardId;
+
+    // Tek seçim varsa sadece state güncelle, shuffle YOK
+    if (!matchingState.leftSelected || !matchingState.rightSelected) {
+      updateMatchingCardStates();
+      return;
+    }
+
+    const isMatch = matchingState.leftSelected === matchingState.rightSelected;
+
+    if (isMatch) {
+      const matchedId = matchingState.leftSelected;
+      matchingState.matched.add(matchedId);
+      matchingState.leftSelected = null;
+      matchingState.rightSelected = null;
+
+      // Doğru: correctCount artar, streak artar (recordMemoryAttempt halleder)
+      recordMemoryAttempt(matchedId, true, null);
+
+      // Yanlış selectedWrongAnswers kayıtlarını temiz tutmak için sadece ana yapıyı güncelle
+      updateMatchingCardStates();
+
+      if (matchingState.matched.size >= matchingState.cards.length) {
+        finishMatchingGame();
+      }
+    } else {
+      // Yanlış: ilgili İngilizce kart için memoryStats güncelle, yanlış Türkçe anlamı kaydet
+      matchingState.wrongAttempts += 1;
+      const wrongEnglishId = matchingState.leftSelected;
+      const selectedTurkish = matchingState.turkishOrder.find(
+        (t) => t.id === matchingState.rightSelected
+      );
+      const wrongMeaningLabel = selectedTurkish ? selectedTurkish.label : "matching";
+      recordMemoryAttempt(wrongEnglishId, false, wrongMeaningLabel);
+
+      // Geçici görsel feedback — kartların POZİSYONU değişmez, sadece class eklenir
+      const board = document.getElementById("matchingBoard");
+      if (board) {
+        const leftEl = board.querySelector(
+          `[data-match-side="left"][data-match-id="${matchingState.leftSelected}"]`
+        );
+        const rightEl = board.querySelector(
+          `[data-match-side="right"][data-match-id="${matchingState.rightSelected}"]`
+        );
+        if (leftEl) leftEl.classList.add("wrong");
+        if (rightEl) rightEl.classList.add("wrong");
+      }
+      updateMatchingCardStates._skipWrongClear = true;
+
+      setTimeout(() => {
+        matchingState.leftSelected = null;
+        matchingState.rightSelected = null;
+        updateMatchingCardStates();
+      }, 600);
+    }
+  }
+
+  function finishMatchingGame() {
+    matchingState.finished = true;
+    stopMatchingTimer();
+    const result = document.getElementById("matchingResult");
+    if (!result) return;
+
+    const sec = Math.floor((Date.now() - matchingState.startedAt) / 1000);
+    const totalAttempts = matchingState.cards.length + matchingState.wrongAttempts;
+    const accuracy = totalAttempts === 0 ? 100 : Math.round((matchingState.cards.length / totalAttempts) * 100);
+
+    result.hidden = false;
+    result.innerHTML = `
+      <h4>🎉 Tüm eşleşmeler tamam!</h4>
+      <div class="matching-result-grid">
+        <div class="matching-result-stat"><strong>${matchingState.cards.length}</strong><small>doğru</small></div>
+        <div class="matching-result-stat"><strong>${matchingState.wrongAttempts}</strong><small>yanlış</small></div>
+        <div class="matching-result-stat"><strong>${accuracy}%</strong><small>başarı</small></div>
+        <div class="matching-result-stat"><strong>${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}</strong><small>süre</small></div>
+      </div>
+      <div class="matching-result-actions">
+        <button type="button" class="primary-btn" onclick="resetMatchingGame()">🔄 Tekrar Oyna</button>
+        <button type="button" class="primary-btn soft" onclick="startWeakWordPractice('matching')">💔 Zayıf Kelimelerle</button>
+        <button type="button" class="ghost-btn" onclick="setMemoryTab('weak')">Zayıfları İncele</button>
+      </div>
+    `;
+  }
+
+  // ---- 8. YAZMA TESTİ ----
+  const typingState = {
+    activeCard: null,
+    answered: false,
+    isCorrect: false,
+    correctCount: 0,
+    wrongCount: 0,
+    streak: 0,
+    weakOnly: false,
+    typedValue: ""
+  };
+
+  function pickTypingCard() {
+    let pool;
+    if (typingState.weakOnly) {
+      const stats = getMemoryStats();
+      const weakIds = Object.entries(stats)
+        .filter(([, s]) => (s.wrongCount || 0) > 0)
+        .sort((a, b) => (b[1].wrongCount || 0) - (a[1].wrongCount || 0))
+        .map(([id]) => id);
+      pool = weakIds.map((id) => MEMORIZATION_CARDS.find((c) => c.id === id)).filter(Boolean);
+      if (pool.length === 0) pool = MEMORIZATION_CARDS.filter((c) => c.word && c.meaning);
+    } else {
+      pool = MEMORIZATION_CARDS.filter((c) => c.word && c.meaning);
+    }
+    if (!pool.length) return null;
+    let chosen = pool[Math.floor(Math.random() * pool.length)];
+    let guard = 0;
+    while (typingState.activeCard && chosen.id === typingState.activeCard.id && pool.length > 1 && guard < 8) {
+      chosen = pool[Math.floor(Math.random() * pool.length)];
+      guard += 1;
+    }
+    return chosen;
+  }
+
+  function nextTypingQuestion() {
+    typingState.activeCard = pickTypingCard();
+    typingState.answered = false;
+    typingState.isCorrect = false;
+    typingState.typedValue = "";
+    renderTypingTest();
+    setTimeout(() => {
+      const input = document.getElementById("typingInput");
+      if (input) input.focus();
+    }, 50);
+  }
+
+  function submitTypingAnswer() {
+    if (!typingState.activeCard || typingState.answered) return;
+    const input = document.getElementById("typingInput");
+    if (!input) return;
+    const typed = input.value;
+    typingState.typedValue = typed;
+
+    const isCorrect = checkTypedAnswer(typingState.activeCard, typed);
+    typingState.answered = true;
+    typingState.isCorrect = isCorrect;
+
+    if (isCorrect) {
+      typingState.correctCount += 1;
+      typingState.streak += 1;
+    } else {
+      typingState.wrongCount += 1;
+      typingState.streak = 0;
+    }
+
+    recordMemoryAttempt(typingState.activeCard.id, isCorrect, typed);
+    renderTypingTest();
+  }
+
+  function handleTypingKeydown(event) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    if (!typingState.answered) {
+      submitTypingAnswer();
+    } else {
+      nextTypingQuestion();
+    }
+  }
+
+  function renderTypingTest() {
+    const card = document.getElementById("typingCard");
+    if (!card) return;
+
+    const corr = document.getElementById("typingCorrectCount");
+    const wr = document.getElementById("typingWrongCount");
+    const sk = document.getElementById("typingStreak");
+    if (corr) corr.textContent = String(typingState.correctCount);
+    if (wr) wr.textContent = String(typingState.wrongCount);
+    if (sk) sk.textContent = String(typingState.streak);
+
+    if (!typingState.activeCard) {
+      card.innerHTML = `<div class="empty-grid">Kelime bulunamadı.</div>`;
+      return;
+    }
+
+    const c = typingState.activeCard;
+    const meaningLine = c.alternativeMeanings && c.alternativeMeanings.length
+      ? `${safeText(c.meaning)} <small style="opacity:.7;">(${safeText(c.alternativeMeanings.join(", "))})</small>`
+      : safeText(c.meaning);
+
+    let inputCls = "typing-input";
+    if (typingState.answered) inputCls += typingState.isCorrect ? " success" : " error";
+
+    let feedbackHtml = "";
+    if (typingState.answered) {
+      if (typingState.isCorrect) {
+        feedbackHtml = `<div class="typing-feedback success">✅ Doğru! ${safeText(c.word)}<small>${safeText(c.example || "")}</small></div>`;
+      } else {
+        feedbackHtml = `<div class="typing-feedback error">❌ Yanlış. Doğru cevap: <strong>${safeText(c.word)}</strong><small>${safeText(c.example || "")}</small></div>`;
+      }
+    }
+
+    const weakBadge = typingState.weakOnly ? `<span class="matching-pill" style="background:rgba(239,68,68,.14);">💔 Zayıf mod</span>` : "";
+
+    card.innerHTML = `
+      <div>
+        <span class="typing-prompt-label">Türkçe anlam ${weakBadge}</span>
+        <h3 class="typing-prompt">${meaningLine}</h3>
+        <p class="typing-hint">İngilizce karşılığını yaz, <kbd>Enter</kbd> ile gönder.</p>
+      </div>
+      <div class="typing-input-row">
+        <input
+          type="text"
+          id="typingInput"
+          class="${inputCls}"
+          placeholder="İngilizce yaz…"
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+          enterkeyhint="send"
+          value="${safeText(typingState.typedValue || "")}"
+          ${typingState.answered ? "disabled" : ""}
+        />
+        ${feedbackHtml}
+        <div class="typing-actions">
+          ${typingState.answered
+            ? `<button type="button" class="primary-btn" onclick="nextTypingQuestion()">➡️ Sonraki Kelime</button>`
+            : `<button type="button" class="primary-btn" onclick="submitTypingAnswer()">✅ Kontrol Et</button>`
+          }
+          <button type="button" class="ghost-btn small" onclick="skipTypingQuestion()">⏭️ Atla</button>
+        </div>
+      </div>
+    `;
+
+    const input = document.getElementById("typingInput");
+    if (input && !typingState.answered) {
+      input.addEventListener("keydown", handleTypingKeydown);
+      input.addEventListener("input", (e) => { typingState.typedValue = e.target.value; });
+    }
+  }
+
+  function skipTypingQuestion() {
+    if (typingState.activeCard && !typingState.answered) {
+      // Atlanan kelimeyi de hafif zayıf say
+      recordMemoryAttempt(typingState.activeCard.id, false, "(atlandı)");
+    }
+    nextTypingQuestion();
+  }
+
+  // ---- 9. ZAYIF KELİMELER MODU ----
+  function renderWeakWords() {
+    const list = document.getElementById("weakWordList");
+    if (!list) return;
+    const stats = getMemoryStats();
+    const rows = Object.values(stats)
+      .filter((s) => (s.wrongCount || 0) > 0)
+      .sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0));
+
+    if (!rows.length) {
+      list.innerHTML = `<div class="weak-empty">Henüz zayıf kelime yok. 4 Şıklı Test, Eşleştirme veya Yazma Testinde yanlış yapınca burada görünür.</div>`;
+      return;
+    }
+
+    list.innerHTML = rows.slice(0, 50).map((s) => {
+      const card = MEMORIZATION_CARDS.find((c) => c.id === s.cardId);
+      const word = card ? card.word : s.word || s.cardId;
+      const meaning = card ? card.meaning : s.meaning || "";
+      return `
+        <div class="weak-word-row">
+          <div class="weak-word-info">
+            <strong>${safeText(word)}</strong>
+            <small>${safeText(meaning)}${card?.example ? " · " + safeText(card.example) : ""}</small>
+          </div>
+          <div class="weak-word-stats">
+            <span>❌ ${s.wrongCount || 0}</span>
+            <span class="good">✅ ${s.correctCount || 0}</span>
+            <span class="mastery">${safeText(s.mastery || "weak")}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function startWeakWordPractice(mode) {
+    if (mode === "practice") {
+      setMemoryTab("practice");
+      // 4 şıklı test mevcut sistemi kullanır; kullanıcı zayıfları görmek isterse de "weak" sekmesine gider
+      activeMemoryPracticeQuestion = buildMemoryPracticeQuestion(memoryPracticeMode);
+      renderMemoryPractice();
+    } else if (mode === "matching") {
+      matchingState.weakOnly = true;
+      setMemoryTab("matching");
+      resetMatchingGame();
+      // bir tur sonra normale dönsün
+      setTimeout(() => { matchingState.weakOnly = false; }, 100);
+    } else if (mode === "typing") {
+      typingState.weakOnly = true;
+      setMemoryTab("typing");
+      nextTypingQuestion();
+    }
+  }
+
+  // ---- 10. BUGÜNÜN 10 KELİMESİ ----
+  function getDailyTen() {
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const cached = safeParse(localStorage.getItem(DAILY_KEY), null);
+    if (cached && cached.date === todayKey && Array.isArray(cached.ids)) {
+      const cards = cached.ids.map((id) => MEMORIZATION_CARDS.find((c) => c.id === id)).filter(Boolean);
+      if (cards.length === cached.ids.length) return cards.map((c, i) => ({ ...c, _tag: cached.tags[i] || "Yeni" }));
+    }
+
+    const stats = getMemoryStats();
+    const weak = Object.values(stats)
+      .filter((s) => (s.wrongCount || 0) > 0)
+      .sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0))
+      .slice(0, 4)
+      .map((s) => ({ id: s.cardId, tag: "Zayıf" }));
+
+    const now = Date.now();
+    const stale = Object.values(stats)
+      .filter((s) => s.lastCorrectAt && (now - new Date(s.lastCorrectAt).getTime()) > 1000 * 60 * 60 * 24 * 5)
+      .slice(0, 3)
+      .map((s) => ({ id: s.cardId, tag: "Tekrar" }));
+
+    const seenIds = new Set([...weak.map((x) => x.id), ...stale.map((x) => x.id)]);
+    const fresh = shuffleArray(MEMORIZATION_CARDS.filter((c) => !stats[c.id] && !seenIds.has(c.id)))
+      .slice(0, 10 - weak.length - stale.length)
+      .map((c) => ({ id: c.id, tag: "Yeni" }));
+
+    let combined = [...weak, ...stale, ...fresh];
+    if (combined.length < 10) {
+      const filler = shuffleArray(MEMORIZATION_CARDS.filter((c) => !combined.find((x) => x.id === c.id)))
+        .slice(0, 10 - combined.length)
+        .map((c) => ({ id: c.id, tag: "Yeni" }));
+      combined = [...combined, ...filler];
+    }
+
+    const ids = combined.slice(0, 10).map((x) => x.id);
+    const tags = combined.slice(0, 10).map((x) => x.tag);
+
+    try {
+      localStorage.setItem(DAILY_KEY, JSON.stringify({ date: todayKey, ids, tags }));
+    } catch {}
+
+    return ids.map((id, i) => {
+      const c = MEMORIZATION_CARDS.find((cc) => cc.id === id);
+      return c ? { ...c, _tag: tags[i] } : null;
+    }).filter(Boolean);
+  }
+
+  function renderDailyTen() {
+    const box = document.getElementById("dailyTenCard");
+    if (!box) return;
+    const list = getDailyTen();
+    if (!list.length) {
+      box.innerHTML = "";
+      return;
+    }
+    box.innerHTML = `
+      <div class="daily-ten-head">
+        <h3 class="daily-ten-title">🌟 Bugünün 10 Kelimesi</h3>
+        <button type="button" class="ghost-btn small" onclick="setMemoryTab('typing')">Yazma Testi ile Çalış</button>
+      </div>
+      <div class="daily-ten-list">
+        ${list.map((c) => `
+          <div class="daily-ten-pill">
+            <strong>${safeText(c.word)}</strong>
+            <small>${safeText(c.meaning)}</small>
+            <span class="daily-ten-tag">${safeText(c._tag)}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  // ---- 11. FAVORİ KELİMELER ----
+  function isFavorite(cardId) {
+    return getFavorites().includes(cardId);
+  }
+  function toggleFavoriteWord(cardId, event) {
+    if (event && typeof event.stopPropagation === "function") event.stopPropagation();
+    const list = getFavorites();
+    const idx = list.indexOf(cardId);
+    if (idx >= 0) list.splice(idx, 1);
+    else list.push(cardId);
+    saveFavorites(list);
+
+    // Yıldız butonunu güncelle
+    document.querySelectorAll(`.memory-fav-btn[data-fav-id="${cardId}"]`).forEach((btn) => {
+      btn.classList.toggle("active", isFavorite(cardId));
+      btn.textContent = isFavorite(cardId) ? "❤️" : "🤍";
+    });
+  }
+
+  // Favori butonunu mevcut flashcard render'ına enjekte et — orijinal renderMemorizationHub'ı sarmalayarak
+  const originalRenderMemorizationHub = renderMemorizationHub;
+  renderMemorizationHub = function patchedRenderMemorizationHub(filterText = "") {
+    originalRenderMemorizationHub(filterText);
+    const grid = document.getElementById("memoryHubGrid");
+    if (!grid) return;
+    grid.querySelectorAll(".memory-card").forEach((cardEl) => {
+      const cardId = cardEl.getAttribute("data-card-id");
+      if (!cardId || cardEl.querySelector(".memory-fav-btn")) return;
+      const fav = isFavorite(cardId);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "memory-fav-btn" + (fav ? " active" : "");
+      btn.dataset.favId = cardId;
+      btn.textContent = fav ? "❤️" : "🤍";
+      btn.setAttribute("aria-label", "Favoriye ekle");
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleFavoriteWord(cardId, e);
+      });
+      cardEl.appendChild(btn);
+    });
+  };
+  window.renderMemorizationHub = renderMemorizationHub;
+
+  // ---- 12. Window globals ----
+  window.setMemoryTab = setMemoryTab;
+  window.resetMatchingGame = resetMatchingGame;
+  window.changeMatchingSize = changeMatchingSize;
+  window.selectMatchingCard = selectMatchingCard;
+  window.submitTypingAnswer = submitTypingAnswer;
+  window.nextTypingQuestion = nextTypingQuestion;
+  window.skipTypingQuestion = skipTypingQuestion;
+  window.startWeakWordPractice = startWeakWordPractice;
+  window.clearMemoryStats = clearMemoryStats;
+  window.toggleFavoriteWord = toggleFavoriteWord;
+  window.normalizeTypedAnswer = normalizeTypedAnswer;
+  window.recordMemoryAttempt = recordMemoryAttempt;
+
+  // 4 Şıklı test'in mevcut submitMemoryPracticeAnswer'ını sarmala — istatistik kaydı ekle
+  const originalSubmitPractice = submitMemoryPracticeAnswer;
+  submitMemoryPracticeAnswer = function patchedSubmit(optionIndex) {
+    if (activeMemoryPracticeQuestion && !activeMemoryPracticeQuestion.answered) {
+      const opt = activeMemoryPracticeQuestion.options[optionIndex];
+      // Mevcut kart bul: prompt'tan kartı bul
+      const promptVal = activeMemoryPracticeQuestion.prompt;
+      const card = MEMORIZATION_CARDS.find((c) =>
+        activeMemoryPracticeQuestion.mode === "en-tr"
+          ? c.front === promptVal
+          : c.back === promptVal
+      );
+      if (card && opt) {
+        recordMemoryAttempt(card.id, !!opt.isCorrect, opt.label);
+      }
+    }
+    originalSubmitPractice(optionIndex);
+  };
+  window.submitMemoryPracticeAnswer = submitMemoryPracticeAnswer;
+
+  // ---- 13. İlk yükleme ----
+  function bootstrap() {
+    // Orijinal setMemoryHubSection çağrısı bu noktada zaten çalıştı; biz son söz olarak
+    // sekme sistemini uyguluyoruz. Bu yüzden setMemoryTab her zaman kazanır.
+    setMemoryTab("practice");
+    renderWeakWords();
+    // Eski 4-şıklı render'ını yeni HTML ile yenile
+    if (typeof activeMemoryPracticeQuestion !== "undefined" && !activeMemoryPracticeQuestion) {
+      activeMemoryPracticeQuestion = buildMemoryPracticeQuestion(memoryPracticeMode);
+    }
+    renderMemoryPracticeRedesigned();
+  }
+
+  // ---- "Bugünün 10 Kelimesi" devre dışı: render no-op ----
+  // (Eski fonksiyon adı çağrılırsa çakışmaması için override)
+  function renderDailyTenNoop() {
+    const box = document.getElementById("dailyTenCard");
+    if (box && box.parentNode) box.parentNode.removeChild(box);
+  }
+  // Patch içindeki orijinal renderDailyTen'i no-op'a çevir
+  // (sonraki çağrılar boşa düşsün)
+  // eslint-disable-next-line no-func-assign
+  renderDailyTen = renderDailyTenNoop;
+
+  // ---- 4 Şıklı Test — yeni mobil-uyumlu render ----
+  function renderMemoryPracticeRedesigned() {
+    const practiceCard = document.getElementById("memoryPracticeCard");
+    if (!practiceCard) return;
+
+    if (!activeMemoryPracticeQuestion) {
+      activeMemoryPracticeQuestion = buildMemoryPracticeQuestion(memoryPracticeMode);
+    }
+
+    const enTrButton = document.getElementById("memoryModeEnTr");
+    const trEnButton = document.getElementById("memoryModeTrEn");
+    if (enTrButton) {
+      enTrButton.classList.toggle("active", memoryPracticeMode === "en-tr");
+      enTrButton.setAttribute("aria-pressed", memoryPracticeMode === "en-tr" ? "true" : "false");
+    }
+    if (trEnButton) {
+      trEnButton.classList.toggle("active", memoryPracticeMode === "tr-en");
+      trEnButton.setAttribute("aria-pressed", memoryPracticeMode === "tr-en" ? "true" : "false");
+    }
+
+    if (!activeMemoryPracticeQuestion) {
+      practiceCard.innerHTML = `<div class="empty-grid">Çalışma sorusu oluşturulamadı.</div>`;
+      return;
+    }
+
+    const q = activeMemoryPracticeQuestion;
+    const promptLabel = q.mode === "en-tr" ? "İNGİLİZCE KELİME" : "TÜRKÇE ANLAM";
+    const instruction = q.mode === "en-tr" ? "Doğru Türkçe anlamı seç." : "Doğru İngilizce kelimeyi seç.";
+
+    let feedbackHtml = "";
+    if (q.answered) {
+      if (q.isCorrect) {
+        feedbackHtml = `<div class="memory-feedback success" role="status">✅ Doğru cevap!</div>`;
+      } else {
+        feedbackHtml = `<div class="memory-feedback error" role="status">❌ Yanlış. Doğru cevap: <strong>${safeText(q.correctLabel)}</strong></div>`;
+      }
+    }
+
+    practiceCard.innerHTML = `
+      <div class="memory-practice-redesign">
+        <div class="memory-question-card">
+          <span class="memory-question-label">${safeText(promptLabel)}</span>
+          <strong class="memory-question-text">${safeText(q.prompt)}</strong>
+          <p class="memory-question-hint">${safeText(instruction)}</p>
+        </div>
+
+        <div class="memory-options-grid" role="radiogroup" aria-label="Cevap seçenekleri">
+          ${q.options.map((option, index) => {
+            let cls = "memory-option-card";
+            if (q.answered && option.isCorrect) cls += " correct";
+            if (q.answered && !option.isCorrect && q.selectedIndex === index) cls += " wrong";
+            if (q.answered) cls += " locked";
+            return `
+              <button
+                type="button"
+                class="${cls}"
+                onclick="submitMemoryPracticeAnswer(${index})"
+                ${q.answered ? "disabled" : ""}
+                role="radio"
+                aria-checked="${q.selectedIndex === index ? "true" : "false"}">
+                <span class="memory-option-tag">SEÇENEK ${index + 1}</span>
+                <span class="memory-option-label">${safeText(option.label)}</span>
+              </button>
+            `;
+          }).join("")}
+        </div>
+
+        ${feedbackHtml}
+
+        <button
+          type="button"
+          class="primary-btn memory-next-btn"
+          onclick="nextMemoryPracticeQuestion()"
+          ${q.answered ? "" : "disabled"}>
+          ➡️ Sonraki Kelime
+        </button>
+      </div>
+    `;
+  }
+
+  // Mevcut renderMemoryPractice'i sarmala — yeni redesign'a yönlendir
+  // (orijinal fonksiyon eskiden mod butonlarını da yönetiyordu; redesign aynısını yapıyor)
+  // eslint-disable-next-line no-func-assign
+  renderMemoryPractice = renderMemoryPracticeRedesigned;
+  window.renderMemoryPractice = renderMemoryPractice;
+  window.renderMemoryPracticeRedesigned = renderMemoryPracticeRedesigned;
+
+  // ---- 14. SCROLL TOP BUTON ----
+  function initScrollTopButton() {
+    const btn = document.getElementById("scrollTopBtn");
+    if (!btn) return;
+    let visible = false;
+    const onScroll = () => {
+      const shouldShow = (window.scrollY || document.documentElement.scrollTop) > 300;
+      if (shouldShow !== visible) {
+        visible = shouldShow;
+        btn.classList.toggle("show", shouldShow);
+      }
+    };
+    btn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initScrollTopButton);
+  } else {
+    initScrollTopButton();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      // Microtask ile orijinal init'ten sonra çalış
+      Promise.resolve()
+        .then(() => loadMemoryExtrasFromFirebase())
+        .finally(() => {
+          // İki rAF ekleyerek orijinal renderların bitmesini bekle
+          requestAnimationFrame(() => requestAnimationFrame(bootstrap));
+        });
+    });
+  } else {
+    loadMemoryExtrasFromFirebase().finally(() => {
+      requestAnimationFrame(() => requestAnimationFrame(bootstrap));
+    });
+  }
+})();
+
+/* ============================================================
+   FINAL STABLE UI FIX — Sticky offset + mobil yukarı çık butonu
+   Not: Arama barı CSS sticky ile çalışır. JS sadece topbar yüksekliğini
+   ölçer ve scroll-top butonunu güvenli biçimde gösterir.
+   ============================================================ */
+(function finalStableStickyAndScrollTopFix() {
+  function getTopbarHeight() {
+    const topbar = document.querySelector(".topbar");
+    if (!topbar) return window.innerWidth <= 768 ? 62 : 78;
+    const rect = topbar.getBoundingClientRect();
+    return Math.max(58, Math.round(rect.height || topbar.offsetHeight || 78));
+  }
+
+  function updateStickyOffsets() {
+    const top = getTopbarHeight() + 8;
+    document.documentElement.style.setProperty("--memory-search-top", `${top}px`);
+    document.documentElement.style.setProperty("--memory-search-top-mobile", `${top}px`);
+  }
+
+  function getScrollTop() {
+    return Math.max(
+      window.pageYOffset || 0,
+      window.scrollY || 0,
+      document.documentElement.scrollTop || 0,
+      document.body.scrollTop || 0,
+      document.querySelector(".main-content")?.scrollTop || 0,
+      document.querySelector(".content-wrapper")?.scrollTop || 0
+    );
+  }
+
+  function setupScrollTopButton() {
+    const btn = document.getElementById("scrollTopBtn");
+    if (!btn) return;
+
+    const toggle = () => {
+      btn.classList.toggle("show", getScrollTop() > 220);
+    };
+
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.documentElement.scrollTo?.({ top: 0, behavior: "smooth" });
+      document.body.scrollTo?.({ top: 0, behavior: "smooth" });
+      document.querySelector(".main-content")?.scrollTo?.({ top: 0, behavior: "smooth" });
+      document.querySelector(".content-wrapper")?.scrollTo?.({ top: 0, behavior: "smooth" });
+    };
+
+    if (btn.dataset.finalStableScrollReady !== "true") {
+      btn.dataset.finalStableScrollReady = "true";
+      btn.addEventListener("click", scrollToTop);
+    }
+
+    [window, document, document.documentElement, document.body, document.querySelector(".main-content"), document.querySelector(".content-wrapper")]
+      .filter(Boolean)
+      .forEach((target) => target.addEventListener?.("scroll", toggle, { passive: true }));
+
+    window.addEventListener("resize", () => {
+      updateStickyOffsets();
+      toggle();
+    }, { passive: true });
+
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => {
+        updateStickyOffsets();
+        toggle();
+      }, 180);
+    }, { passive: true });
+
+    updateStickyOffsets();
+    requestAnimationFrame(toggle);
+  }
+
+  function setup() {
+    updateStickyOffsets();
+    setupScrollTopButton();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setup);
+  } else {
+    setup();
+  }
+})();
+
+/* ============================================================
+   HACIBEY STYLE MEMORY SEARCH FOLLOW + FAVORITE FILTER
+   - Flashcard arama barı aşağı kaydırınca sayfanın en üstünde takip eder.
+   - Kalp/Favoriler butonu sadece favori flashcardları gösterir.
+   ============================================================ */
+(function hacibeyStyleMemorySearchFollowAndFavoriteFilter() {
+  const FAVORITE_KEY = "eul_favorite_words";
+  const FAVORITE_FILTER_KEY = "eul_flashcard_favorites_only";
+  let flashcardFavoritesOnly = false;
+
+  try {
+    flashcardFavoritesOnly = localStorage.getItem(FAVORITE_FILTER_KEY) === "true";
+  } catch {
+    flashcardFavoritesOnly = false;
+  }
+
+  function getTopbarHeightForFollow() {
+    // Yusuf isteği: Flashcard arama barı scroll sırasında sayfanın en üstünde dursun.
+    // Bu yüzden topbar yüksekliği kadar aşağı itmek yerine, sadece küçük güvenli boşluk bırakıyoruz.
+    // Böylece Hacıbey kategori barı gibi viewport'un üstüne yapışarak takip eder.
+    const safeInset = Number.parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue("--safe-area-top") || "0",
+      10
+    ) || 0;
+    return safeInset + (window.innerWidth <= 768 ? 8 : 10);
+  }
+
+  function getPageScrollTop() {
+    return Math.max(
+      window.pageYOffset || 0,
+      window.scrollY || 0,
+      document.documentElement.scrollTop || 0,
+      document.body.scrollTop || 0
+    );
+  }
+
+  function getFavoriteIdsForFilter() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(FAVORITE_KEY) || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function getMemorySearchValue() {
+    return document.getElementById("memoryFilter")?.value || "";
+  }
+
+  function syncFavoriteFilterButton() {
+    const btn = document.getElementById("memoryFavFilterBtn");
+    if (!btn) return;
+    const active = !!flashcardFavoritesOnly;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+    const icon = btn.querySelector(".fav-filter-icon");
+    const text = btn.querySelector(".fav-filter-text");
+    if (icon) icon.textContent = active ? "❤️" : "♡";
+    if (text) text.textContent = active ? "Favoriler" : "Favoriler";
+    btn.title = active ? "Tüm kelimeleri göster" : "Sadece favori kelimeleri göster";
+  }
+
+  function applyFlashcardFavoriteFilter() {
+    const grid = document.getElementById("memoryHubGrid");
+    if (!grid) return;
+
+    syncFavoriteFilterButton();
+
+    if (!flashcardFavoritesOnly) return;
+
+    const favorites = new Set(getFavoriteIdsForFilter());
+    const cards = Array.from(grid.querySelectorAll(".memory-card[data-card-id]"));
+
+    if (!favorites.size) {
+      grid.innerHTML = `
+        <div class="empty-grid">
+          Henüz favori kelime yok. Kartların üzerindeki kalbe dokunarak favori ekleyebilirsin.
+        </div>
+      `;
+      return;
+    }
+
+    let visibleCount = 0;
+    cards.forEach((card) => {
+      const id = card.getAttribute("data-card-id");
+      const keep = favorites.has(id);
+      card.hidden = !keep;
+      if (keep) visibleCount += 1;
+    });
+
+    if (!visibleCount) {
+      grid.innerHTML = `
+        <div class="empty-grid">
+          Bu aramada favori kelime bulunamadı. Arama metnini temizleyebilir veya Favoriler filtresini kapatabilirsin.
+        </div>
+      `;
+    }
+  }
+
+  function rerenderFlashcardsAfterFilterChange() {
+    if (typeof renderMemorizationHub === "function") {
+      renderMemorizationHub(getMemorySearchValue());
+    } else if (typeof window.renderMemorizationHub === "function") {
+      window.renderMemorizationHub(getMemorySearchValue());
+    }
+    requestAnimationFrame(() => {
+      applyFlashcardFavoriteFilter();
+      updateMemorySearchFollowPosition();
+    });
+  }
+
+  window.toggleFlashcardFavoriteFilter = function toggleFlashcardFavoriteFilter() {
+    flashcardFavoritesOnly = !flashcardFavoritesOnly;
+    try {
+      localStorage.setItem(FAVORITE_FILTER_KEY, flashcardFavoritesOnly ? "true" : "false");
+    } catch {}
+    syncFavoriteFilterButton();
+    rerenderFlashcardsAfterFilterChange();
+  };
+
+  // Mevcut renderMemorizationHub fonksiyonunu bozmadan favori filtresini sonradan uygula.
+  if (typeof renderMemorizationHub === "function" && !renderMemorizationHub.__favoriteFilterWrapped) {
+    const previousRenderMemorizationHub = renderMemorizationHub;
+    renderMemorizationHub = function renderMemorizationHubWithFavoriteFilter(filterText = "") {
+      previousRenderMemorizationHub(filterText);
+      applyFlashcardFavoriteFilter();
+      requestAnimationFrame(updateMemorySearchFollowPosition);
+    };
+    renderMemorizationHub.__favoriteFilterWrapped = true;
+    window.renderMemorizationHub = renderMemorizationHub;
+  }
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".memory-fav-btn")) return;
+    // Mevcut favori tıklama kodu çalıştıktan sonra filtreyi yenile.
+    setTimeout(() => {
+      if (flashcardFavoritesOnly) rerenderFlashcardsAfterFilterChange();
+      else syncFavoriteFilterButton();
+    }, 0);
+  }, true);
+
+  let followPlaceholder = null;
+
+  function ensureFollowPlaceholder(bar) {
+    if (followPlaceholder && followPlaceholder.isConnected) return followPlaceholder;
+    followPlaceholder = document.createElement("div");
+    followPlaceholder.className = "memory-search-spacer";
+    bar.parentNode.insertBefore(followPlaceholder, bar);
+    return followPlaceholder;
+  }
+
+  function isFlashcardPanelVisible(section) {
+    if (!section) return false;
+    if (section.hidden || section.classList.contains("is-hidden")) return false;
+    const style = window.getComputedStyle(section);
+    return style.display !== "none" && style.visibility !== "hidden";
+  }
+
+  function releaseMemorySearchFollow(bar, placeholder) {
+    bar.classList.remove("is-scroll-following");
+    if (placeholder) {
+      placeholder.classList.remove("active");
+      placeholder.style.height = "0px";
+    }
+  }
+
+  function updateMemorySearchFollowPosition() {
+    const section = document.getElementById("memoryCardsSection");
+    const bar = document.getElementById("memorySearchSticky") || document.querySelector("#memoryCardsSection .memory-search-sticky");
+    if (!section || !bar) return;
+
+    const placeholder = ensureFollowPlaceholder(bar);
+    const visible = isFlashcardPanelVisible(section);
+    if (!visible) {
+      releaseMemorySearchFollow(bar, placeholder);
+      return;
+    }
+
+    const topOffset = getTopbarHeightForFollow() + 8;
+    document.documentElement.style.setProperty("--memory-search-top", `${topOffset}px`);
+    document.documentElement.style.setProperty("--memory-search-top-mobile", `${topOffset}px`);
+
+    const scrollTop = getPageScrollTop();
+    const wasFixed = bar.classList.contains("is-scroll-following");
+    if (wasFixed) bar.classList.remove("is-scroll-following");
+
+    const anchorRect = placeholder.classList.contains("active")
+      ? placeholder.getBoundingClientRect()
+      : bar.getBoundingClientRect();
+    const anchorTop = anchorRect.top + scrollTop;
+    const sectionRect = section.getBoundingClientRect();
+    const sectionBottom = sectionRect.bottom + scrollTop;
+    const barHeight = Math.max(1, Math.round(bar.offsetHeight || anchorRect.height || 62));
+    const shouldFollow = scrollTop + topOffset >= anchorTop && scrollTop + topOffset + barHeight < sectionBottom - 12;
+
+    if (!shouldFollow) {
+      releaseMemorySearchFollow(bar, placeholder);
+      return;
+    }
+
+    placeholder.classList.add("active");
+    placeholder.style.height = `${barHeight}px`;
+
+    const parentRect = (bar.parentElement || section).getBoundingClientRect();
+    document.documentElement.style.setProperty("--memory-search-left", `${Math.round(parentRect.left)}px`);
+    document.documentElement.style.setProperty("--memory-search-width", `${Math.round(parentRect.width)}px`);
+    bar.classList.add("is-scroll-following");
+  }
+
+  function setupMemorySearchFollow() {
+    const bar = document.getElementById("memorySearchSticky") || document.querySelector("#memoryCardsSection .memory-search-sticky");
+    if (!bar || bar.dataset.hacibeyFollowReady === "true") return;
+    bar.dataset.hacibeyFollowReady = "true";
+    ensureFollowPlaceholder(bar);
+
+    [window, document, document.documentElement, document.body].forEach((target) => {
+      target.addEventListener?.("scroll", updateMemorySearchFollowPosition, { passive: true });
+    });
+    window.addEventListener("resize", updateMemorySearchFollowPosition, { passive: true });
+    window.addEventListener("orientationchange", () => setTimeout(updateMemorySearchFollowPosition, 180), { passive: true });
+
+    requestAnimationFrame(() => {
+      syncFavoriteFilterButton();
+      applyFlashcardFavoriteFilter();
+      updateMemorySearchFollowPosition();
+    });
+  }
+
+  window.updateMemorySearchFollowPosition = updateMemorySearchFollowPosition;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupMemorySearchFollow);
+  } else {
+    setupMemorySearchFollow();
+  }
+})();

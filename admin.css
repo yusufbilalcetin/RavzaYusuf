@@ -54,3 +54,157 @@ body { background: var(--p-bg); color: var(--p-text); display:flex; height: 100v
 .block-item { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px; position:relative;}
 .block-item select { margin-bottom:10px; width:150px;}
 .block-actions { position:absolute; top:15px; right:15px;}
+
+/* ==============================================================
+   MOBİL RESPONSIVE — admin panel
+   ============================================================== */
+
+html, body { max-width: 100%; overflow-x: hidden; }
+img, video, svg, iframe { max-width: 100%; height: auto; }
+
+/* TABLET (≤ 1024px) — sidebar üstte yatay olur */
+@media (max-width: 1024px) {
+  body {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 14px;
+  }
+  .admin-brand {
+    padding: 8px 12px;
+    border-bottom: none;
+    flex: 1 1 auto;
+  }
+  .admin-brand h1 { font-size: 18px; }
+  .admin-brand p { display: none; }
+  .admin-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px;
+    gap: 6px;
+    flex: 1 1 100%;
+    order: 3;
+    scrollbar-width: none;
+  }
+  .admin-tabs::-webkit-scrollbar { display: none; }
+  .admin-tabs li { padding: 0; flex: 0 0 auto; }
+  .tab-btn {
+    white-space: nowrap;
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .admin-actions {
+    flex-direction: row;
+    gap: 8px;
+    padding: 6px 12px;
+    border-top: none;
+    flex: 0 0 auto;
+  }
+  .admin-actions .btn { padding: 8px 14px; font-size: 13px; min-height: 40px; }
+
+  .admin-main { padding: 20px; }
+  .layout-split {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .list-panel {
+    height: auto;
+    max-height: 360px;
+  }
+}
+
+/* TELEFON (≤ 768px) */
+@media (max-width: 768px) {
+  .admin-main { padding: 14px; }
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .panel-header h2 { font-size: 22px; }
+  .status-badge { font-size: 12px; padding: 6px 12px; }
+
+  .card {
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .card h3 { font-size: 16px; padding-bottom: 12px; margin-bottom: 14px; }
+
+  .form-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  .block-item { padding: 12px; }
+  .block-item select { width: 100%; margin-bottom: 8px; }
+  .block-actions {
+    position: static;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+  .btn-danger { padding: 8px 12px; }
+
+  /* iOS zoom önleme */
+  .form-group input,
+  .form-group textarea,
+  .form-group select,
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Touch hedef minimumu */
+  .btn,
+  .tab-btn,
+  button,
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+}
+
+/* KÜÇÜK TELEFON (≤ 480px) */
+@media (max-width: 480px) {
+  .admin-sidebar { padding: 8px 10px; }
+  .admin-brand { padding: 6px 8px; }
+  .admin-brand h1 { font-size: 16px; }
+  .admin-actions { padding: 4px 10px; flex-wrap: wrap; }
+  .admin-actions .btn { flex: 1 1 calc(50% - 4px); }
+
+  .admin-main { padding: 10px; }
+  .card { padding: 14px; border-radius: 12px; }
+  .card h3 { font-size: 15px; }
+
+  .item-list li { padding: 10px 12px; font-size: 13px; }
+  .form-group label { font-size: 12px; }
+}
+
+/* ÇOK KÜÇÜK (≤ 360px) */
+@media (max-width: 360px) {
+  .tab-btn { padding: 8px 10px; font-size: 12px; }
+  .btn { padding: 8px 12px; font-size: 12px; }
+}
+
+/* SAFE AREA */
+@supports (padding: max(0px)) {
+  .admin-sidebar {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+  .admin-main {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+}

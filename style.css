@@ -1790,6 +1790,10 @@ body.dark .mini-title { color: var(--pink-bright); }
   gap: 14px;
   margin: 8px 0 24px;
 }
+.memory-section-shell[hidden],
+.memory-section-shell.is-hidden {
+  display: none !important;
+}
 .memory-cards-section { margin-top: 4px; }
 .memory-cards-shell,
 .memory-practice-shell {
@@ -3184,5 +3188,1963 @@ body.modal-open { overflow: hidden; }
     width: 60px;
     height: 60px;
     font-size: 28px;
+  }
+}
+
+/* ============================================================
+   MEMORY HUB UPGRADE — tabs, matching, typing, weak words
+   ============================================================ */
+
+.memory-tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  margin: 16px 0 18px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--line, rgba(36, 72, 255, 0.12));
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(15, 23, 57, 0.06);
+}
+body.dark .memory-tab-bar {
+  background: rgba(20, 26, 60, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.memory-tab-btn {
+  flex: 1 1 130px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ink, #0f1739);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.memory-tab-btn:hover {
+  background: rgba(36, 72, 255, 0.08);
+}
+.memory-tab-btn.active {
+  background: linear-gradient(135deg, var(--pink, #d4669c), var(--pink-bright, #e879a0));
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(212, 102, 156, 0.35);
+  transform: translateY(-1px);
+}
+body.dark .memory-tab-btn { color: #f4f6ff; }
+body.dark .memory-tab-btn:hover { background: rgba(255, 255, 255, 0.06); }
+.memory-tab-icon { font-size: 18px; }
+
+/* DAILY 10 CARD — kaldırıldı (display:none güvence) */
+.daily-ten-card,
+.daily-ten-head,
+.daily-ten-list,
+.daily-ten-pill,
+.daily-ten-tag,
+.daily-ten-title { display: none !important; }
+
+/* MATCHING GAME */
+.matching-shell {
+  display: grid;
+  gap: 14px;
+}
+.matching-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.matching-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.matching-pill {
+  background: rgba(36, 72, 255, 0.08);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+body.dark .matching-pill { background: rgba(255, 255, 255, 0.08); }
+.matching-pill strong { font-weight: 700; }
+
+.matching-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.matching-size-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.matching-size-toggle select {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line, rgba(36, 72, 255, 0.18));
+  background: #fff;
+  font-size: 14px;
+  min-height: 40px;
+}
+body.dark .matching-size-toggle select {
+  background: rgba(20, 26, 60, 0.7);
+  color: #f4f6ff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.matching-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.matching-column {
+  display: grid;
+  gap: 10px;
+}
+.matching-column-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted, #64748b);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.matching-card {
+  min-height: 56px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line, rgba(36, 72, 255, 0.18));
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink, #0f1739);
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform .15s ease, border-color .2s ease, background .2s ease, opacity .2s ease;
+  user-select: none;
+}
+body.dark .matching-card {
+  background: rgba(20, 26, 60, 0.7);
+  color: #f4f6ff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.matching-card:hover { transform: translateY(-1px); }
+.matching-card.selected {
+  border-color: var(--pink, #d4669c);
+  background: rgba(212, 102, 156, 0.12);
+  box-shadow: 0 0 0 3px rgba(212, 102, 156, 0.18);
+}
+.matching-card.matched {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.18);
+  color: #065f46;
+  cursor: default;
+  opacity: 0.85;
+  pointer-events: none;
+}
+body.dark .matching-card.matched { color: #d1fae5; }
+.matching-card.wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.16);
+  animation: match-shake .35s ease;
+}
+@keyframes match-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+}
+
+.matching-result {
+  margin-top: 14px;
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(36, 72, 255, 0.08));
+  border-radius: 18px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.matching-result.shown { display: block; }
+.matching-result h4 {
+  margin: 0 0 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+}
+.matching-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+.matching-result-stat {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+body.dark .matching-result-stat { background: rgba(20, 26, 60, 0.5); }
+.matching-result-stat strong {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+.matching-result-stat small { color: var(--muted, #64748b); font-size: 12px; }
+.matching-result-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* TYPING TEST */
+.typing-shell { display: grid; gap: 14px; }
+.typing-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.typing-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--line, rgba(36, 72, 255, 0.12));
+  border-radius: 20px;
+  padding: 24px 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 57, 0.06);
+  display: grid;
+  gap: 16px;
+}
+body.dark .typing-card {
+  background: rgba(20, 26, 60, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.typing-prompt-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted, #64748b);
+  font-weight: 700;
+}
+.typing-prompt {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  margin: 4px 0;
+  color: var(--ink, #0f1739);
+}
+body.dark .typing-prompt { color: #f4f6ff; }
+.typing-hint {
+  font-size: 13px;
+  color: var(--muted, #64748b);
+}
+.typing-hint kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(36, 72, 255, 0.1);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0 2px;
+}
+.typing-input-row {
+  display: grid;
+  gap: 10px;
+}
+.typing-input {
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 2px solid var(--line, rgba(36, 72, 255, 0.18));
+  background: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--ink, #0f1739);
+  transition: border-color .2s ease, box-shadow .2s ease;
+  outline: none;
+}
+body.dark .typing-input {
+  background: rgba(15, 22, 50, 0.85);
+  color: #f4f6ff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.typing-input:focus {
+  border-color: var(--pink, #d4669c);
+  box-shadow: 0 0 0 4px rgba(212, 102, 156, 0.18);
+}
+.typing-input.success {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+.typing-input.error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+  animation: match-shake .35s ease;
+}
+.typing-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.typing-actions > * { flex: 1 1 140px; min-height: 48px; }
+
+.typing-feedback {
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+.typing-feedback.success {
+  background: rgba(16, 185, 129, 0.14);
+  color: #065f46;
+}
+.typing-feedback.error {
+  background: rgba(239, 68, 68, 0.14);
+  color: #991b1b;
+}
+body.dark .typing-feedback.success { color: #d1fae5; }
+body.dark .typing-feedback.error { color: #fecaca; }
+.typing-feedback small { display: block; margin-top: 4px; opacity: 0.85; font-weight: 400; }
+
+/* WEAK WORDS LIST */
+.weak-shell { display: grid; gap: 14px; }
+.weak-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.weak-actions > * { min-height: 48px; }
+.weak-words-list {
+  display: grid;
+  gap: 10px;
+}
+.weak-word-row {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--line, rgba(36, 72, 255, 0.12));
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  align-items: center;
+}
+body.dark .weak-word-row {
+  background: rgba(20, 26, 60, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.weak-word-info strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+.weak-word-info small { color: var(--muted, #64748b); font-size: 12px; }
+.weak-word-stats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-weight: 600;
+}
+.weak-word-stats span {
+  background: rgba(239, 68, 68, 0.14);
+  color: #991b1b;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.weak-word-stats span.good {
+  background: rgba(16, 185, 129, 0.14);
+  color: #065f46;
+}
+.weak-word-stats span.mastery {
+  background: rgba(36, 72, 255, 0.14);
+  color: var(--navy, #1a2850);
+}
+body.dark .weak-word-stats span { color: #fecaca; }
+body.dark .weak-word-stats span.good { color: #d1fae5; }
+body.dark .weak-word-stats span.mastery { color: #c7d2fe; }
+
+.weak-empty {
+  background: rgba(36, 72, 255, 0.06);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted, #64748b);
+}
+
+/* FAVORITE BUTTON ON FLASHCARDS */
+.memory-fav-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(15, 23, 57, 0.1);
+  transition: transform .15s ease;
+}
+.memory-fav-btn:hover { transform: scale(1.1); }
+.memory-fav-btn.active { color: #ef4444; }
+body.dark .memory-fav-btn {
+  background: rgba(20, 26, 60, 0.85);
+  color: #f4f6ff;
+}
+.memory-card { position: relative; }
+
+.memory-fav-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line, rgba(36, 72, 255, 0.18));
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 40px;
+  margin-left: 10px;
+}
+.memory-fav-toggle.active {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  color: #fff;
+  border-color: transparent;
+}
+body.dark .memory-fav-toggle {
+  background: rgba(20, 26, 60, 0.6);
+  color: #f4f6ff;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .memory-tab-btn {
+    flex: 1 1 calc(50% - 8px);
+    font-size: 13px;
+  }
+  .memory-tab-label { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .memory-tab-bar {
+    padding: 6px;
+    gap: 6px;
+    border-radius: 14px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .memory-tab-bar::-webkit-scrollbar { display: none; }
+  .memory-tab-btn {
+    flex: 0 0 auto;
+    min-width: 110px;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 12px;
+    scroll-snap-align: start;
+  }
+  .memory-tab-icon { font-size: 16px; }
+  .memory-tab-label { font-size: 11px; }
+
+  .matching-board {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .matching-column { gap: 8px; }
+  .matching-card {
+    min-height: 52px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  .matching-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .matching-controls { justify-content: space-between; }
+
+  .typing-card { padding: 18px 16px; }
+  .typing-prompt { font-size: 24px; }
+  .typing-input {
+    min-height: 52px;
+    padding: 12px 14px;
+    font-size: 16px; /* prevents iOS zoom */
+  }
+  .typing-actions > * { flex: 1 1 100%; }
+
+  .daily-ten-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .daily-ten-pill { padding: 8px 10px; min-height: 50px; }
+
+  .weak-word-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  .memory-tab-btn { flex: 1 1 100%; }
+  .matching-card { font-size: 13px; min-height: 48px; }
+  .typing-prompt { font-size: 22px; }
+}
+
+/* keyboard-safe footer for typing on mobile */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .typing-card { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+}
+
+/* ==============================================================
+   ============== GLOBAL MOBİL SERTLEŞTİRME KATMANI ============
+   Tüm sitenin her sayfasında çalışır. Mevcut katmanı bozmaz,
+   sadece eksik garantileri ve modern viewport özelliklerini ekler.
+   ============================================================== */
+
+/* 1) Yatay overflow kilidi — hiçbir element body'i geçip yatay scroll açamaz */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* 2) Tüm media elementleri esnek */
+img, video, iframe, svg {
+  max-width: 100%;
+  height: auto;
+}
+iframe { border: 0; }
+
+/* 3) Uzun metinleri kaydırılabilir tut, tablodan taşmasın */
+p, li, td, th, h1, h2, h3, h4, h5, span, strong, em, small, a, label, button {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.example-list li,
+.review-question,
+.exam-question-title,
+.option-item,
+.exam-option-text,
+.memory-prompt-text,
+.typing-prompt {
+  hyphens: auto;
+}
+
+/* 4) Pre/code blokları yatay kayar */
+pre, code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* 5) Tablo wrapper'ı olmayan tablolar bile yatay kayabilsin */
+table {
+  max-width: 100%;
+}
+.table-wrap,
+.source-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 6) Touch dostu temel */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn,
+  .check-btn,
+  .mark-btn,
+  .nav-links button,
+  .tab-btn,
+  .memory-tab-btn,
+  .exam-nav-btn,
+  .topic-card,
+  .feature-panel button,
+  input[type="submit"],
+  input[type="button"],
+  a.btn {
+    touch-action: manipulation;
+  }
+}
+
+/* 7) iOS zoom önleme — input/select/textarea minimum 16px font */
+@media (max-width: 640px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="color"],
+  input:not([type]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* 8) Dynamic viewport: klavye açılınca 100vh kullanan modal/sheet'lerin patlamasını önle */
+@supports (height: 100dvh) {
+  .theme-sheet { max-height: 100dvh; }
+  .exam-cancel-dialog { max-height: 100dvh; overflow-y: auto; }
+}
+@supports (height: 100svh) {
+  .sidebar { height: 100svh; }
+}
+
+/* 9) Safe area padding — notch/dinamik ada cihazlar için */
+@supports (padding: max(0px)) {
+  .topbar {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+  .content-wrapper {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  .sidebar {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* 10) Touch hedefi minimumu — tüm interaktif elementler en az 40px */
+@media (max-width: 768px) {
+  button,
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn,
+  .check-btn,
+  .mark-btn,
+  .nav-links button,
+  .tab-btn,
+  .memory-tab-btn,
+  .exam-nav-btn,
+  input[type="submit"],
+  input[type="button"],
+  select {
+    min-height: 40px;
+  }
+}
+
+/* 11) Hero / başlık tipografisi clamp ile akışkan */
+.hero h1 {
+  font-size: clamp(20px, 4.5vw, 38px);
+  line-height: 1.18;
+}
+.hero p {
+  font-size: clamp(13px, 2.6vw, 17px);
+}
+.page-header-left h2,
+.detail-title,
+.quiz-title {
+  font-size: clamp(20px, 4vw, 30px);
+  line-height: 1.2;
+}
+
+/* 12) Sidebar mobil scroll — uzun menü yetmezse kayar */
+@media (max-width: 1024px) {
+  .sidebar {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* 13) Tablo zorunlu kayma (mobil) */
+@media (max-width: 640px) {
+  .table-wrap,
+  .source-table-wrap {
+    margin-left: -4px;
+    margin-right: -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+
+/* 14) Çok küçük ekran (≤ 360px) — Galaxy Fold kapalı vs */
+@media (max-width: 360px) {
+  :root { --radius: 16px; }
+  .content-wrapper { padding: 10px; }
+  .hero { padding: 16px 12px; }
+  .stat-card,
+  .progress-card,
+  .feature-panel,
+  .dashboard-card,
+  .topic-card,
+  .exam-mode-card,
+  .flashcard,
+  .review-card,
+  .content-card { padding: 12px; }
+  .stat-num { font-size: 20px; }
+  .stat-label { font-size: 10px; }
+  .unit-badge,
+  .panel-badge { font-size: 10px; padding: 4px 8px; }
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn { padding: 10px 14px; font-size: 13px; }
+}
+
+/* 15) Sınavda klavye aşağıdan açılınca alt aksiyonların görünür kalması */
+@media (max-width: 768px) {
+  .exam-shell-actions,
+  .typing-actions,
+  .topic-actions {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* 16) Modal arkayı kilitleme — body scroll lock garantisi */
+body.modal-open,
+body.nav-open {
+  position: relative;
+}
+
+/* 17) Topbar mobile arama: focus halinde tam genişlik */
+@media (max-width: 768px) {
+  .search-bar input:focus { outline: none; }
+}
+
+/* 18) Karanlık moddaki seçim rengi */
+::selection {
+  background: var(--pink-bright);
+  color: var(--white);
+}
+
+/* 19) Yazma input — iOS klavye autocorrect kapalı + büyük font garanti */
+.typing-input {
+  font-size: max(16px, 1rem);
+}
+
+/* 20) Theme sheet mobil gerçek kayan grid */
+@media (max-width: 480px) {
+  .theme-sheet-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px;
+  }
+}
+@media (max-width: 360px) {
+  .theme-sheet-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==============================================================
+   ============== EZBER MERKEZİ — 4 ŞIKLI TEST REDESIGN ========
+   Mobile-first, premium, kompakt. Sekme paneli görünürlüğü
+   üstteki katmandan geliyor; bu blok sadece içeriği biçimlendirir.
+   ============================================================== */
+
+/* Panel genel */
+.memory-panel { display: none; }
+.memory-panel.active { display: block; }
+
+/* Practice card — kompakt, ortalı, premium */
+#memoryPracticeSection .memory-practice-shell {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  gap: 16px;
+}
+
+#memoryPracticeSection .memory-practice-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#memoryPracticeSection .memory-practice-head > div:first-child { flex: 1 1 200px; }
+#memoryPracticeSection .memory-practice-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 2.4vw, 22px);
+  margin: 4px 0;
+  letter-spacing: -.01em;
+}
+#memoryPracticeSection .helper-line {
+  font-size: 13px;
+  color: var(--text-light);
+  margin: 0;
+}
+
+/* Mode switch — segmented control */
+.memory-mode-switch {
+  display: inline-flex;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  padding: 4px;
+  border-radius: 999px;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+.memory-mode-btn {
+  border: none;
+  background: transparent;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 40px;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+  white-space: nowrap;
+}
+.memory-mode-btn.active {
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(212, 102, 156, .28);
+}
+.memory-mode-btn:not(.active):hover {
+  color: var(--navy);
+  background: rgba(212, 102, 156, .08);
+}
+body.dark .memory-mode-btn:not(.active) { color: #cbd5e1; }
+body.dark .memory-mode-btn:not(.active):hover { color: #fff; background: rgba(255,255,255,.06); }
+
+/* Question card */
+.memory-practice-redesign {
+  display: grid;
+  gap: 14px;
+}
+
+.memory-question-card {
+  background: linear-gradient(135deg, rgba(212, 102, 156, .08), rgba(36, 72, 255, .04));
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 22px 20px;
+  text-align: center;
+  display: grid;
+  gap: 8px;
+  min-height: 140px;
+  align-content: center;
+}
+body.dark .memory-question-card {
+  background: linear-gradient(135deg, rgba(212,102,156,.14), rgba(36,72,255,.08));
+}
+.memory-question-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: var(--pink);
+  text-transform: uppercase;
+}
+body.dark .memory-question-label { color: var(--pink-bright); }
+.memory-question-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 5vw, 34px);
+  line-height: 1.18;
+  color: var(--navy);
+  letter-spacing: -.01em;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+body.dark .memory-question-text { color: #fff; }
+.memory-question-hint {
+  font-size: 13px;
+  color: var(--text-light);
+  margin: 0;
+}
+
+/* Options grid */
+.memory-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 720px) {
+  .memory-options-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.memory-option-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1.5px solid var(--card-border);
+  background: var(--white);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .12s ease, box-shadow .2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.memory-option-card:hover { border-color: var(--pink); background: rgba(212,102,156,.04); }
+.memory-option-card:active { transform: scale(.98); }
+.memory-option-card[disabled] { cursor: default; }
+
+.memory-option-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--pink);
+  background: rgba(212, 102, 156, .12);
+  padding: 4px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+body.dark .memory-option-tag { color: var(--pink-bright); background: rgba(212,102,156,.18); }
+.memory-option-label {
+  font-size: clamp(14px, 2vw, 16px);
+  line-height: 1.4;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.memory-option-card.correct {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, .12);
+  color: #065f46;
+}
+.memory-option-card.correct .memory-option-tag {
+  color: #065f46;
+  background: rgba(16, 185, 129, .16);
+}
+body.dark .memory-option-card.correct { color: #d1fae5; }
+
+.memory-option-card.wrong {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, .12);
+  color: #991b1b;
+  animation: memShake .35s ease;
+}
+.memory-option-card.wrong .memory-option-tag {
+  color: #991b1b;
+  background: rgba(239, 68, 68, .16);
+}
+body.dark .memory-option-card.wrong { color: #fecaca; }
+@keyframes memShake {
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-5px);}
+  50%{transform:translateX(5px);}
+  75%{transform:translateX(-3px);}
+}
+.memory-option-card.locked { opacity: 0.92; pointer-events: none; }
+
+/* Feedback */
+.memory-feedback {
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.memory-feedback.success {
+  background: rgba(16, 185, 129, .14);
+  color: #065f46;
+}
+.memory-feedback.error {
+  background: rgba(239, 68, 68, .14);
+  color: #991b1b;
+}
+body.dark .memory-feedback.success { color: #d1fae5; }
+body.dark .memory-feedback.error { color: #fecaca; }
+
+/* Next button */
+.memory-next-btn {
+  width: 100%;
+  min-height: 52px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  font-size: 15px;
+}
+.memory-next-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================================
+   FLASHCARD — Mobil 2 kolon
+   ============================================================ */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .memory-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+  .memory-card,
+  .memory-card-inner { min-height: 170px !important; }
+  .memory-face { padding: 14px !important; }
+  .memory-face strong { font-size: 17px !important; }
+  .memory-face small,
+  .memory-face em { font-size: 11px !important; }
+  .memory-fav-btn { width: 30px; height: 30px; font-size: 14px; top: 6px; right: 6px; }
+}
+@media (max-width: 420px) {
+  .memory-grid { gap: 8px; }
+  .memory-card,
+  .memory-card-inner { min-height: 150px !important; }
+  .memory-face { padding: 12px !important; }
+  .memory-face strong { font-size: 15px !important; }
+}
+@media (max-width: 360px) {
+  .memory-card,
+  .memory-card-inner { min-height: 138px !important; }
+  .memory-face strong { font-size: 14px !important; }
+}
+
+/* ============================================================
+   EŞLEŞTİRME — Mobil yatay scroll
+   ============================================================ */
+@media (max-width: 480px) {
+  .matching-shell { gap: 10px; }
+  .matching-board {
+    /* iki sütun yan yana kalsın, gerekirse yatay scroll */
+    grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr) !important;
+    gap: 10px;
+    min-width: 340px;
+    overflow-x: visible;
+  }
+  /* Dış kapsayıcıyı scroll yap */
+  #memoryMatchingSection .matching-shell {
+    overflow-x: visible;
+  }
+  /* Board'u scroll'lu wrapper'a sar — JS değişikliği gerekmez:
+     overflow-x'i .matching-board üst container'ına ver */
+  .matching-shell > .matching-board {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+  .matching-card { font-size: 13px; min-height: 50px; padding: 10px 12px; }
+  .matching-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .matching-controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+
+/* ============================================================
+   YAZMA TESTİ — Mobil sıkılaştırma
+   ============================================================ */
+@media (max-width: 480px) {
+  .typing-card {
+    padding: 18px 16px;
+    border-radius: 20px;
+  }
+  .typing-prompt { font-size: clamp(20px, 6vw, 26px); }
+  .typing-input {
+    min-height: 50px;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+  .typing-actions { gap: 8px; }
+  .typing-actions > * {
+    flex: 1 1 100%;
+    min-height: 48px;
+  }
+  .typing-stats { justify-content: center; }
+}
+/* Klavye açıldığında alt aksiyonlar görünür kalsın */
+@supports (height: 100dvh) {
+  #memoryTypingSection .typing-card {
+    max-height: calc(100dvh - 140px);
+    overflow-y: auto;
+  }
+}
+
+/* ============================================================
+   PRACTICE PANELİ — Mobile-first sıkılaştırma
+   ============================================================ */
+@media (max-width: 768px) {
+  #memoryPracticeSection .memory-practice-shell {
+    padding: 16px;
+    border-radius: 20px;
+  }
+  .memory-practice-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .memory-mode-switch {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: 14px;
+    padding: 4px;
+  }
+  .memory-mode-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 8px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+  .memory-question-card {
+    padding: 18px 14px;
+    min-height: 120px;
+    border-radius: 18px;
+  }
+  .memory-options-grid { gap: 8px; }
+  .memory-option-card {
+    min-height: 56px;
+    padding: 11px 14px;
+    border-radius: 14px;
+  }
+  .memory-option-tag { font-size: 9px; padding: 3px 6px; }
+  .memory-option-label { font-size: 14px; }
+  .memory-feedback { font-size: 13px; padding: 10px 12px; }
+  .memory-next-btn { min-height: 48px; font-size: 14px; }
+}
+
+@media (max-width: 420px) {
+  #memoryPracticeSection .memory-practice-shell {
+    padding: 14px;
+    border-radius: 18px;
+  }
+  .memory-question-card {
+    padding: 16px 12px;
+    min-height: 110px;
+  }
+  .memory-question-text { font-size: clamp(20px, 6.5vw, 26px); }
+  .memory-question-label { font-size: 10px; letter-spacing: .1em; }
+  .memory-option-card {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    min-height: 56px;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  .memory-option-tag {
+    justify-self: start;
+    font-size: 9px;
+  }
+  .memory-option-label { font-size: 14px; }
+}
+
+@media (max-width: 390px) {
+  #memoryPracticeSection .memory-practice-shell { padding: 12px; }
+  .memory-question-card { padding: 14px 10px; min-height: 100px; }
+  .memory-question-text { font-size: clamp(19px, 6.8vw, 24px); }
+  .memory-mode-btn { font-size: 12px; padding: 8px 6px; }
+  .memory-option-card { padding: 10px 12px; }
+  .memory-option-label { font-size: 13.5px; }
+  .memory-feedback { font-size: 12.5px; padding: 9px 10px; }
+}
+
+@media (max-width: 360px) {
+  .memory-mode-switch { grid-template-columns: 1fr; }
+  .memory-question-text { font-size: 18px; }
+}
+
+/* Touch cihazlarda hover efektini kaldır */
+@media (hover: none) {
+  .memory-option-card:hover {
+    border-color: var(--card-border);
+    background: var(--white);
+  }
+  .memory-option-card:active {
+    border-color: var(--pink);
+    background: rgba(212,102,156,.08);
+    transform: scale(.98);
+  }
+}
+
+/* Sayfa yatay taşma kilidi (tekrar garanti) */
+#memoryhub,
+#memoryhub * {
+  max-width: 100%;
+}
+.memory-grid,
+.memory-options-grid,
+.typing-card,
+.weak-words-list { min-width: 0; }
+
+/* ============================================================
+   MATCHING SCROLL WRAPPER — mobilde yatay scroll, board sabit min-width
+   ============================================================ */
+.matching-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 4px;
+}
+.matching-scroll .matching-board {
+  min-width: 0; /* desktop default */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* 480px altı: yatay scroll devreye girer, board min-width 560px */
+@media (max-width: 480px) {
+  .matching-scroll .matching-board {
+    min-width: 560px;
+    grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr) !important;
+  }
+  /* Önceki tek kolon kuralını ezerek yan yana zorla */
+  .matching-board {
+    grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr) !important;
+  }
+}
+@media (max-width: 390px) {
+  .matching-scroll .matching-board {
+    min-width: 520px;
+  }
+}
+
+/* ============================================================
+   STICKY ARAMA KUTUSU (Ezber Merkezi flashcard alanı)
+   ============================================================ */
+.memory-search-sticky {
+  position: sticky;
+  top: 80px;
+  z-index: 80;
+  padding: 10px 0;
+  margin: 0 0 10px;
+  background: color-mix(in srgb, var(--white) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border-radius: 16px;
+}
+body.dark .memory-search-sticky {
+  background: color-mix(in srgb, var(--white) 80%, transparent);
+}
+@media (max-width: 768px) {
+  .memory-search-sticky { top: 64px; padding: 8px 0; }
+}
+@media (max-width: 480px) {
+  .memory-search-sticky { top: 60px; }
+}
+
+/* ============================================================
+   SAĞ ALT YUKARI ÇIK BUTONU
+   ============================================================ */
+.scroll-top-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(212, 102, 156, .35);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px) scale(.92);
+  transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  touch-action: manipulation;
+}
+.scroll-top-btn.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.scroll-top-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 16px 32px rgba(212, 102, 156, .42);
+}
+body.dark .scroll-top-btn {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .08);
+}
+@media (max-width: 480px) {
+  .scroll-top-btn {
+    right: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+}
+
+/* ============================================================
+   FLASHCARD GRID — mobil 2 sütun zorunlu (kuralı sertleştir)
+   ============================================================ */
+.flashcards-grid,
+#memoryHubGrid.memory-grid {
+  display: grid;
+  gap: 14px;
+}
+@media (min-width: 768px) {
+  #memoryHubGrid.memory-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+@media (max-width: 768px) {
+  #memoryHubGrid.memory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+  }
+}
+@media (max-width: 420px) {
+  #memoryHubGrid.memory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+  }
+}
+@media (max-width: 360px) {
+  #memoryHubGrid.memory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px;
+  }
+}
+
+/* ============================================================
+   FINAL STABLE FIX — Flashcard sticky arama + mobil yukarı butonu
+   Amaç: Arayüz temiz kalsın; arama barı Hacıbey kategori barı gibi
+   aşağı kaydırınca topbar altında sabit kalsın.
+   ============================================================ */
+#memoryhub,
+#memoryCardsSection,
+#memoryCardsSection .memory-section-shell,
+#memoryCardsSection .memory-cards-shell {
+  overflow: visible !important;
+}
+
+#memoryCardsSection .memory-cards-shell {
+  position: relative !important;
+}
+
+#memoryCardsSection .memory-search-sticky {
+  position: sticky !important;
+  top: var(--memory-search-top, 86px) !important;
+  z-index: 1300 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+  width: 100% !important;
+  margin: -4px 0 14px !important;
+  padding: 8px 0 10px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  isolation: isolate !important;
+}
+
+#memoryCardsSection .memory-search-sticky::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 -14px !important;
+  z-index: -1 !important;
+  border-radius: 0 0 20px 20px !important;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg) 98%, transparent),
+      color-mix(in srgb, var(--bg) 86%, transparent)
+    ) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--card-border) 72%, transparent) !important;
+  box-shadow: 0 12px 26px rgba(126, 32, 70, .07) !important;
+  backdrop-filter: blur(18px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.15) !important;
+}
+
+#memoryCardsSection .memory-search-sticky .hub-legend {
+  display: none !important;
+}
+
+#memoryCardsSection .memory-search-sticky .hub-search,
+#memoryCardsSection .memory-search-sticky input {
+  width: 100% !important;
+  min-height: 52px !important;
+  height: 52px !important;
+  border-radius: 999px !important;
+  padding: 0 18px !important;
+  border: 1.5px solid color-mix(in srgb, var(--pink) 34%, var(--card-border) 66%) !important;
+  background: color-mix(in srgb, var(--white) 94%, transparent) !important;
+  color: var(--text) !important;
+  box-shadow: 0 10px 24px rgba(126, 32, 70, .08) !important;
+  outline: none !important;
+}
+
+#memoryCardsSection .memory-search-sticky .hub-search:focus,
+#memoryCardsSection .memory-search-sticky input:focus {
+  border-color: var(--pink) !important;
+  box-shadow: 0 0 0 4px rgba(212, 102, 156, .12), 0 12px 26px rgba(126, 32, 70, .10) !important;
+}
+
+body.dark #memoryCardsSection .memory-search-sticky::before {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15, 8, 11, .96),
+      rgba(15, 8, 11, .84)
+    ) !important;
+  border-bottom-color: rgba(255,255,255,.08) !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,.28) !important;
+}
+
+body.dark #memoryCardsSection .memory-search-sticky .hub-search,
+body.dark #memoryCardsSection .memory-search-sticky input {
+  background: rgba(25, 16, 20, .94) !important;
+  color: var(--text) !important;
+  border-color: rgba(255, 157, 184, .30) !important;
+}
+
+#scrollTopBtn.scroll-top-btn {
+  position: fixed !important;
+  right: 18px !important;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  width: 56px !important;
+  height: 56px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  z-index: 2147483000 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  color: #fff !important;
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright)) !important;
+  box-shadow: 0 18px 44px rgba(139, 23, 68, .34) !important;
+  font-size: 25px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(12px) scale(.94) !important;
+  transition: opacity .22s ease, visibility .22s ease, transform .22s ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+#scrollTopBtn.scroll-top-btn.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+#scrollTopBtn.scroll-top-btn:hover {
+  transform: translateY(-3px) scale(1.04) !important;
+}
+
+@media (max-width: 768px) {
+  #memoryCardsSection .memory-search-sticky {
+    top: var(--memory-search-top-mobile, 70px) !important;
+    margin: -2px 0 12px !important;
+    padding: 7px 0 9px !important;
+  }
+
+  #memoryCardsSection .memory-search-sticky::before {
+    inset: 0 -12px !important;
+    border-radius: 0 0 18px 18px !important;
+  }
+
+  #memoryCardsSection .memory-search-sticky .hub-search,
+  #memoryCardsSection .memory-search-sticky input {
+    min-height: 50px !important;
+    height: 50px !important;
+    font-size: 15px !important;
+    padding-inline: 16px !important;
+  }
+
+  #scrollTopBtn.scroll-top-btn {
+    right: 14px !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 52px !important;
+    height: 52px !important;
+    font-size: 23px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  #memoryCardsSection .memory-search-sticky {
+    top: var(--memory-search-top-mobile, 64px) !important;
+  }
+
+  #scrollTopBtn.scroll-top-btn {
+    right: 12px !important;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 50px !important;
+    height: 50px !important;
+  }
+}
+
+/* ============================================================
+   HACIBEY STYLE FOLLOW BAR + FLASHCARD FAVORITE FILTER
+   - Arama barı scroll ile topbar altında takip eder.
+   - Kalp/Favoriler butonu sadece favori flashcardları filtreler.
+   ============================================================ */
+.memory-search-spacer {
+  display: none;
+  width: 100%;
+  pointer-events: none;
+}
+.memory-search-spacer.active { display: block; }
+
+#memoryCardsSection .memory-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+#memoryCardsSection .memory-search-sticky.is-scroll-following {
+  position: fixed !important;
+  top: var(--memory-search-top, 86px) !important;
+  left: var(--memory-search-left, 16px) !important;
+  width: var(--memory-search-width, calc(100vw - 32px)) !important;
+  z-index: 2147482600 !important;
+  margin: 0 !important;
+  padding: 8px 0 10px !important;
+}
+
+.memory-favorite-filter-btn {
+  min-height: 52px;
+  height: 52px;
+  border: 1.5px solid color-mix(in srgb, var(--pink) 30%, var(--card-border) 70%);
+  border-radius: 999px;
+  padding: 0 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: color-mix(in srgb, var(--white) 92%, transparent);
+  color: var(--navy);
+  font-weight: 900;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(126, 32, 70, .07);
+  transition: transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.memory-favorite-filter-btn:hover { transform: translateY(-1px); border-color: var(--pink); }
+.memory-favorite-filter-btn.active,
+.memory-favorite-filter-btn[aria-pressed="true"] {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  box-shadow: 0 14px 28px rgba(212, 102, 156, .24);
+}
+.memory-favorite-filter-btn .fav-filter-icon {
+  font-size: 17px;
+  line-height: 1;
+}
+.memory-favorite-filter-btn.active .fav-filter-icon,
+.memory-favorite-filter-btn[aria-pressed="true"] .fav-filter-icon {
+  content: "❤️";
+}
+
+body.dark .memory-favorite-filter-btn {
+  color: #ffe3ea;
+  background: rgba(25, 16, 20, .94);
+  border-color: rgba(255, 157, 184, .30);
+  box-shadow: 0 12px 24px rgba(0,0,0,.24);
+}
+body.dark .memory-favorite-filter-btn.active,
+body.dark .memory-favorite-filter-btn[aria-pressed="true"] {
+  color: #fff;
+  background: linear-gradient(135deg, #7d1935, #de5f7f);
+}
+
+@media (max-width: 768px) {
+  #memoryCardsSection .memory-search-row {
+    grid-template-columns: minmax(0, 1fr) 50px;
+    gap: 8px;
+  }
+  .memory-favorite-filter-btn {
+    width: 50px;
+    min-width: 50px;
+    height: 50px;
+    min-height: 50px;
+    padding: 0;
+  }
+  .memory-favorite-filter-btn .fav-filter-text { display: none; }
+  .memory-favorite-filter-btn .fav-filter-icon { font-size: 20px; }
+}
+
+@media (max-width: 420px) {
+  #memoryCardsSection .memory-search-row {
+    grid-template-columns: minmax(0, 1fr) 48px;
+  }
+  .memory-favorite-filter-btn {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
+  }
+}
+
+/* ============================================================
+   FINAL MOBILE MATCHING + CLEAN FLASHCARD STICKY SEARCH UI
+   - Kelime eşleştirme mobilde tam ekrana oturur.
+   - Flashcard arama barı Hacıbey kategori barı gibi daha temiz görünür.
+   ============================================================ */
+
+/* Flashcard sticky search: clean premium follow bar */
+#memoryCardsSection .memory-search-sticky,
+#memoryCardsSection .memory-search-sticky.is-scroll-following {
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--white) 86%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--card-border) 70%, var(--pink) 30%) !important;
+  box-shadow: 0 16px 36px rgba(126, 32, 70, .12) !important;
+  backdrop-filter: blur(22px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.2) !important;
+  padding: 8px !important;
+  isolation: isolate !important;
+}
+
+#memoryCardsSection .memory-search-sticky::before,
+#memoryCardsSection .memory-search-sticky.is-scroll-following::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -9px !important;
+  z-index: -1 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 82%, transparent),
+    color-mix(in srgb, var(--bg) 64%, transparent)
+  ) !important;
+  border: 1px solid color-mix(in srgb, var(--card-border) 55%, transparent) !important;
+  box-shadow: 0 10px 28px rgba(126, 32, 70, .08) !important;
+  backdrop-filter: blur(20px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.15) !important;
+}
+
+#memoryCardsSection .memory-search-row {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+#memoryCardsSection .memory-search-sticky .hub-search,
+#memoryCardsSection .memory-search-sticky input {
+  height: 48px !important;
+  min-height: 48px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 0 18px !important;
+  background: color-mix(in srgb, var(--input-bg) 88%, var(--white) 12%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.58) !important;
+}
+
+#memoryCardsSection .memory-search-sticky .hub-search:focus,
+#memoryCardsSection .memory-search-sticky input:focus {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.58),
+    0 0 0 3px rgba(212,102,156,.14) !important;
+}
+
+#memoryCardsSection .memory-favorite-filter-btn {
+  height: 48px !important;
+  min-height: 48px !important;
+  border-radius: 999px !important;
+  border: 0 !important;
+  background: color-mix(in srgb, var(--pink-pale) 78%, var(--white) 22%) !important;
+  color: var(--navy) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.52) !important;
+}
+
+#memoryCardsSection .memory-favorite-filter-btn.active,
+#memoryCardsSection .memory-favorite-filter-btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright)) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(212,102,156,.24) !important;
+}
+
+body.dark #memoryCardsSection .memory-search-sticky,
+body.dark #memoryCardsSection .memory-search-sticky.is-scroll-following {
+  background: rgba(25, 16, 20, .88) !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: 0 18px 38px rgba(0,0,0,.30) !important;
+}
+
+body.dark #memoryCardsSection .memory-search-sticky::before,
+body.dark #memoryCardsSection .memory-search-sticky.is-scroll-following::before {
+  background: rgba(15, 8, 11, .62) !important;
+  border-color: rgba(255,255,255,.06) !important;
+}
+
+/* Matching desktop cleanup */
+.matching-shell {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.matching-scroll {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: visible !important;
+}
+
+.matching-board {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: start !important;
+}
+
+.matching-card {
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: 56px !important;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1.35 !important;
+  word-break: break-word !important;
+}
+
+/* Mobile: matching full viewport fit */
+@media (max-width: 768px) {
+  #memoryMatchingSection.memory-section-shell {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    margin-left: calc(50% - 50vw + 12px) !important;
+    margin-right: calc(50% - 50vw + 12px) !important;
+  }
+
+  #memoryMatchingSection .memory-section-head {
+    padding: 0 2px !important;
+  }
+
+  .matching-shell {
+    border-radius: 18px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  .matching-toolbar {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+    margin-bottom: 12px !important;
+  }
+
+  .matching-stats {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 2px !important;
+  }
+
+  .matching-pill {
+    flex: 0 0 auto !important;
+    min-height: 34px !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .matching-controls {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    width: 100% !important;
+    align-items: center !important;
+  }
+
+  .matching-size-toggle {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .matching-size-toggle select {
+    width: 100% !important;
+    min-height: 44px !important;
+    border-radius: 14px !important;
+  }
+
+  .matching-controls .ghost-btn,
+  .matching-controls button {
+    min-height: 44px !important;
+    padding: 0 14px !important;
+    border-radius: 16px !important;
+    white-space: nowrap !important;
+  }
+
+  .matching-scroll {
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .matching-board,
+  .matching-scroll .matching-board {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .matching-column {
+    min-width: 0 !important;
+    gap: 8px !important;
+  }
+
+  .matching-column-title {
+    font-size: 11px !important;
+    margin: 0 0 4px !important;
+    letter-spacing: .08em !important;
+  }
+
+  .matching-card {
+    min-height: 52px !important;
+    padding: 9px 8px !important;
+    border-radius: 14px !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+  }
+
+  /* Clean mobile sticky flashcard search */
+  #memoryCardsSection .memory-search-sticky,
+  #memoryCardsSection .memory-search-sticky.is-scroll-following {
+    width: min(var(--memory-search-width, calc(100vw - 24px)), calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+    padding: 7px !important;
+  }
+
+  #memoryCardsSection .memory-search-sticky .hub-search,
+  #memoryCardsSection .memory-search-sticky input {
+    height: 46px !important;
+    min-height: 46px !important;
+    font-size: 14.5px !important;
+    padding-inline: 15px !important;
+  }
+
+  #memoryCardsSection .memory-search-row {
+    grid-template-columns: minmax(0, 1fr) 46px !important;
+    gap: 7px !important;
+  }
+
+  #memoryCardsSection .memory-favorite-filter-btn {
+    width: 46px !important;
+    min-width: 46px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .matching-board,
+  .matching-scroll .matching-board {
+    gap: 7px !important;
+  }
+
+  .matching-card {
+    min-height: 50px !important;
+    padding: 8px 6px !important;
+    border-radius: 13px !important;
+    font-size: 12.8px !important;
+  }
+
+  .matching-size-toggle span {
+    font-size: 12px !important;
+  }
+
+  #memoryCardsSection .memory-search-sticky,
+  #memoryCardsSection .memory-search-sticky.is-scroll-following {
+    padding: 6px !important;
+  }
+
+  #memoryCardsSection .memory-search-row {
+    grid-template-columns: minmax(0, 1fr) 44px !important;
+  }
+
+  #memoryCardsSection .memory-favorite-filter-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+}
+
+
+/* ============================================================
+   YUSUF FINAL OVERRIDE — Flashcard arama barı sayfanın en üstünde takip etsin
+   ============================================================ */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+}
+
+#memoryCardsSection .memory-search-sticky.is-scroll-following {
+  top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
+  z-index: 2147483000 !important;
+}
+
+#memoryCardsSection .memory-search-sticky.is-scroll-following::before {
+  background: color-mix(in srgb, var(--bg) 72%, transparent) !important;
+}
+
+@media (max-width: 768px) {
+  #memoryCardsSection .memory-search-sticky.is-scroll-following {
+    top: calc(env(safe-area-inset-top, 0px) + 8px) !important;
+    left: 10px !important;
+    width: calc(100vw - 20px) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  #memoryCardsSection .memory-search-sticky.is-scroll-following {
+    top: calc(env(safe-area-inset-top, 0px) + 7px) !important;
+    left: 8px !important;
+    width: calc(100vw - 16px) !important;
   }
 }
