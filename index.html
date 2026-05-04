@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -450,81 +451,194 @@
       </section>
 
       <section id="examcenter" class="page">
-        <div class="page-header">
-          <div class="page-header-left">
-            <span class="unit-badge exam-badge">EXAM HUB</span>
-            <h2>Sınav Merkezi</h2>
-            <p class="subtitle">Karışık deneme sınavı, süre takibi ve sonuç analizi.</p>
-          </div>
-        </div>
-
-        <div class="exam-modes">
-          <div class="exam-mode-card">
-            <div class="mode-top">
-              <span class="mode-chip">Mini</span>
-              <strong>10 soru</strong>
+        <div class="exam-pro-shell">
+          <div class="exam-pro-header">
+            <div>
+              <span class="unit-badge exam-badge">EXAM HUB</span>
+              <h2>Sınav Merkezi</h2>
+              <p>Kendini test et, gelişimini takip et, hedeflerine ulaş. ✨</p>
             </div>
-            <p>Hızlı tekrar sonrası ideal. Süre: 8 dakika.</p>
-            <button class="primary-btn" onclick="startExam(10, 8)">Mini Sınav Başlat</button>
+
+            <button class="exam-history-btn" type="button" onclick="showExamHistoryPanel()">
+              <span>⏱</span>
+              Sınav Geçmişim
+              <small>⌄</small>
+            </button>
           </div>
 
-          <div class="exam-mode-card">
-            <div class="mode-top">
-              <span class="mode-chip mid">Orta</span>
-              <strong>20 soru</strong>
+          <div class="exam-pro-stats">
+            <div class="exam-stat-card purple">
+              <span class="exam-stat-icon">📋</span>
+              <div>
+                <small>Toplam Sınav</small>
+                <strong id="exam-total-count">0</strong>
+                <em id="exam-weekly-change">Bu hafta +0</em>
+              </div>
             </div>
-            <p>Günlük genel kontrol için iyi. Süre: 15 dakika.</p>
-            <button class="primary-btn soft" onclick="startExam(20, 15)">Orta Sınav Başlat</button>
-          </div>
 
-          <div class="exam-mode-card">
-            <div class="mode-top">
-              <span class="mode-chip full">Tam</span>
-              <strong>30 soru</strong>
+            <div class="exam-stat-card green">
+              <span class="exam-stat-icon">🎯</span>
+              <div>
+                <small>Ortalama Puan</small>
+                <strong id="exam-average-score">0%</strong>
+                <em>Genel ortalama</em>
+              </div>
             </div>
-            <p>Daha ciddi deneme için. Süre: 25 dakika.</p>
-            <button class="primary-btn dark" onclick="startExam(30, 25)">Tam Sınav Başlat</button>
-          </div>
 
-          <div class="exam-mode-card">
-            <div class="mode-top">
-              <span class="mode-chip mega">Mega</span>
-              <strong>60 soru</strong>
+            <div class="exam-stat-card orange">
+              <span class="exam-stat-icon">🏆</span>
+              <div>
+                <small>En Yüksek Puan</small>
+                <strong id="exam-highest-score">0%</strong>
+                <em>En iyi deneme</em>
+              </div>
             </div>
-            <p>Uzun deneme modu. Süre: 90 dakika (1.5 saat).</p>
-            <button class="primary-btn dark" onclick="startExam(60, 90)">60 Soruluk Sınav Başlat</button>
-          </div>
 
-          <div class="exam-mode-card">
-            <div class="mode-top">
-              <span class="mode-chip ultra">Ultra</span>
-              <strong>80 soru</strong>
+            <div class="exam-stat-card blue">
+              <span class="exam-stat-icon">📈</span>
+              <div>
+                <small>Doğru Cevaplar</small>
+                <strong id="exam-total-correct">0</strong>
+                <em>Toplam doğru</em>
+              </div>
             </div>
-            <p>En kapsamlı deneme modu. Süre: 90 dakika (1.5 saat).</p>
-            <button class="primary-btn dark" onclick="startExam(80, 90)">80 Soruluk Sınav Başlat</button>
-          </div>
-        </div>
 
-        <div id="examMetaBox" class="exam-meta-box">
-          <div class="exam-meta-item">
-            <span>Hazır soru havuzu</span>
-            <strong id="exam-bank-count">0</strong>
+            <div class="exam-stat-card pink">
+              <span class="exam-stat-icon">🎯</span>
+              <div>
+                <small>Hedef</small>
+                <strong>85%</strong>
+                <em>Ortalama puan</em>
+              </div>
+            </div>
           </div>
-          <div class="exam-meta-item">
-            <span>En iyi derece</span>
-            <strong id="exam-best-inline">0%</strong>
-          </div>
-          <div class="exam-meta-item">
-            <span>Son sonuç</span>
-            <strong id="exam-last-inline">—</strong>
-          </div>
-        </div>
 
-        <div id="examWorkspace" class="exam-workspace">
-          <div class="empty-state">
-            <h3>Henüz aktif bir sınav yok</h3>
-            <p>Yukarıdan bir sınav türü seçip karışık grammar sınavını başlatabilirsin.</p>
+          <div class="exam-pro-main-grid">
+            <div class="exam-pro-panel exam-categories-panel">
+              <div class="exam-panel-head">
+                <h3>Sınav Kategorileri</h3>
+                <button type="button" class="exam-link-btn" onclick="showExamHistoryPanel()">Tümünü Gör →</button>
+              </div>
+
+              <div class="exam-category-grid">
+                <article class="exam-category-card violet">
+                  <div class="exam-category-visual">Aa</div>
+                  <h4>Mini Sınav</h4>
+                  <p>Hızlı tekrar sonrası ideal.</p>
+                  <div class="exam-category-footer">
+                    <span>10 Soru</span>
+                    <button onclick="startExam(10, 8)">Başla</button>
+                  </div>
+                </article>
+
+                <article class="exam-category-card green">
+                  <div class="exam-category-visual">✎</div>
+                  <h4>Orta Sınav</h4>
+                  <p>Günlük genel kontrol için.</p>
+                  <div class="exam-category-footer">
+                    <span>20 Soru</span>
+                    <button onclick="startExam(20, 15)">Başla</button>
+                  </div>
+                </article>
+
+                <article class="exam-category-card orange">
+                  <div class="exam-category-visual">🎧</div>
+                  <h4>Tam Sınav</h4>
+                  <p>Daha ciddi deneme modu.</p>
+                  <div class="exam-category-footer">
+                    <span>30 Soru</span>
+                    <button onclick="startExam(30, 25)">Başla</button>
+                  </div>
+                </article>
+
+                <article class="exam-category-card blue">
+                  <div class="exam-category-visual">📄</div>
+                  <h4>Mega Sınav</h4>
+                  <p>Uzun deneme modu.</p>
+                  <div class="exam-category-footer">
+                    <span>60 Soru</span>
+                    <button onclick="startExam(60, 90)">Başla</button>
+                  </div>
+                </article>
+
+                <article class="exam-category-card pink">
+                  <div class="exam-category-visual">✏️</div>
+                  <h4>Ultra Sınav</h4>
+                  <p>En kapsamlı deneme.</p>
+                  <div class="exam-category-footer">
+                    <span>80 Soru</span>
+                    <button onclick="startExam(80, 90)">Başla</button>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <div class="exam-pro-panel exam-history-panel">
+              <div class="exam-panel-head">
+                <h3>Son Sınavlarım</h3>
+                <button type="button" class="exam-link-btn" onclick="showExamHistoryPanel()">Tüm Geçmiş →</button>
+              </div>
+
+              <div id="examRecentList" class="exam-recent-list">
+                <div class="exam-empty-mini">Henüz sınav geçmişi yok.</div>
+              </div>
+            </div>
+
+            <div class="exam-pro-panel exam-chart-panel">
+              <div class="exam-panel-head">
+                <h3>Performans Grafiği</h3>
+                <select id="examChartRange" onchange="renderExamPerformanceChart()" aria-label="Grafik aralığı">
+                  <option value="7">Son 7 Gün</option>
+                  <option value="30">Son 30 Gün</option>
+                </select>
+              </div>
+
+              <div class="exam-chart-box">
+                <svg id="examPerformanceSvg" viewBox="0 0 640 260" role="img" aria-label="Performans grafiği"></svg>
+              </div>
+            </div>
+
+            <div class="exam-pro-panel exam-goals-panel">
+              <h3>Yaklaşan Hedefler</h3>
+
+              <div class="exam-goal-item">
+                <div>
+                  <strong>Ortalama Puanı %85+ Yap</strong>
+                  <small>Mevcut hedef</small>
+                </div>
+                <span id="exam-average-goal-label">0%</span>
+                <div class="exam-goal-bar"><i id="exam-average-goal-bar" style="width: 0%"></i></div>
+              </div>
+
+              <div class="exam-goal-item">
+                <div>
+                  <strong>Bu Hafta 5 Sınav Çöz</strong>
+                  <small>Planlı çalışma</small>
+                </div>
+                <span id="exam-weekly-goal">0%</span>
+                <div class="exam-goal-bar green"><i id="exam-weekly-goal-bar" style="width: 0%"></i></div>
+              </div>
+
+              <div class="exam-goal-item">
+                <div>
+                  <strong>Tüm Ünite Sınavlarını Bitir</strong>
+                  <small>Uzun hedef</small>
+                </div>
+                <span>50%</span>
+                <div class="exam-goal-bar orange"><i style="width: 50%"></i></div>
+              </div>
+            </div>
+
           </div>
+
+          <div id="examWorkspace" class="exam-workspace exam-pro-workspace">
+            <div class="exam-pro-empty">
+              <h3>Henüz aktif bir sınav yok</h3>
+              <p>Yukarıdan bir sınav türü seçip karışık grammar sınavını başlatabilirsin.</p>
+            </div>
+          </div>
+
+          <div class="exam-motivation-note">★ Unutma: Başarı, küçük çabaların her gün tekrarlanmasıyla gelir. Kendine inan, vazgeçme! 💪</div>
         </div>
       </section>
 
@@ -550,6 +664,21 @@
       </section>
     </div>
   </main>
+
+  <button class="exam-history-modal-backdrop" id="examHistoryModalBackdrop" type="button" aria-label="Sınav geçmişini kapat" onclick="closeExamHistoryModal()"></button>
+  <aside class="exam-history-modal" id="examHistoryModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="examHistoryModalTitle">
+    <div class="exam-history-modal-head">
+      <div>
+        <span class="unit-badge exam-badge">GEÇMİŞ</span>
+        <h3 id="examHistoryModalTitle">Son 10 Sınav Geçmişi</h3>
+        <p>En son çözdüğün sınavlar ve başarı oranların.</p>
+      </div>
+      <button type="button" class="exam-history-modal-close" onclick="closeExamHistoryModal()" aria-label="Kapat">✕</button>
+    </div>
+    <div id="examHistoryModalList" class="exam-history-modal-list">
+      <div class="exam-empty-mini">Henüz sınav geçmişi yok.</div>
+    </div>
+  </aside>
 
   <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Yukarı çık" title="Yukarı çık">⌃</button>
 

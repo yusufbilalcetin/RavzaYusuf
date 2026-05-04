@@ -3710,21 +3710,6 @@ function submitExam(autoSubmitted = false) {
         </div>
       </div>
 
-      <div>
-        <h3>Cevap inceleme</h3>
-        <div class="review-grid">
-          ${results.map((item) => `
-            <div class="review-card">
-              <h4>${safeText(item.unit)} · ${safeText(item.topicTitle)} · Soru ${item.index + 1}</h4>
-              <p>${safeText(item.question)}</p>
-              <p class="review-answer"><strong>Senin cevabın:</strong> ${item.selectedIndex === null ? "Boş" : safeText(item.options[item.selectedIndex])}</p>
-              <p class="review-answer"><strong>Doğru cevap:</strong> ${safeText(item.options[item.answer])}</p>
-              <p>${safeText(item.explanation)}</p>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
       <div class="topic-actions">
         <button class="primary-btn dark" onclick="startExam(${results.length}, ${activeExam.durationMinutes})">Aynı Türde Yeni Sınav</button>
         <button class="ghost-btn" onclick="navigate('quizhub')">Quiz Merkezine Git</button>
@@ -4861,7 +4846,306 @@ document.addEventListener("keydown", (event) => {
     })[0] || null;
   }
 
-  function renderExamResultView(filter = "all") {
+
+  function getDetailedTurkishExamExplanation(item) {
+    if (!item) return "Bu soru için açıklama bulunmuyor.";
+
+    const questionText = String(item.question || "").trim();
+    const topicTitle = String(item.topicTitle || "").trim();
+    const unit = String(item.unit || "").trim();
+    const selectedText = item.selectedIndex === null || item.selectedIndex === undefined
+      ? "Boş bırakıldı"
+      : String(item.options?.[item.selectedIndex] || "").trim();
+    const correctText = String(item.options?.[item.answer] || "").trim();
+    const baseExplanation = String(item.explanation || "").trim();
+    const lowerTopic = topicTitle.toLowerCase();
+    const lowerQuestion = questionText.toLowerCase();
+
+    let rule = "Bu soruda doğru cevabı bulmak için önce cümlenin istediği yapıyı belirlemek gerekir.";
+    let whyCorrect = `Doğru cevap “${correctText}” çünkü cümlenin anlamına ve konu kuralına en uygun seçenek budur.`;
+    let whySelected = "";
+    let tip = "Benzer sorularda önce anahtar kelimeyi, sonra cümlenin zamanını ve anlamını kontrol et.";
+
+    if (lowerTopic.includes("future") || /will|going to|shall|tomorrow|cloud|plan|future/i.test(questionText)) {
+      rule = "Future Forms sorularında önce kararın ne zaman verildiğine ve elimizde kanıt olup olmadığına bakılır.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlede gelecek anlamı vardır ve yapı, bağlama göre doğru gelecek zaman formunu ister.`;
+      tip = "Kanıt varsa genellikle be going to; anlık karar, söz verme veya teklif varsa will/shall; ayarlanmış plan varsa present continuous kullanılır.";
+      if (/cloud|look at|evidence|kanıt/i.test(questionText + " " + baseExplanation)) {
+        whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlede görünen bir kanıt vardır. “Look at those black clouds” gibi ifadeler yağmurun olacağına dair kanıt verdiği için “be going to” kullanılır.`;
+        tip = "İpucu: Gözle görülen kanıt = be going to. Sadece kişisel tahmin = will olabilir.";
+      }
+    } else if (lowerTopic.includes("passive") || lowerQuestion.includes("passive")) {
+      rule = "Passive Voice sorularında odak eylemi yapan kişi değil, eylemden etkilenen nesnedir. Yapı genelde be + V3 şeklindedir.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlenin passive karşılığı yapılırken nesne başa alınır ve fiil uygun zamanda be + V3 yapılır.`;
+      tip = "Active cümledeki object passive cümlede subject olur. Present Simple passive için is/are + V3, Past Simple passive için was/were + V3 kullanılır.";
+    } else if (lowerTopic.includes("present tense") || lowerTopic.includes("present tenses")) {
+      rule = "Present Tenses sorularında fiilin durum fiili mi, eylem fiili mi olduğuna ve cümlenin şu an mı, genel alışkanlık mı, plan mı anlattığına bakılır.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümledeki zaman ve anlam bu present tense kullanımını gerektirir.`;
+      tip = "Stative verbs genelde continuous almaz. Timetable için present simple, ayarlanmış gelecek plan için present continuous kullanılır.";
+    } else if (lowerTopic.includes("condition")) {
+      rule = "Conditional sorularında if cümlesinin zamanı ve sonuç cümlesindeki yardımcı yapı birlikte kontrol edilir.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu cümledeki koşul yapısı doğru zaman uyumunu ister.`;
+      tip = "1st conditional: if + present simple, will + verb1. 2nd conditional: if + past simple, would + verb1. 3rd conditional: if + had V3, would have V3.";
+    } else if (lowerTopic.includes("perfect")) {
+      rule = "Perfect tense sorularında eylemin geçmişle bağlantısı, süresi ve şu ana etkisi kontrol edilir.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümle geçmişte başlayıp şimdiyle bağlantısı olan bir anlam taşıyor.`;
+      tip = "for süreyi, since başlangıç noktasını gösterir. already/yet/just gibi kelimeler present perfect ile sık kullanılır.";
+    } else if (lowerTopic.includes("modal") || lowerTopic.includes("can") || lowerTopic.includes("could") || lowerTopic.includes("able")) {
+      rule = "Modal sorularında anlam çok önemlidir: yetenek, izin, zorunluluk, yasak veya mantıksal çıkarım olabilir.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlenin anlamı bu modal yapıyı gerektirir.`;
+      tip = "can şimdiki yetenek/izin, could geçmiş genel yetenek, be able to farklı zamanlarda yetenek için kullanılır. must güçlü çıkarım, can't imkansızlık anlatır.";
+    } else if (lowerTopic.includes("phrasal")) {
+      rule = "Phrasal verb sorularında fiil + particle birlikte düşünülür. Bazı phrasal verbler ayrılabilir, bazıları ayrılamaz.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu phrasal verb cümledeki anlamı doğru şekilde tamamlar.`;
+      tip = "Nesne zamirse ayrılabilen phrasal verblerde zamir araya gelir: turn it off, call her back.";
+    } else if (lowerTopic.includes("pronoun")) {
+      rule = "Pronoun sorularında özne, nesne ve iyelik görevleri ayrılmalıdır.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu cümlede kelime nesne/iyelik görevine uygun biçimde kullanılmalıdır.`;
+      tip = "Preposition sonrasında object pronoun kullanılır: to her, for them, with us.";
+    } else if (lowerTopic.includes("adjective")) {
+      rule = "Adjective sorularında sıfatın isimden önce geldiği, comparative/superlative yapısı ve one/ones kullanımı kontrol edilir.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü sıfat yapısı cümlenin karşılaştırma veya tanımlama anlamına uygundur.`;
+      tip = "Tekil sayılabilir isimde a/an gerekir. Büyük fark için much + comparative, küçük fark için a bit + comparative kullanılır.";
+    } else if (lowerTopic.includes("preposition")) {
+      rule = "Preposition sorularında fiil/sıfat ile gelen sabit edat ve cümlenin hareket mi konum mu anlattığı kontrol edilir.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu kelime cümlenin istediği edat veya hareket anlamını verir.`;
+      tip = "Preposition sonrası genelde -ing gelir. discuss, enter, marry gibi bazı fiiller ekstra preposition almaz.";
+    } else if (lowerTopic.includes("reported")) {
+      rule = "Reported Speech sorularında zaman kayması, kişi zamirleri ve soru kelime sırası kontrol edilir.";
+      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü aktarılmış cümlede doğru zaman ve düz cümle sırası kullanılmalıdır.`;
+      tip = "Reported question içinde do/does/did kullanılmaz; kelime sırası düz cümle gibi olur: where I lived.";
+    }
+
+    if (item.status === "correct") {
+      whySelected = `Sen “${selectedText}” seçtin ve bu doğru. Cümledeki anahtar bilgi doğru yapıyı seçmeni sağlamış.`;
+    } else if (item.status === "empty") {
+      whySelected = "Bu soruyu boş bıraktın. Boş sorularda önce seçenekleri elemek iyi olur: cümlenin zamanı, anlamı ve anahtar kelimesiyle uyuşmayan seçenekleri çıkar.";
+    } else {
+      whySelected = `Sen “${selectedText}” seçtin; ancak bu seçenek cümlenin istediği dilbilgisi/anlam kuralıyla tam uyuşmuyor. Doğru cevap “${correctText}” olmalı.`;
+    }
+
+    const base = baseExplanation
+      ? `Kısa kaynak açıklaması: ${baseExplanation}`
+      : "Kısa kaynak açıklaması: Bu soru için sistemde kısa açıklama yoktu; detaylı açıklama konu kuralına göre oluşturuldu.";
+
+    return `${rule}\n\n${whyCorrect}\n\n${whySelected}\n\n${base}\n\n${tip}`;
+  }
+
+
+  function getOptionLetter(optionIndex) {
+    return String.fromCharCode(65 + Number(optionIndex || 0));
+  }
+
+  function getQuestionRuleSummary(item) {
+    if (!item) return "Bu soruda seçenekleri cümlenin anlamına ve dilbilgisi kuralına göre elemek gerekir.";
+    const topicTitle = String(item.topicTitle || "").toLowerCase();
+    const questionText = String(item.question || "").toLowerCase();
+    const baseExplanation = String(item.explanation || "").toLowerCase();
+    const merged = `${topicTitle} ${questionText} ${baseExplanation}`;
+
+    if (topicTitle.includes("future") || /will|going to|shall|tomorrow|cloud|plan|future/.test(merged)) {
+      if (/cloud|look at|kanıt|kanita|evidence/.test(merged)) {
+        return "Bu soru Future Forms konusudur. Cümlede gözle görülen kanıt varsa gelecek tahmini için genellikle be going to kullanılır.";
+      }
+      return "Bu soru Future Forms konusudur. Will, be going to ve present continuous arasındaki fark cümlenin bağlamına göre seçilir.";
+    }
+    if (topicTitle.includes("passive") || questionText.includes("passive")) {
+      return "Bu soru Passive Voice konusudur. Active cümledeki nesne passive cümlede özne olur ve fiil uygun zamanda be + V3 şeklinde kurulur.";
+    }
+    if (topicTitle.includes("present tense")) {
+      return "Bu soru Present Tenses konusudur. Cümlenin alışkanlık, şu an olan eylem, timetable veya ayarlanmış gelecek plan anlamı taşıyıp taşımadığı kontrol edilir.";
+    }
+    if (topicTitle.includes("condition")) {
+      return "Bu soru Conditional konusudur. If kısmındaki zaman ile sonuç kısmındaki yapı birbiriyle uyumlu olmalıdır.";
+    }
+    if (topicTitle.includes("perfect")) {
+      return "Bu soru Perfect Tense konusudur. Eylemin geçmişle bağlantısı, şimdiye etkisi, for/since/yet/already gibi ipuçları kontrol edilir.";
+    }
+    if (topicTitle.includes("modal") || topicTitle.includes("can") || topicTitle.includes("could") || topicTitle.includes("able")) {
+      return "Bu soru Modal konusudur. Seçenekler yetenek, izin, zorunluluk, yasak veya mantıksal çıkarım anlamına göre değerlendirilir.";
+    }
+    if (topicTitle.includes("phrasal")) {
+      return "Bu soru Phrasal Verbs konusudur. Fiil ve particle birlikte düşünülür; bazı yapılar ayrılabilir, bazıları ayrılamaz.";
+    }
+    if (topicTitle.includes("pronoun")) {
+      return "Bu soru Pronouns konusudur. Kelimenin cümlede özne, nesne veya iyelik görevi yapıp yapmadığına bakılır.";
+    }
+    if (topicTitle.includes("adjective")) {
+      return "Bu soru Adjectives konusudur. Sıfatın isme göre konumu, one/ones, comparative veya superlative yapısı kontrol edilir.";
+    }
+    if (topicTitle.includes("preposition")) {
+      return "Bu soru Prepositions konusudur. Fiil veya sıfatla gelen sabit edat ve hareket/konum anlamı kontrol edilir.";
+    }
+    if (topicTitle.includes("reported")) {
+      return "Bu soru Reported Speech konusudur. Zaman kayması, kişi zamiri ve düz cümle kelime sırası kontrol edilir.";
+    }
+
+    return "Bu soruda doğru cevabı bulmak için cümlenin anlamını, zamanını ve konu kuralını birlikte kontrol etmek gerekir.";
+  }
+
+  function getDetailedOptionReason(item, optionIndex) {
+    if (!item || !Array.isArray(item.options)) return "Bu şık için açıklama oluşturulamadı.";
+
+    const optionText = String(item.options[optionIndex] || "").trim();
+    const correctText = String(item.options[item.answer] || "").trim();
+    const selectedIndex = item.selectedIndex;
+    const isCorrect = optionIndex === item.answer;
+    const isSelected = selectedIndex === optionIndex;
+    const topicTitle = String(item.topicTitle || "").toLowerCase();
+    const questionText = String(item.question || "").toLowerCase();
+    const baseExplanation = String(item.explanation || "").trim();
+    const merged = `${topicTitle} ${questionText} ${String(baseExplanation).toLowerCase()}`;
+
+    let correctReason = `Bu seçenek cümlenin anlamına ve konu kuralına uyduğu için doğru cevaptır.`;
+    let wrongReason = `Bu seçenek cümlenin istediği anlam veya dilbilgisi kuralıyla tam uyuşmadığı için doğru değildir.`;
+
+    if (topicTitle.includes("future") || /will|going to|shall|tomorrow|cloud|plan|future/.test(merged)) {
+      if (/cloud|look at|kanıt|kanita|evidence/.test(merged)) {
+        correctReason = `Cümlede görünen kanıt vardır. Bu yüzden geleceğe dair tahmin “be going to” yapısıyla verilir.`;
+        wrongReason = `Bu seçenek görünen kanıta dayalı gelecek tahmini mantığını tam karşılamaz. Bu bağlamda “${correctText}” daha uygundur.`;
+      } else {
+        correctReason = `Bu seçenek gelecek zaman bağlamını doğru kurduğu için uygundur.`;
+        wrongReason = `Bu seçenek gelecek zaman kullanımındaki bağlama uymadığı için elenir.`;
+      }
+    } else if (topicTitle.includes("passive") || questionText.includes("passive")) {
+      correctReason = `Passive yapıda nesne başa alınır ve fiil uygun zamanda be + V3 yapılır. Bu seçenek bu yapıyı doğru kurar.`;
+      wrongReason = `Bu seçenek passive yapıyı doğru kurmaz; ya zaman, ya özne-fiil uyumu ya da V3 kullanımı hatalıdır.`;
+    } else if (topicTitle.includes("present tense")) {
+      correctReason = `Cümlenin zamanı ve anlamı bu present tense kullanımını gerektirir.`;
+      wrongReason = `Bu seçenek cümlenin present tense anlamıyla uyuşmaz; stative/action, timetable veya arrangement ipuçlarına dikkat edilmelidir.`;
+    } else if (topicTitle.includes("condition")) {
+      correctReason = `Koşul cümlesindeki zaman uyumu bu seçenekte doğru kurulmuştur.`;
+      wrongReason = `Bu seçenek conditional yapısındaki if kısmı ve sonuç kısmı zaman uyumunu bozduğu için doğru değildir.`;
+    } else if (topicTitle.includes("perfect")) {
+      correctReason = `Cümlede geçmişle şimdi arasında bağlantı kurulduğu için bu perfect tense yapısı uygundur.`;
+      wrongReason = `Bu seçenek perfect tense ipuçlarıyla uyuşmaz. For/since/yet/already veya süre anlamına dikkat edilmelidir.`;
+    } else if (topicTitle.includes("modal") || topicTitle.includes("can") || topicTitle.includes("could") || topicTitle.includes("able")) {
+      correctReason = `Cümlenin anlamı bu modal yapıyı ister; seçenek yetenek/izin/zorunluluk/çıkarım anlamını doğru verir.`;
+      wrongReason = `Bu seçenek cümlenin istediği modal anlamını doğru vermez veya modal sonrası fiil yapısını bozabilir.`;
+    } else if (topicTitle.includes("phrasal")) {
+      correctReason = `Bu phrasal verb cümlenin anlamını doğru tamamlar ve ayrılabilir/ayrılamaz kullanım kuralına uygundur.`;
+      wrongReason = `Bu seçenek phrasal verb anlamına veya nesne zamiri yerleşimine uymadığı için doğru değildir.`;
+    } else if (topicTitle.includes("pronoun")) {
+      correctReason = `Bu seçenek cümlede gereken pronoun görevine uygundur.`;
+      wrongReason = `Bu seçenek cümlede gereken özne/nesne/iyelik görevine uymadığı için elenir.`;
+    } else if (topicTitle.includes("adjective")) {
+      correctReason = `Bu seçenek sıfat yapısı, karşılaştırma veya one/ones kullanımını doğru kurar.`;
+      wrongReason = `Bu seçenek sıfat dizilimi veya comparative/superlative kuralıyla uyuşmadığı için doğru değildir.`;
+    } else if (topicTitle.includes("preposition")) {
+      correctReason = `Bu seçenek cümlenin istediği sabit edatı veya hareket/konum anlamını doğru verir.`;
+      wrongReason = `Bu seçenek fiil/sıfat ile kullanılan doğru edatı vermediği veya hareket/konum anlamını bozduğu için doğru değildir.`;
+    } else if (topicTitle.includes("reported")) {
+      correctReason = `Reported Speech yapısında zaman kayması ve düz cümle sırası bu seçenekte doğru kurulmuştur.`;
+      wrongReason = `Bu seçenek reported speech kelime sırasını, zaman kaymasını veya yardımcı fiil kullanımını bozduğu için doğru değildir.`;
+    }
+
+    if (isCorrect && isSelected) {
+      return `Bu şık senin seçimin ve doğru cevaptır. Neden doğru? ${correctReason}${baseExplanation ? ` Ek kural: ${baseExplanation}` : ""}`;
+    }
+    if (isCorrect) {
+      return `Bu şık doğru cevaptır. Neden doğru? ${correctReason}${baseExplanation ? ` Ek kural: ${baseExplanation}` : ""}`;
+    }
+    if (isSelected) {
+      return `Bu şık senin seçimin, fakat doğru değildir. Neden olmaz? ${wrongReason} Bu yüzden doğru cevap “${correctText}” olmalıdır.`;
+    }
+    return `Bu şık doğru değildir. Neden olmaz? ${wrongReason}`;
+  }
+
+  function renderDetailedExplanationParagraphs(text) {
+    return String(text || "")
+      .split(/\n{2,}/)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => `<p>${safeText(part)}</p>`)
+      .join("");
+  }
+
+  function renderOptionExplanationHtml(item) {
+    if (!item || !Array.isArray(item.options)) return "";
+    return `
+      <div class="result-option-explanation-box">
+        <strong>Şıklar Üzerinden Açıklama</strong>
+        <div class="result-option-explanation-list">
+          ${item.options.map((option, optionIndex) => {
+            const isCorrect = optionIndex === item.answer;
+            const isSelected = item.selectedIndex === optionIndex;
+            let cls = "result-option-explanation-item";
+            if (isCorrect) cls += " is-correct";
+            if (isSelected && !isCorrect) cls += " is-selected-wrong";
+            if (isSelected && isCorrect) cls += " is-selected-correct";
+
+            return `
+              <div class="${cls}">
+                <div class="option-explanation-head">
+                  <span class="option-explanation-letter">${getOptionLetter(optionIndex)}</span>
+                  <strong>${safeText(option)}</strong>
+                  ${isSelected ? `<em>Senin seçimin</em>` : ""}
+                  ${isCorrect ? `<em>Doğru cevap</em>` : ""}
+                </div>
+                <p>${safeText(getDetailedOptionReason(item, optionIndex))}</p>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderExamQuestionDetailHtml(item) {
+    if (!item) return "";
+
+    const statusLabel = item.status === "correct" ? "Doğru" : item.status === "wrong" ? "Yanlış" : "Boş";
+    const selectedLabel = item.selectedIndex === null ? "Boş" : safeText(item.options[item.selectedIndex]);
+    const correctLabel = safeText(item.options[item.answer]);
+
+    return `
+      <div class="exam-focus-card result-question-detail" id="examResultQuestionDetail">
+        <div class="result-question-detail-head">
+          <div>
+            <span class="review-status-chip review-status-${item.status}">${statusLabel}</span>
+            <h4>${safeText(item.unit)} · ${safeText(item.topicTitle)} · Soru ${item.index + 1}</h4>
+          </div>
+        </div>
+
+        <p class="result-question-text">${safeText(item.question)}</p>
+
+        <div class="result-option-list" aria-label="Soru seçenekleri">
+          ${item.options.map((option, optionIndex) => {
+            let cls = "result-option-review";
+            const isSelected = item.selectedIndex === optionIndex;
+            const isCorrect = item.answer === optionIndex;
+            if (isCorrect) cls += " is-correct-answer";
+            if (isSelected) cls += " is-selected-answer";
+            if (isSelected && !isCorrect) cls += " is-wrong-selected";
+
+            return `
+              <div class="${cls}">
+                <span class="result-option-letter">${String.fromCharCode(65 + optionIndex)}</span>
+                <span class="result-option-text">${safeText(option)}</span>
+                ${isSelected ? `<strong class="result-option-tag selected-tag">Senin seçimin</strong>` : ""}
+                ${isCorrect ? `<strong class="result-option-tag correct-tag">Doğru cevap</strong>` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+
+        <div class="result-detail-summary">
+          <div class="review-answer-row review-answer-${item.status}">
+            <strong>Senin cevabın:</strong>
+            <span>${selectedLabel}</span>
+          </div>
+          <div class="review-answer-row review-answer-correct">
+            <strong>Doğru cevap:</strong>
+            <span>${correctLabel}</span>
+          </div>
+        </div>
+
+        ${renderOptionExplanationHtml(item)}
+      </div>
+    `;
+  }
+
+  function renderExamResultView(filter = "all", focusedIndex = null) {
     const workspace = document.getElementById("examWorkspace");
     if (!workspace || !lastExamSession) return;
 
@@ -4873,6 +5157,11 @@ document.addEventListener("keydown", (event) => {
     results.forEach((item) => {
       resultMap[item.index] = { status: item.status };
     });
+
+    const numericFocusIndex = focusedIndex === null || focusedIndex === undefined ? null : Number(focusedIndex);
+    const focusedResult = Number.isFinite(numericFocusIndex)
+      ? results.find((item) => item.index === numericFocusIndex)
+      : null;
 
     const filteredResults = results.filter((item) => {
       if (filter === "wrong") return item.status === "wrong";
@@ -4934,69 +5223,29 @@ document.addEventListener("keydown", (event) => {
           ${results.map((item) => `
             <button
               type="button"
-              class="exam-nav-btn is-${item.status}"
-              onclick="showExamResultFilter('${item.status === "wrong" ? "wrong" : item.status === "correct" ? "correct" : "empty"}')"
-              aria-label="Soru ${item.index + 1} - ${item.status === "correct" ? "Doğru" : item.status === "wrong" ? "Yanlış" : "Boş"}">
+              class="exam-nav-btn is-${item.status}${focusedResult && focusedResult.index === item.index ? " is-focused-result" : ""}"
+              onclick="showExamResultQuestion(${item.index})"
+              aria-label="Soru ${item.index + 1} detayını aç - ${item.status === "correct" ? "Doğru" : item.status === "wrong" ? "Yanlış" : "Boş"}">
               <span>${item.index + 1}</span>
             </button>
           `).join("")}
         </div>
 
-        <div class="result-action-row">
-          <button type="button" class="primary-btn dark" onclick="showExamResultFilter('wrong')">Yanlışlarımı Gör</button>
-          <button type="button" class="secondary-btn" onclick="retryLastExam()">Tekrar Sınavı Çöz</button>
-          <button type="button" class="ghost-btn" onclick="openWeakTopicFromLastExam()">Zayıf Konuyu Aç</button>
-          <button type="button" class="ghost-btn" onclick="navigate('memoryhub')">Ezber Merkezine Git</button>
-        </div>
+        ${focusedResult ? renderExamQuestionDetailHtml(focusedResult) : ""}
 
-        <div class="result-action-row secondary">
-          <button type="button" class="ghost-btn" onclick="showExamResultFilter('all')">Tüm Sonuçları Göster</button>
-          <button type="button" class="ghost-btn" onclick="showExamResultFilter('empty')">Boşları Gör</button>
-          <button type="button" class="ghost-btn" onclick="startWrongRetryExam(5)">Yanlışlardan 5 Soru</button>
-          <button type="button" class="ghost-btn" onclick="startWrongRetryExam(10)">Yanlışlardan 10 Soru</button>
-        </div>
-
-        <div class="result-review-shell">
-          <div class="result-review-head">
-            <h4>${filter === "wrong" ? "Yanlış Soruların" : filter === "empty" ? "Boş Bıraktığın Sorular" : filter === "correct" ? "Doğru Soruların" : "Cevap İnceleme"}</h4>
-            <span>${filteredResults.length} soru</span>
-          </div>
-
-          <div class="review-grid">
-            ${filteredResults.length ? filteredResults.map((item) => `
-              <div class="review-card review-card-${item.status}">
-                <div class="review-card-top">
-                  <span class="review-status-chip review-status-${item.status}">
-                    ${item.status === "correct" ? "Doğru" : item.status === "wrong" ? "Yanlış" : "Boş"}
-                  </span>
-                  <strong>${safeText(item.unit)} · ${safeText(item.topicTitle)} · Soru ${item.index + 1}</strong>
-                </div>
-                <p class="review-question">${safeText(item.question)}</p>
-
-                <div class="review-answer-row review-answer-${item.status}">
-                  <strong>Senin cevabın:</strong>
-                  <span>${item.selectedIndex === null ? "Boş" : safeText(item.options[item.selectedIndex])}</span>
-                </div>
-
-                <div class="review-answer-row review-answer-correct">
-                  <strong>Doğru cevap:</strong>
-                  <span>${safeText(item.options[item.answer])}</span>
-                </div>
-
-                <p class="review-explanation">${safeText(item.explanation)}</p>
-
-                <div class="review-card-actions">
-                  <button type="button" class="ghost-btn small" onclick="openStudyTopic('${item.topicId}')">Konuyu Aç</button>
-                  <button type="button" class="ghost-btn small" onclick="navigate('memoryhub')">Ezber Merkezi</button>
-                </div>
-              </div>
-            `).join("") : `
-              <div class="empty-state compact">
-                <h3>Bu filtrede soru yok</h3>
-                <p>Farklı bir filtre seçerek sonuçlarını inceleyebilirsin.</p>
-              </div>
-            `}
-          </div>
+        <div class="exam-result-actions simple" aria-label="Sınav sonucu hızlı işlemleri">
+          <button type="button" class="exam-action-btn primary" onclick="showExamResultFilter('wrong')">
+            Yanlışlarımı Gör
+          </button>
+          <button type="button" class="exam-action-btn secondary" onclick="retryLastExam()">
+            Tekrar Sınavı Çöz
+          </button>
+          <button type="button" class="exam-action-btn ghost" onclick="openWeakTopicFromLastExam()">
+            Zayıf Konuyu Aç
+          </button>
+          <button type="button" class="exam-action-btn ghost" onclick="navigate('memoryhub')">
+            Ezber Merkezine Git
+          </button>
         </div>
       </div>
     `;
@@ -5123,8 +5372,25 @@ document.addEventListener("keydown", (event) => {
   }
 
   function showExamResultFilter(filter = "all") {
-    renderExamResultView(filter);
+    if (!lastExamSession) return;
+
+    if (filter === "wrong" || filter === "empty" || filter === "correct") {
+      const target = lastExamSession.results.find((item) => item.status === filter);
+      renderExamResultView(filter, target ? target.index : null);
+    } else {
+      renderExamResultView(filter);
+    }
+
     scrollExamWorkspaceIntoView();
+  }
+
+  function showExamResultQuestion(questionIndex) {
+    renderExamResultView("all", Number(questionIndex));
+    requestAnimationFrame(() => {
+      const detail = document.getElementById("examResultQuestionDetail");
+      if (detail) detail.scrollIntoView({ behavior: "smooth", block: "center" });
+      else scrollExamWorkspaceIntoView();
+    });
   }
 
   function enhancedStartExam(questionCount, durationMinutes) {
@@ -5185,6 +5451,7 @@ document.addEventListener("keydown", (event) => {
   window.closeCancelExamDialog = closeCancelExamDialog;
   window.confirmCancelExam = confirmCancelExam;
   window.showExamResultFilter = showExamResultFilter;
+  window.showExamResultQuestion = showExamResultQuestion;
   window.retryLastExam = retryLastExam;
   window.openWeakTopicFromLastExam = openWeakTopicFromLastExam;
   window.startWrongRetryExam = startWrongRetryExam;
@@ -6464,5 +6731,271 @@ document.addEventListener("keydown", (event) => {
     loadMemoryExtrasFromFirebase().finally(() => {
       requestAnimationFrame(() => requestAnimationFrame(bootstrap));
     });
+  }
+})();
+
+
+/* ============================================================
+   PROFESSIONAL EXAM CENTER DASHBOARD LOGIC
+   Sadece Sınav Merkezi görsel dashboard alanını besler.
+   ============================================================ */
+(function professionalExamCenterDashboard() {
+  function safeExamHistory() {
+    try {
+      return typeof getExamHistory === "function" ? getExamHistory() : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function examPercentLabel(value) {
+    const n = Number(value) || 0;
+    return `${Math.max(0, Math.min(100, Math.round(n)))}%`;
+  }
+
+  function formatShortExamDate(dateValue) {
+    try {
+      return new Intl.DateTimeFormat("tr-TR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(new Date(dateValue));
+    } catch {
+      return "Tarih yok";
+    }
+  }
+
+  function getQualityMeta(percentage) {
+    if (percentage >= 90) return { text: "Mükemmel", cls: "" };
+    if (percentage >= 75) return { text: "İyi", cls: "mid" };
+    return { text: "Orta", cls: "low" };
+  }
+
+  function getThisWeekExamCount(history) {
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+    return history.filter((item) => {
+      const d = new Date(item.date || 0);
+      return d >= start && d <= now;
+    }).length;
+  }
+
+  function updateProfessionalExamDashboardStats() {
+    const history = safeExamHistory();
+    const total = history.length;
+    const totalCorrect = history.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
+    const avg = total
+      ? Math.round(history.reduce((sum, item) => sum + (Number(item.percentage) || 0), 0) / total)
+      : 0;
+    const highest = total
+      ? Math.max(...history.map((item) => Number(item.percentage) || 0), 0)
+      : (typeof getBestExam === "function" ? getBestExam() : 0);
+    const weekCount = getThisWeekExamCount(history);
+    const weeklyGoal = Math.min(100, Math.round((weekCount / 5) * 100));
+    const avgGoal = Math.min(100, Math.round((avg / 85) * 100));
+
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    };
+    const setWidth = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.style.width = `${Math.max(0, Math.min(100, value))}%`;
+    };
+
+    setText("exam-total-count", String(total));
+    setText("exam-weekly-change", `Bu hafta +${weekCount}`);
+    setText("exam-average-score", examPercentLabel(avg));
+    setText("exam-highest-score", examPercentLabel(highest));
+    setText("exam-total-correct", String(totalCorrect));
+    setText("exam-weekly-goal", examPercentLabel(weeklyGoal));
+    setText("exam-average-goal-label", examPercentLabel(avg));
+    setWidth("exam-weekly-goal-bar", weeklyGoal);
+    setWidth("exam-average-goal-bar", avgGoal);
+
+    renderProfessionalRecentExams(history);
+    renderExamPerformanceChart();
+  }
+
+  function renderProfessionalRecentExams(history = safeExamHistory()) {
+    const list = document.getElementById("examRecentList");
+    if (!list) return;
+
+    const recent = history.slice(0, 4);
+    if (!recent.length) {
+      list.innerHTML = `<div class="exam-empty-mini">Henüz sınav geçmişi yok. İlk denemeni başlatınca burada görünecek.</div>`;
+      return;
+    }
+
+    list.innerHTML = recent.map((item, index) => {
+      const percentage = Number(item.percentage) || 0;
+      const quality = getQualityMeta(percentage);
+      const icon = index % 4 === 0 ? "📖" : index % 4 === 1 ? "🧠" : index % 4 === 2 ? "🎧" : "📄";
+      return `
+        <div class="exam-recent-item">
+          <span class="exam-recent-icon">${icon}</span>
+          <div class="exam-recent-title">
+            <strong>${safeText(item.label || "Sınav")}</strong>
+            <small>${safeText(formatShortExamDate(item.date))}</small>
+          </div>
+          <div class="exam-score-ring" style="--p:${percentage}"><span>${percentage}%</span></div>
+          <div class="exam-recent-score">
+            <strong>${Number(item.score) || 0} / ${Number(item.total) || 0}</strong>
+            <small>Doğru</small>
+          </div>
+          <span class="exam-quality-pill ${quality.cls}">${quality.text}</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderExamPerformanceChart() {
+    const svg = document.getElementById("examPerformanceSvg");
+    if (!svg) return;
+
+    const range = Number(document.getElementById("examChartRange")?.value || 7);
+    const history = safeExamHistory()
+      .slice(0, Math.max(7, range))
+      .reverse();
+
+    if (!history.length) {
+      svg.innerHTML = `
+        <rect x="0" y="0" width="640" height="260" rx="22" fill="rgba(248,250,252,.9)"></rect>
+        <text x="320" y="125" text-anchor="middle" class="exam-chart-label">Henüz grafik için sınav sonucu yok.</text>
+        <text x="320" y="150" text-anchor="middle" class="exam-chart-label">Bir sınav çözünce performans çizgisi burada görünecek.</text>
+      `;
+      return;
+    }
+
+    const points = history.map((item, index) => {
+      const x = history.length === 1 ? 320 : 48 + (index * (544 / (history.length - 1)));
+      const y = 220 - ((Number(item.percentage) || 0) * 1.75);
+      return { x, y, percentage: Number(item.percentage) || 0, date: item.date };
+    });
+
+    const line = points.map((p) => `${p.x},${p.y}`).join(" ");
+    const area = `48,220 ${line} 592,220`;
+    const yGrid = [0, 25, 50, 75, 100].map((value) => {
+      const y = 220 - (value * 1.75);
+      return `<line x1="48" x2="592" y1="${y}" y2="${y}" stroke="#e5e7eb" stroke-width="1"/><text x="18" y="${y + 4}" class="exam-chart-label">%${value}</text>`;
+    }).join("");
+
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="examLineGradient" x1="0" x2="1">
+          <stop offset="0" stop-color="#7c3aed"/>
+          <stop offset="1" stop-color="#2563eb"/>
+        </linearGradient>
+        <linearGradient id="examAreaGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#7c3aed" stop-opacity=".18"/>
+          <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="640" height="260" rx="22" fill="rgba(255,255,255,.72)"></rect>
+      ${yGrid}
+      <polyline points="${area}" fill="url(#examAreaGradient)"></polyline>
+      <polyline points="${line}" fill="none" stroke="url(#examLineGradient)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      ${points.map((p, i) => `
+        <circle cx="${p.x}" cy="${p.y}" r="6" fill="#7c3aed" stroke="#fff" stroke-width="3"></circle>
+        ${i === points.length - 1 ? `<text x="${Math.min(575, p.x + 18)}" y="${Math.max(25, p.y - 16)}" class="exam-chart-score">${p.percentage}%</text>` : ""}
+      `).join("")}
+      <text x="48" y="248" class="exam-chart-label">Eski</text>
+      <text x="560" y="248" class="exam-chart-label">Yeni</text>
+    `;
+  }
+
+  function renderExamHistoryModalList(history = safeExamHistory()) {
+    const list = document.getElementById("examHistoryModalList");
+    if (!list) return;
+
+    const recent = history.slice(0, 10);
+    if (!recent.length) {
+      list.innerHTML = `<div class="exam-empty-mini">Henüz sınav geçmişi yok. İlk sınavını çözdüğünde burada son 10 sınav görünecek.</div>`;
+      return;
+    }
+
+    list.innerHTML = recent.map((item, index) => {
+      const percentage = Number(item.percentage) || 0;
+      const quality = getQualityMeta(percentage);
+      const correct = Number(item.score) || 0;
+      const total = Number(item.total) || 0;
+      const wrong = Math.max(0, total - correct);
+      return `
+        <button type="button" class="exam-history-modal-item" onclick="closeExamHistoryModal()" aria-label="${safeText(item.label || "Sınav")} geçmiş sonucu">
+          <span class="exam-history-order">${index + 1}</span>
+          <span class="exam-history-info">
+            <strong>${safeText(item.label || "Sınav")}</strong>
+            <small>${safeText(formatShortExamDate(item.date))}</small>
+          </span>
+          <span class="exam-history-score">
+            <strong>${percentage}%</strong>
+            <small>${correct}/${total} doğru${wrong ? ` · ${wrong} yanlış` : ""}</small>
+          </span>
+          <span class="exam-quality-pill ${quality.cls}">${quality.text}</span>
+        </button>
+      `;
+    }).join("");
+  }
+
+  function showExamHistoryPanel() {
+    const modal = document.getElementById("examHistoryModal");
+    const backdrop = document.getElementById("examHistoryModalBackdrop");
+    if (!modal || !backdrop) return;
+
+    renderExamHistoryModalList();
+    modal.classList.add("open");
+    backdrop.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("exam-history-modal-open");
+  }
+
+  function closeExamHistoryModal() {
+    const modal = document.getElementById("examHistoryModal");
+    const backdrop = document.getElementById("examHistoryModalBackdrop");
+    if (!modal || !backdrop) return;
+
+    modal.classList.remove("open");
+    backdrop.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("exam-history-modal-open");
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeExamHistoryModal();
+  });
+
+  window.showExamHistoryPanel = showExamHistoryPanel;
+  window.closeExamHistoryModal = closeExamHistoryModal;
+  window.renderExamPerformanceChart = renderExamPerformanceChart;
+  window.updateProfessionalExamDashboardStats = updateProfessionalExamDashboardStats;
+
+  if (typeof updateDashboardStats === "function" && !updateDashboardStats.__professionalExamWrapped) {
+    const previousUpdateDashboardStats = updateDashboardStats;
+    updateDashboardStats = function updateDashboardStatsWithProfessionalExam() {
+      previousUpdateDashboardStats();
+      updateProfessionalExamDashboardStats();
+    };
+    updateDashboardStats.__professionalExamWrapped = true;
+  }
+
+  if (typeof submitExam === "function" && !submitExam.__professionalExamWrapped) {
+    const previousSubmitExam = submitExam;
+    submitExam = function submitExamWithProfessionalDashboard(autoSubmitted = false) {
+      previousSubmitExam(autoSubmitted);
+      setTimeout(updateProfessionalExamDashboardStats, 0);
+    };
+    window.submitExam = submitExam;
+    submitExam.__professionalExamWrapped = true;
+  }
+
+  const boot = () => requestAnimationFrame(updateProfessionalExamDashboardStats);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
   }
 })();
