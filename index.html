@@ -326,7 +326,19 @@
 
           <div class="memory-cards-shell">
             <div class="hub-toolbar memory-toolbar memory-search-sticky">
-              <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
+              <div class="memory-search-row">
+                <input type="text" id="memoryFilter" class="hub-search" placeholder="Kelime ara… örn: evidence / kanıt" oninput="renderMemorizationHub(this.value)">
+                <button
+                  type="button"
+                  id="memoryFavFilterBtn"
+                  class="memory-favorite-filter-btn"
+                  onclick="toggleFlashcardFavoriteFilter()"
+                  aria-pressed="false"
+                  title="Sadece favori kelimeleri göster">
+                  <span class="fav-filter-icon">♡</span>
+                  <span class="fav-filter-text">Favoriler</span>
+                </button>
+              </div>
               <div class="hub-legend">
                 <span><i class="dot exam"></i> Tıkla ve çevir</span>
                 <span><i class="dot success"></i> İngilizce → Türkçe</span>

@@ -5397,6 +5397,13 @@ document.addEventListener("keydown", (event) => {
   const STATS_KEY = "eul_memory_stats";
   const FAV_KEY = "eul_favorite_words";
   const DAILY_KEY = "eul_daily_ten";
+  const FAV_FILTER_KEY = "eul_flashcard_favorites_only";
+  let flashcardFavoritesOnly = false;
+  try {
+    flashcardFavoritesOnly = localStorage.getItem(FAV_FILTER_KEY) === "true";
+  } catch {
+    flashcardFavoritesOnly = false;
+  }
 
   function safeParse(raw, fallback) {
     if (!raw) return fallback;
@@ -6165,6 +6172,68 @@ document.addEventListener("keydown", (event) => {
   function isFavorite(cardId) {
     return getFavorites().includes(cardId);
   }
+
+  function getFlashcardSearchText() {
+    return document.getElementById("memoryFilter")?.value || "";
+  }
+
+  function updateFavoriteFilterButton() {
+    const btn = document.getElementById("memoryFavFilterBtn");
+    if (!btn) return;
+    btn.classList.toggle("active", flashcardFavoritesOnly);
+    btn.setAttribute("aria-pressed", flashcardFavoritesOnly ? "true" : "false");
+    btn.title = flashcardFavoritesOnly ? "Tüm kelimeleri göster" : "Sadece favori kelimeleri göster";
+    const icon = btn.querySelector(".fav-filter-icon");
+    const text = btn.querySelector(".fav-filter-text");
+    if (icon) icon.textContent = flashcardFavoritesOnly ? "❤️" : "♡";
+    if (text) text.textContent = flashcardFavoritesOnly ? "Favoriler" : "Favoriler";
+  }
+
+  function applyFlashcardFavoriteFilter() {
+    const grid = document.getElementById("memoryHubGrid");
+    if (!grid) return;
+
+    updateFavoriteFilterButton();
+    if (!flashcardFavoritesOnly) return;
+
+    const favoriteIds = new Set(getFavorites());
+    if (!favoriteIds.size) {
+      grid.innerHTML = `
+        <div class="empty-grid">
+          Henüz favori kelime yok. Kartlardaki kalbe dokunarak favori ekleyebilirsin.
+        </div>
+      `;
+      return;
+    }
+
+    const cards = Array.from(grid.querySelectorAll(".memory-card[data-card-id]"));
+    let visibleCount = 0;
+    cards.forEach((cardEl) => {
+      const cardId = cardEl.getAttribute("data-card-id");
+      const shouldShow = favoriteIds.has(cardId);
+      cardEl.hidden = !shouldShow;
+      cardEl.classList.toggle("is-filter-hidden", !shouldShow);
+      if (shouldShow) visibleCount += 1;
+    });
+
+    if (!visibleCount) {
+      grid.innerHTML = `
+        <div class="empty-grid">
+          Bu aramada favori kelime bulunamadı. Arama metnini temizleyebilir veya Favoriler filtresini kapatabilirsin.
+        </div>
+      `;
+    }
+  }
+
+  function toggleFlashcardFavoriteFilter() {
+    flashcardFavoritesOnly = !flashcardFavoritesOnly;
+    try {
+      localStorage.setItem(FAV_FILTER_KEY, flashcardFavoritesOnly ? "true" : "false");
+    } catch {}
+    updateFavoriteFilterButton();
+    renderMemorizationHub(getFlashcardSearchText());
+  }
+
   function toggleFavoriteWord(cardId, event) {
     if (event && typeof event.stopPropagation === "function") event.stopPropagation();
     const list = getFavorites();
@@ -6173,11 +6242,16 @@ document.addEventListener("keydown", (event) => {
     else list.push(cardId);
     saveFavorites(list);
 
-    // Yıldız butonunu güncelle
+    // Kalp butonunu güncelle
     document.querySelectorAll(`.memory-fav-btn[data-fav-id="${cardId}"]`).forEach((btn) => {
       btn.classList.toggle("active", isFavorite(cardId));
       btn.textContent = isFavorite(cardId) ? "❤️" : "🤍";
     });
+
+    // Favoriler filtresi açıksa, favoriden çıkarılan kart anında listeden kaybolsun.
+    if (flashcardFavoritesOnly) {
+      requestAnimationFrame(() => renderMemorizationHub(getFlashcardSearchText()));
+    }
   }
 
   // Favori butonunu mevcut flashcard render'ına enjekte et — orijinal renderMemorizationHub'ı sarmalayarak
@@ -6195,15 +6269,17 @@ document.addEventListener("keydown", (event) => {
       btn.className = "memory-fav-btn" + (fav ? " active" : "");
       btn.dataset.favId = cardId;
       btn.textContent = fav ? "❤️" : "🤍";
-      btn.setAttribute("aria-label", "Favoriye ekle");
+      btn.setAttribute("aria-label", fav ? "Favoriden çıkar" : "Favoriye ekle");
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         toggleFavoriteWord(cardId, e);
       });
       cardEl.appendChild(btn);
     });
+    applyFlashcardFavoriteFilter();
   };
   window.renderMemorizationHub = renderMemorizationHub;
+  window.toggleFlashcardFavoriteFilter = toggleFlashcardFavoriteFilter;
 
   // ---- 12. Window globals ----
   window.setMemoryTab = setMemoryTab;

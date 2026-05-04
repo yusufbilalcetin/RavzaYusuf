@@ -5003,3 +5003,229 @@ body.theme-sheet-open .scroll-top-btn {
     overflow-y: auto !important;
   }
 }
+
+/* ============================================================
+   EZBER MERKEZI — ESLESTIRME ESKI ARAYUZ + TAM EKRAN
+   Altin kural: Eslestirme kart/gorunum stillerine dokunmadan
+   sadece bolum genisligi tam ekrana oturtulur.
+   ============================================================ */
+#memoryhub #memoryMatchingSection {
+  width: calc(100vw - var(--sidebar-w) - clamp(28px, 4vw, 68px));
+  max-width: none !important;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  overflow: visible !important;
+}
+
+#memoryhub #memoryMatchingSection[hidden] {
+  display: none !important;
+}
+
+#memoryhub #memoryMatchingSection .memory-section-head,
+#memoryhub #memoryMatchingSection .matching-shell,
+#memoryhub #memoryMatchingSection .matching-toolbar,
+#memoryhub #memoryMatchingSection .matching-scroll,
+#memoryhub #memoryMatchingSection .matching-result {
+  width: 100%;
+  max-width: none !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+#memoryhub #memoryMatchingSection .matching-board {
+  width: 100%;
+  max-width: none !important;
+}
+
+@media (max-width: 1024px) {
+  #memoryhub #memoryMatchingSection {
+    width: calc(100vw - clamp(24px, 5vw, 48px));
+  }
+}
+
+@media (max-width: 768px) {
+  #memoryhub #memoryMatchingSection {
+    width: calc(100vw - 28px);
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 420px) {
+  #memoryhub #memoryMatchingSection {
+    width: calc(100vw - 20px);
+  }
+}
+
+/* ============================================================
+   FINAL MATCHING FULL-FIT FIX
+   Altın kural: sadece Ezber Merkezi > Eşleştirme bölümünü etkiler.
+   Eski arayüz korunur; bölüm bilgisayar/tablet/telefon ekranına tam oturur.
+   ============================================================ */
+#memoryhub #memoryMatchingSection {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 0 24px 0 !important;
+  margin-left: 0 !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
+#memoryhub #memoryMatchingSection[hidden],
+#memoryhub #memoryMatchingSection.is-hidden {
+  display: none !important;
+}
+
+#memoryhub #memoryMatchingSection .memory-section-head,
+#memoryhub #memoryMatchingSection .matching-shell,
+#memoryhub #memoryMatchingSection .matching-toolbar,
+#memoryhub #memoryMatchingSection .matching-scroll,
+#memoryhub #memoryMatchingSection .matching-board,
+#memoryhub #memoryMatchingSection .matching-result {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-scroll {
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  padding-bottom: 0 !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-board {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: clamp(10px, 1.35vw, 18px) !important;
+  align-items: start !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-column {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+}
+
+@media (min-width: 1280px) {
+  #memoryhub #memoryMatchingSection .matching-board {
+    gap: 20px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-card {
+    min-height: 58px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  #memoryhub #memoryMatchingSection {
+    width: 100% !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-toolbar {
+    align-items: stretch !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #memoryhub #memoryMatchingSection .matching-shell {
+    gap: 12px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-toolbar {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-stats,
+  #memoryhub #memoryMatchingSection .matching-controls {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-size-toggle {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-size-toggle select {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 520px) {
+  #memoryhub #memoryMatchingSection .memory-section-title {
+    font-size: 20px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .helper-line {
+    font-size: 12.5px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-board {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-column {
+    gap: 8px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-column-title {
+    font-size: 10.5px !important;
+    margin-bottom: 2px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-card {
+    min-height: 46px !important;
+    padding: 9px 7px !important;
+    border-radius: 12px !important;
+    font-size: clamp(11.5px, 3.15vw, 13.5px) !important;
+    line-height: 1.25 !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-pill {
+    padding: 6px 9px !important;
+    font-size: 12px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-controls {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    gap: 8px !important;
+    align-items: end !important;
+  }
+}
+
+@media (max-width: 390px) {
+  #memoryhub #memoryMatchingSection .matching-board {
+    gap: 7px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-card {
+    min-height: 44px !important;
+    padding: 8px 6px !important;
+    font-size: 11.5px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-pill {
+    padding: 5px 8px !important;
+    font-size: 11.5px !important;
+  }
+}
