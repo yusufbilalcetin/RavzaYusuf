@@ -584,18 +584,34 @@
               </div>
             </div>
 
-            <div class="exam-pro-panel exam-chart-panel">
-              <div class="exam-panel-head">
-                <h3>Performans Grafiği</h3>
-                <select id="examChartRange" onchange="renderExamPerformanceChart()" aria-label="Grafik aralığı">
-                  <option value="7">Son 7 Gün</option>
-                  <option value="30">Son 30 Gün</option>
-                </select>
+            <div class="exam-pro-panel exam-chart-panel exam-chart-detail-panel">
+              <div class="exam-panel-head exam-chart-head">
+                <div>
+                  <h3>Performans Grafiği</h3>
+                  <p class="exam-chart-subtitle">Skor, doğru/yanlış, trend ve zayıf konu analizini seçerek incele.</p>
+                </div>
+                <div class="exam-chart-controls">
+                  <select id="examChartRange" onchange="renderExamPerformanceChart()" aria-label="Grafik aralığı">
+                    <option value="7">Son 7 Sınav</option>
+                    <option value="14">Son 14 Sınav</option>
+                    <option value="30">Son 30 Sınav</option>
+                    <option value="999">Tüm Geçmiş</option>
+                  </select>
+                  <select id="examChartMode" onchange="renderExamPerformanceChart()" aria-label="Grafik görünümü">
+                    <option value="score">Başarı Grafiği</option>
+                    <option value="answers">Doğru / Yanlış / Boş</option>
+                    <option value="trend">Trend Analizi</option>
+                    <option value="topics">Zayıf Konular</option>
+                    <option value="summary">Genel Özet</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="exam-chart-box">
-                <svg id="examPerformanceSvg" viewBox="0 0 640 260" role="img" aria-label="Performans grafiği"></svg>
+              <div id="examChartInsights" class="exam-chart-insights" aria-live="polite"></div>
+              <div class="exam-chart-box detailed-chart-box">
+                <svg id="examPerformanceSvg" viewBox="0 0 760 340" role="img" aria-label="Performans grafiği"></svg>
               </div>
+              <div id="examChartLegend" class="exam-chart-legend"></div>
             </div>
 
             <div class="exam-pro-panel exam-goals-panel">

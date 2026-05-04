@@ -6512,3 +6512,833 @@ body.dark .exam-history-order {
     border-radius: 12px;
   }
 }
+
+/* =========================================================
+   EXAM HISTORY DETAIL + THEME PERFORMANCE CHART PATCH
+   ========================================================= */
+.exam-recent-item {
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.exam-recent-item:hover {
+  background: color-mix(in srgb, var(--pink-pale) 38%, transparent);
+  border-radius: 16px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+body.dark .exam-recent-item:hover {
+  background: rgba(255, 255, 255, .035);
+}
+.exam-history-modal-item {
+  grid-template-columns: 42px minmax(0, 1fr) auto auto auto;
+}
+.exam-history-open-label {
+  color: var(--pink-bright);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.exam-history-modal-item:hover .exam-history-open-label {
+  color: var(--pink);
+}
+.history-result-box .result-title {
+  color: var(--pink-bright);
+}
+.history-result-box .result-insight-card {
+  border: 1px solid color-mix(in srgb, var(--pink) 26%, var(--card-border));
+  background: color-mix(in srgb, var(--pink-pale) 42%, var(--white));
+}
+body.dark .history-result-box .result-insight-card {
+  background: rgba(255,255,255,.035);
+}
+.history-question-detail {
+  border-color: color-mix(in srgb, var(--pink) 34%, var(--card-border));
+}
+.compact-option-explain {
+  margin-top: 18px;
+}
+#examPerformanceSvg {
+  min-height: 280px;
+  background: color-mix(in srgb, var(--white) 84%, transparent);
+  border-radius: 24px;
+}
+.exam-chart-panel .exam-chart-box {
+  min-height: 300px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 76%, var(--pink) 24%);
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--pink) 13%, transparent), transparent 30%),
+    color-mix(in srgb, var(--white) 78%, transparent);
+  padding: 8px;
+}
+body.dark .exam-chart-panel .exam-chart-box {
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--pink) 16%, transparent), transparent 32%),
+    rgba(255,255,255,.025);
+}
+.exam-chart-label,
+.exam-chart-score {
+  fill: var(--text-light);
+}
+@media (max-width: 760px) {
+  .exam-history-modal-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+  .exam-history-modal-item .exam-quality-pill,
+  .exam-history-open-label {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+  .exam-history-score {
+    justify-items: end;
+  }
+}
+@media (max-width: 520px) {
+  .exam-chart-panel .exam-chart-box {
+    padding: 4px;
+    min-height: 240px;
+  }
+  #examPerformanceSvg {
+    min-height: 220px;
+  }
+  .exam-recent-item {
+    grid-template-columns: auto 1fr auto;
+  }
+  .exam-recent-score,
+  .exam-quality-pill {
+    grid-column: 2 / -1;
+  }
+}
+
+/* ============================================================
+   PERFORMANCE CHART THEME POLISH
+   Sadece Sınav Merkezi performans grafiği görünümünü iyileştirir.
+   ============================================================ */
+.exam-chart-panel {
+  overflow: hidden;
+}
+
+.exam-chart-panel .exam-panel-head {
+  align-items: center;
+}
+
+.exam-chart-panel .exam-panel-head h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exam-chart-panel .exam-panel-head h3::before {
+  content: "📈";
+  width: 34px;
+  height: 34px;
+  border-radius: 14px;
+  display: inline-grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--pink) 18%, var(--white));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24);
+  font-size: 15px;
+}
+
+.exam-chart-panel .exam-panel-head select,
+#examChartRange {
+  min-height: 42px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 72%, var(--pink) 28%);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--white) 92%, transparent), color-mix(in srgb, var(--input-bg) 92%, transparent));
+  color: var(--text);
+  font-weight: 800;
+  padding: 0 38px 0 14px;
+  box-shadow: 0 10px 24px rgba(15,23,42,.06);
+  outline: none;
+}
+
+.exam-chart-panel .exam-chart-box {
+  position: relative;
+  min-height: 330px;
+  border-radius: 28px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 72%, var(--pink) 28%);
+  background:
+    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--pink) 16%, transparent), transparent 30%),
+    radial-gradient(circle at 92% 20%, color-mix(in srgb, var(--pink-bright) 15%, transparent), transparent 28%),
+    linear-gradient(135deg, color-mix(in srgb, var(--white) 90%, transparent), color-mix(in srgb, var(--input-bg) 78%, transparent));
+  padding: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    0 16px 38px rgba(15,23,42,.08);
+}
+
+/* Grafik üstündeki otomatik "Tema uyumlu performans takibi" etiketi kaldırıldı. */
+.exam-chart-panel .exam-chart-box::before {
+  content: none !important;
+  display: none !important;
+}
+
+#examPerformanceSvg {
+  width: 100%;
+  min-height: 310px;
+  height: auto;
+  display: block;
+  border-radius: 24px;
+  background: transparent;
+}
+
+body.dark .exam-chart-panel .exam-panel-head h3::before {
+  background: rgba(255,255,255,.055);
+}
+
+body.dark .exam-chart-panel .exam-panel-head select,
+body.dark #examChartRange {
+  background: rgba(255,255,255,.035);
+  color: var(--text);
+  border-color: rgba(255,255,255,.10);
+  box-shadow: none;
+}
+
+body.dark .exam-chart-panel .exam-chart-box {
+  background:
+    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--pink) 20%, transparent), transparent 32%),
+    radial-gradient(circle at 92% 20%, color-mix(in srgb, var(--pink-bright) 15%, transparent), transparent 28%),
+    rgba(255,255,255,.025);
+  border-color: rgba(255,255,255,.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 20px 44px rgba(0,0,0,.24);
+}
+
+body.dark .exam-chart-panel .exam-chart-box::before {
+  background: rgba(255,255,255,.055);
+  color: var(--text);
+  border-color: rgba(255,255,255,.09);
+}
+
+@media (max-width: 768px) {
+  .exam-chart-panel .exam-chart-box {
+    min-height: 286px;
+    padding: 6px;
+    border-radius: 22px;
+  }
+
+  .exam-chart-panel .exam-chart-box::before {
+    display: none;
+  }
+
+  #examPerformanceSvg {
+    min-height: 270px;
+  }
+}
+
+/* =========================================================
+   PERFORMANCE CHART - DETAILED DROPDOWN MODES
+   Sadece Sınav Merkezi performans grafiğini geliştirir.
+   ========================================================= */
+.exam-chart-detail-panel {
+  overflow: hidden;
+}
+
+.exam-chart-head {
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.exam-chart-subtitle {
+  margin-top: 6px;
+  color: var(--text-light);
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+.exam-chart-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.exam-chart-controls select,
+#examChartMode {
+  min-height: 42px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 78%, var(--pink) 22%);
+  background: color-mix(in srgb, var(--input-bg) 88%, var(--white) 12%);
+  color: var(--text);
+  font-weight: 900;
+  font-size: 12.5px;
+  padding: 0 34px 0 12px;
+  outline: none;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .06);
+}
+
+.exam-chart-controls select:focus,
+#examChartMode:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pink) 20%, transparent);
+}
+
+.exam-chart-insights {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 12px;
+}
+
+.exam-chart-mini-card {
+  min-height: 74px;
+  padding: 12px 13px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 84%, var(--pink) 16%);
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--pink) 18%, transparent), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 78%, var(--white) 22%);
+  display: grid;
+  gap: 4px;
+}
+
+.exam-chart-mini-card span {
+  color: var(--text-light);
+  font-size: 10.5px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.exam-chart-mini-card strong {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.exam-chart-mini-card small {
+  color: var(--text-light);
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.exam-chart-mini-card.success {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(16,185,129,.20), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 78%, var(--white) 22%);
+}
+
+.exam-chart-mini-card.danger {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(239,68,68,.18), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 78%, var(--white) 22%);
+}
+
+.exam-chart-mini-card.trend {
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--navy-light) 20%, transparent), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 78%, var(--white) 22%);
+}
+
+.exam-chart-mini-card.trend-wide {
+  grid-column: span 2;
+}
+
+.exam-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 12px;
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.exam-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.exam-chart-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.detailed-chart-box {
+  min-height: 370px;
+}
+
+.detailed-chart-box svg {
+  width: 100%;
+  min-height: 330px;
+  display: block;
+}
+
+body.dark .exam-chart-controls select,
+body.dark #examChartMode {
+  background: color-mix(in srgb, var(--input-bg) 86%, #000 14%);
+  color: var(--text);
+  border-color: rgba(255,255,255,.10);
+  box-shadow: none;
+}
+
+body.dark .exam-chart-mini-card {
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--pink) 16%, transparent), transparent 34%),
+    rgba(255,255,255,.035);
+  border-color: rgba(255,255,255,.08);
+}
+
+body.dark .exam-chart-mini-card strong {
+  color: var(--text);
+}
+
+@media (max-width: 1180px) {
+  .exam-chart-insights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .exam-chart-head {
+    display: grid;
+  }
+
+  .exam-chart-controls {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .exam-chart-controls select,
+  #examChartMode {
+    flex: 1 1 180px;
+    width: 100%;
+  }
+
+  .exam-chart-insights {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-chart-mini-card.trend-wide {
+    grid-column: auto;
+  }
+
+  .detailed-chart-box {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .detailed-chart-box svg {
+    min-width: 720px;
+  }
+}
+
+/* ============================================================
+   PERFORMANCE CHART DARK/LIGHT READABILITY FINAL FIX
+   Sadece performans grafiği alanının tema modu okunabilirliğini düzeltir.
+   ============================================================ */
+.exam-chart-detail-panel,
+.exam-chart-panel {
+  color: var(--text);
+}
+
+.exam-chart-detail-panel .exam-panel-head h3,
+.exam-chart-panel .exam-panel-head h3 {
+  color: var(--text) !important;
+}
+
+.exam-chart-subtitle,
+.exam-chart-legend,
+.exam-chart-legend span {
+  color: color-mix(in srgb, var(--text) 74%, var(--text-light) 26%) !important;
+}
+
+.exam-chart-controls select,
+#examChartRange,
+#examChartMode {
+  color: var(--text) !important;
+  background: color-mix(in srgb, var(--input-bg) 82%, var(--white) 18%) !important;
+  border-color: color-mix(in srgb, var(--card-border) 72%, var(--pink) 28%) !important;
+}
+
+.exam-chart-mini-card {
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--pink) 16%, transparent), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 74%, var(--white) 26%) !important;
+}
+
+.exam-chart-mini-card span,
+.exam-chart-mini-card small {
+  color: color-mix(in srgb, var(--text) 70%, var(--text-light) 30%) !important;
+}
+
+.exam-chart-mini-card strong {
+  color: var(--text) !important;
+}
+
+.detailed-chart-box,
+.exam-chart-panel .exam-chart-box {
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--pink) 10%, transparent), transparent 28%),
+    color-mix(in srgb, var(--white) 88%, var(--bg) 12%) !important;
+  border-color: color-mix(in srgb, var(--card-border) 74%, var(--pink) 26%) !important;
+}
+
+body.dark .exam-chart-detail-panel .exam-panel-head h3,
+body.dark .exam-chart-panel .exam-panel-head h3 {
+  color: #fff7fb !important;
+}
+
+body.dark .exam-chart-subtitle,
+body.dark .exam-chart-legend,
+body.dark .exam-chart-legend span {
+  color: #f0cfdb !important;
+}
+
+body.dark .exam-chart-controls select,
+body.dark #examChartRange,
+body.dark #examChartMode {
+  color: #fff7fb !important;
+  background: rgba(35, 22, 31, 0.96) !important;
+  border-color: rgba(255,255,255,.16) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.22) !important;
+}
+
+body.dark .exam-chart-controls select option,
+body.dark #examChartRange option,
+body.dark #examChartMode option {
+  color: #fff7fb;
+  background: #1f121b;
+}
+
+body.dark .exam-chart-mini-card {
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--pink-bright) 18%, transparent), transparent 34%),
+    rgba(255,255,255,.055) !important;
+  border-color: rgba(255,255,255,.14) !important;
+}
+
+body.dark .exam-chart-mini-card span,
+body.dark .exam-chart-mini-card small {
+  color: #f0cfdb !important;
+}
+
+body.dark .exam-chart-mini-card strong {
+  color: #fff7fb !important;
+}
+
+body.dark .detailed-chart-box,
+body.dark .exam-chart-panel .exam-chart-box {
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--pink-bright) 12%, transparent), transparent 30%),
+    rgba(255,255,255,.035) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  box-shadow: 0 18px 46px rgba(0,0,0,.34) !important;
+}
+
+/* ============================================================
+   PERFORMANCE CHART MOBILE RESPONSIVE FINAL
+   Sadece performans grafiği alanını telefon/tablet uyumlu yapar.
+   ============================================================ */
+.exam-chart-detail-panel,
+.exam-chart-panel {
+  width: 100%;
+  max-width: 100%;
+}
+
+.exam-chart-detail-panel .exam-panel-head,
+.exam-chart-panel .exam-panel-head,
+.exam-chart-head {
+  min-width: 0;
+}
+
+.exam-chart-controls,
+.exam-chart-controls select,
+#examChartRange,
+#examChartMode {
+  min-width: 0;
+}
+
+.detailed-chart-box,
+.exam-chart-panel .exam-chart-box {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden !important;
+  touch-action: pan-y;
+}
+
+.detailed-chart-box svg,
+.exam-chart-panel .exam-chart-box svg,
+#examPerformanceSvg {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: clamp(260px, 48vw, 340px);
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .exam-chart-detail-panel {
+    padding: 18px !important;
+  }
+
+  .exam-chart-head,
+  .exam-chart-panel .exam-panel-head {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .exam-chart-controls {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .exam-chart-controls select,
+  #examChartRange,
+  #examChartMode {
+    width: 100% !important;
+    min-height: 46px;
+    border-radius: 14px;
+    font-size: 13px;
+  }
+
+  .exam-chart-insights {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .exam-chart-mini-card {
+    min-height: 68px;
+    padding: 11px 12px;
+  }
+
+  .exam-chart-mini-card strong {
+    font-size: 17px;
+  }
+
+  .exam-chart-legend {
+    gap: 8px 10px;
+    font-size: 11.5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .exam-chart-detail-panel {
+    padding: 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .exam-chart-panel .exam-panel-head h3,
+  .exam-chart-detail-panel .exam-panel-head h3 {
+    font-size: 18px !important;
+    line-height: 1.25;
+  }
+
+  .exam-chart-subtitle {
+    font-size: 12px !important;
+    line-height: 1.45;
+  }
+
+  .exam-chart-controls {
+    grid-template-columns: 1fr !important;
+  }
+
+  .exam-chart-insights {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    margin: 12px 0 10px !important;
+  }
+
+  .exam-chart-mini-card {
+    border-radius: 16px;
+    min-height: 64px;
+    padding: 10px;
+  }
+
+  .exam-chart-mini-card span {
+    font-size: 9.5px !important;
+  }
+
+  .exam-chart-mini-card strong {
+    font-size: 16px !important;
+  }
+
+  .exam-chart-mini-card small {
+    font-size: 10px !important;
+  }
+
+  .exam-chart-mini-card.trend-wide {
+    grid-column: 1 / -1 !important;
+  }
+
+  .detailed-chart-box,
+  .exam-chart-panel .exam-chart-box {
+    min-height: 0 !important;
+    padding: 8px !important;
+    border-radius: 20px !important;
+  }
+
+  .detailed-chart-box svg,
+  .exam-chart-panel .exam-chart-box svg,
+  #examPerformanceSvg {
+    min-height: 300px !important;
+  }
+
+  .exam-chart-legend {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    font-size: 10.8px !important;
+  }
+
+  .exam-chart-legend span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 390px) {
+  .exam-chart-detail-panel {
+    padding: 12px !important;
+  }
+
+  .exam-chart-insights {
+    gap: 8px !important;
+  }
+
+  .exam-chart-mini-card {
+    padding: 9px;
+  }
+
+  .exam-chart-mini-card strong {
+    font-size: 15px !important;
+  }
+
+  .detailed-chart-box svg,
+  .exam-chart-panel .exam-chart-box svg,
+  #examPerformanceSvg {
+    min-height: 285px !important;
+  }
+}
+
+/* ============================================================
+   EXAM CENTER PERFORMANCE CHART - DARK MODE SUCCESS AREA FIX
+   Sadece Sınav Merkezi > Performans Grafiği alanındaki
+   başarı oranı / başarı grafiği yazılarını dark modda okunur yapar.
+   ============================================================ */
+#examcenter .exam-chart-detail-panel,
+#examcenter .exam-chart-panel {
+  color: var(--text) !important;
+}
+
+#examcenter .exam-chart-detail-panel .exam-panel-head h3,
+#examcenter .exam-chart-panel .exam-panel-head h3,
+#examcenter .exam-chart-mini-card strong,
+#examcenter .exam-chart-box svg text {
+  paint-order: stroke fill;
+}
+
+body.dark #examcenter .exam-chart-detail-panel,
+body.dark #examcenter .exam-chart-panel {
+  background:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--pink-bright) 10%, transparent), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)),
+    var(--white) !important;
+  border-color: rgba(255,255,255,.14) !important;
+}
+
+body.dark #examcenter .exam-chart-detail-panel .exam-panel-head h3,
+body.dark #examcenter .exam-chart-panel .exam-panel-head h3 {
+  color: #fff7fb !important;
+  text-shadow: 0 1px 12px rgba(0,0,0,.35);
+}
+
+body.dark #examcenter .exam-chart-subtitle,
+body.dark #examcenter .exam-chart-legend,
+body.dark #examcenter .exam-chart-legend span {
+  color: #f1d6e1 !important;
+}
+
+body.dark #examcenter .exam-chart-controls select,
+body.dark #examcenter #examChartRange,
+body.dark #examcenter #examChartMode {
+  color: #fff7fb !important;
+  background: #24151d !important;
+  border-color: rgba(255,255,255,.18) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28) !important;
+}
+
+body.dark #examcenter .exam-chart-controls select option,
+body.dark #examcenter #examChartRange option,
+body.dark #examcenter #examChartMode option {
+  color: #fff7fb !important;
+  background: #1b1017 !important;
+}
+
+body.dark #examcenter .exam-chart-insights .exam-chart-mini-card {
+  background:
+    radial-gradient(circle at 84% 14%, color-mix(in srgb, var(--pink-bright) 18%, transparent), transparent 34%),
+    linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.035)) !important;
+  border-color: rgba(255,255,255,.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 16px 34px rgba(0,0,0,.24) !important;
+}
+
+body.dark #examcenter .exam-chart-insights .exam-chart-mini-card span,
+body.dark #examcenter .exam-chart-insights .exam-chart-mini-card small {
+  color: #f0cfdb !important;
+}
+
+body.dark #examcenter .exam-chart-insights .exam-chart-mini-card strong {
+  color: #ffffff !important;
+  text-shadow: 0 1px 10px rgba(0,0,0,.28);
+}
+
+body.dark #examcenter .exam-chart-insights .exam-chart-mini-card.success {
+  border-color: rgba(16,185,129,.34) !important;
+  background:
+    radial-gradient(circle at 84% 14%, rgba(16,185,129,.20), transparent 34%),
+    linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.035)) !important;
+}
+
+body.dark #examcenter .exam-chart-insights .exam-chart-mini-card.danger {
+  border-color: rgba(248,113,113,.34) !important;
+  background:
+    radial-gradient(circle at 84% 14%, rgba(248,113,113,.19), transparent 34%),
+    linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.035)) !important;
+}
+
+body.dark #examcenter .exam-chart-insights .exam-chart-mini-card.trend {
+  border-color: color-mix(in srgb, var(--pink-bright) 34%, rgba(255,255,255,.12)) !important;
+}
+
+body.dark #examcenter .detailed-chart-box,
+body.dark #examcenter .exam-chart-panel .exam-chart-box {
+  background:
+    radial-gradient(circle at 15% 15%, color-mix(in srgb, var(--pink-bright) 12%, transparent), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)) !important;
+  border-color: rgba(255,255,255,.16) !important;
+}
+
+/* SVG içindeki başarı oranı / eksen / etiket yazılarının dark modda kaybolmasını engeller */
+body.dark #examcenter #examPerformanceSvg text {
+  stroke: rgba(16, 8, 12, .62);
+  stroke-width: 2.2px;
+  paint-order: stroke fill;
+}
+
+body.dark #examcenter #examPerformanceSvg text[fill*="rgba"],
+body.dark #examcenter #examPerformanceSvg text[fill="#765367"],
+body.dark #examcenter #examPerformanceSvg text[fill="#3f1f2d"] {
+  fill: #fff7fb !important;
+}

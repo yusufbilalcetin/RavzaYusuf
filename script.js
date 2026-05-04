@@ -2465,7 +2465,7 @@ function getExamHistory() {
 }
 
 function setExamHistory(history) {
-  localStorage.setItem("eul_exam_history", JSON.stringify(history.slice(0, 5)));
+  localStorage.setItem("eul_exam_history", JSON.stringify(history.slice(0, 10)));
 }
 
 function countStudyDone() {
@@ -2554,6 +2554,24 @@ function initTheme() {
   updateThemeSelectionUi();
 }
 
+function refreshExamPerformanceChartAfterThemeChange() {
+  const isExamPageActive = document.getElementById("examcenter")?.classList.contains("active");
+  if (!isExamPageActive) return;
+
+  const refresh = () => {
+    if (typeof window.renderExamPerformanceChart === "function") {
+      window.renderExamPerformanceChart();
+    } else if (typeof renderExamPerformanceChart === "function") {
+      renderExamPerformanceChart();
+    }
+  };
+
+  requestAnimationFrame(() => {
+    refresh();
+    setTimeout(refresh, 80);
+  });
+}
+
 function applySiteTheme(themeId, persist = true) {
   const normalized = normalizeThemeStyle(themeId);
   document.body.setAttribute("data-theme-style", normalized);
@@ -2561,6 +2579,7 @@ function applySiteTheme(themeId, persist = true) {
     localStorage.setItem("eul_theme_style", normalized);
   }
   updateThemeSelectionUi();
+  refreshExamPerformanceChartAfterThemeChange();
 }
 
 function updateThemeSelectionUi() {
@@ -2615,6 +2634,7 @@ function applyDark(isDark) {
     const icon = topBtn.querySelector(".mode-toggle-icon");
     if (icon) icon.textContent = isDark ? "🌙" : "☀️";
   }
+  refreshExamPerformanceChartAfterThemeChange();
 }
 
 function toggleTheme() {
@@ -5279,13 +5299,37 @@ document.addEventListener("keydown", (event) => {
     const weakestTopic = getWeakestTopic(results);
 
     const history = getExamHistory();
-    history.unshift({
+    const examHistoryRecord = {
+      id: `exam-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       label: activeExam.label,
+      durationMinutes: activeExam.durationMinutes,
       score,
       total: results.length,
       percentage,
+      blankCount,
+      wrongCount,
+      correctCount: score,
+      autoSubmitted,
+      weakestTopic,
+      results: results.map((item) => ({
+        question: item.question,
+        options: Array.isArray(item.options) ? item.options.slice() : [],
+        answer: item.answer,
+        explanation: item.explanation || "",
+        topicId: item.topicId,
+        topicTitle: item.topicTitle,
+        unit: item.unit,
+        uid: item.uid,
+        index: item.index,
+        selectedIndex: item.selectedIndex,
+        status: item.status,
+        isCorrect: item.isCorrect,
+        isEmpty: item.isEmpty,
+        isWrong: item.isWrong
+      })),
       date: new Date().toISOString()
-    });
+    };
+    history.unshift(examHistoryRecord);
     setExamHistory(history);
 
     if (percentage > getBestExam()) {
@@ -6836,76 +6880,490 @@ document.addEventListener("keydown", (event) => {
       const quality = getQualityMeta(percentage);
       const icon = index % 4 === 0 ? "📖" : index % 4 === 1 ? "🧠" : index % 4 === 2 ? "🎧" : "📄";
       return `
-        <div class="exam-recent-item">
+        <button type="button" class="exam-recent-item" onclick="openExamHistorySession(${index})" aria-label="${safeText(item.label || "Sınav")} sonucunu aç">
           <span class="exam-recent-icon">${icon}</span>
-          <div class="exam-recent-title">
+          <span class="exam-recent-title">
             <strong>${safeText(item.label || "Sınav")}</strong>
             <small>${safeText(formatShortExamDate(item.date))}</small>
-          </div>
-          <div class="exam-score-ring" style="--p:${percentage}"><span>${percentage}%</span></div>
-          <div class="exam-recent-score">
+          </span>
+          <span class="exam-score-ring" style="--p:${percentage}"><span>${percentage}%</span></span>
+          <span class="exam-recent-score">
             <strong>${Number(item.score) || 0} / ${Number(item.total) || 0}</strong>
             <small>Doğru</small>
-          </div>
+          </span>
           <span class="exam-quality-pill ${quality.cls}">${quality.text}</span>
-        </div>
+        </button>
       `;
     }).join("");
   }
 
+  function getCssVar(name, fallback) {
+    try {
+      const value = getComputedStyle(document.body).getPropertyValue(name).trim();
+      return value || fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function getExamChartThemePalette() {
+    const body = document.body;
+    const isDark = body?.classList?.contains("dark");
+    const theme = body?.dataset?.themeStyle || "noel-ask";
+    const cssPink = getCssVar("--pink", "#d85f93");
+    const cssBright = getCssVar("--pink-bright", "#ef8bb3");
+    const cssNavy = getCssVar("--navy", "#7b1731");
+    // SVG içine renkler inline basıldığı için dark/light değişince grafik yeniden çizilir.
+    // Dark mode'da yazıların silik kalmaması için CSS değişkenlerinin üstüne
+    // daha yüksek kontrastlı güvenli renkler uygulanır.
+    const cssText = isDark ? "#fff7fb" : getCssVar("--text", "#3f1f2d");
+    const cssTextLight = isDark ? "#f0cfdb" : getCssVar("--text-light", "#765367");
+    const cssBorder = getCssVar("--card-border", isDark ? "#5b2a3c" : "#efc9d8");
+    const cssCard = isDark ? "#150b12" : getCssVar("--white", "#ffffff");
+
+    const themeMap = {
+      "gece-mavisi": {
+        line1: "#60a5fa",
+        line2: "#38bdf8",
+        line3: "#818cf8",
+        goal: "#22c55e",
+        danger: "#fb7185"
+      },
+      "orman-yesili": {
+        line1: "#34d399",
+        line2: "#22c55e",
+        line3: "#a3e635",
+        goal: "#14b8a6",
+        danger: "#f97316"
+      },
+      "mor-isik": {
+        line1: "#a78bfa",
+        line2: "#c084fc",
+        line3: "#f0abfc",
+        goal: "#22c55e",
+        danger: "#fb7185"
+      },
+      "klasik-koyu": {
+        line1: "#94a3b8",
+        line2: "#60a5fa",
+        line3: "#c084fc",
+        goal: "#22c55e",
+        danger: "#fb7185"
+      },
+      "pembe-tema": {
+        line1: "#d85f93",
+        line2: "#ef8bb3",
+        line3: "#fb7185",
+        goal: "#10b981",
+        danger: "#f97316"
+      },
+      "noel-ask": {
+        line1: "#dc5f86",
+        line2: "#ff9db8",
+        line3: "#f59e0b",
+        goal: "#14b8a6",
+        danger: "#ef4444"
+      }
+    };
+
+    const themeColors = themeMap[theme] || themeMap["noel-ask"];
+    return {
+      isDark,
+      theme,
+      text: cssText,
+      textLight: cssTextLight,
+      card: cssCard,
+      border: cssBorder,
+      navy: cssNavy,
+      accent: themeColors.line1 || cssPink,
+      accent2: themeColors.line2 || cssBright,
+      accent3: themeColors.line3 || cssNavy,
+      goal: themeColors.goal,
+      danger: themeColors.danger,
+      bg: isDark ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.74)",
+      grid: isDark ? "rgba(255,255,255,0.16)" : "rgba(123,23,49,0.12)",
+      axis: isDark ? "rgba(255,255,255,0.28)" : "rgba(123,23,49,0.22)",
+      cardStroke: isDark ? "rgba(255,255,255,0.18)" : "rgba(123,23,49,0.14)",
+      tooltipBg: isDark ? "rgba(21,11,18,.98)" : "rgba(255,255,255,.96)",
+      tooltipText: isDark ? "#fff7fb" : "#3f1f2d"
+    };
+  }
+
+  function formatChartDate(dateValue) {
+    try {
+      return new Intl.DateTimeFormat("tr-TR", { day: "2-digit", month: "short" }).format(new Date(dateValue));
+    } catch {
+      return "—";
+    }
+  }
+
   function renderExamPerformanceChart() {
     const svg = document.getElementById("examPerformanceSvg");
+    const insights = document.getElementById("examChartInsights");
+    const legend = document.getElementById("examChartLegend");
     if (!svg) return;
 
-    const range = Number(document.getElementById("examChartRange")?.value || 7);
-    const history = safeExamHistory()
-      .slice(0, Math.max(7, range))
+    const palette = getExamChartThemePalette();
+    const rangeValue = Number(document.getElementById("examChartRange")?.value || 7);
+    const mode = document.getElementById("examChartMode")?.value || "score";
+    const rawHistory = safeExamHistory().filter((item) => typeof item.percentage !== "undefined");
+    const limitedHistory = rawHistory
+      .slice(0, rangeValue >= 999 ? rawHistory.length : Math.max(7, rangeValue))
+      .map((item, originalIndex) => ({ item, originalIndex }))
       .reverse();
 
-    if (!history.length) {
+    const isChartMobile = window.matchMedia("(max-width: 640px)").matches;
+    const isChartTablet = window.matchMedia("(max-width: 900px)").matches;
+    const width = isChartMobile ? 560 : isChartTablet ? 680 : 800;
+    const height = mode === "topics"
+      ? (isChartMobile ? 450 : 360)
+      : (isChartMobile ? 360 : 350);
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    svg.classList.toggle("is-mobile-chart", isChartMobile);
+
+    const emptySvg = () => {
+      if (insights) {
+        insights.innerHTML = `
+          <div class="exam-chart-mini-card">
+            <span>Durum</span><strong>Veri yok</strong><small>Grafik için önce bir sınav çöz.</small>
+          </div>
+          <div class="exam-chart-mini-card">
+            <span>İpucu</span><strong>Mini sınav</strong><small>10 soruluk sınavla hızlı başlangıç yap.</small>
+          </div>
+        `;
+      }
+      if (legend) legend.innerHTML = "";
       svg.innerHTML = `
-        <rect x="0" y="0" width="640" height="260" rx="22" fill="rgba(248,250,252,.9)"></rect>
-        <text x="320" y="125" text-anchor="middle" class="exam-chart-label">Henüz grafik için sınav sonucu yok.</text>
-        <text x="320" y="150" text-anchor="middle" class="exam-chart-label">Bir sınav çözünce performans çizgisi burada görünecek.</text>
+        <defs>
+          <linearGradient id="examEmptyThemeBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="${palette.accent}" stop-opacity="${palette.isDark ? ".16" : ".12"}"/>
+            <stop offset=".52" stop-color="${palette.accent2}" stop-opacity="${palette.isDark ? ".10" : ".08"}"/>
+            <stop offset="1" stop-color="${palette.card}" stop-opacity=".92"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="${width}" height="${height}" rx="28" fill="url(#examEmptyThemeBg)" stroke="${palette.cardStroke}"/>
+        <circle cx="${width / 2}" cy="130" r="36" fill="${palette.accent}" opacity=".16"></circle>
+        <text x="${width / 2}" y="140" text-anchor="middle" fill="${palette.accent}" font-size="32" font-weight="900">↗</text>
+        <text x="${width / 2}" y="198" text-anchor="middle" fill="${palette.text}" font-size="18" font-weight="900">Henüz grafik için sınav sonucu yok.</text>
+        <text x="${width / 2}" y="228" text-anchor="middle" fill="${palette.textLight}" font-size="13" font-weight="700">Bir sınav çözünce seçtiğin analiz modu burada görünecek.</text>
       `;
+    };
+
+    if (!limitedHistory.length) {
+      emptySvg();
       return;
     }
 
-    const points = history.map((item, index) => {
-      const x = history.length === 1 ? 320 : 48 + (index * (544 / (history.length - 1)));
-      const y = 220 - ((Number(item.percentage) || 0) * 1.75);
-      return { x, y, percentage: Number(item.percentage) || 0, date: item.date };
+    const data = limitedHistory.map(({ item, originalIndex }) => {
+      const total = Number(item.total) || 0;
+      const correct = Number(item.score) || 0;
+      const blank = Number(item.blankCount ?? 0) || 0;
+      const wrong = Number(item.wrongCount ?? Math.max(0, total - correct - blank)) || 0;
+      const percentage = Math.max(0, Math.min(100, Math.round(Number(item.percentage) || 0)));
+      return {
+        originalIndex,
+        label: item.label || "Sınav",
+        date: item.date,
+        percentage,
+        correct,
+        wrong,
+        blank,
+        total,
+        results: Array.isArray(item.results) ? item.results : []
+      };
     });
 
-    const line = points.map((p) => `${p.x},${p.y}`).join(" ");
-    const area = `48,220 ${line} 592,220`;
+    const values = data.map((item) => item.percentage);
+    const avg = Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+    const best = Math.max(...values);
+    const lowest = Math.min(...values);
+    const last = values[values.length - 1];
+    const goal = 85;
+    const trend = values.length > 1 ? last - values[0] : 0;
+    const totalCorrect = data.reduce((sum, item) => sum + item.correct, 0);
+    const totalWrong = data.reduce((sum, item) => sum + item.wrong, 0);
+    const totalBlank = data.reduce((sum, item) => sum + item.blank, 0);
+    const totalQuestions = data.reduce((sum, item) => sum + item.total, 0);
+    const trendLabel = trend > 4 ? "Yükseliyor" : trend < -4 ? "Düşüyor" : "Sabit";
+    const trendIcon = trend > 4 ? "↗" : trend < -4 ? "↘" : "→";
+    const trendColor = trend >= 0 ? palette.goal : palette.danger;
+
+    function setInsights(extra = "") {
+      if (!insights) return;
+      insights.innerHTML = `
+        <div class="exam-chart-mini-card">
+          <span>Ortalama</span><strong>${avg}%</strong><small>${data.length} sınav üzerinden</small>
+        </div>
+        <div class="exam-chart-mini-card success">
+          <span>En iyi</span><strong>${best}%</strong><small>Hedef: %${goal}</small>
+        </div>
+        <div class="exam-chart-mini-card danger">
+          <span>En düşük</span><strong>${lowest}%</strong><small>Tekrar edilmesi gereken seviye</small>
+        </div>
+        <div class="exam-chart-mini-card trend">
+          <span>Trend</span><strong>${trendIcon} ${trendLabel}</strong><small>${trend > 0 ? "+" : ""}${trend} puan değişim</small>
+        </div>
+        ${extra}
+      `;
+    }
+
+    function setLegend(items) {
+      if (!legend) return;
+      legend.innerHTML = items.map((item) => `
+        <span><i style="background:${item.color}"></i>${item.label}</span>
+      `).join("");
+    }
+
+    const left = isChartMobile ? 46 : 62;
+    const right = isChartMobile ? 20 : 42;
+    const top = isChartMobile ? 52 : 44;
+    const bottom = isChartMobile ? 62 : 68;
+    const innerW = width - left - right;
+    const innerH = height - top - bottom;
+    const yFor = (value) => top + innerH - ((Math.max(0, Math.min(100, value)) / 100) * innerH);
+    const xFor = (index) => data.length === 1
+      ? left + innerW / 2
+      : left + (index * (innerW / (data.length - 1)));
+
+    const defs = `
+      <defs>
+        <linearGradient id="examThemeBgGradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="${palette.accent}" stop-opacity="${palette.isDark ? ".16" : ".10"}"/>
+          <stop offset=".5" stop-color="${palette.accent2}" stop-opacity="${palette.isDark ? ".08" : ".06"}"/>
+          <stop offset="1" stop-color="${palette.card}" stop-opacity=".92"/>
+        </linearGradient>
+        <linearGradient id="examThemeLineGradient" x1="0" x2="1">
+          <stop offset="0" stop-color="${palette.accent3}"/>
+          <stop offset=".52" stop-color="${palette.accent}"/>
+          <stop offset="1" stop-color="${palette.accent2}"/>
+        </linearGradient>
+        <linearGradient id="examThemeAreaGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="${palette.accent2}" stop-opacity="${palette.isDark ? ".34" : ".26"}"/>
+          <stop offset=".72" stop-color="${palette.accent}" stop-opacity="${palette.isDark ? ".08" : ".07"}"/>
+          <stop offset="1" stop-color="${palette.accent}" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="examChartGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="${palette.accent}" flood-opacity="${palette.isDark ? ".32" : ".20"}"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="${width}" height="${height}" rx="28" fill="url(#examThemeBgGradient)" stroke="${palette.cardStroke}"></rect>
+      <circle cx="${width - 92}" cy="64" r="62" fill="${palette.accent2}" opacity="${palette.isDark ? ".10" : ".12"}"></circle>
+      <circle cx="86" cy="${height - 62}" r="76" fill="${palette.accent}" opacity="${palette.isDark ? ".08" : ".07"}"></circle>
+    `;
+
     const yGrid = [0, 25, 50, 75, 100].map((value) => {
-      const y = 220 - (value * 1.75);
-      return `<line x1="48" x2="592" y1="${y}" y2="${y}" stroke="#e5e7eb" stroke-width="1"/><text x="18" y="${y + 4}" class="exam-chart-label">%${value}</text>`;
+      const y = yFor(value);
+      return `
+        <line x1="${left}" x2="${left + innerW}" y1="${y}" y2="${y}" stroke="${palette.grid}" stroke-width="1"/>
+        <text x="${left - 16}" y="${y + 4}" text-anchor="end" fill="${palette.textLight}" font-size="11" font-weight="800">%${value}</text>
+      `;
     }).join("");
 
-    svg.innerHTML = `
-      <defs>
-        <linearGradient id="examLineGradient" x1="0" x2="1">
-          <stop offset="0" stop-color="#7c3aed"/>
-          <stop offset="1" stop-color="#2563eb"/>
-        </linearGradient>
-        <linearGradient id="examAreaGradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#7c3aed" stop-opacity=".18"/>
-          <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <rect x="0" y="0" width="640" height="260" rx="22" fill="rgba(255,255,255,.72)"></rect>
+    const axis = `
       ${yGrid}
-      <polyline points="${area}" fill="url(#examAreaGradient)"></polyline>
-      <polyline points="${line}" fill="none" stroke="url(#examLineGradient)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline>
-      ${points.map((p, i) => `
-        <circle cx="${p.x}" cy="${p.y}" r="6" fill="#7c3aed" stroke="#fff" stroke-width="3"></circle>
-        ${i === points.length - 1 ? `<text x="${Math.min(575, p.x + 18)}" y="${Math.max(25, p.y - 16)}" class="exam-chart-score">${p.percentage}%</text>` : ""}
-      `).join("")}
-      <text x="48" y="248" class="exam-chart-label">Eski</text>
-      <text x="560" y="248" class="exam-chart-label">Yeni</text>
+      <line x1="${left}" x2="${left + innerW}" y1="${top + innerH}" y2="${top + innerH}" stroke="${palette.axis}" stroke-width="2"/>
+      <line x1="${left}" x2="${left}" y1="${top}" y2="${top + innerH}" stroke="${palette.axis}" stroke-width="2"/>
     `;
+
+    function renderScoreLine(title = "Başarı yüzdesi") {
+      const points = data.map((item, index) => ({ ...item, x: xFor(index), y: yFor(item.percentage) }));
+      const line = points.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+      const area = `${left},${top + innerH} ${line} ${left + innerW},${top + innerH}`;
+      const avgY = yFor(avg);
+      const goalY = yFor(goal);
+      const xLabels = points.map((p, index) => {
+        if (isChartMobile && data.length > 5 && index % 2 === 1 && index !== data.length - 1) return "";
+        if (!isChartMobile && data.length > 10 && index % 2 === 1 && index !== data.length - 1) return "";
+        return `<text x="${p.x}" y="${height - 28}" text-anchor="middle" fill="${palette.textLight}" font-size="${isChartMobile ? "9.5" : "10.5"}" font-weight="800">${safeText(formatChartDate(p.date))}</text>`;
+      }).join("");
+      const lastPoint = points[points.length - 1];
+      const tooltipX = Math.max(left + 10, Math.min(width - 168, lastPoint.x + 18));
+      const tooltipY = Math.max(18, Math.min(height - 124, lastPoint.y - 54));
+
+      svg.innerHTML = `
+        ${defs}
+        ${axis}
+        <line x1="${left}" x2="${left + innerW}" y1="${goalY}" y2="${goalY}" stroke="${palette.goal}" stroke-width="2" stroke-dasharray="8 8" opacity=".82"/>
+        <text x="${left + 8}" y="${goalY - 9}" fill="${palette.goal}" font-size="11" font-weight="900">Hedef %${goal}</text>
+        <line x1="${left}" x2="${left + innerW}" y1="${avgY}" y2="${avgY}" stroke="${palette.accent}" stroke-width="2" stroke-dasharray="5 7" opacity=".76"/>
+        <text x="${left + innerW - 6}" y="${avgY - 9}" text-anchor="end" fill="${palette.accent}" font-size="11" font-weight="900">Ortalama %${avg}</text>
+        <polyline points="${area}" fill="url(#examThemeAreaGradient)"></polyline>
+        <polyline points="${line}" fill="none" stroke="url(#examThemeLineGradient)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#examChartGlow)"></polyline>
+        ${points.map((p) => {
+          const pointColor = p.percentage >= goal ? palette.goal : p.percentage < 50 ? palette.danger : palette.accent;
+          return `
+            <g class="exam-chart-point" onclick="openExamHistorySession(${p.originalIndex})" style="cursor:pointer">
+              <circle cx="${p.x}" cy="${p.y}" r="11" fill="${pointColor}" opacity=".16"></circle>
+              <circle cx="${p.x}" cy="${p.y}" r="6" fill="${pointColor}" stroke="${palette.card}" stroke-width="4"></circle>
+              <title>${safeText(p.label)} · ${p.percentage}% · ${safeText(formatShortExamDate(p.date))}</title>
+            </g>
+          `;
+        }).join("")}
+        ${xLabels}
+        <text x="${left}" y="${isChartMobile ? 24 : 26}" fill="${palette.text}" font-size="${isChartMobile ? "12" : "13"}" font-weight="900">${safeText(title)}</text>
+        <text x="${left + innerW}" y="${isChartMobile ? 24 : 26}" text-anchor="end" fill="${palette.textLight}" font-size="${isChartMobile ? "10" : "12"}" font-weight="800">${data.length} sınav · En düşük %${lowest}</text>
+      `;
+    }
+
+    function renderAnswerBars() {
+      const maxTotal = Math.max(1, ...data.map((item) => item.total || 1));
+      const barGap = Math.max(10, Math.min(26, innerW / Math.max(1, data.length) * 0.18));
+      const barW = Math.max(20, Math.min(48, (innerW - barGap * (data.length - 1)) / data.length));
+      const startX = left + Math.max(0, (innerW - (barW * data.length + barGap * (data.length - 1))) / 2);
+      const colorCorrect = palette.goal;
+      const colorWrong = palette.danger;
+      const colorBlank = palette.accent2;
+      const bars = data.map((item, index) => {
+        const x = startX + index * (barW + barGap);
+        const correctH = (item.correct / maxTotal) * innerH;
+        const wrongH = (item.wrong / maxTotal) * innerH;
+        const blankH = (item.blank / maxTotal) * innerH;
+        let y = top + innerH;
+        const correctY = y - correctH; y = correctY;
+        const wrongY = y - wrongH; y = wrongY;
+        const blankY = y - blankH;
+        return `
+          <g onclick="openExamHistorySession(${item.originalIndex})" style="cursor:pointer">
+            <rect x="${x}" y="${correctY}" width="${barW}" height="${correctH}" rx="8" fill="${colorCorrect}" opacity=".88"></rect>
+            <rect x="${x}" y="${wrongY}" width="${barW}" height="${wrongH}" rx="8" fill="${colorWrong}" opacity=".82"></rect>
+            <rect x="${x}" y="${blankY}" width="${barW}" height="${blankH}" rx="8" fill="${colorBlank}" opacity=".75"></rect>
+            <text x="${x + barW / 2}" y="${height - 28}" text-anchor="middle" fill="${palette.textLight}" font-size="${isChartMobile ? "9" : "10"}" font-weight="800">${safeText(formatChartDate(item.date))}</text>
+            <title>${safeText(item.label)} · ${item.correct} doğru · ${item.wrong} yanlış · ${item.blank} boş</title>
+          </g>
+        `;
+      }).join("");
+      svg.innerHTML = `
+        ${defs}
+        ${axis}
+        ${bars}
+        <text x="${left}" y="${isChartMobile ? 24 : 26}" fill="${palette.text}" font-size="${isChartMobile ? "12" : "13"}" font-weight="900">Doğru / Yanlış / Boş</text>
+        <text x="${left + innerW}" y="${isChartMobile ? 24 : 26}" text-anchor="end" fill="${palette.textLight}" font-size="${isChartMobile ? "10" : "12"}" font-weight="800">${totalCorrect} D · ${totalWrong} Y · ${totalBlank} B</text>
+      `;
+      setLegend([
+        { color: colorCorrect, label: "Doğru" },
+        { color: colorWrong, label: "Yanlış" },
+        { color: colorBlank, label: "Boş" }
+      ]);
+    }
+
+    function getWeakTopicStats() {
+      const map = new Map();
+      data.forEach((session) => {
+        session.results.forEach((result) => {
+          const status = result.status || (result.isCorrect ? "correct" : result.isEmpty ? "empty" : "wrong");
+          if (status === "correct") return;
+          const key = result.topicTitle || result.unit || "Bilinmeyen konu";
+          const current = map.get(key) || { topic: key, wrong: 0, blank: 0, total: 0 };
+          if (status === "empty" || result.isEmpty) current.blank += 1;
+          else current.wrong += 1;
+          current.total += 1;
+          map.set(key, current);
+        });
+      });
+      return [...map.values()].sort((a, b) => b.total - a.total).slice(0, 6);
+    }
+
+    function renderWeakTopics() {
+      const topics = getWeakTopicStats();
+      const max = Math.max(1, ...topics.map((item) => item.total));
+      if (!topics.length) {
+        svg.innerHTML = `
+          ${defs}
+          <text x="${width / 2}" y="150" text-anchor="middle" fill="${palette.text}" font-size="18" font-weight="900">Zayıf konu verisi yok.</text>
+          <text x="${width / 2}" y="178" text-anchor="middle" fill="${palette.textLight}" font-size="13" font-weight="700">Yanlış veya boş sorular olduğunda konu analizi burada görünecek.</text>
+        `;
+        setLegend([]);
+        return;
+      }
+      const rowH = isChartMobile ? 58 : 42;
+      const startY = isChartMobile ? 78 : 70;
+      const barX = isChartMobile ? left : 260;
+      const barYShift = isChartMobile ? 24 : 0;
+      const barMax = isChartMobile ? width - left - right - 82 : width - 310;
+      const rows = topics.map((item, index) => {
+        const y = startY + index * rowH;
+        const barW = Math.max(18, (item.total / max) * barMax);
+        const topicText = isChartMobile && item.topic.length > 24 ? `${item.topic.slice(0, 23)}…` : item.topic;
+        return `
+          <g>
+            <text x="${left}" y="${y + 16}" fill="${palette.text}" font-size="${isChartMobile ? "11.5" : "13"}" font-weight="900">${safeText(topicText)}</text>
+            <rect x="${barX}" y="${y + barYShift}" width="${barMax}" height="22" rx="11" fill="${palette.grid}"></rect>
+            <rect x="${barX}" y="${y + barYShift}" width="${barW}" height="22" rx="11" fill="${palette.danger}" opacity=".86"></rect>
+            <text x="${Math.min(barX + barW + 8, width - right - 52)}" y="${y + barYShift + 15}" fill="${palette.textLight}" font-size="${isChartMobile ? "10" : "12"}" font-weight="900">${item.total} hata</text>
+            <text x="${width - right}" y="${y + barYShift + 15}" text-anchor="end" fill="${palette.textLight}" font-size="${isChartMobile ? "9.5" : "11"}" font-weight="800">${item.wrong}Y · ${item.blank}B</text>
+          </g>
+        `;
+      }).join("");
+      svg.innerHTML = `
+        ${defs}
+        <text x="${left}" y="30" fill="${palette.text}" font-size="${isChartMobile ? "12.5" : "14"}" font-weight="900">En çok hata yapılan konular</text>
+        <text x="${left}" y="50" fill="${palette.textLight}" font-size="${isChartMobile ? "10.5" : "12"}" font-weight="800">Yanlış ve boşların konu dağılımı</text>
+        ${rows}
+      `;
+      setLegend([{ color: palette.danger, label: "Yanlış / boş yoğunluğu" }]);
+    }
+
+    function renderTrend() {
+      renderScoreLine("Trend analizi");
+      const extra = `
+        <div class="exam-chart-mini-card trend-wide">
+          <span>Yorum</span><strong>${trendIcon} ${trendLabel}</strong><small>${trend >= 0 ? "Sonuçların başlangıca göre daha iyi görünüyor." : "Son sınavlar düşüş gösteriyor; zayıf konulara dön."}</small>
+        </div>
+      `;
+      setInsights(extra);
+    }
+
+    if (mode === "answers") {
+      setInsights();
+      renderAnswerBars();
+      return;
+    }
+
+    if (mode === "topics") {
+      const topics = getWeakTopicStats();
+      const topTopic = topics[0];
+      setInsights(topTopic ? `
+        <div class="exam-chart-mini-card danger trend-wide">
+          <span>En zayıf konu</span><strong>${safeText(topTopic.topic)}</strong><small>${topTopic.wrong} yanlış · ${topTopic.blank} boş</small>
+        </div>
+      ` : "");
+      renderWeakTopics();
+      return;
+    }
+
+    if (mode === "trend") {
+      setLegend([
+        { color: palette.accent, label: "Skor" },
+        { color: palette.goal, label: "Hedef %85" },
+        { color: trendColor, label: "Trend" }
+      ]);
+      renderTrend();
+      return;
+    }
+
+    if (mode === "summary") {
+      setInsights(`
+        <div class="exam-chart-mini-card success trend-wide">
+          <span>Toplam cevap</span><strong>${totalCorrect} doğru</strong><small>${totalWrong} yanlış · ${totalBlank} boş · ${totalQuestions} toplam</small>
+        </div>
+      `);
+      setLegend([
+        { color: palette.accent, label: "Skor" },
+        { color: palette.goal, label: "Hedef" },
+        { color: palette.danger, label: "Riskli skor" }
+      ]);
+      renderScoreLine("Genel performans özeti");
+      return;
+    }
+
+    setInsights();
+    setLegend([
+      { color: palette.accent, label: "Başarı skoru" },
+      { color: palette.goal, label: "Hedef %85" },
+      { color: palette.accent2, label: "Ortalama" }
+    ]);
+    renderScoreLine("Başarı yüzdesi");
   }
 
   function renderExamHistoryModalList(history = safeExamHistory()) {
@@ -6925,7 +7383,7 @@ document.addEventListener("keydown", (event) => {
       const total = Number(item.total) || 0;
       const wrong = Math.max(0, total - correct);
       return `
-        <button type="button" class="exam-history-modal-item" onclick="closeExamHistoryModal()" aria-label="${safeText(item.label || "Sınav")} geçmiş sonucu">
+        <button type="button" class="exam-history-modal-item" onclick="openExamHistorySession(${index})" aria-label="${safeText(item.label || "Sınav")} geçmiş sınavını aç">
           <span class="exam-history-order">${index + 1}</span>
           <span class="exam-history-info">
             <strong>${safeText(item.label || "Sınav")}</strong>
@@ -6936,9 +7394,230 @@ document.addEventListener("keydown", (event) => {
             <small>${correct}/${total} doğru${wrong ? ` · ${wrong} yanlış` : ""}</small>
           </span>
           <span class="exam-quality-pill ${quality.cls}">${quality.text}</span>
+          <span class="exam-history-open-label">Detayı aç →</span>
         </button>
       `;
     }).join("");
+  }
+
+  let selectedHistorySession = null;
+
+  function normalizeHistoryExamSession(item) {
+    if (!item) return null;
+    const results = Array.isArray(item.results) ? item.results.map((result, index) => {
+      const selectedIndex = result.selectedIndex === undefined ? null : result.selectedIndex;
+      const answer = Number(result.answer);
+      const status = result.status || (selectedIndex === null ? "empty" : selectedIndex === answer ? "correct" : "wrong");
+      return {
+        ...result,
+        index: Number.isFinite(Number(result.index)) ? Number(result.index) : index,
+        selectedIndex,
+        answer,
+        status,
+        isCorrect: status === "correct",
+        isEmpty: status === "empty",
+        isWrong: status === "wrong"
+      };
+    }) : [];
+
+    const total = Number(item.total) || results.length || 0;
+    const score = Number(item.score) || results.filter((r) => r.isCorrect).length;
+    const blankCount = Number(item.blankCount ?? results.filter((r) => r.isEmpty).length) || 0;
+    const wrongCount = Number(item.wrongCount ?? results.filter((r) => r.isWrong).length) || Math.max(0, total - score - blankCount);
+    const percentage = Number(item.percentage) || formatPercent(score, total || 1);
+
+    return {
+      label: item.label || "Geçmiş Sınav",
+      durationMinutes: Number(item.durationMinutes) || 0,
+      total,
+      score,
+      wrongCount,
+      blankCount,
+      percentage,
+      results,
+      autoSubmitted: Boolean(item.autoSubmitted),
+      weakestTopic: item.weakestTopic || null,
+      date: item.date || null,
+      fromHistory: true
+    };
+  }
+
+  function getHistoryOptionReason(item, optionIndex) {
+    if (!item || !Array.isArray(item.options)) return "Bu şık için açıklama oluşturulamadı.";
+    const optionText = String(item.options[optionIndex] || "").trim();
+    const correctText = String(item.options[item.answer] || "").trim();
+    const isCorrect = optionIndex === item.answer;
+    const isSelected = item.selectedIndex === optionIndex;
+    const topic = String(item.topicTitle || "").toLowerCase();
+    const question = String(item.question || "").toLowerCase();
+    const base = String(item.explanation || "").trim();
+    const merged = `${topic} ${question} ${base.toLowerCase()}`;
+
+    let correctReason = "Bu şık cümlenin istediği anlam ve dilbilgisi kuralıyla uyumlu olduğu için doğru cevaptır.";
+    let wrongReason = "Bu şık cümlenin istediği anlam veya dilbilgisi kuralıyla tam uyuşmadığı için doğru değildir.";
+
+    if (topic.includes("future") || /will|going to|shall|tomorrow|cloud|plan|future/.test(merged)) {
+      if (/cloud|look at|kanıt|kanita|evidence/.test(merged)) {
+        correctReason = "Cümlede görünen kanıt vardır. Görünen kanıta dayalı gelecek tahminlerinde genellikle be going to kullanılır.";
+        wrongReason = `Bu seçenek görünen kanıta dayalı gelecek tahmini mantığını tam karşılamaz. Bu bağlamda “${correctText}” daha uygundur.`;
+      } else {
+        correctReason = "Bu seçenek cümlenin gelecek zaman bağlamını doğru kurar.";
+        wrongReason = "Bu seçenek gelecek zaman kullanımındaki bağlama uymadığı için elenir.";
+      }
+    } else if (topic.includes("passive") || question.includes("passive")) {
+      correctReason = "Passive yapıda nesne başa alınır ve fiil uygun zamanda be + V3 şeklinde kurulur. Bu seçenek bu yapıyı doğru verir.";
+      wrongReason = "Bu seçenek passive yapıyı doğru kurmaz; zaman, özne-fiil uyumu veya V3 kullanımı hatalı olabilir.";
+    } else if (topic.includes("condition")) {
+      correctReason = "Koşul cümlesindeki if kısmı ve sonuç kısmı bu seçenekte doğru zaman uyumuyla kurulmuştur.";
+      wrongReason = "Bu seçenek conditional yapısındaki zaman uyumunu bozduğu için doğru değildir.";
+    } else if (topic.includes("perfect")) {
+      correctReason = "Cümlede geçmişle şimdi arasında bağlantı veya süre anlamı olduğu için bu perfect yapı uygundur.";
+      wrongReason = "Bu seçenek perfect tense ipuçlarıyla uyuşmaz. for/since/yet/already gibi ipuçlarına dikkat edilmelidir.";
+    } else if (topic.includes("modal") || topic.includes("can") || topic.includes("could") || topic.includes("able")) {
+      correctReason = "Cümlenin anlamı bu modal yapıyı ister; seçenek yetenek, izin, zorunluluk veya çıkarım anlamını doğru verir.";
+      wrongReason = "Bu seçenek cümlenin istediği modal anlamını doğru vermez veya modal sonrası fiil yapısını bozabilir.";
+    } else if (topic.includes("phrasal")) {
+      correctReason = "Bu phrasal verb cümlenin anlamını doğru tamamlar ve kullanım kuralına uygundur.";
+      wrongReason = "Bu seçenek phrasal verb anlamına veya nesne yerleşimine uymadığı için doğru değildir.";
+    }
+
+    if (isCorrect && isSelected) return `Bu şık senin seçimin ve doğru cevaptır. ${correctReason}${base ? ` Ek açıklama: ${base}` : ""}`;
+    if (isCorrect) return `Bu şık doğru cevaptır. ${correctReason}${base ? ` Ek açıklama: ${base}` : ""}`;
+    if (isSelected) return `Bu şık senin seçimin, fakat doğru değildir. ${wrongReason} Bu yüzden doğru cevap “${correctText}” olmalıdır.`;
+    return `Bu şık doğru değildir. ${wrongReason}`;
+  }
+
+  function renderHistoryQuestionDetail(item) {
+    if (!item) return "";
+    const statusLabel = item.status === "correct" ? "Doğru" : item.status === "wrong" ? "Yanlış" : "Boş";
+    const selectedLabel = item.selectedIndex === null || item.selectedIndex === undefined ? "Boş" : safeText(item.options?.[item.selectedIndex] || "—");
+    const correctLabel = safeText(item.options?.[item.answer] || "—");
+
+    return `
+      <div class="exam-focus-card result-question-detail history-question-detail" id="examResultQuestionDetail">
+        <div class="result-question-detail-head">
+          <div>
+            <span class="review-status-chip review-status-${item.status}">${statusLabel}</span>
+            <h4>${safeText(item.unit || "Ünite")} · ${safeText(item.topicTitle || "Konu")} · Soru ${item.index + 1}</h4>
+          </div>
+        </div>
+        <p class="result-question-text">${safeText(item.question || "Soru metni bulunamadı.")}</p>
+        <div class="result-option-list" aria-label="Soru seçenekleri">
+          ${(item.options || []).map((option, optionIndex) => {
+            const isSelected = item.selectedIndex === optionIndex;
+            const isCorrect = item.answer === optionIndex;
+            let cls = "result-option-review";
+            if (isCorrect) cls += " is-correct-answer";
+            if (isSelected) cls += " is-selected-answer";
+            if (isSelected && !isCorrect) cls += " is-wrong-selected";
+            return `
+              <div class="${cls}">
+                <span class="result-option-letter">${String.fromCharCode(65 + optionIndex)}</span>
+                <span class="result-option-text">${safeText(option)}</span>
+                ${isSelected ? `<strong class="result-option-tag selected-tag">Senin seçimin</strong>` : ""}
+                ${isCorrect ? `<strong class="result-option-tag correct-tag">Doğru cevap</strong>` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+        <div class="result-detail-summary">
+          <div class="review-answer-row review-answer-${item.status}"><strong>Senin cevabın:</strong><span>${selectedLabel}</span></div>
+          <div class="review-answer-row review-answer-correct"><strong>Doğru cevap:</strong><span>${correctLabel}</span></div>
+        </div>
+        <div class="result-option-explanation-box compact-option-explain">
+          <strong>Şıklar Üzerinden Açıklama</strong>
+          <div class="result-option-explanation-list">
+            ${(item.options || []).map((option, optionIndex) => {
+              const isCorrect = optionIndex === item.answer;
+              const isSelected = item.selectedIndex === optionIndex;
+              let cls = "result-option-explanation-item";
+              if (isCorrect) cls += " is-correct";
+              if (isSelected && !isCorrect) cls += " is-selected-wrong";
+              if (isSelected && isCorrect) cls += " is-selected-correct";
+              return `
+                <div class="${cls}">
+                  <div class="option-explanation-head">
+                    <span class="option-explanation-letter">${String.fromCharCode(65 + optionIndex)}</span>
+                    <strong>${safeText(option)}</strong>
+                    ${isSelected ? `<em>Senin seçimin</em>` : ""}
+                    ${isCorrect ? `<em>Doğru cevap</em>` : ""}
+                  </div>
+                  <p>${safeText(getHistoryOptionReason(item, optionIndex))}</p>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderHistoryExamResultView(focusedIndex = null) {
+    const workspace = document.getElementById("examWorkspace");
+    if (!workspace || !selectedHistorySession) return;
+
+    const s = selectedHistorySession;
+    const results = s.results || [];
+    const focus = Number.isFinite(Number(focusedIndex))
+      ? Number(focusedIndex)
+      : (results.find((item) => item.status !== "correct") || results[0] || {}).index;
+    const focusedResult = results.find((item) => item.index === focus) || results[0] || null;
+    const weaknessText = s.weakestTopic
+      ? `${safeText(s.weakestTopic.topicTitle)} (${Number(s.weakestTopic.wrong) || 0} yanlış${s.weakestTopic.empty ? `, ${s.weakestTopic.empty} boş` : ""})`
+      : (s.wrongCount > 0 || s.blankCount > 0 ? "Aşağıdaki soru numaralarından yanlış/boş sorularını tek tek inceleyebilirsin." : "Bu sınavda belirgin hata yok.");
+
+    workspace.innerHTML = `
+      <div class="result-box premium-result-box history-result-box">
+        <div class="result-box-top">
+          <div>
+            <span class="unit-badge exam-badge">GEÇMİŞ SINAV</span>
+            <h3 class="result-title">${safeText(s.label)} · ${safeText(formatShortExamDate(s.date))}</h3>
+            <p>Bu geçmiş sınavda hangi soruları doğru yaptığını, hangi sorularda hata yaptığını ve şıkları nedenleriyle görebilirsin.</p>
+          </div>
+          <div class="result-score-circle"><strong>${s.percentage}%</strong><span>Başarı</span></div>
+        </div>
+        <div class="result-main premium-result-main">
+          <div class="result-stat success"><span>Doğru</span><strong>${s.score}</strong></div>
+          <div class="result-stat danger"><span>Yanlış</span><strong>${s.wrongCount}</strong></div>
+          <div class="result-stat neutral"><span>Boş</span><strong>${s.blankCount}</strong></div>
+          <div class="result-stat"><span>Toplam</span><strong>${s.total} Soru</strong></div>
+        </div>
+        <div class="result-insight-card">
+          <h4>Geçmiş sınav yorumu</h4>
+          <p><strong>Hata odağı:</strong> ${weaknessText}</p>
+          <p>Yeşil numaralar doğru, kırmızı numaralar yanlış, gri/koyu numaralar boş soruları gösterir. Bir numaraya tıklayınca sorunun kendisi ve şık açıklamaları açılır.</p>
+        </div>
+        ${results.length ? `
+          <div class="exam-nav-grid result-nav-grid" aria-label="Geçmiş sınav soru navigasyonu">
+            ${results.map((item) => `
+              <button type="button" class="exam-nav-btn is-${item.status}${focusedResult && focusedResult.index === item.index ? " is-focused-result" : ""}" onclick="openExamHistoryQuestion(${item.index})" aria-label="Soru ${item.index + 1} detayını aç">
+                <span>${item.index + 1}</span>
+              </button>
+            `).join("")}
+          </div>
+          ${renderHistoryQuestionDetail(focusedResult)}
+        ` : `
+          <div class="exam-empty-mini">Bu eski sınav kaydında soru detayları tutulmamış. Yeni çözdüğün sınavlarda tüm sorular ve şık açıklamaları kaydedilecek.</div>
+        `}
+      </div>
+    `;
+
+    requestAnimationFrame(() => {
+      document.getElementById("examWorkspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function openExamHistorySession(index) {
+    const session = normalizeHistoryExamSession(safeExamHistory()[Number(index)]);
+    if (!session) return;
+    selectedHistorySession = session;
+    closeExamHistoryModal();
+    navigate("examcenter");
+    renderHistoryExamResultView();
+  }
+
+  function openExamHistoryQuestion(questionIndex) {
+    renderHistoryExamResultView(Number(questionIndex));
   }
 
   function showExamHistoryPanel() {
@@ -6970,7 +7649,36 @@ document.addEventListener("keydown", (event) => {
 
   window.showExamHistoryPanel = showExamHistoryPanel;
   window.closeExamHistoryModal = closeExamHistoryModal;
+  window.openExamHistorySession = openExamHistorySession;
+  window.openExamHistoryQuestion = openExamHistoryQuestion;
   window.renderExamPerformanceChart = renderExamPerformanceChart;
+
+  if (!window.__examChartResponsiveResizeReady) {
+    window.__examChartResponsiveResizeReady = true;
+    let examChartResizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(examChartResizeTimer);
+      examChartResizeTimer = setTimeout(() => {
+        if (document.getElementById("examcenter")?.classList.contains("active")) {
+          renderExamPerformanceChart();
+        }
+      }, 140);
+    }, { passive: true });
+  }
+
+  // Dark/light veya tema değişimi dışarıdan da yapılırsa performans grafiğini
+  // otomatik yeniden çiz. Böylece SVG içindeki yazılar eski tema renginde kalmaz.
+  if (!window.__examChartThemeObserverReady) {
+    window.__examChartThemeObserverReady = true;
+    const observer = new MutationObserver((mutations) => {
+      const shouldRefresh = mutations.some((mutation) =>
+        mutation.type === "attributes" &&
+        (mutation.attributeName === "class" || mutation.attributeName === "data-theme-style")
+      );
+      if (shouldRefresh) refreshExamPerformanceChartAfterThemeChange();
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-theme-style"] });
+  }
   window.updateProfessionalExamDashboardStats = updateProfessionalExamDashboardStats;
 
   if (typeof updateDashboardStats === "function" && !updateDashboardStats.__professionalExamWrapped) {
