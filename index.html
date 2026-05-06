@@ -1,6 +1,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -29,6 +31,7 @@
       <li><button onclick="navigate('dashboard')" id="nav-dashboard" class="active"><span class="nav-icon">🏠</span>Ana Sayfa</button></li>
       <li><button onclick="navigate('studyhub')" id="nav-studyhub"><span class="nav-icon">📚</span>Çalışma Merkezi</button></li>
       <li><button onclick="navigate('memoryhub')" id="nav-memoryhub"><span class="nav-icon">🧠</span>Ezber Merkezi</button></li>
+      <li><button onclick="navigate('fillgaphub')" id="nav-fillgaphub"><span class="nav-icon">🧩</span>Boşluk Doldurma</button></li>
       <li><button onclick="navigate('quizhub')" id="nav-quizhub"><span class="nav-icon">📝</span>Quiz Merkezi</button></li>
       <li><button onclick="navigate('examcenter')" id="nav-examcenter"><span class="nav-icon">🎯</span>Sınav Merkezi</button></li>
       <li><button onclick="navigate('recap')" id="nav-recap"><span class="nav-icon">⚡</span>Hızlı Tekrar</button></li>
@@ -169,6 +172,42 @@
           <div class="stat-card">
             <div class="stat-num" id="stat-question-bank">0</div>
             <div class="stat-label">Toplam Soru Havuzu</div>
+          </div>
+        </div>
+
+
+
+        <!-- Duolingo tarzı sade streak modülü -->
+        <div class="streak-module" id="streakModule">
+          <div class="streak-main-card">
+            <div class="streak-fire-wrap" aria-hidden="true">
+              <span class="streak-fire" id="streakFireIcon">🔥</span>
+            </div>
+
+            <div class="streak-main-info">
+              <span class="unit-badge streak-badge">STREAK</span>
+              <h3><span id="streakCurrent">0</span> Günlük Seri</h3>
+              <p id="streakMessage">Bugün çalışmaya başla, serin başlasın.</p>
+            </div>
+
+            <div class="streak-status-pill" id="streakStatusPill">Bugün bekliyor</div>
+          </div>
+
+          <div class="streak-week-card">
+            <div class="streak-week-head">
+              <strong>Haftalık Takip</strong>
+              <span id="streakBestLabel">En iyi seri: 0 gün</span>
+            </div>
+
+            <div class="streak-days" id="streakDays" aria-label="Haftalık streak takibi">
+              <span data-day="0">Pzt</span>
+              <span data-day="1">Sal</span>
+              <span data-day="2">Çar</span>
+              <span data-day="3">Per</span>
+              <span data-day="4">Cum</span>
+              <span data-day="5">Cmt</span>
+              <span data-day="6">Paz</span>
+            </div>
           </div>
         </div>
 
@@ -424,6 +463,39 @@
             <div id="weakWordList" class="weak-words-list"></div>
           </div>
         </div>
+      </section>
+
+
+      <section id="fillgaphub" class="page fill-gap-page">
+        <div class="page-header fill-gap-page-header">
+          <div class="page-header-left">
+            <span class="unit-badge fill-gap-badge">FILL IN THE GAPS</span>
+            <h2>Boşluk Doldurma Merkezi</h2>
+            <p class="subtitle">Kelimeleri ve grammar yapılarını cümle içinde doğru yere yerleştir. Masaüstünde sürükle-bırak, mobilde kelimeye dokunup boşluğa dokunarak çalış.</p>
+          </div>
+        </div>
+
+        <div class="fill-gap-hero">
+          <div>
+            <span class="fill-gap-kicker">Ravza için pratik çalışma</span>
+            <h3>Tüm konular için profesyonel alıştırma</h3>
+            <p>Bir kelime seç, istediğin boşluğa dokun ve cevabını yerleştir. Yanlışlarını tekrar çözerek konuları güçlendir.</p>
+          </div>
+          <div class="fill-gap-hero-stats" id="fillGapHeroStats">
+            <span><strong>20</strong> konu</span>
+            <span><strong>100+</strong> boşluk</span>
+            <span><strong>Mobil</strong> uyumlu</span>
+          </div>
+        </div>
+
+        <div class="fill-gap-toolbar">
+          <input type="text" id="fillGapSearch" class="hub-search fill-gap-search" placeholder="Boşluk doldurma ara… örn: present perfect, phrasal, passive" oninput="renderFillGapHub()">
+          <button type="button" class="ghost-btn fill-gap-wrong-btn" onclick="startFillGapWrongPractice()">Yanlışlarımı Tekrar Et</button>
+        </div>
+
+        <div id="fillGapFilters" class="fill-gap-filters" aria-label="Boşluk doldurma filtreleri"></div>
+        <div id="fillGapGrid" class="fill-gap-grid"></div>
+        <div id="fillGapWorkspace" class="fill-gap-workspace" hidden></div>
       </section>
 
       <section id="quizhub" class="page">

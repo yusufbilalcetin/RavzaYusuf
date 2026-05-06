@@ -7707,3 +7707,1003 @@ document.addEventListener("keydown", (event) => {
     boot();
   }
 })();
+
+/* ================= PROFESSIONAL FILL GAP MODULE ================= */
+const FILL_GAP_FILTERS = [
+  { id: "all", label: "Tümü" },
+  { id: "Vocabulary", label: "Vocabulary" },
+  { id: "Grammar", label: "Grammar" },
+  { id: "Present Perfect", label: "Present Perfect" },
+  { id: "Phrasal Verbs", label: "Phrasal Verbs" },
+  { id: "Verb Patterns", label: "Verb Patterns" },
+  { id: "Prepositions", label: "Prepositions" },
+  { id: "Modals", label: "Modals" },
+  { id: "Passive", label: "Passive" },
+  { id: "Reported Speech", label: "Reported Speech" },
+  { id: "Conditionals", label: "Conditionals" }
+];
+
+const FILL_GAP_EXERCISES = [
+  {
+    id: "fg-vocabulary-wordlist", title: "Vocabulary / Word List", category: "Vocabulary", topicId: "wordlist1a", level: "Easy",
+    description: "Akademik kelimeleri cümle içinde doğru bağlama yerleştir.",
+    items: [
+      { id: "fg-vocab-1", sentence: "Researchers found strong ________ that regular exercise improves mental health.", answer: "evidence", hintType: "noun", hintFirstLetter: "e", hintTr: "kanıt", explanation: "Evidence, bir düşünceyi destekleyen bilgi veya kanıt anlamındadır." },
+      { id: "fg-vocab-2", sentence: "The teacher did a ________ to learn students’ favourite books.", answer: "survey", hintType: "noun", hintFirstLetter: "s", hintTr: "anket", explanation: "Survey, insanlara soru sorarak bilgi toplama yöntemidir." },
+      { id: "fg-vocab-3", sentence: "Her bright dress made her ________ in the crowd.", answer: "stand out", hintType: "phrasal verb", hintFirstLetter: "s", hintTr: "öne çıkmak", explanation: "Stand out, diğerlerinden farklı ya da dikkat çekici olmak demektir." },
+      { id: "fg-vocab-4", sentence: "Overall, the project was a great ________.", answer: "success", hintType: "noun", hintFirstLetter: "s", hintTr: "başarı", explanation: "Success, başarılı sonuç anlamındadır." },
+      { id: "fg-vocab-5", sentence: "It is ________ that it will rain tomorrow.", answer: "likely", hintType: "adjective", hintFirstLetter: "l", hintTr: "muhtemel", explanation: "Likely, gerçekleşme ihtimali yüksek olan durumlar için kullanılır." }
+    ]
+  },
+  {
+    id: "fg-object-pronouns", title: "Object Pronouns", category: "Grammar", topicId: "objectpronouns", level: "Easy",
+    description: "Direct object, indirect object ve object pronoun sırasını çalış.",
+    items: [
+      { id: "fg-obj-1", sentence: "I bought a book and gave ________ to Ravza.", answer: "it", hintType: "object pronoun", hintFirstLetter: "i", hintTr: "onu", explanation: "Book tekil nesne olduğu için object pronoun olarak it kullanılır." },
+      { id: "fg-obj-2", sentence: "Yusuf sent ________ a postcard from Istanbul.", answer: "her", hintType: "object pronoun", hintFirstLetter: "h", hintTr: "ona", explanation: "Ravza için object pronoun her kullanılır." },
+      { id: "fg-obj-3", sentence: "Please give the keys to ________.", answer: "me", hintType: "object pronoun", hintFirstLetter: "m", hintTr: "bana", explanation: "Preposition to’dan sonra object pronoun gelir: to me." },
+      { id: "fg-obj-4", sentence: "She found the answer and showed ________ to us.", answer: "it", hintType: "object pronoun", hintFirstLetter: "i", hintTr: "onu", explanation: "Answer tekil nesne olduğu için it kullanılır." },
+      { id: "fg-obj-5", sentence: "They invited ________ to the party.", answer: "us", hintType: "object pronoun", hintFirstLetter: "u", hintTr: "bizi", explanation: "Invite fiilinden sonra object pronoun gerekir: us." }
+    ]
+  },
+  {
+    id: "fg-adjectives", title: "Adjectives", category: "Grammar", topicId: "adjectives", level: "Easy",
+    description: "Adjective, comparative, superlative ve one/ones kullanımını çalış.",
+    items: [
+      { id: "fg-adj-1", sentence: "Suzan is ________ beautiful girl.", answer: "a", hintType: "article", hintFirstLetter: "a", hintTr: "bir", explanation: "Tekil countable noun önünde article gerekir: a beautiful girl." },
+      { id: "fg-adj-2", sentence: "This book is ________ expensive than that pen.", answer: "more", hintType: "comparative", hintFirstLetter: "m", hintTr: "daha", explanation: "Expensive uzun sıfat olduğu için comparative yapısı more expensive olur." },
+      { id: "fg-adj-3", sentence: "That is the ________ film I have ever seen.", answer: "worst", hintType: "superlative", hintFirstLetter: "w", hintTr: "en kötü", explanation: "Bad kelimesinin superlative hali worst’tür." },
+      { id: "fg-adj-4", sentence: "Can you give me the blue ________?", answer: "one", hintType: "pronoun", hintFirstLetter: "o", hintTr: "olan", explanation: "Tekil countable noun tekrarlanmasın diye one kullanılır." },
+      { id: "fg-adj-5", sentence: "iPhones are ________ more expensive than many phones.", answer: "much", hintType: "intensifier", hintFirstLetter: "m", hintTr: "çok daha", explanation: "Büyük farkı vurgulamak için much + comparative kullanılır." }
+    ]
+  },
+  {
+    id: "fg-present-tenses", title: "Present Tenses", category: "Grammar", topicId: "presenttenses", level: "Medium",
+    description: "Present simple, present continuous ve stative verb farklarını pekiştir.",
+    items: [
+      { id: "fg-pres-1", sentence: "I ________ it is a good idea.", answer: "think", hintType: "stative verb", hintFirstLetter: "t", hintTr: "düşünüyorum", explanation: "Think opinion anlamındaysa present simple kullanılır." },
+      { id: "fg-pres-2", sentence: "I ________ about moving abroad these days.", answer: "am thinking", hintType: "present continuous", hintFirstLetter: "a", hintTr: "düşünüyorum/süreç", explanation: "Think düşünme süreci anlamındaysa continuous kullanılabilir." },
+      { id: "fg-pres-3", sentence: "The flight ________ at 6.50 tomorrow morning.", answer: "leaves", hintType: "present simple", hintFirstLetter: "l", hintTr: "kalkar", explanation: "Timetable için present simple kullanılır." },
+      { id: "fg-pres-4", sentence: "We ________ in an airport hotel tonight.", answer: "are staying", hintType: "future arrangement", hintFirstLetter: "a", hintTr: "kalıyoruz", explanation: "Önceden ayarlanmış gelecek planlarda present continuous kullanılır." },
+      { id: "fg-pres-5", sentence: "She ________ the dentist tomorrow.", answer: "is seeing", hintType: "arrangement", hintFirstLetter: "i", hintTr: "görüşüyor/randevusu var", explanation: "See randevu anlamındaysa present continuous ile kullanılabilir." }
+    ]
+  },
+  {
+    id: "fg-possessives", title: "Possessives", category: "Grammar", topicId: "possessives", level: "Easy",
+    description: "Possessive 's, of yapısı ve own kullanımını çalış.",
+    items: [
+      { id: "fg-pos-1", sentence: "This is ________ car.", answer: "Tom's", hintType: "possessive 's", hintFirstLetter: "T", hintTr: "Tom'un", explanation: "Kişi sahipliğinde possessive 's kullanılır." },
+      { id: "fg-pos-2", sentence: "The ________ room is upstairs.", answer: "teachers'", hintType: "plural possessive", hintFirstLetter: "t", hintTr: "öğretmenlerin", explanation: "Plural noun s ile bitiyorsa sadece apostrophe eklenir: teachers'." },
+      { id: "fg-pos-3", sentence: "The door ________ the car was open.", answer: "of", hintType: "preposition", hintFirstLetter: "o", hintTr: "-in", explanation: "Cansız nesnelerde of yapısı doğaldır." },
+      { id: "fg-pos-4", sentence: "She has her ________ room.", answer: "own", hintType: "emphasis", hintFirstLetter: "o", hintTr: "kendi", explanation: "Own sahipliği vurgular." },
+      { id: "fg-pos-5", sentence: "Emma and Mia’s ________ is very modern.", answer: "house", hintType: "noun", hintFirstLetter: "h", hintTr: "ev", explanation: "İki kişi aynı şeye sahipse 's ikinci isme gelir: Emma and Mia's house." }
+    ]
+  },
+  {
+    id: "fg-past-tenses", title: "Past Tenses & Used To", category: "Grammar", topicId: "pasttenses", level: "Medium",
+    description: "Past simple, past continuous ve used to yapılarını çalış.",
+    items: [
+      { id: "fg-past-1", sentence: "Did you ________ to school yesterday?", answer: "go", hintType: "past simple question", hintFirstLetter: "g", hintTr: "gitmek", explanation: "Did ile soru kurulduğunda fiil yalın halde olur." },
+      { id: "fg-past-2", sentence: "I ________ a book when the phone rang.", answer: "was reading", hintType: "past continuous", hintFirstLetter: "w", hintTr: "okuyordum", explanation: "Geçmişte devam eden eylem past continuous ile anlatılır." },
+      { id: "fg-past-3", sentence: "We ________ to the beach every weekend when we were children.", answer: "used to go", hintType: "used to", hintFirstLetter: "u", hintTr: "giderdik", explanation: "Geçmişte düzenli yapılan ama artık yapılmayan alışkanlık used to ile kurulur." },
+      { id: "fg-past-4", sentence: "She ________ dinner at 6 PM yesterday.", answer: "was cooking", hintType: "past continuous", hintFirstLetter: "w", hintTr: "pişiriyordu", explanation: "Belirli geçmiş anda devam eden eylem past continuous ister." },
+      { id: "fg-past-5", sentence: "I didn’t ________ to like broccoli.", answer: "use", hintType: "negative used to", hintFirstLetter: "u", hintTr: "eskiden", explanation: "Olumsuzda didn’t use to kullanılır; used değil." }
+    ]
+  },
+  {
+    id: "fg-prepositions", title: "Prepositions", category: "Prepositions", topicId: "prepositions", level: "Medium",
+    description: "Place, movement ve dependent preposition yapılarını çalış.",
+    items: [
+      { id: "fg-prep-1", sentence: "She is waiting ________ the bus.", answer: "for", hintType: "dependent preposition", hintFirstLetter: "f", hintTr: "için/beklemek", explanation: "Wait fiili for preposition ile kullanılır: wait for." },
+      { id: "fg-prep-2", sentence: "I am interested ________ learning English.", answer: "in", hintType: "adjective + preposition", hintFirstLetter: "i", hintTr: "ile ilgilenmek", explanation: "Interested in sabit bir yapıdır." },
+      { id: "fg-prep-3", sentence: "We walked ________ the beach.", answer: "along", hintType: "movement", hintFirstLetter: "a", hintTr: "boyunca", explanation: "Along, bir çizgi veya yol boyunca hareketi anlatır." },
+      { id: "fg-prep-4", sentence: "The cat is ________ the bed.", answer: "under", hintType: "place", hintFirstLetter: "u", hintTr: "altında", explanation: "Under, bir şeyin altında olma durumunu anlatır." },
+      { id: "fg-prep-5", sentence: "I am looking forward to ________ you.", answer: "seeing", hintType: "verb + ing", hintFirstLetter: "s", hintTr: "görmeyi", explanation: "Preposition to’dan sonra verb + ing gelir: looking forward to seeing." }
+    ]
+  },
+  {
+    id: "fg-future-forms", title: "Future Forms", category: "Grammar", topicId: "futureforms", level: "Medium",
+    description: "Will, going to, present continuous ve future in the past yapılarını çalış.",
+    items: [
+      { id: "fg-fut-1", sentence: "The room is hot. I ________ open the window.", answer: "will", hintType: "instant decision", hintFirstLetter: "w", hintTr: "-ecek", explanation: "O anda verilen kararlarda will kullanılır." },
+      { id: "fg-fut-2", sentence: "Look at those clouds! It ________ rain.", answer: "is going to", hintType: "evidence prediction", hintFirstLetter: "i", hintTr: "yağacak", explanation: "Görünen kanıta dayalı tahminde going to kullanılır." },
+      { id: "fg-fut-3", sentence: "I ________ my friend at 6 PM tomorrow.", answer: "am meeting", hintType: "arrangement", hintFirstLetter: "a", hintTr: "buluşuyorum", explanation: "Ayarlanmış gelecek plan için present continuous kullanılır." },
+      { id: "fg-fut-4", sentence: "The sun ________ rise tomorrow.", answer: "will", hintType: "future fact", hintFirstLetter: "w", hintTr: "doğacak", explanation: "Gelecek gerçekleri için will kullanılır." },
+      { id: "fg-fut-5", sentence: "I ________ visit my uncle, but he was abroad.", answer: "was going to", hintType: "failed plan", hintFirstLetter: "w", hintTr: "gidecektim", explanation: "Gerçekleşmeyen geçmiş planlar was/were going to ile anlatılır." }
+    ]
+  },
+  {
+    id: "fg-conditionals-12", title: "1st & 2nd Conditionals", category: "Conditionals", topicId: "conditionals12", level: "Hard",
+    description: "Gerçek gelecek ve hayali durum koşullarını çalış.",
+    items: [
+      { id: "fg-cond12-1", sentence: "If it rains tomorrow, we ________ stay at home.", answer: "will", hintType: "first conditional", hintFirstLetter: "w", hintTr: "kalacağız", explanation: "First conditional: If + present simple, will + verb1." },
+      { id: "fg-cond12-2", sentence: "If I won the lottery, I ________ travel the world.", answer: "would", hintType: "second conditional", hintFirstLetter: "w", hintTr: "seyahat ederdim", explanation: "Second conditional: If + past simple, would + verb1." },
+      { id: "fg-cond12-3", sentence: "If I ________ you, I wouldn’t do that.", answer: "were", hintType: "advice phrase", hintFirstLetter: "w", hintTr: "senin yerinde olsam", explanation: "Tavsiye verirken If I were you kalıbı kullanılır." },
+      { id: "fg-cond12-4", sentence: "We can’t help you ________ you tell us the problem.", answer: "unless", hintType: "if not", hintFirstLetter: "u", hintTr: "-mezsen", explanation: "Unless = if not anlamındadır." },
+      { id: "fg-cond12-5", sentence: "If she knew the answer, she ________ help us.", answer: "could", hintType: "possibility", hintFirstLetter: "c", hintTr: "yardım edebilirdi", explanation: "Could olasılık veya yetenek anlatır." }
+    ]
+  },
+  {
+    id: "fg-present-perfect-simple", title: "Present Perfect Simple", category: "Present Perfect", topicId: "perfect", level: "Medium",
+    description: "Have/has + V3, for/since ve yet/already kullanımını çalış.",
+    items: [
+      { id: "fg-pps-1", sentence: "I ________ Ravza for many years.", answer: "have known", hintType: "present perfect simple", hintFirstLetter: "h", hintTr: "tanıyorum", explanation: "Know stative verb olduğu için continuous değil, Present Perfect Simple kullanılır." },
+      { id: "fg-pps-2", sentence: "The film ________ already started.", answer: "has", hintType: "auxiliary", hintFirstLetter: "h", hintTr: "başladı", explanation: "The film tekil olduğu için has kullanılır." },
+      { id: "fg-pps-3", sentence: "We have lived here ________ Monday.", answer: "since", hintType: "time marker", hintFirstLetter: "s", hintTr: "-den beri", explanation: "Since başlangıç noktası ile kullanılır." },
+      { id: "fg-pps-4", sentence: "They have been married ________ six months.", answer: "for", hintType: "time marker", hintFirstLetter: "f", hintTr: "boyunca", explanation: "For süre miktarı ile kullanılır." },
+      { id: "fg-pps-5", sentence: "Have you finished your homework ________?", answer: "yet", hintType: "adverb", hintFirstLetter: "y", hintTr: "henüz", explanation: "Yet genellikle soru ve olumsuzlarda kullanılır." }
+    ]
+  },
+  {
+    id: "fg-present-perfect-continuous", title: "Present Perfect Continuous", category: "Present Perfect", topicId: "perfectcont", level: "Medium",
+    description: "Have/has been + V-ing yapısını ve süreç vurgusunu çalış.",
+    items: [
+      { id: "fg-ppc-1", sentence: "I ________ working too hard lately.", answer: "have been", hintType: "present perfect continuous", hintFirstLetter: "h", hintTr: "çalışıyorum", explanation: "Lately ve süreç vurgusu Present Perfect Continuous ister." },
+      { id: "fg-ppc-2", sentence: "She ________ travelling a lot since February.", answer: "has been", hintType: "present perfect continuous", hintFirstLetter: "h", hintTr: "seyahat ediyor", explanation: "She tekil olduğu için has been kullanılır." },
+      { id: "fg-ppc-3", sentence: "How long have you ________ looking for a job?", answer: "been", hintType: "auxiliary", hintFirstLetter: "b", hintTr: "olmak", explanation: "Present Perfect Continuous soru yapısı have/has + been + V-ing şeklindedir." },
+      { id: "fg-ppc-4", sentence: "They have been waiting ________ an hour.", answer: "for", hintType: "duration", hintFirstLetter: "f", hintTr: "boyunca", explanation: "For süre miktarı ile kullanılır." },
+      { id: "fg-ppc-5", sentence: "I have been studying English ________ morning.", answer: "all", hintType: "time phrase", hintFirstLetter: "a", hintTr: "bütün", explanation: "All morning, günün belli bir bölümünde süren eylemi anlatır." }
+    ]
+  },
+  {
+    id: "fg-modals-obligation", title: "Modals of Obligation", category: "Modals", topicId: "modals", level: "Medium",
+    description: "Have to, must, mustn’t, don’t have to ve should farklarını çalış.",
+    items: [
+      { id: "fg-mod-1", sentence: "I ________ buy a new fridge last week.", answer: "had to", hintType: "past obligation", hintFirstLetter: "h", hintTr: "zorunda kaldım", explanation: "Geçmiş zorunluluk için had to kullanılır." },
+      { id: "fg-mod-2", sentence: "You ________ spill anything on the sofa.", answer: "mustn't", hintType: "prohibition", hintFirstLetter: "m", hintTr: "yapmamalısın/yasak", explanation: "Mustn’t yasak veya güçlü uyarı bildirir." },
+      { id: "fg-mod-3", sentence: "We ________ be at the airport until 5.00.", answer: "don't have to", hintType: "no necessity", hintFirstLetter: "d", hintTr: "zorunda değiliz", explanation: "Don’t have to gerekli değil anlamına gelir." },
+      { id: "fg-mod-4", sentence: "You ________ study a little every day.", answer: "should", hintType: "advice", hintFirstLetter: "s", hintTr: "yapmalısın", explanation: "Should tavsiye vermek için kullanılır." },
+      { id: "fg-mod-5", sentence: "Students ________ be quiet during the exam.", answer: "must", hintType: "strong obligation", hintFirstLetter: "m", hintTr: "zorunda", explanation: "Must güçlü zorunluluk bildirir." }
+    ]
+  },
+  {
+    id: "fg-ability-deduction", title: "Can / Could / Be Able To", category: "Modals", topicId: "ability", level: "Medium",
+    description: "Yetenek, izin ve deduction modallarını çalış.",
+    items: [
+      { id: "fg-abil-1", sentence: "When I was five, I ________ swim well.", answer: "could", hintType: "past ability", hintFirstLetter: "c", hintTr: "yapabiliyordum", explanation: "Geçmiş genel yetenek için could kullanılır." },
+      { id: "fg-abil-2", sentence: "She ________ join us tomorrow.", answer: "will be able to", hintType: "future ability", hintFirstLetter: "w", hintTr: "katılabilecek", explanation: "Future ability için will be able to kullanılır." },
+      { id: "fg-abil-3", sentence: "He ________ be at home; the lights are on.", answer: "must", hintType: "deduction", hintFirstLetter: "m", hintTr: "olmalı", explanation: "Must güçlü olumlu tahmin bildirir." },
+      { id: "fg-abil-4", sentence: "She ________ be Kate. Kate is in Italy.", answer: "can't", hintType: "negative deduction", hintFirstLetter: "c", hintTr: "olamaz", explanation: "Can’t güçlü olumsuz tahmin veya imkânsızlık bildirir." },
+      { id: "fg-abil-5", sentence: "I like ________ able to read quickly.", answer: "being", hintType: "gerund", hintFirstLetter: "b", hintTr: "olabilmek", explanation: "Like sonrası burada gerund yapı kullanılır: being able to." }
+    ]
+  },
+  {
+    id: "fg-phrasal-verbs", title: "Phrasal Verbs", category: "Phrasal Verbs", topicId: "phrasal", level: "Hard",
+    description: "Separable, inseparable ve pronoun kuralını çalış.",
+    items: [
+      { id: "fg-phr-1", sentence: "Your phone is ringing. Please turn ________ off.", answer: "it", hintType: "pronoun rule", hintFirstLetter: "i", hintTr: "onu", explanation: "Separable phrasal verb’de pronoun araya girer: turn it off." },
+      { id: "fg-phr-2", sentence: "I am looking ________ my keys.", answer: "for", hintType: "inseparable phrasal verb", hintFirstLetter: "f", hintTr: "aramak", explanation: "Look for = aramak anlamındadır ve ayrılmaz." },
+      { id: "fg-phr-3", sentence: "She looks ________ her little brother.", answer: "after", hintType: "phrasal verb", hintFirstLetter: "a", hintTr: "ilgilenmek", explanation: "Look after = bakmak/ilgilenmek anlamındadır." },
+      { id: "fg-phr-4", sentence: "We are looking forward ________ seeing you.", answer: "to", hintType: "three-word phrasal verb", hintFirstLetter: "t", hintTr: "dört gözle beklemek", explanation: "Look forward to + V-ing kullanılır." },
+      { id: "fg-phr-5", sentence: "The pasta was cold, so I sent ________ back.", answer: "it", hintType: "pronoun rule", hintFirstLetter: "i", hintTr: "onu", explanation: "Send back separable olabilir; pronoun araya girer: sent it back." }
+    ]
+  },
+  {
+    id: "fg-verb-patterns", title: "Verb Patterns", category: "Verb Patterns", topicId: "verbpatterns", level: "Hard",
+    description: "To-infinitive, gerund, bare infinitive ve object + infinitive yapılarını çalış.",
+    items: [
+      { id: "fg-vp-1", sentence: "We enjoy ________ to concerts.", answer: "going", hintType: "gerund", hintFirstLetter: "g", hintTr: "gitmek", explanation: "Enjoy fiili gerund alır." },
+      { id: "fg-vp-2", sentence: "I want ________ English better.", answer: "to learn", hintType: "to-infinitive", hintFirstLetter: "t", hintTr: "öğrenmek", explanation: "Want fiili to-infinitive alır." },
+      { id: "fg-vp-3", sentence: "The teacher let her ________ early.", answer: "leave", hintType: "bare infinitive", hintFirstLetter: "l", hintTr: "çıkmak", explanation: "Let + object + bare infinitive kullanılır." },
+      { id: "fg-vp-4", sentence: "My mother told me ________ careful.", answer: "to be", hintType: "object + infinitive", hintFirstLetter: "t", hintTr: "olmak", explanation: "Tell somebody to do something yapısı kullanılır." },
+      { id: "fg-vp-5", sentence: "She avoided ________ late.", answer: "arriving", hintType: "gerund", hintFirstLetter: "a", hintTr: "varmak", explanation: "Avoid fiili gerund alır." }
+    ]
+  },
+  {
+    id: "fg-causative", title: "Have Something Done", category: "Grammar", topicId: "causative", level: "Medium",
+    description: "Have/get something done yapısını çalış.",
+    items: [
+      { id: "fg-caus-1", sentence: "I had my hair ________ yesterday.", answer: "cut", hintType: "past participle", hintFirstLetter: "c", hintTr: "kestirdim", explanation: "Causative yapı have + object + V3 şeklindedir." },
+      { id: "fg-caus-2", sentence: "We need to have the roof ________.", answer: "repaired", hintType: "past participle", hintFirstLetter: "r", hintTr: "tamir ettirmek", explanation: "Have + object + V3: have the roof repaired." },
+      { id: "fg-caus-3", sentence: "She is going to have her photo ________.", answer: "taken", hintType: "past participle", hintFirstLetter: "t", hintTr: "çektirmek", explanation: "Photo taken kalıbında take fiilinin V3 hali taken kullanılır." },
+      { id: "fg-caus-4", sentence: "They had the kitchen ________ last week.", answer: "painted", hintType: "past participle", hintFirstLetter: "p", hintTr: "boyatmak", explanation: "İşi başkasına yaptırma anlamı causative yapı ile verilir." },
+      { id: "fg-caus-5", sentence: "I got my phone ________ yesterday.", answer: "fixed", hintType: "get causative", hintFirstLetter: "f", hintTr: "tamir ettirdim", explanation: "Get something done konuşma dilinde yaygın causative yapıdır." }
+    ]
+  },
+  {
+    id: "fg-passive", title: "Passive Voice", category: "Passive", topicId: "passive", level: "Hard",
+    description: "Farklı zamanlarda passive voice yapılarını çalış.",
+    items: [
+      { id: "fg-pass-1", sentence: "Rice ________ grown in Valencia.", answer: "is", hintType: "present simple passive", hintFirstLetter: "i", hintTr: "yetiştirilir", explanation: "Present simple passive: is/are + V3." },
+      { id: "fg-pass-2", sentence: "The museum was ________ in 1997.", answer: "opened", hintType: "past participle", hintFirstLetter: "o", hintTr: "açıldı", explanation: "Past simple passive: was/were + V3." },
+      { id: "fg-pass-3", sentence: "A new bridge will be ________ next year.", answer: "built", hintType: "future passive", hintFirstLetter: "b", hintTr: "inşa edilecek", explanation: "Future passive: will be + V3." },
+      { id: "fg-pass-4", sentence: "The road is being ________ at the moment.", answer: "cleaned", hintType: "present continuous passive", hintFirstLetter: "c", hintTr: "temizleniyor", explanation: "Present continuous passive: is/are being + V3." },
+      { id: "fg-pass-5", sentence: "The bridge has been ________.", answer: "repaired", hintType: "present perfect passive", hintFirstLetter: "r", hintTr: "tamir edildi", explanation: "Present perfect passive: has/have been + V3." }
+    ]
+  },
+  {
+    id: "fg-reported-speech", title: "Reported Speech", category: "Reported Speech", topicId: "reported", level: "Hard",
+    description: "Backshift, reported questions ve requests yapılarını çalış.",
+    items: [
+      { id: "fg-rep-1", sentence: "She said that she ________ find her purse.", answer: "couldn't", hintType: "backshift", hintFirstLetter: "c", hintTr: "bulamadı", explanation: "Can reported speech’te could olur." },
+      { id: "fg-rep-2", sentence: "He asked me where I ________.", answer: "lived", hintType: "reported question", hintFirstLetter: "l", hintTr: "yaşadım", explanation: "Reported question’da düz cümle sırası kullanılır." },
+      { id: "fg-rep-3", sentence: "They asked us ________ fill in the form.", answer: "to", hintType: "request", hintFirstLetter: "t", hintTr: "-mek", explanation: "Request yapısı ask + object + to infinitive şeklindedir." },
+      { id: "fg-rep-4", sentence: "He said he would see me the ________ day.", answer: "next", hintType: "time change", hintFirstLetter: "n", hintTr: "ertesi", explanation: "Tomorrow reported speech’te the next day olur." },
+      { id: "fg-rep-5", sentence: "She asked me ________ I was coming with them.", answer: "if", hintType: "yes/no reported question", hintFirstLetter: "i", hintTr: "-ip -mediğimi", explanation: "Yes/no reported questions için if veya whether kullanılır." }
+    ]
+  },
+  {
+    id: "fg-third-conditional", title: "Third Conditional", category: "Conditionals", topicId: "conditionals3", level: "Hard",
+    description: "Geçmişte gerçekleşmeyen durumlar ve pişmanlıkları çalış.",
+    items: [
+      { id: "fg-third-1", sentence: "If I had known his number, I would have ________ him.", answer: "called", hintType: "third conditional", hintFirstLetter: "c", hintTr: "arardım", explanation: "Third conditional result: would have + V3." },
+      { id: "fg-third-2", sentence: "If we had missed the bus, we ________ have got home late.", answer: "would", hintType: "third conditional", hintFirstLetter: "w", hintTr: "olurdu", explanation: "Third conditional ana cümlede would have + V3 kullanılır." },
+      { id: "fg-third-3", sentence: "When we arrived, the train had ________.", answer: "left", hintType: "past perfect", hintFirstLetter: "l", hintTr: "ayrılmıştı", explanation: "Daha önce olan geçmiş olay past perfect ile anlatılır." },
+      { id: "fg-third-4", sentence: "If they had been invited, they would have ________.", answer: "gone", hintType: "third conditional", hintFirstLetter: "g", hintTr: "giderlerdi", explanation: "Go fiilinin V3 hali gone’dır." },
+      { id: "fg-third-5", sentence: "If she had studied, she would have ________ the exam.", answer: "passed", hintType: "third conditional", hintFirstLetter: "p", hintTr: "geçerdi", explanation: "Would have + V3 yapısı kullanılır." }
+    ]
+  },
+  {
+    id: "fg-auxiliaries", title: "Be / Do / Have", category: "Grammar", topicId: "auxiliaries", level: "Medium",
+    description: "Auxiliary verb ve main verb farklarını çalış.",
+    items: [
+      { id: "fg-aux-1", sentence: "________ he like living in the UK?", answer: "Does", hintType: "auxiliary", hintFirstLetter: "D", hintTr: "yardımcı fiil", explanation: "Present simple he/she/it sorularında does kullanılır." },
+      { id: "fg-aux-2", sentence: "Is he ________ homesick?", answer: "feeling", hintType: "present continuous", hintFirstLetter: "f", hintTr: "hissediyor", explanation: "Present continuous: is + V-ing." },
+      { id: "fg-aux-3", sentence: "What have you been ________ since I last saw you?", answer: "doing", hintType: "perfect continuous", hintFirstLetter: "d", hintTr: "yapıyorsun", explanation: "Present perfect continuous: have been + V-ing." },
+      { id: "fg-aux-4", sentence: "She ________ two brothers and a sister.", answer: "has", hintType: "main verb", hintFirstLetter: "h", hintTr: "sahip", explanation: "Have possession anlamındaysa main verb olarak has kullanılır." },
+      { id: "fg-aux-5", sentence: "Did you ________ the beginning of the film?", answer: "miss", hintType: "past simple question", hintFirstLetter: "m", hintTr: "kaçırmak", explanation: "Did ile fiil yalın halde kullanılır." }
+    ]
+  }
+];
+
+let fillGapActiveFilter = "all";
+let activeFillGapExerciseId = null;
+let fillGapAnswers = {};
+let selectedFillGapWordId = null;
+let fillGapChecked = false;
+let fillGapIsWrongPractice = false;
+const FILL_GAP_WRONG_KEY = "ravza_fill_gap_wrong_items";
+
+function fillGapEscape(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function getFillGapExercisesWithWords() {
+  return FILL_GAP_EXERCISES.map((exercise) => ({
+    ...exercise,
+    words: exercise.items.map((item, index) => ({
+      id: `${exercise.id}-word-${index}`,
+      text: item.answer,
+      itemId: item.id,
+      hintTr: item.hintTr || item.answer
+    }))
+  }));
+}
+
+function getActiveFillGapExercise() {
+  if (fillGapIsWrongPractice) return buildWrongFillGapExercise();
+  return getFillGapExercisesWithWords().find((exercise) => exercise.id === activeFillGapExerciseId) || null;
+}
+
+function buildWrongFillGapExercise() {
+  const wrongItems = getStoredFillGapWrongItems();
+  return {
+    id: "fg-wrong-practice",
+    title: "Yanlışları Tekrar Et",
+    category: "Tekrar",
+    topicId: "wrong-practice",
+    level: "Review",
+    description: "Daha önce yanlış yapılan boşlukları tekrar çöz.",
+    items: wrongItems.map((item, index) => ({
+      id: item.itemId || `wrong-${index}`,
+      sentence: item.sentence,
+      answer: item.answer,
+      hintType: item.topic || "Tekrar",
+      hintFirstLetter: String(item.answer || "").charAt(0),
+      hintTr: item.hintTr || item.answer,
+      explanation: item.explanation || "Bu soru daha önce yanlış yapıldığı için tekrar listesine eklendi."
+    })),
+    words: wrongItems.map((item, index) => ({
+      id: `fg-wrong-word-${index}`,
+      text: item.answer,
+      itemId: item.itemId || `wrong-${index}`,
+      hintTr: item.hintTr || item.answer
+    }))
+  };
+}
+
+function syncFillGapWordsToMemoryCards() {
+  if (!Array.isArray(MEMORIZATION_CARDS)) return;
+  const existing = new Set(MEMORIZATION_CARDS.map((card) => String(card.front || "").toLowerCase()));
+  FILL_GAP_EXERCISES.forEach((exercise) => {
+    exercise.items.forEach((item) => {
+      const front = String(item.answer || "").trim();
+      if (!front || existing.has(front.toLowerCase())) return;
+      MEMORIZATION_CARDS.push({
+        id: `fg-mem-${exercise.id}-${item.id}`,
+        front,
+        back: item.hintTr || exercise.title || "Fill Gap",
+        source: "Fill Gap",
+        category: exercise.category
+      });
+      existing.add(front.toLowerCase());
+    });
+  });
+}
+
+function setFillGapFocusMode(isActive) {
+  const page = document.getElementById("fillgaphub");
+  if (!page) return;
+  page.classList.toggle("fill-gap-focus-mode", Boolean(isActive));
+}
+
+function renderFillGapHub(filter = fillGapActiveFilter) {
+  fillGapActiveFilter = filter || fillGapActiveFilter || "all";
+  const filtersEl = document.getElementById("fillGapFilters");
+  const grid = document.getElementById("fillGapGrid");
+  const workspace = document.getElementById("fillGapWorkspace");
+  const searchEl = document.getElementById("fillGapSearch");
+  if (!filtersEl || !grid) return;
+
+  const hasActiveExercise = Boolean(activeFillGapExerciseId || fillGapIsWrongPractice);
+  setFillGapFocusMode(hasActiveExercise);
+  if (hasActiveExercise) {
+    grid.innerHTML = "";
+    filtersEl.innerHTML = "";
+    return;
+  }
+
+  const wrongCount = getStoredFillGapWrongItems().length;
+  const heroStats = document.getElementById("fillGapHeroStats");
+  if (heroStats) {
+    heroStats.innerHTML = `
+      <span><strong>${FILL_GAP_EXERCISES.length}</strong> konu</span>
+      <span><strong>${FILL_GAP_EXERCISES.reduce((sum, ex) => sum + ex.items.length, 0)}</strong> boşluk</span>
+      <span><strong>${wrongCount}</strong> tekrar</span>
+    `;
+  }
+
+  const q = String(searchEl?.value || "").trim().toLowerCase();
+  const activeFilterLower = String(fillGapActiveFilter || "all").toLowerCase();
+  const exercises = getFillGapExercisesWithWords().filter((exercise) => {
+    const searchableText = [exercise.title, exercise.category, exercise.description, exercise.level, ...exercise.items.map((item) => `${item.sentence} ${item.answer} ${item.hintTr}`)].join(" ").toLowerCase();
+    const matchesFilter = activeFilterLower === "all"
+      || String(exercise.category || "").toLowerCase() === activeFilterLower
+      || String(exercise.title || "").toLowerCase().includes(activeFilterLower);
+    return matchesFilter && (!q || searchableText.includes(q));
+  });
+
+  filtersEl.innerHTML = `
+    <div class="fill-gap-filter-wrap">
+      <label for="fillGapFilterSelect" class="fill-gap-filter-label">Konu filtresi</label>
+      <div class="fill-gap-filter-control">
+        <select id="fillGapFilterSelect" class="fill-gap-filter-select" onchange="renderFillGapHub(this.value)">
+          ${FILL_GAP_FILTERS.map((filterItem) => `<option value="${fillGapEscape(filterItem.id)}" ${fillGapActiveFilter === filterItem.id ? "selected" : ""}>${fillGapEscape(filterItem.label)}</option>`).join("")}
+        </select>
+        <span class="fill-gap-filter-count">${exercises.length} egzersiz</span>
+      </div>
+    </div>
+  `;
+
+  if (!exercises.length) {
+    grid.innerHTML = `<div class="fill-gap-empty">Bu filtreye uygun boşluk doldurma egzersizi bulunamadı.</div>`;
+  } else {
+    grid.innerHTML = exercises.map((exercise) => `
+      <article class="fill-gap-card">
+        <div class="fill-gap-card-top">
+          <span class="fill-gap-chip">${fillGapEscape(exercise.category)}</span>
+          <span class="fill-gap-level">${fillGapEscape(exercise.level)}</span>
+        </div>
+        <h3>${fillGapEscape(exercise.title)}</h3>
+        <p>${fillGapEscape(exercise.description)}</p>
+        <div class="fill-gap-card-meta">
+          <span>${exercise.items.length} boşluk</span>
+          <span>${exercise.words.length} kelime</span>
+        </div>
+        <button type="button" class="primary-btn fill-gap-start-btn" onclick="startFillGapExercise('${fillGapEscape(exercise.id)}')">Başla</button>
+      </article>
+    `).join("");
+  }
+
+  if (workspace && !activeFillGapExerciseId && !fillGapIsWrongPractice) workspace.hidden = true;
+}
+
+function startFillGapExercise(exerciseId) {
+  activeFillGapExerciseId = exerciseId;
+  fillGapIsWrongPractice = false;
+  resetFillGapStateOnly();
+  setFillGapFocusMode(true);
+  renderFillGapWorkspace();
+
+  setTimeout(() => {
+    document.getElementById("fillgaphub")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, 50);
+}
+
+function closeFillGapExercise() {
+  activeFillGapExerciseId = null;
+  fillGapIsWrongPractice = false;
+  resetFillGapStateOnly();
+  setFillGapFocusMode(false);
+  const workspace = document.getElementById("fillGapWorkspace");
+  if (workspace) {
+    workspace.hidden = true;
+    workspace.innerHTML = "";
+  }
+  renderFillGapHub(fillGapActiveFilter);
+  document.getElementById("fillgaphub")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function backToFillGapTopics() {
+  closeFillGapExercise();
+}
+
+
+function resetFillGapStateOnly() {
+  fillGapAnswers = {};
+  selectedFillGapWordId = null;
+  fillGapChecked = false;
+}
+
+function renderFillGapWorkspace() {
+  const workspace = document.getElementById("fillGapWorkspace");
+  const exercise = getActiveFillGapExercise();
+  if (!workspace || !exercise) return;
+  workspace.hidden = false;
+
+  const score = getFillGapScore(exercise);
+  workspace.innerHTML = `
+    <div class="fill-gap-focus-actions">
+      <button type="button" class="ghost-btn fill-gap-back-btn" onclick="backToFillGapTopics()">
+        ← Konulara Dön
+      </button>
+    </div>
+
+    <div class="fill-gap-wordbar">
+      <div class="fill-gap-word-pills" id="fillGapWordBox">
+        ${renderFillGapWordBox(exercise)}
+      </div>
+    </div>
+
+    <div class="fill-gap-work-head">
+      <div>
+        <span class="fill-gap-chip">${fillGapEscape(exercise.category)}</span>
+        <h3>${fillGapEscape(exercise.title)}</h3>
+        <p>${fillGapEscape(exercise.description || "Kelimeyi seç, boşluğa dokun ve kontrol et.")}</p>
+      </div>
+
+      <div class="fill-gap-score" id="fillGapScoreBox">
+        ${renderFillGapScore(score, fillGapChecked)}
+      </div>
+    </div>
+
+    <div class="fill-gap-sentences-wrap">
+      <div class="fill-gap-sentences">
+        ${exercise.items.map((item, index) => renderFillGapItem(item, index)).join("")}
+      </div>
+    </div>
+
+    <div class="fill-gap-actions">
+      <button type="button" class="check-btn" onclick="checkFillGapAnswers()">Kontrol Et</button>
+      <button type="button" class="secondary-btn" onclick="showFillGapAnswers()">Cevapları Göster</button>
+      <button type="button" class="ghost-btn" onclick="resetFillGapExercise()">Tekrar Çöz</button>
+      <button type="button" class="ghost-btn" onclick="startFillGapWrongPractice()">Yanlışlarımı Tekrar Et</button>
+      <button type="button" class="primary-btn soft" onclick="nextFillGapExercise()">Sonraki Egzersiz</button>
+    </div>
+  `;
+  updateFillGapWordBoxState();
+}
+
+function renderFillGapScore(score, checked) {
+  if (!checked) {
+    return `
+      <span><strong>${score.total}</strong> boşluk</span>
+      <span><strong>${score.filled}</strong> dolu</span>
+      <span><strong>${score.empty}</strong> boş</span>
+    `;
+  }
+  return `
+    <span class="is-correct"><strong>${score.correct}</strong> doğru</span>
+    <span class="is-wrong"><strong>${score.wrong}</strong> yanlış</span>
+    <span><strong>${score.empty}</strong> boş</span>
+    <span><strong>%${score.percent}</strong> başarı</span>
+  `;
+}
+
+function renderFillGapWordBox(exercise) {
+  return `
+    <div class="fill-gap-words" aria-label="Boşluk doldurma kelime seçenekleri">
+      ${exercise.words.map((word) => {
+        const used = Object.values(fillGapAnswers).some((answer) => answer.wordId === word.id);
+        const selected = selectedFillGapWordId === word.id;
+        return `
+          <button
+            type="button"
+            class="fill-gap-word ${selected ? "selected" : ""} ${used ? "used" : ""}"
+            draggable="true"
+            data-word-id="${fillGapEscape(word.id)}"
+            onclick="selectFillGapWord('${fillGapEscape(word.id)}')"
+            ondragstart="handleFillGapDragStart(event, '${fillGapEscape(word.id)}')">
+            ${fillGapEscape(word.text)}
+          </button>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderFillGapItem(item, index) {
+  const answer = fillGapAnswers[item.id];
+  const value = answer?.text || "";
+  const status = getFillGapItemStatus(item);
+  const parts = String(item.sentence).split("________");
+  const sentenceHtml = `${fillGapEscape(parts[0] || "")}<button type="button" tabindex="0" class="fill-gap-drop ${value ? "filled" : ""} ${status}" onclick="placeSelectedWord('${fillGapEscape(item.id)}')" ondragover="handleFillGapDragOver(event)" ondrop="handleFillGapDrop(event, '${fillGapEscape(item.id)}')" aria-label="${index + 1}. boşluk">${value ? fillGapEscape(value) : "Cevap seç"}</button>${fillGapEscape(parts.slice(1).join("________"))}`;
+  return `
+    <article class="fill-gap-sentence-card" data-fill-item-id="${fillGapEscape(item.id)}">
+      <div class="fill-gap-question-line">
+        <span class="fill-gap-number">${index + 1}</span>
+        <p>${sentenceHtml}</p>
+      </div>
+      <div class="fill-gap-hints">
+        <span>Tür: ${fillGapEscape(item.hintType || "-")}</span>
+        <span>İlk harf: ${fillGapEscape(item.hintFirstLetter || "-")}</span>
+        <span>TR: ${fillGapEscape(item.hintTr || "-")}</span>
+      </div>
+      ${fillGapChecked ? `<div class="fill-gap-explanation ${status}"><strong>Doğru cevap:</strong> ${fillGapEscape(item.answer)}<br>${fillGapEscape(item.explanation || "")}</div>` : ""}
+    </article>
+  `;
+}
+
+function getFillGapItemStatus(item) {
+  if (!fillGapChecked) return "";
+  const userAnswer = (fillGapAnswers[item.id]?.text || "").trim().toLowerCase();
+  const correctAnswer = String(item.answer || "").trim().toLowerCase();
+  if (!userAnswer) return "empty";
+  return userAnswer === correctAnswer ? "correct" : "wrong";
+}
+
+function selectFillGapWord(wordId) {
+  const exercise = getActiveFillGapExercise();
+  if (!exercise) return;
+  const usedItemId = Object.entries(fillGapAnswers).find(([, answer]) => answer.wordId === wordId)?.[0];
+  if (usedItemId) {
+    delete fillGapAnswers[usedItemId];
+    selectedFillGapWordId = null;
+    fillGapChecked = false;
+    renderFillGapWorkspace();
+    return;
+  }
+  selectedFillGapWordId = selectedFillGapWordId === wordId ? null : wordId;
+  updateFillGapWordBoxState();
+  document.querySelectorAll(".fill-gap-drop").forEach((drop) => drop.classList.toggle("active", Boolean(selectedFillGapWordId)));
+}
+
+function placeSelectedWord(itemId) {
+  const exercise = getActiveFillGapExercise();
+  if (!exercise) return;
+  if (fillGapAnswers[itemId] && !selectedFillGapWordId) {
+    removeFillGapAnswer(itemId);
+    return;
+  }
+  if (!selectedFillGapWordId) return;
+  const word = exercise.words.find((wordItem) => wordItem.id === selectedFillGapWordId);
+  if (!word) return;
+  Object.keys(fillGapAnswers).forEach((key) => {
+    if (fillGapAnswers[key].wordId === word.id) delete fillGapAnswers[key];
+  });
+  fillGapAnswers[itemId] = { wordId: word.id, text: word.text };
+  selectedFillGapWordId = null;
+  fillGapChecked = false;
+  renderFillGapWorkspace();
+  requestAnimationFrame(() => {
+    const card = document.querySelector(`[data-fill-item-id="${CSS.escape(itemId)}"] .fill-gap-drop`);
+    if (card) {
+      card.classList.add("pop");
+      setTimeout(() => card.classList.remove("pop"), 260);
+    }
+  });
+}
+
+function removeFillGapAnswer(itemId) {
+  delete fillGapAnswers[itemId];
+  fillGapChecked = false;
+  renderFillGapWorkspace();
+}
+
+function handleFillGapDragStart(event, wordId) {
+  selectedFillGapWordId = wordId;
+  event.dataTransfer?.setData("text/plain", wordId);
+  event.dataTransfer?.setData("application/x-fill-gap-word", wordId);
+  updateFillGapWordBoxState();
+}
+
+function handleFillGapDragOver(event) {
+  event.preventDefault();
+  event.currentTarget?.classList.add("active");
+}
+
+function handleFillGapDrop(event, itemId) {
+  event.preventDefault();
+  const wordId = event.dataTransfer?.getData("application/x-fill-gap-word") || event.dataTransfer?.getData("text/plain") || selectedFillGapWordId;
+  if (!wordId) return;
+  selectedFillGapWordId = wordId;
+  placeSelectedWord(itemId);
+}
+
+function checkFillGapAnswers() {
+  const exercise = getActiveFillGapExercise();
+  if (!exercise) return;
+  fillGapChecked = true;
+  saveFillGapWrongItems();
+  renderFillGapWorkspace();
+}
+
+function showFillGapAnswers() {
+  const exercise = getActiveFillGapExercise();
+  if (!exercise) return;
+  fillGapAnswers = {};
+  exercise.items.forEach((item, index) => {
+    const word = exercise.words.find((wordItem) => wordItem.itemId === item.id) || { id: `${exercise.id}-answer-${index}`, text: item.answer };
+    fillGapAnswers[item.id] = { wordId: word.id, text: item.answer };
+  });
+  selectedFillGapWordId = null;
+  fillGapChecked = true;
+  renderFillGapWorkspace();
+  const scoreBox = document.getElementById("fillGapScoreBox");
+  if (scoreBox) scoreBox.insertAdjacentHTML("beforeend", `<span class="is-info"><strong>Cevaplar</strong> gösterildi</span>`);
+}
+
+function resetFillGapExercise() {
+  resetFillGapStateOnly();
+  renderFillGapWorkspace();
+}
+
+function nextFillGapExercise() {
+  const exercises = getFillGapExercisesWithWords();
+  const currentIndex = exercises.findIndex((exercise) => exercise.id === activeFillGapExerciseId);
+  const next = exercises[(currentIndex + 1 + exercises.length) % exercises.length];
+  if (next) startFillGapExercise(next.id);
+}
+
+function getFillGapScore(exercise) {
+  let correct = 0;
+  let wrong = 0;
+  let empty = 0;
+  exercise.items.forEach((item) => {
+    const userAnswer = (fillGapAnswers[item.id]?.text || "").trim().toLowerCase();
+    const correctAnswer = String(item.answer || "").trim().toLowerCase();
+    if (!userAnswer) empty += 1;
+    else if (userAnswer === correctAnswer) correct += 1;
+    else wrong += 1;
+  });
+  const total = exercise.items.length;
+  const filled = total - empty;
+  const percent = total ? Math.round((correct / total) * 100) : 0;
+  return { correct, wrong, empty, total, filled, percent };
+}
+
+function getFillGapWordUsage() {
+  return Object.values(fillGapAnswers).reduce((acc, answer) => {
+    acc[answer.wordId] = (acc[answer.wordId] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function updateFillGapWordBoxState() {
+  const exercise = getActiveFillGapExercise();
+  const box = document.getElementById("fillGapWordBox");
+  if (!exercise || !box) return;
+  box.innerHTML = renderFillGapWordBox(exercise);
+}
+
+function getStoredFillGapWrongItems() {
+  try {
+    return JSON.parse(localStorage.getItem(FILL_GAP_WRONG_KEY) || "[]");
+  } catch (error) {
+    return [];
+  }
+}
+
+function setStoredFillGapWrongItems(items) {
+  localStorage.setItem(FILL_GAP_WRONG_KEY, JSON.stringify(items));
+}
+
+function saveFillGapWrongItems() {
+  const exercise = getActiveFillGapExercise();
+  if (!exercise) return;
+  const stored = getStoredFillGapWrongItems();
+  const byId = new Map(stored.map((item) => [`${item.exerciseId}:${item.itemId}`, item]));
+
+  exercise.items.forEach((item) => {
+    const userAnswer = (fillGapAnswers[item.id]?.text || "").trim();
+    const isCorrect = userAnswer.toLowerCase() === String(item.answer || "").trim().toLowerCase();
+    const key = `${exercise.id}:${item.id}`;
+    if (isCorrect) {
+      byId.delete(key);
+      return;
+    }
+    if (userAnswer) {
+      byId.set(key, {
+        exerciseId: exercise.id,
+        itemId: item.id,
+        sentence: item.sentence,
+        answer: item.answer,
+        userAnswer,
+        topic: exercise.title,
+        hintTr: item.hintTr,
+        explanation: item.explanation
+      });
+    }
+  });
+
+  setStoredFillGapWrongItems([...byId.values()].slice(-80));
+  renderFillGapHub(fillGapActiveFilter);
+}
+
+function startFillGapWrongPractice() {
+  const wrongItems = getStoredFillGapWrongItems();
+  if (!wrongItems.length) {
+    alert("Henüz tekrar edilecek yanlış boşluk yok. Önce bir egzersiz çözebilirsin.");
+    return;
+  }
+  fillGapIsWrongPractice = true;
+  activeFillGapExerciseId = "fg-wrong-practice";
+  resetFillGapStateOnly();
+  setFillGapFocusMode(true);
+  renderFillGapWorkspace();
+  navigate("fillgaphub");
+  document.getElementById("fillGapWorkspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+const originalRavzaNavigate = window.navigate;
+window.navigate = function ravzaFillGapNavigate(pageId) {
+  if (typeof originalRavzaNavigate === "function") originalRavzaNavigate(pageId);
+  if (pageId === "fillgaphub") {
+    document.querySelectorAll(".nav-links button").forEach((button) => button.classList.remove("active"));
+    document.getElementById("nav-fillgaphub")?.classList.add("active");
+    renderFillGapHub(fillGapActiveFilter);
+  }
+};
+
+window.renderFillGapHub = renderFillGapHub;
+window.startFillGapExercise = startFillGapExercise;
+window.renderFillGapWorkspace = renderFillGapWorkspace;
+window.closeFillGapExercise = closeFillGapExercise;
+window.backToFillGapTopics = backToFillGapTopics;
+window.selectFillGapWord = selectFillGapWord;
+window.placeSelectedWord = placeSelectedWord;
+window.removeFillGapAnswer = removeFillGapAnswer;
+window.handleFillGapDragStart = handleFillGapDragStart;
+window.handleFillGapDragOver = handleFillGapDragOver;
+window.handleFillGapDrop = handleFillGapDrop;
+window.checkFillGapAnswers = checkFillGapAnswers;
+window.showFillGapAnswers = showFillGapAnswers;
+window.resetFillGapExercise = resetFillGapExercise;
+window.nextFillGapExercise = nextFillGapExercise;
+window.saveFillGapWrongItems = saveFillGapWrongItems;
+window.startFillGapWrongPractice = startFillGapWrongPractice;
+window.syncFillGapWordsToMemoryCards = syncFillGapWordsToMemoryCards;
+window.getFillGapWordUsage = getFillGapWordUsage;
+window.updateFillGapWordBoxState = updateFillGapWordBoxState;
+
+try {
+  syncFillGapWordsToMemoryCards();
+} catch (error) {
+  console.warn("Fill gap words could not sync to memory cards", error);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  syncFillGapWordsToMemoryCards();
+  renderFillGapHub();
+  if (typeof renderMemorizationHub === "function") {
+    renderMemorizationHub(document.getElementById("memoryFilter")?.value || "");
+  }
+});
+
+
+/* =========================================================
+   DUOLINGO TARZI STREAK MODÜLÜ
+   - Mevcut özellikleri değiştirmez.
+   - Çalışma tamamlanınca, quiz bitince, sınav bitince veya ezber/fill-gap pratiği yapılınca bugünü kaydeder.
+   - Veriyi localStorage içinde saklar.
+   ========================================================= */
+(function initDuolingoStyleStreakModule() {
+  const STORAGE_KEY = "ravza_study_streak_v1";
+  const DAY_MS = 24 * 60 * 60 * 1000;
+
+  function pad(value) {
+    return String(value).padStart(2, "0");
+  }
+
+  function toLocalDateKey(date = new Date()) {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  function fromLocalDateKey(key) {
+    const [year, month, day] = String(key).split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  function getMonday(date = new Date()) {
+    const copy = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const day = copy.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    copy.setDate(copy.getDate() + diff);
+    return copy;
+  }
+
+  function readStreakData() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      return {
+        days: Array.isArray(parsed.days) ? parsed.days.filter(Boolean) : [],
+        best: Number(parsed.best || 0),
+        lastAction: parsed.lastAction || null
+      };
+    } catch (error) {
+      return { days: [], best: 0, lastAction: null };
+    }
+  }
+
+  function writeStreakData(data) {
+    const normalized = {
+      days: [...new Set(data.days || [])].sort(),
+      best: Number(data.best || 0),
+      lastAction: data.lastAction || null
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+  }
+
+  function calculateCurrentStreak(days) {
+    const daySet = new Set(days || []);
+    const today = new Date();
+    const todayKey = toLocalDateKey(today);
+    const yesterday = new Date(today.getTime() - DAY_MS);
+    const yesterdayKey = toLocalDateKey(yesterday);
+
+    if (!daySet.has(todayKey) && !daySet.has(yesterdayKey)) return 0;
+
+    let cursor = daySet.has(todayKey) ? today : yesterday;
+    let count = 0;
+
+    while (daySet.has(toLocalDateKey(cursor))) {
+      count += 1;
+      cursor = new Date(cursor.getTime() - DAY_MS);
+    }
+
+    return count;
+  }
+
+  function markStudyStreakToday(action = "study") {
+    const data = readStreakData();
+    const todayKey = toLocalDateKey();
+
+    if (!data.days.includes(todayKey)) {
+      data.days.push(todayKey);
+    }
+
+    const current = calculateCurrentStreak(data.days);
+    data.best = Math.max(Number(data.best || 0), current);
+    data.lastAction = action;
+    writeStreakData(data);
+    renderStudyStreak();
+  }
+
+  function getStreakMessage(current, isTodayDone) {
+    if (!isTodayDone && current === 0) return "Bugün bir çalışma yap, serin başlasın.";
+    if (!isTodayDone) return "Seriyi kaybetmemek için bugün kısa bir tekrar yap.";
+    if (current === 1) return "Harika başlangıç! Bugün streak aktif.";
+    if (current < 4) return "Güzel gidiyorsun, küçük adımlar seri oluşturur.";
+    if (current < 7) return "Mükemmel! Çalışma alışkanlığı oluşuyor.";
+    return "Efsane seri! Ravza için çalışma ritmi oturdu.";
+  }
+
+  function renderStudyStreak() {
+    const data = readStreakData();
+    const todayKey = toLocalDateKey();
+    const isTodayDone = data.days.includes(todayKey);
+    const current = calculateCurrentStreak(data.days);
+    const best = Math.max(Number(data.best || 0), current);
+
+    if (best !== data.best) {
+      data.best = best;
+      writeStreakData(data);
+    }
+
+    const currentEl = document.getElementById("streakCurrent");
+    const messageEl = document.getElementById("streakMessage");
+    const statusEl = document.getElementById("streakStatusPill");
+    const bestEl = document.getElementById("streakBestLabel");
+    const fireEl = document.getElementById("streakFireIcon");
+    const dayEls = document.querySelectorAll("#streakDays [data-day]");
+
+    if (currentEl) currentEl.textContent = String(current);
+    if (messageEl) messageEl.textContent = getStreakMessage(current, isTodayDone);
+    if (bestEl) bestEl.textContent = `En iyi seri: ${best} gün`;
+
+    if (statusEl) {
+      statusEl.textContent = isTodayDone ? "Bugün tamamlandı" : "Bugün bekliyor";
+      statusEl.classList.toggle("done", isTodayDone);
+    }
+
+    if (fireEl) {
+      fireEl.classList.toggle("is-active", isTodayDone);
+      fireEl.textContent = isTodayDone ? "🔥" : "🕯️";
+    }
+
+    const monday = getMonday();
+    const todayIndex = (new Date().getDay() + 6) % 7;
+    const daySet = new Set(data.days || []);
+
+    dayEls.forEach((el) => {
+      const index = Number(el.dataset.day || 0);
+      const date = new Date(monday.getTime() + index * DAY_MS);
+      const key = toLocalDateKey(date);
+      el.classList.toggle("done", daySet.has(key));
+      el.classList.toggle("today", index === todayIndex);
+      el.title = `${key}${daySet.has(key) ? " - tamamlandı" : " - bekliyor"}`;
+    });
+  }
+
+  function wrapFunction(name, afterRun, options = {}) {
+    const current = window[name];
+    if (typeof current !== "function" || current.__streakWrapped) return;
+
+    const wrapped = function streakWrappedFunction(...args) {
+      const result = current.apply(this, args);
+      const runAfter = () => {
+        try { afterRun(args, result); } catch (error) { console.warn("Streak güncellenemedi:", error); }
+      };
+
+      if (options.delay) setTimeout(runAfter, options.delay);
+      else runAfter();
+
+      return result;
+    };
+
+    wrapped.__streakWrapped = true;
+    window[name] = wrapped;
+  }
+
+  function attachStreakHooks() {
+    wrapFunction("toggleStudyDone", ([topicId]) => {
+      if (typeof isStudyDone === "function" && isStudyDone(topicId)) {
+        markStudyStreakToday("study-complete");
+      }
+    }, { delay: 0 });
+
+    wrapFunction("toggleQuizDone", ([topicId]) => {
+      if (typeof isQuizDone === "function" && isQuizDone(topicId)) {
+        markStudyStreakToday("quiz-complete");
+      }
+    }, { delay: 0 });
+
+    wrapFunction("submitTopicQuiz", () => markStudyStreakToday("quiz-submit"), { delay: 0 });
+    wrapFunction("submitExam", () => markStudyStreakToday("exam-submit"), { delay: 0 });
+    wrapFunction("submitMemoryPracticeAnswer", () => markStudyStreakToday("memory-practice"), { delay: 0 });
+    wrapFunction("checkFillGapAnswers", () => markStudyStreakToday("fill-gap"), { delay: 0 });
+    wrapFunction("finishFillGapPractice", () => markStudyStreakToday("fill-gap-finish"), { delay: 0 });
+
+    if (typeof updateDashboardStats === "function" && !updateDashboardStats.__streakRenderWrapped) {
+      const previousUpdateDashboardStats = updateDashboardStats;
+      updateDashboardStats = function updateDashboardStatsWithStreak(...args) {
+        const result = previousUpdateDashboardStats.apply(this, args);
+        renderStudyStreak();
+        return result;
+      };
+      updateDashboardStats.__streakRenderWrapped = true;
+    }
+  }
+
+  window.markStudyStreakToday = markStudyStreakToday;
+  window.renderStudyStreak = renderStudyStreak;
+
+  const boot = () => {
+    attachStreakHooks();
+    renderStudyStreak();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => setTimeout(boot, 0));
+  } else {
+    setTimeout(boot, 0);
+  }
+})();
