@@ -1,128 +1,231 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#1a2850">
-<meta name="format-detection" content="telephone=no">
-<title>CMS Panel | EUL Grammar</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css">
-<script src="admin-guard.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#7b1731">
+  <meta name="format-detection" content="telephone=no">
+  <title>Ravza CMS | Premium Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-
-<aside class="admin-sidebar">
+  <aside class="admin-sidebar" id="adminSidebar">
     <div class="admin-brand">
-        <h1>PORTAL CMS</h1>
-        <p>Premium Yönetim Sistemi</p>
+      <span class="brand-kicker">♡ CMS</span>
+      <h1>Ravza Study Admin</h1>
+      <p>İçerik, kullanıcı girişleri ve cihaz takibi</p>
     </div>
-    <ul class="admin-tabs">
-        <li><button class="tab-btn active" data-tab="tab-general">Genel Ayarlar</button></li>
-        <li><button class="tab-btn" data-tab="tab-dash">Dashboard Yönetimi</button></li>
-        <li><button class="tab-btn" data-tab="tab-pages">Sayfa & İçerik Yönetimi</button></li>
-        <li><button class="tab-btn" data-tab="tab-theme">Tema Tasarımı</button></li>
-    </ul>
+
+    <nav class="admin-tabs" aria-label="Admin menü">
+      <button class="tab-btn active" data-tab="overview"><span>📊</span>Genel Bakış</button>
+      <button class="tab-btn" data-tab="visits"><span>📱</span>Kullanıcı Girişleri</button>
+      <button class="tab-btn" data-tab="content"><span>📚</span>Konu Yönetimi</button>
+      <button class="tab-btn" data-tab="dashboard"><span>🏠</span>Dashboard</button>
+      <button class="tab-btn" data-tab="theme"><span>🎨</span>Tema</button>
+      <button class="tab-btn" data-tab="settings"><span>⚙️</span>Ayarlar</button>
+    </nav>
+
     <div class="admin-actions">
-        <a href="index.html" target="_blank" class="btn btn-outline">Siteyi Aç 👁️</a>
-        <button id="btn-global-save" class="btn btn-primary">💾 Tümünü Kaydet</button>
+      <a class="btn btn-outline" href="index.html" target="_blank">Siteyi Aç</a>
+      <button class="btn btn-primary" id="saveAllBtn">Tümünü Kaydet</button>
     </div>
-</aside>
+  </aside>
 
-<main class="admin-main">
-    <div class="panel-header">
-        <h2>İçerik Stüdyosu</h2>
-        <span id="status-badge" class="status-badge">Veriler Yüklendi</span>
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">☰</button>
+      <div>
+        <span class="page-eyebrow">Premium Yönetim Paneli</span>
+        <h2 id="panelTitle">Genel Bakış</h2>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-soft" id="refreshBtn" type="button">Yenile</button>
+        <span id="statusBadge" class="status-badge">Hazır</span>
+      </div>
+    </header>
+
+    <section class="tab-panel active" id="tab-overview">
+      <div class="metric-grid">
+        <article class="metric-card gradient">
+          <span>Toplam Giriş</span>
+          <strong id="metricTotalVisits">0</strong>
+          <small>Firestore: user_visits</small>
+        </article>
+        <article class="metric-card">
+          <span>Bugünkü Giriş</span>
+          <strong id="metricTodayVisits">0</strong>
+          <small>Bugün açılan oturumlar</small>
+        </article>
+        <article class="metric-card">
+          <span>Mobil Oranı</span>
+          <strong id="metricMobileRate">0%</strong>
+          <small>Mobil + tablet cihazlar</small>
+        </article>
+        <article class="metric-card">
+          <span>En Sık Cihaz</span>
+          <strong id="metricTopDevice">-</strong>
+          <small>Cihaz modeli / platform</small>
+        </article>
+      </div>
+
+      <div class="overview-grid">
+        <article class="admin-card">
+          <div class="card-head">
+            <div><h3>Son Girişler</h3><p>Kullanıcı tarafında site açıldığında kaydedilir.</p></div>
+            <button class="mini-btn" data-tab-jump="visits">Tümünü Gör</button>
+          </div>
+          <div id="latestVisits" class="latest-list"></div>
+        </article>
+
+        <article class="admin-card">
+          <div class="card-head">
+            <div><h3>Cihaz Dağılımı</h3><p>Mobil, masaüstü ve tablet oranları.</p></div>
+          </div>
+          <div id="deviceBreakdown" class="breakdown-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-visits">
+      <div class="admin-card">
+        <div class="card-head card-head-wrap">
+          <div>
+            <h3>Kullanıcı Girişleri ve Cihaz Takibi</h3>
+            <p>Kullanıcı cihaz analiz izni verirse teknik cihaz bilgileri burada listelenir. Kullanıcıya telefon modeli sorulmaz; sistem tarayıcının verdiği bilgiler, ekran ölçüsü ve DPR ile otomatik analiz yapar.</p>
+          </div>
+          <div class="visit-actions">
+            <input id="visitSearch" class="admin-search" type="search" placeholder="Cihaz, OS, tarayıcı ara...">
+            <select id="visitTypeFilter" class="admin-select">
+              <option value="all">Tüm cihazlar</option>
+              <option value="Mobil">Mobil</option>
+              <option value="Tablet">Tablet</option>
+              <option value="Masaüstü">Masaüstü</option>
+            </select>
+            <button class="btn btn-soft" id="exportVisitsBtn" type="button">CSV Dışa Aktar</button>
+          </div>
+        </div>
+
+        <div class="table-wrap admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Cihaz / Ekran Grubu</th>
+                <th>Kaynak</th>
+                <th>Tür</th>
+                <th>OS</th>
+                <th>Tarayıcı</th>
+                <th>Ekran</th>
+                <th>Sayfa</th>
+                <th>Detay</th>
+              </tr>
+            </thead>
+            <tbody id="visitTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-content">
+      <div class="content-editor-layout">
+        <aside class="admin-card page-list-card">
+          <div class="card-head compact">
+            <div><h3>Konu Sayfaları</h3><p>Sayfa seç ve düzenle.</p></div>
+            <button class="mini-btn" id="addPageBtn" type="button">+ Yeni</button>
+          </div>
+          <div id="pagesList" class="page-list"></div>
+        </aside>
+
+        <article class="admin-card editor-card" id="pageEditorCard">
+          <div class="empty-editor" id="emptyEditor">
+            <h3>Bir konu seç</h3>
+            <p>Sol taraftan bir konu seçerek içerik bloklarını ve quiz sorularını düzenleyebilirsin.</p>
+          </div>
+
+          <div id="pageEditor" hidden>
+            <div class="editor-section-head">
+              <div><h3>Sayfa Ayarları</h3><p>ID, başlık, rozet ve açıklama düzenle.</p></div>
+              <button class="btn btn-danger" id="deletePageBtn" type="button">Sayfayı Sil</button>
+            </div>
+            <div class="form-grid">
+              <label class="form-field">Sayfa ID<input id="pageIdInput" type="text" placeholder="unit1a"></label>
+              <label class="form-field">Başlık<input id="pageTitleInput" type="text"></label>
+              <label class="form-field">İkon<input id="pageIconInput" type="text" placeholder="📚"></label>
+              <label class="form-field">Ünite Rozeti<input id="pageBadgeInput" type="text" placeholder="UNIT 1A"></label>
+              <label class="form-field full">Açıklama<input id="pageDescInput" type="text"></label>
+            </div>
+
+            <div class="editor-section-head sub">
+              <div><h3>İçerik Blokları</h3><p>Paragraf, uyarı, bilgi kutusu veya özel HTML ekle.</p></div>
+              <button class="mini-btn" id="addBlockBtn" type="button">+ Blok</button>
+            </div>
+            <div id="blocksContainer" class="block-list"></div>
+
+            <div class="editor-section-head sub">
+              <div><h3>Quiz Soruları</h3><p>Her konuya mini test ekleyebilirsin.</p></div>
+              <button class="mini-btn" id="addQuizBtn" type="button">+ Soru</button>
+            </div>
+            <div id="quizContainer" class="block-list"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-dashboard">
+      <div class="admin-card">
+        <div class="card-head"><div><h3>Dashboard İstatistikleri</h3><p>Ana sayfadaki kutuları yönet.</p></div><button class="mini-btn" id="addStatBtn">+ İstatistik</button></div>
+        <div id="statsContainer" class="block-list"></div>
+      </div>
+      <div class="admin-card">
+        <div class="card-head"><div><h3>Yönlendirme Kartları</h3><p>Ana sayfa butonlarını ve açıklamalarını düzenle.</p></div><button class="mini-btn" id="addDashCardBtn">+ Kart</button></div>
+        <div id="dashCardsContainer" class="block-list"></div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-theme">
+      <div class="admin-card">
+        <div class="card-head"><div><h3>Tema Tasarımı</h3><p>Site renklerini Firestore system/general içinde saklar.</p></div></div>
+        <div class="form-grid color-grid">
+          <label class="form-field">Ana Renk<input id="themeNavy" type="color" value="#1a2850"></label>
+          <label class="form-field">Vurgu Pembe<input id="themePink" type="color" value="#d4669c"></label>
+          <label class="form-field">Parlak Pembe<input id="themePinkBright" type="color" value="#e879a0"></label>
+          <label class="form-field">Arka Plan<input id="themeBg" type="color" value="#f5f4fb"></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-settings">
+      <div class="admin-card">
+        <div class="card-head"><div><h3>Site Genel Ayarları</h3><p>Başlık, hero ve footer metinlerini yönet.</p></div></div>
+        <div class="form-grid">
+          <label class="form-field">Site Başlığı<input id="generalSiteTitle" type="text"></label>
+          <label class="form-field">Alt Başlık<input id="generalSubtitle" type="text"></label>
+          <label class="form-field">Topbar Rozeti<input id="generalBadge" type="text"></label>
+          <label class="form-field">Footer<input id="generalFooter" type="text"></label>
+          <label class="form-field full">Hero Başlığı<input id="generalHeroTitle" type="text"></label>
+          <label class="form-field full">Hero Açıklama<textarea id="generalHeroDesc" rows="4"></textarea></label>
+        </div>
+      </div>
+
+      <div class="admin-card warning-card">
+        <h3>Firestore Koleksiyonları</h3>
+        <p>Bu panel şu yapıları kullanır: <code>system/general</code>, <code>system/dashboard</code>, <code>system/navigation</code>, <code>pages</code>, <code>quizzes</code>, <code>user_visits</code>.</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="visitDetailDialog" class="admin-dialog">
+    <div class="dialog-head">
+      <h3>Giriş Detayı</h3>
+      <button id="closeVisitDialog" type="button">✕</button>
     </div>
+    <pre id="visitDetailPre"></pre>
+  </dialog>
 
-    <section id="tab-general" class="tab-content active">
-        <div class="card">
-            <h3>Site Kimliği</h3>
-            <div class="form-grid">
-                <div class="form-group"><label>Site Başlığı</label><input type="text" id="g-title"></div>
-                <div class="form-group"><label>Alt Başlık</label><input type="text" id="g-subtitle"></div>
-                <div class="form-group"><label>Topbar Rozeti</label><input type="text" id="g-badge"></div>
-                <div class="form-group"><label>Footer Yazısı</label><input type="text" id="g-footer"></div>
-            </div>
-        </div>
-        <div class="card">
-            <h3>Karşılama Ekranı (Hero)</h3>
-            <div class="form-group"><label>Ana Başlık</label><input type="text" id="g-heroTitle"></div>
-            <div class="form-group full"><label>Açıklama</label><textarea id="g-heroDesc" rows="3"></textarea></div>
-        </div>
-    </section>
-
-    <section id="tab-dash" class="tab-content">
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <h3>Dashboard İstatistikleri</h3>
-                <button id="add-stat-btn" class="btn btn-small">+ İstatistik Ekle</button>
-            </div>
-            <div id="stat-list-container"></div>
-        </div>
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <h3>Dashboard Yönlendirme Kartları</h3>
-                <button id="add-dashcard-btn" class="btn btn-small">+ Kart Ekle</button>
-            </div>
-            <div id="dashcard-list-container"></div>
-        </div>
-    </section>
-
-    <section id="tab-pages" class="tab-content">
-        <div class="layout-split">
-            <div class="list-panel">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3 style="font-size:16px; margin:0;">Konu Sayfaları</h3>
-                    <button id="add-page-btn" class="btn btn-small">+ Yeni</button>
-                </div>
-                <ul id="pages-list" class="item-list"></ul>
-            </div>
-
-            <div class="card" id="page-editor-panel" style="display:none; margin:0;">
-                <h3>Sayfa Ayarları</h3>
-                <div class="form-grid mb-4">
-                    <div class="form-group"><label>Sayfa ID (İngilizce/Boşluksuz)</label><input type="text" id="p-id"></div>
-                    <div class="form-group"><label>Menü & Sayfa Başlığı</label><input type="text" id="p-title"></div>
-                    <div class="form-group"><label>İkon (Emoji)</label><input type="text" id="p-icon"></div>
-                    <div class="form-group"><label>Ünite Etiketi (Örn: UNIT 1A)</label><input type="text" id="p-badge"></div>
-                    <div class="form-group full"><label>Açıklama Metni</label><input type="text" id="p-desc"></div>
-                </div>
-
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:20px; margin-top:20px;">
-                    <h3>İçerik Blokları</h3>
-                    <button id="add-block-btn" class="btn btn-small">+ Blok Ekle</button>
-                </div>
-                <div id="blocks-container" style="margin-top:15px;"></div>
-
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:20px; margin-top:20px;">
-                    <h3>Bölüm Sonu Testi (Quiz)</h3>
-                    <button id="add-quiz-btn" class="btn btn-small">+ Soru Ekle</button>
-                </div>
-                <div id="quiz-container" style="margin-top:15px;"></div>
-
-                <div style="border-top:1px solid #e2e8f0; padding-top:20px; margin-top:30px;">
-                    <button id="delete-page-btn" class="btn btn-danger" style="width:100%;">Bu Sayfayı Tamamen Sil</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="tab-theme" class="tab-content">
-        <div class="card">
-            <h3>Tema Renk Yönetimi (CSS Tokens)</h3>
-            <p style="font-size:13px; color:#64748b; margin-bottom:20px;">Hex kodlarını girerek tüm sitenin rengini değiştirebilirsiniz.</p>
-            <div class="form-grid">
-                <div class="form-group"><label>Navy (Ana Koyu Renk)</label><input type="color" id="t-navy"></div>
-                <div class="form-group"><label>Pink (Vurgu Rengi)</label><input type="color" id="t-pink"></div>
-                <div class="form-group"><label>Pink Bright</label><input type="color" id="t-pink-bright"></div>
-                <div class="form-group"><label>Background (Arkaplan)</label><input type="color" id="t-bg"></div>
-            </div>
-        </div>
-    </section>
-
-</main>
-
-<script type="module" src="admin.js"></script>
+  <script type="module" src="admin.js"></script>
 </body>
 </html>
