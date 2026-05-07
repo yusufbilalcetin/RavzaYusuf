@@ -1729,55 +1729,55 @@ const MEMORIZATION_CARDS = [
   { id: "mem-27", front: "Celebrity", back: "Ünlü" },
   { id: "mem-28", front: "Suit", back: "Yakışmak / uygun olmak" }
 ,
-  { id: "mem-29", front: "Direct object", back: "DoÄŸrudan nesne" },
-  { id: "mem-30", front: "Indirect object", back: "DolaylÄ± nesne" },
+  { id: "mem-29", front: "Direct object", back: "Doğrudan nesne" },
+  { id: "mem-30", front: "Indirect object", back: "Dolaylı nesne" },
   { id: "mem-31", front: "Object pronoun", back: "Nesne zamiri" },
-  { id: "mem-32", front: "Possessive adjective", back: "Ä°yelik sÄ±fatÄ±" },
-  { id: "mem-33", front: "Possessive pronoun", back: "Ä°yelik zamiri" },
-  { id: "mem-34", front: "Lend", back: "Ã–dÃ¼nÃ§ vermek" },
-  { id: "mem-35", front: "Borrow", back: "Ã–dÃ¼nÃ§ almak" },
-  { id: "mem-36", front: "Ambitious", back: "HÄ±rslÄ±" },
+  { id: "mem-32", front: "Possessive adjective", back: "İyelik sıfatı" },
+  { id: "mem-33", front: "Possessive pronoun", back: "İyelik zamiri" },
+  { id: "mem-34", front: "Lend", back: "Ödünç vermek" },
+  { id: "mem-35", front: "Borrow", back: "Ödünç almak" },
+  { id: "mem-36", front: "Ambitious", back: "Hırslı" },
   { id: "mem-37", front: "Selfish", back: "Bencil" },
-  { id: "mem-38", front: "Expensive", back: "PahalÄ±" },
+  { id: "mem-38", front: "Expensive", back: "Pahalı" },
   { id: "mem-39", front: "Cheap", back: "Ucuz" },
   { id: "mem-40", front: "Comfortable", back: "Rahat / konforlu" },
-  { id: "mem-41", front: "Successful", back: "BaÅŸarÄ±lÄ±" },
-  { id: "mem-42", front: "Friendly", back: "Dost canlÄ±sÄ±" },
+  { id: "mem-41", front: "Successful", back: "Başarılı" },
+  { id: "mem-42", front: "Friendly", back: "Dost canlısı" },
   { id: "mem-43", front: "Stative verb", back: "Durum fiili" },
   { id: "mem-44", front: "Possession", back: "Sahiplik" },
-  { id: "mem-45", front: "Opinion", back: "GÃ¶rÃ¼ÅŸ / fikir" },
-  { id: "mem-46", front: "Arrangement", back: "Ã–nceden ayarlanmÄ±ÅŸ plan" },
-  { id: "mem-47", front: "Timetable", back: "Tarife / zaman Ã§izelgesi" },
+  { id: "mem-45", front: "Opinion", back: "Görüş / fikir" },
+  { id: "mem-46", front: "Arrangement", back: "Önceden ayarlanmış plan" },
+  { id: "mem-47", front: "Timetable", back: "Tarife / zaman çizelgesi" },
   { id: "mem-48", front: "Ownership", back: "Sahiplik" },
-  { id: "mem-49", front: "Share", back: "PaylaÅŸmak" },
-  { id: "mem-50", front: "Separate", back: "AyrÄ± / ayÄ±rmak" },
+  { id: "mem-49", front: "Share", back: "Paylaşmak" },
+  { id: "mem-50", front: "Separate", back: "Ayrı / ayırmak" },
   { id: "mem-51", front: "Own", back: "Kendine ait" },
-  { id: "mem-52", front: "Colleague", back: "Ä°ÅŸ arkadaÅŸÄ±" },
-  { id: "mem-53", front: "Bakery", back: "FÄ±rÄ±n" },
-  { id: "mem-54", front: "Habit", back: "AlÄ±ÅŸkanlÄ±k" },
-  { id: "mem-55", front: "Interrupted", back: "BÃ¶lÃ¼nmÃ¼ÅŸ / kesintiye uÄŸramÄ±ÅŸ" },
+  { id: "mem-52", front: "Colleague", back: "İş arkadaşı" },
+  { id: "mem-53", front: "Bakery", back: "Fırın" },
+  { id: "mem-54", front: "Habit", back: "Alışkanlık" },
+  { id: "mem-55", front: "Interrupted", back: "Bölünmüş / kesintiye uğramış" },
   { id: "mem-56", front: "Background action", back: "Arka plan eylemi" },
-  { id: "mem-57", front: "Across", back: "KarÅŸÄ±ya / bir uÃ§tan diÄŸer uca" },
-  { id: "mem-58", front: "Through", back: "Ä°Ã§inden geÃ§erek" },
+  { id: "mem-57", front: "Across", back: "Karşıya / bir uçtan diğer uca" },
+  { id: "mem-58", front: "Through", back: "İçinden geçerek" },
   { id: "mem-59", front: "Along", back: "Boyunca" },
-  { id: "mem-60", front: "Towards", back: "-e doÄŸru" },
-  { id: "mem-61", front: "Apply for", back: "BaÅŸvurmak" },
-  { id: "mem-62", front: "Rely on", back: "GÃ¼venmek / bel baÄŸlamak" },
+  { id: "mem-60", front: "Towards", back: "-e doğru" },
+  { id: "mem-61", front: "Apply for", back: "Başvurmak" },
+  { id: "mem-62", front: "Rely on", back: "Güvenmek / bel bağlamak" },
   { id: "mem-63", front: "Proud of", back: "Gurur duymak" },
-  { id: "mem-64", front: "Worried about", back: "EndiÅŸeli olmak" },
+  { id: "mem-64", front: "Worried about", back: "Endişeli olmak" },
   { id: "mem-65", front: "Prediction", back: "Tahmin" },
-  { id: "mem-66", front: "Promise", back: "SÃ¶z vermek / vaat" },
+  { id: "mem-66", front: "Promise", back: "Söz vermek / vaat" },
   { id: "mem-67", front: "Offer", back: "Teklif etmek / teklif" },
-  { id: "mem-68", front: "Instant decision", back: "AnÄ±nda verilen karar" },
+  { id: "mem-68", front: "Instant decision", back: "Anında verilen karar" },
   { id: "mem-69", front: "Intention", back: "Niyet" },
-  { id: "mem-70", front: "Evidence-based", back: "KanÄ±ta dayalÄ±" },
-  { id: "mem-71", front: "Conditional", back: "KoÅŸul yapÄ±sÄ±" },
-  { id: "mem-72", front: "Imaginary", back: "Hayali / gerÃ§ek dÄ±ÅŸÄ±" },
-  { id: "mem-73", front: "Consequence", back: "SonuÃ§" },
-  { id: "mem-74", front: "Unless", back: "EÄŸer ... deÄŸilse" },
-  { id: "mem-75", front: "Already", back: "Zaten / Ã§oktan" },
-  { id: "mem-76", front: "Yet", back: "HenÃ¼z" },
-  { id: "mem-77", front: "Recently", back: "YakÄ±n zamanda" },
+  { id: "mem-70", front: "Evidence-based", back: "Kanıta dayalı" },
+  { id: "mem-71", front: "Conditional", back: "Koşul yapısı" },
+  { id: "mem-72", front: "Imaginary", back: "Hayali / gerçek dışı" },
+  { id: "mem-73", front: "Consequence", back: "Sonuç" },
+  { id: "mem-74", front: "Unless", back: "Eğer ... değilse" },
+  { id: "mem-75", front: "Already", back: "Zaten / çoktan" },
+  { id: "mem-76", front: "Yet", back: "Henüz" },
+  { id: "mem-77", front: "Recently", back: "Yakın zamanda" },
   { id: "mem-78", front: "Lately", back: "Son zamanlarda" },
   { id: "mem-79", front: "Since", back: "-den beri" },
   { id: "mem-80", front: "Obligation", back: "Zorunluluk" },
@@ -1785,128 +1785,37 @@ const MEMORIZATION_CARDS = [
   { id: "mem-82", front: "Prohibition", back: "Yasak" },
   { id: "mem-83", front: "Advice", back: "Tavsiye" },
   { id: "mem-84", front: "Ability", back: "Yetenek" },
-  { id: "mem-85", front: "Permission", back: "Ä°zin" },
-  { id: "mem-86", front: "Deduction", back: "MantÄ±ksal Ã§Ä±karÄ±m" },
-  { id: "mem-87", front: "Manage to", back: "BaÅŸarmak" },
+  { id: "mem-85", front: "Permission", back: "İzin" },
+  { id: "mem-86", front: "Deduction", back: "Mantıksal çıkarım" },
+  { id: "mem-87", front: "Manage to", back: "Başarmak" },
   { id: "mem-88", front: "Get up", back: "Kalkmak" },
-  { id: "mem-89", front: "Set off", back: "Yola Ã§Ä±kmak" },
+  { id: "mem-89", front: "Set off", back: "Yola çıkmak" },
   { id: "mem-90", front: "Switch off", back: "Kapatmak" },
   { id: "mem-91", front: "Fill in", back: "Doldurmak" },
   { id: "mem-92", front: "Put away", back: "Yerine koymak" },
-  { id: "mem-93", front: "Pay back", back: "Geri Ã¶demek" },
+  { id: "mem-93", front: "Pay back", back: "Geri ödemek" },
   { id: "mem-94", front: "Take after", back: "Birine benzemek" },
   { id: "mem-95", front: "Look after", back: "Bakmak / ilgilenmek" },
   { id: "mem-96", front: "Look forward to", back: "Heyecanla beklemek" },
-  { id: "mem-97", front: "Give away", back: "Bedava vermek / daÄŸÄ±tmak" },
+  { id: "mem-97", front: "Give away", back: "Bedava vermek / dağıtmak" },
   { id: "mem-98", front: "Agree to", back: "Kabul etmek" },
   { id: "mem-99", front: "Decide to", back: "Karar vermek" },
-  { id: "mem-100", front: "Avoid", back: "KaÃ§Ä±nmak" },
-  { id: "mem-101", front: "Allow", back: "Ä°zin vermek" },
-  { id: "mem-102", front: "Persuade", back: "Ä°kna etmek" },
-  { id: "mem-103", front: "Have something done", back: "Bir iÅŸi birine yaptÄ±rmak" },
-  { id: "mem-104", front: "Get something done", back: "Bir iÅŸi yaptÄ±rtmak" },
+  { id: "mem-100", front: "Avoid", back: "Kaçınmak" },
+  { id: "mem-101", front: "Allow", back: "İzin vermek" },
+  { id: "mem-102", front: "Persuade", back: "İkna etmek" },
+  { id: "mem-103", front: "Have something done", back: "Bir işi birine yaptırmak" },
+  { id: "mem-104", front: "Get something done", back: "Bir işi yaptırtmak" },
   { id: "mem-105", front: "Repair", back: "Tamir etmek" },
   { id: "mem-106", front: "Redecorate", back: "Yeniden dekore etmek" },
-  { id: "mem-107", front: "Passive voice", back: "Edilgen yapÄ±" },
-  { id: "mem-108", front: "Reported speech", back: "DolaylÄ± anlatÄ±m" },
-  { id: "mem-109", front: "Whether", back: "Olup olmadÄ±ÄŸÄ±" },
+  { id: "mem-107", front: "Passive voice", back: "Edilgen yapı" },
+  { id: "mem-108", front: "Reported speech", back: "Dolaylı anlatım" },
+  { id: "mem-109", front: "Whether", back: "Olup olmadığı" },
   { id: "mem-110", front: "Request", back: "Rica / talep" },
-  { id: "mem-111", front: "Third conditional", back: "ÃœÃ§Ã¼ncÃ¼ koÅŸul yapÄ±sÄ±" },
-  { id: "mem-112", front: "Regret", back: "PiÅŸmanlÄ±k / piÅŸman olmak" },
-  { id: "mem-113", front: "Auxiliary verb", back: "YardÄ±mcÄ± fiil" },
+  { id: "mem-111", front: "Third conditional", back: "Üçüncü koşul yapısı" },
+  { id: "mem-112", front: "Regret", back: "Pişmanlık / pişman olmak" },
+  { id: "mem-113", front: "Auxiliary verb", back: "Yardımcı fiil" },
   { id: "mem-114", front: "Main verb", back: "Ana fiil" }
 ];
-
-const EXTRA_MEMORIZATION_CARDS = [
-  { id: "mem-29", front: "Direct object", back: "Dogrudan nesne" },
-  { id: "mem-30", front: "Indirect object", back: "Dolayli nesne" },
-  { id: "mem-31", front: "Object pronoun", back: "Nesne zamiri" },
-  { id: "mem-32", front: "Possessive adjective", back: "Iyelik sifati" },
-  { id: "mem-33", front: "Possessive pronoun", back: "Iyelik zamiri" },
-  { id: "mem-34", front: "Lend", back: "Odunc vermek" },
-  { id: "mem-35", front: "Borrow", back: "Odunc almak" },
-  { id: "mem-36", front: "Ambitious", back: "Hirsli" },
-  { id: "mem-37", front: "Selfish", back: "Bencil" },
-  { id: "mem-38", front: "Expensive", back: "Pahali" },
-  { id: "mem-39", front: "Cheap", back: "Ucuz" },
-  { id: "mem-40", front: "Comfortable", back: "Rahat / konforlu" },
-  { id: "mem-41", front: "Successful", back: "Basarili" },
-  { id: "mem-42", front: "Friendly", back: "Dost canlisi" },
-  { id: "mem-43", front: "Stative verb", back: "Durum fiili" },
-  { id: "mem-44", front: "Possession", back: "Sahiplik" },
-  { id: "mem-45", front: "Opinion", back: "Gorus / fikir" },
-  { id: "mem-46", front: "Arrangement", back: "Onceden ayarlanmis plan" },
-  { id: "mem-47", front: "Timetable", back: "Tarife / zaman cizelgesi" },
-  { id: "mem-48", front: "Ownership", back: "Sahiplik" },
-  { id: "mem-49", front: "Share", back: "Paylasmak" },
-  { id: "mem-50", front: "Separate", back: "Ayri / ayirmak" },
-  { id: "mem-51", front: "Own", back: "Kendine ait" },
-  { id: "mem-52", front: "Colleague", back: "Is arkadasi" },
-  { id: "mem-53", front: "Bakery", back: "Firin" },
-  { id: "mem-54", front: "Habit", back: "Aliskanlik" },
-  { id: "mem-55", front: "Interrupted", back: "Bolunmus / kesintiye ugramis" },
-  { id: "mem-56", front: "Background action", back: "Arka plan eylemi" },
-  { id: "mem-57", front: "Across", back: "Karsiya / bir uctan diger uca" },
-  { id: "mem-58", front: "Through", back: "Icinden gecerek" },
-  { id: "mem-59", front: "Along", back: "Boyunca" },
-  { id: "mem-60", front: "Towards", back: "-e dogru" },
-  { id: "mem-61", front: "Apply for", back: "Basvurmak" },
-  { id: "mem-62", front: "Rely on", back: "Guvenmek / bel baglamak" },
-  { id: "mem-63", front: "Proud of", back: "Gurur duymak" },
-  { id: "mem-64", front: "Worried about", back: "Endiseli olmak" },
-  { id: "mem-65", front: "Prediction", back: "Tahmin" },
-  { id: "mem-66", front: "Promise", back: "Soz vermek / vaat" },
-  { id: "mem-67", front: "Offer", back: "Teklif etmek / teklif" },
-  { id: "mem-68", front: "Instant decision", back: "Aninda verilen karar" },
-  { id: "mem-69", front: "Intention", back: "Niyet" },
-  { id: "mem-70", front: "Evidence-based", back: "Kanita dayali" },
-  { id: "mem-71", front: "Conditional", back: "Kosul yapisi" },
-  { id: "mem-72", front: "Imaginary", back: "Hayali / gercek disi" },
-  { id: "mem-73", front: "Consequence", back: "Sonuc" },
-  { id: "mem-74", front: "Unless", back: "Eger ... degilse" },
-  { id: "mem-75", front: "Already", back: "Zaten / coktan" },
-  { id: "mem-76", front: "Yet", back: "Henuz" },
-  { id: "mem-77", front: "Recently", back: "Yakin zamanda" },
-  { id: "mem-78", front: "Lately", back: "Son zamanlarda" },
-  { id: "mem-79", front: "Since", back: "-den beri" },
-  { id: "mem-80", front: "Obligation", back: "Zorunluluk" },
-  { id: "mem-81", front: "Necessity", back: "Gereklilik" },
-  { id: "mem-82", front: "Prohibition", back: "Yasak" },
-  { id: "mem-83", front: "Advice", back: "Tavsiye" },
-  { id: "mem-84", front: "Ability", back: "Yetenek" },
-  { id: "mem-85", front: "Permission", back: "Izin" },
-  { id: "mem-86", front: "Deduction", back: "Mantiksal cikarim" },
-  { id: "mem-87", front: "Manage to", back: "Basarmak" },
-  { id: "mem-88", front: "Get up", back: "Kalkmak" },
-  { id: "mem-89", front: "Set off", back: "Yola cikmak" },
-  { id: "mem-90", front: "Switch off", back: "Kapatmak" },
-  { id: "mem-91", front: "Fill in", back: "Doldurmak" },
-  { id: "mem-92", front: "Put away", back: "Yerine koymak" },
-  { id: "mem-93", front: "Pay back", back: "Geri odemek" },
-  { id: "mem-94", front: "Take after", back: "Birine benzemek" },
-  { id: "mem-95", front: "Look after", back: "Bakmak / ilgilenmek" },
-  { id: "mem-96", front: "Look forward to", back: "Heyecanla beklemek" },
-  { id: "mem-97", front: "Give away", back: "Bedava vermek / dagitmak" },
-  { id: "mem-98", front: "Agree to", back: "Kabul etmek" },
-  { id: "mem-99", front: "Decide to", back: "Karar vermek" },
-  { id: "mem-100", front: "Avoid", back: "Kacinmak" },
-  { id: "mem-101", front: "Allow", back: "Izin vermek" },
-  { id: "mem-102", front: "Persuade", back: "Ikna etmek" },
-  { id: "mem-103", front: "Have something done", back: "Bir isi birine yaptirmak" },
-  { id: "mem-104", front: "Get something done", back: "Bir isi yaptirtmak" },
-  { id: "mem-105", front: "Repair", back: "Tamir etmek" },
-  { id: "mem-106", front: "Redecorate", back: "Yeniden dekore etmek" },
-  { id: "mem-107", front: "Passive voice", back: "Edilgen yapi" },
-  { id: "mem-108", front: "Reported speech", back: "Dolayli anlatim" },
-  { id: "mem-109", front: "Whether", back: "Olup olmadigi" },
-  { id: "mem-110", front: "Request", back: "Rica / talep" },
-  { id: "mem-111", front: "Third conditional", back: "Ucuncu kosul yapisi" },
-  { id: "mem-112", front: "Regret", back: "Pismanlik / pisman olmak" },
-  { id: "mem-113", front: "Auxiliary verb", back: "Yardimci fiil" },
-  { id: "mem-114", front: "Main verb", back: "Ana fiil" }
-];
-
-MEMORIZATION_CARDS.splice(28, MEMORIZATION_CARDS.length - 28, ...EXTRA_MEMORIZATION_CARDS);
 
 const ADDITIONAL_MEMORY_CARDS = [
   { id: "mem-115", front: "Phrasal verb", back: "verb + particle" },
@@ -2662,9 +2571,11 @@ function navigate(pageId) {
 
   const navMap = {
     dashboard: "nav-dashboard",
+    ravzalingo: "nav-ravzalingo",
     studyhub: "nav-studyhub",
     studydetail: "nav-studyhub",
     memoryhub: "nav-memoryhub",
+    fillgaphub: "nav-fillgaphub",
     quizhub: "nav-quizhub",
     quizdetail: "nav-quizhub",
     examcenter: "nav-examcenter",
@@ -2676,7 +2587,7 @@ function navigate(pageId) {
     navButton.classList.add("active");
   }
 
-  if (window.innerWidth <= 768) {
+  if (window.innerWidth <= 1024) {
     closeMobileMenu();
   }
 
@@ -2690,6 +2601,22 @@ function toggleMenu() {
   const isOpen = !sidebar.classList.contains("open");
   sidebar.classList.toggle("open", isOpen);
   document.body.classList.toggle("nav-open", isOpen);
+  const toggleBtn = document.querySelector(".menu-toggle");
+  if (toggleBtn) toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+
+if (typeof document !== "undefined" && !window.__RAVZA_ESC_HOOKED__) {
+  window.__RAVZA_ESC_HOOKED__ = true;
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar?.classList.contains("open")) { closeMobileMenu(); return; }
+    const themeSheet = document.getElementById("theme-sheet");
+    if (themeSheet?.classList.contains("open") && typeof window.closeThemeSheet === "function") { window.closeThemeSheet(); return; }
+  });
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 1024) closeMobileMenu();
+  });
 }
 
 function searchTopics(event) {
@@ -2718,6 +2645,21 @@ function searchTopics(event) {
 
   if (q.includes("ezber") || q.includes("kelime") || q.includes("kart") || q.includes("vocabulary") || q.includes("word")) {
     navigate("memoryhub");
+    return;
+  }
+
+  if (q.includes("boşluk") || q.includes("bosluk") || q.includes("gap") || q.includes("fill")) {
+    navigate("fillgaphub");
+    return;
+  }
+
+  if (q.includes("ravzalingo") || q.includes("duolingo") || q.includes("lingo")) {
+    navigate("ravzalingo");
+    return;
+  }
+
+  if (q.includes("hızlı") || q.includes("hizli") || q.includes("recap") || q.includes("tekrar")) {
+    navigate("recap");
     return;
   }
 
@@ -9042,3 +8984,1207 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 })();
 
+/* ============================================================
+   RAVZALINGO — DUOLINGO BENZERİ ÖĞRENME MOTORU
+   Tüm içerik kullanıcının kendi modüllerinden gelir:
+     - TOPICS (Çalışma Merkezi)         → ünite + quiz
+     - MEMORIZATION_CARDS (Ezber)       → kelime havuzu
+     - FILL_GAP_EXERCISES (Boşluk)      → boşluk doldurma
+     - QUESTION_BANK (Sınav Merkezi)    → karma quiz
+   Hiçbir sahte/fallback veri yok.
+   ============================================================ */
+(function () {
+  "use strict";
+  if (window.__RAVZALINGO_V5__) return;
+  window.__RAVZALINGO_V5__ = true;
+
+  const RLZ_STATE_KEY = "ravzalingo_v5_state";
+  const RLZ_MAX_HEARTS = 5;
+  const RLZ_HEART_REFILL_MS = 30 * 60 * 1000;
+  const RLZ_LESSON_LENGTH = 6;
+  const RLZ_LESSONS_PER_UNIT = 5;
+  const RLZ_XP_PER_CORRECT = 10;
+  const RLZ_XP_LESSON_BONUS = 15;
+  const RLZ_GEMS_LESSON_BONUS = 5;
+
+  let RLZ_CONTENT_CACHE = null;
+  let RLZ_SESSION = null;
+  let RLZ_CLICK_LOCK = false;
+
+  /* --- HELPERS --- */
+  function rlzShuffle(list) {
+    const arr = [...(list || [])];
+    for (let i = arr.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  function rlzPickRandom(list, n) {
+    if (!list || !list.length) return n === 1 ? null : [];
+    const s = rlzShuffle(list);
+    return n === 1 ? s[0] : s.slice(0, n);
+  }
+  function rlzEsc(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+  function rlzNorm(value) {
+    return String(value || "").toLowerCase()
+      .replace(/[ıİ]/g, "i").replace(/[ğĞ]/g, "g").replace(/[üÜ]/g, "u")
+      .replace(/[şŞ]/g, "s").replace(/[öÖ]/g, "o").replace(/[çÇ]/g, "c")
+      .replace(/[^a-z0-9' -]+/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  /* --- CONTENT BUILDER --- */
+  function rlzBuildContent() {
+    if (RLZ_CONTENT_CACHE) return RLZ_CONTENT_CACHE;
+
+    const topics = (typeof TOPICS !== "undefined" && Array.isArray(TOPICS)) ? TOPICS : [];
+    const memCards = (typeof MEMORIZATION_CARDS !== "undefined" && Array.isArray(MEMORIZATION_CARDS)) ? MEMORIZATION_CARDS : [];
+    const gapEx = (typeof FILL_GAP_EXERCISES !== "undefined" && Array.isArray(FILL_GAP_EXERCISES)) ? FILL_GAP_EXERCISES : [];
+
+    const lexemes = memCards.filter((c) => c?.front && c?.back).map((c) => ({
+      id: `lex_${c.id}`, en: String(c.front).trim(), tr: String(c.back).trim()
+    }));
+
+    const gapsByTopic = {};
+    gapEx.forEach((set) => {
+      if (!set?.items?.length) return;
+      const tid = set.topicId || "_general";
+      if (!gapsByTopic[tid]) gapsByTopic[tid] = [];
+      set.items.forEach((it) => {
+        if (it?.sentence && it?.answer) {
+          gapsByTopic[tid].push({
+            id: `gap_${it.id || Math.random().toString(36).slice(2)}`,
+            sentence: it.sentence,
+            answer: String(it.answer).trim(),
+            hintTr: it.hintTr || "",
+            explanation: it.explanation || ""
+          });
+        }
+      });
+    });
+
+    const quizByTopic = {};
+    topics.forEach((t) => {
+      const arr = [];
+      (t.quiz || []).forEach((q, i) => {
+        if (!q?.question || !Array.isArray(q?.options)) return;
+        const ans = typeof q.answer === "number" ? q.answer : -1;
+        if (ans < 0 || ans >= q.options.length) return;
+        arr.push({
+          id: `quiz_${t.id}_${i}`,
+          question: q.question,
+          options: q.options.map(String),
+          answer: ans,
+          explanation: q.explanation || ""
+        });
+      });
+      if (arr.length) quizByTopic[t.id] = arr;
+    });
+
+    const sectionsMap = {};
+    topics.forEach((t, idx) => {
+      const unitMatch = String(t.unit || "").match(/(\d+)/);
+      const sectionNum = unitMatch ? parseInt(unitMatch[1], 10) : Math.floor(idx / 2) + 1;
+      if (!sectionsMap[sectionNum]) sectionsMap[sectionNum] = { number: sectionNum, units: [] };
+      sectionsMap[sectionNum].units.push({
+        id: t.id,
+        title: t.title || t.id,
+        subtitle: t.subtitle || "",
+        unit: t.unit || `Unit ${sectionNum}`,
+        icon: rlzPickIcon(t.title || t.id, sectionsMap[sectionNum].units.length),
+        topic: t,
+        gapPool: gapsByTopic[t.id] || [],
+        quizPool: quizByTopic[t.id] || []
+      });
+    });
+
+    const sections = Object.values(sectionsMap)
+      .sort((a, b) => a.number - b.number)
+      .map((s, i) => ({
+        ...s,
+        id: `section_${s.number}`,
+        title: `Bölüm ${s.number}`,
+        kicker: `SECTION ${s.number}`,
+        color: rlzSectionColor(i)
+      }));
+
+    RLZ_CONTENT_CACHE = { sections, lexemes, gapsByTopic, quizByTopic };
+    return RLZ_CONTENT_CACHE;
+  }
+
+  function rlzPickIcon(title, fallbackIndex) {
+    const t = String(title).toLowerCase();
+    if (/word|kelime|vocab/.test(t)) return "📚";
+    if (/object|pronoun|zamir/.test(t)) return "🎯";
+    if (/adjective|comparative|sıfat/.test(t)) return "✨";
+    if (/present|şimdiki/.test(t)) return "⏰";
+    if (/possess|sahip/.test(t)) return "🔑";
+    if (/past|geçmiş/.test(t)) return "📜";
+    if (/preposition|edat/.test(t)) return "🧭";
+    if (/future|gelecek/.test(t)) return "🚀";
+    if (/conditional|koşul/.test(t)) return "🌀";
+    if (/perfect/.test(t)) return "💎";
+    if (/modal/.test(t)) return "🛡️";
+    if (/phrasal/.test(t)) return "🧩";
+    if (/passive|edilgen/.test(t)) return "🌊";
+    if (/reported|aktarım/.test(t)) return "💬";
+    if (/causative|ettirgen/.test(t)) return "🛠️";
+    if (/auxiliary|yardımcı/.test(t)) return "🪄";
+    return ["🌱", "⚡", "🎨", "🎁", "🔥", "🌈", "🍀"][fallbackIndex % 7];
+  }
+
+  function rlzSectionColor(index) {
+    const palette = [
+      { main: "#58cc02", deep: "#2d7600", light: "#7ee000" },
+      { main: "#1cb0f6", deep: "#0b75a2", light: "#4cc9ff" },
+      { main: "#ce82ff", deep: "#7a3fb0", light: "#e0a9ff" },
+      { main: "#ff9600", deep: "#a35a00", light: "#ffb84d" },
+      { main: "#ff4b4b", deep: "#a52a2a", light: "#ff7b7b" },
+      { main: "#ffd000", deep: "#a37d00", light: "#ffe566" },
+      { main: "#46d5ff", deep: "#1e7ea0", light: "#7eecff" },
+      { main: "#ff6dca", deep: "#a13a87", light: "#ff9bd9" }
+    ];
+    return palette[index % palette.length];
+  }
+
+  /* --- STATE --- */
+  function rlzSafeJson(value, fallback) {
+    try { return JSON.parse(value); } catch (_) { return fallback; }
+  }
+  function rlzLoad() {
+    const base = {
+      version: 5, xp: 0, gems: 0, hearts: RLZ_MAX_HEARTS, heartsRefilledAt: Date.now(),
+      streakDays: [], lastPlayedAt: null, unitProgress: {},
+      totalCorrect: 0, totalWrong: 0, lessonsCompleted: 0
+    };
+    const raw = localStorage.getItem(RLZ_STATE_KEY);
+    const loaded = raw ? rlzSafeJson(raw, {}) : {};
+    return {
+      ...base, ...loaded,
+      unitProgress: { ...(loaded.unitProgress || {}) },
+      streakDays: Array.isArray(loaded.streakDays) ? loaded.streakDays.slice(-365) : []
+    };
+  }
+  function rlzSave(state) {
+    try { localStorage.setItem(RLZ_STATE_KEY, JSON.stringify(state)); }
+    catch (e) { console.warn("RavzaLingo state kaydedilemedi", e); }
+  }
+  function rlzToday() { return new Date().toISOString().slice(0, 10); }
+  function rlzMarkDaily(state) {
+    const today = rlzToday();
+    if (!state.streakDays.includes(today)) state.streakDays.push(today);
+    state.streakDays = state.streakDays.slice(-365);
+    state.lastPlayedAt = Date.now();
+    return state;
+  }
+  function rlzStreakCount(state) {
+    const days = [...new Set(state.streakDays || [])].sort().reverse();
+    let check = new Date();
+    let count = 0;
+    for (const day of days) {
+      const target = check.toISOString().slice(0, 10);
+      if (day === target) {
+        count += 1;
+        check.setDate(check.getDate() - 1);
+      } else if (count === 0) {
+        const yesterday = new Date(check.getTime() - 86400000).toISOString().slice(0, 10);
+        if (day === yesterday) {
+          count += 1;
+          check.setDate(check.getDate() - 2);
+        } else break;
+      } else break;
+    }
+    return count;
+  }
+  function rlzSyncExternalStreak() {
+    const names = ["markTodayAsStudied", "markStreakToday", "recordStreakActivity", "completeDailyStreak"];
+    for (const name of names) {
+      if (typeof window[name] === "function") {
+        try { window[name]("ravzalingo"); return; } catch (_) {}
+      }
+    }
+  }
+  function rlzRefillHearts(state) {
+    if (state.hearts >= RLZ_MAX_HEARTS) {
+      state.heartsRefilledAt = Date.now();
+      return state;
+    }
+    const last = state.heartsRefilledAt || Date.now();
+    const elapsed = Date.now() - last;
+    const gained = Math.floor(elapsed / RLZ_HEART_REFILL_MS);
+    if (gained > 0) {
+      state.hearts = Math.min(RLZ_MAX_HEARTS, state.hearts + gained);
+      state.heartsRefilledAt = last + gained * RLZ_HEART_REFILL_MS;
+    }
+    return state;
+  }
+  function rlzMsToNextHeart(state) {
+    if (state.hearts >= RLZ_MAX_HEARTS) return 0;
+    const last = state.heartsRefilledAt || Date.now();
+    const elapsed = Date.now() - last;
+    return Math.max(0, RLZ_HEART_REFILL_MS - (elapsed % RLZ_HEART_REFILL_MS));
+  }
+  function rlzFmtMs(ms) {
+    const total = Math.ceil(ms / 1000);
+    return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+  }
+  function rlzGetUnitProgress(state, unitId) {
+    return state.unitProgress[unitId] || { stars: 0, lessonsDone: 0 };
+  }
+  function rlzIsUnitUnlocked(state, sections, sectionIdx, unitIdx) {
+    if (sectionIdx === 0 && unitIdx === 0) return true;
+    if (unitIdx > 0) {
+      const prev = sections[sectionIdx].units[unitIdx - 1];
+      return rlzGetUnitProgress(state, prev.id).stars >= 1;
+    }
+    if (sectionIdx > 0) {
+      const prevSection = sections[sectionIdx - 1];
+      const last = prevSection.units[prevSection.units.length - 1];
+      return rlzGetUnitProgress(state, last.id).stars >= 1;
+    }
+    return false;
+  }
+
+  /* --- LESSON BUILDER --- */
+  function rlzBuildLesson(unit, content, isUnitTest) {
+    const length = isUnitTest ? Math.min(8, RLZ_LESSON_LENGTH + 2) : RLZ_LESSON_LENGTH;
+    const challenges = [];
+    const lexemes = content.lexemes;
+    const order = isUnitTest
+      ? ["quiz", "gap", "translate", "match", "quiz", "listen", "gap", "quiz"]
+      : ["translate", "gap", "quiz", "match", "listen", "quiz"];
+    for (let i = 0; i < length; i += 1) {
+      const ch = rlzMakeChallenge(order[i % order.length], unit, lexemes, i);
+      if (ch) challenges.push(ch);
+    }
+    return { unitId: unit.id, unitTitle: unit.title, isUnitTest: !!isUnitTest, challenges, current: 0, correct: 0, wrong: 0 };
+  }
+
+  function rlzMakeChallenge(type, unit, lexemes, slot) {
+    const stamp = `${Date.now()}_${slot}_${Math.random().toString(36).slice(2, 7)}`;
+    if (type === "gap" && unit.gapPool.length) {
+      const item = rlzPickRandom(unit.gapPool, 1);
+      const wrongs = lexemes.filter((l) => rlzNorm(l.en) !== rlzNorm(item.answer));
+      const distractors = rlzPickRandom(wrongs, 7).map((l) => l.en);
+      const bank = rlzShuffle([item.answer, ...distractors]).slice(0, 8);
+      return { type: "gap", id: `gap_${stamp}`, item, bank, selected: null, topic: unit.title };
+    }
+    if (type === "quiz" && unit.quizPool.length) {
+      const item = rlzPickRandom(unit.quizPool, 1);
+      return { type: "quiz", id: `quiz_${stamp}`, item, selected: null, topic: unit.title };
+    }
+    if (type === "translate" && lexemes.length) {
+      const item = rlzPickRandom(lexemes, 1);
+      const wrongs = lexemes.filter((l) => l.id !== item.id);
+      const distractors = rlzPickRandom(wrongs, 7).map((l) => l.en);
+      const bank = rlzShuffle([item.en, ...distractors]).slice(0, 8);
+      return { type: "translate", id: `translate_${stamp}`, item, bank, selected: null, topic: unit.title };
+    }
+    if (type === "match" && lexemes.length >= 4) {
+      const pairs = rlzPickRandom(lexemes, Math.min(5, lexemes.length));
+      return {
+        type: "match", id: `match_${stamp}`, topic: unit.title, pairs,
+        left: rlzShuffle(pairs.map((p) => ({ id: p.id, text: p.en }))),
+        right: rlzShuffle(pairs.map((p) => ({ id: p.id, text: p.tr }))),
+        selectedLeft: null, selectedRight: null, matched: [], wrong: []
+      };
+    }
+    if (type === "listen" && lexemes.length >= 4) {
+      const item = rlzPickRandom(lexemes, 1);
+      const wrongs = rlzPickRandom(lexemes.filter((l) => l.id !== item.id), 3);
+      const options = rlzShuffle([
+        { text: item.tr, correct: true },
+        ...wrongs.map((w) => ({ text: w.tr, correct: false }))
+      ]);
+      return { type: "listen", id: `listen_${stamp}`, item, options, selected: null, played: false, topic: unit.title };
+    }
+    if (unit.quizPool.length) return rlzMakeChallenge("quiz", unit, lexemes, slot);
+    if (lexemes.length) return rlzMakeChallenge("translate", unit, lexemes, slot);
+    return null;
+  }
+
+  /* --- EVALUATE --- */
+  function rlzCanCheck(c) {
+    if (!c) return false;
+    if (c.checked) return true;
+    if (c.type === "gap" || c.type === "translate") return !!c.selected;
+    if (c.type === "quiz" || c.type === "listen") return c.selected !== null && c.selected !== undefined;
+    if (c.type === "match") return c.matched.length === c.pairs.length;
+    return false;
+  }
+  function rlzEvaluate(c) {
+    if (c.type === "gap") return { ok: rlzNorm(c.selected) === rlzNorm(c.item.answer), correctText: c.item.answer, hint: c.item.explanation || c.item.hintTr };
+    if (c.type === "translate") return { ok: rlzNorm(c.selected) === rlzNorm(c.item.en), correctText: c.item.en, hint: c.item.tr };
+    if (c.type === "quiz") return { ok: c.selected === c.item.answer, correctText: c.item.options[c.item.answer], hint: c.item.explanation };
+    if (c.type === "listen") return { ok: c.options[c.selected]?.correct === true, correctText: c.item.tr, hint: c.item.en };
+    if (c.type === "match") return { ok: c.matched.length === c.pairs.length && c.wrong.length === 0, correctText: "Tüm eşleştirmeler doğru!", hint: "" };
+    return { ok: false, correctText: "-", hint: "" };
+  }
+  function rlzSpeak(text, slow) {
+    if (!text || !window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-US";
+      u.rate = slow ? 0.55 : 0.9;
+      window.speechSynthesis.speak(u);
+    } catch (_) {}
+  }
+
+  /* --- DOM --- */
+  function rlzEnsureMarkup() {
+    const nav = document.querySelector(".nav-links");
+    if (nav && !document.getElementById("nav-ravzalingo")) {
+      const li = document.createElement("li");
+      li.innerHTML = `<button onclick="navigate('ravzalingo')" id="nav-ravzalingo"><span class="nav-icon">🟢</span>RavzaLingo</button>`;
+      const study = document.getElementById("nav-studyhub")?.closest("li");
+      if (study) nav.insertBefore(li, study); else nav.appendChild(li);
+    }
+    if (!document.getElementById("ravzalingo")) {
+      const sec = document.createElement("section");
+      sec.id = "ravzalingo";
+      sec.className = "page ravzalingo-page";
+      sec.innerHTML = `<div id="ravzaLingoRoot"></div>`;
+      const study = document.getElementById("studyhub");
+      const wrap = document.querySelector(".content-wrapper") || document.body;
+      if (study?.parentNode) study.parentNode.insertBefore(sec, study); else wrap.appendChild(sec);
+    }
+  }
+  function rlzRoot() { return document.getElementById("ravzaLingoRoot"); }
+
+  /* --- RENDER --- */
+  function rlzRenderHome() {
+    rlzEnsureMarkup();
+    const root = rlzRoot();
+    if (!root) return;
+    const content = rlzBuildContent();
+    const state = rlzRefillHearts(rlzLoad());
+    rlzSave(state);
+    const streak = rlzStreakCount(state);
+
+    if (!content.sections.length) {
+      root.innerHTML = `<div class="rlz5-empty"><div class="rlz5-empty-card"><h2>Henüz içerik yok</h2><p>Çalışma Merkezi, Ezber Merkezi, Boşluk Doldurma veya Sınav Merkezi'ne içerik ekledikten sonra RavzaLingo otomatik dolacak.</p><button type="button" class="rlz5-btn-primary" onclick="navigate('studyhub')">Çalışma Merkezi'ne Git</button></div></div>`;
+      return;
+    }
+
+    let totalUnits = 0, doneUnits = 0;
+    content.sections.forEach((s) => {
+      totalUnits += s.units.length;
+      s.units.forEach((u) => { if (rlzGetUnitProgress(state, u.id).stars >= 1) doneUnits += 1; });
+    });
+    const overallPct = Math.round((doneUnits / Math.max(1, totalUnits)) * 100);
+    const heartTimer = state.hearts < RLZ_MAX_HEARTS ? `<small>${rlzFmtMs(rlzMsToNextHeart(state))}</small>` : "";
+
+    root.innerHTML = `
+      <div class="rlz5-shell">
+        <header class="rlz5-topbar">
+          <div class="rlz5-stat fire"><span>🔥</span><div><b>${streak}</b><small>Seri</small></div></div>
+          <div class="rlz5-stat heart"><span>❤️</span><div><b>${state.hearts}/${RLZ_MAX_HEARTS}</b>${heartTimer}</div></div>
+          <div class="rlz5-stat xp"><span>⚡</span><div><b>${state.xp || 0}</b><small>XP</small></div></div>
+          <div class="rlz5-stat gem"><span>💎</span><div><b>${state.gems || 0}</b><small>Kristal</small></div></div>
+          <div class="rlz5-stat progress"><span>📊</span><div><b>${overallPct}%</b><small>İlerleme</small></div></div>
+        </header>
+        <div class="rlz5-path">${content.sections.map((s, i) => rlzRenderSection(s, i, state, content)).join("")}</div>
+        <footer class="rlz5-footer-info">
+          <p>Kaynak: <strong>Çalışma · Ezber · Boşluk · Sınav</strong> Merkezleri</p>
+          <p>${content.sections.length} bölüm · ${totalUnits} ünite · ${content.lexemes.length} kelime</p>
+        </footer>
+      </div>`;
+  }
+
+  /* Düğüm tipini lesson sırasına göre belirle (yıldız/kitap/video/dumbbell/sandık/star) */
+  function rlzNodeType(lessonIdx, totalLessons) {
+    if (lessonIdx === totalLessons) return "test";   // ünite testi
+    const cycle = ["star", "book", "dumbbell", "video", "star"];
+    return cycle[lessonIdx % cycle.length];
+  }
+
+  function rlzNodeIcon(type, status) {
+    if (status === "locked") return "🔒";
+    if (status === "done") return "⭐";
+    if (type === "test") return "🏆";
+    if (type === "book") return "📖";
+    if (type === "dumbbell") return "🏋️";
+    if (type === "video") return "🎬";
+    if (type === "chest") return "🎁";
+    return "⭐";
+  }
+
+  /* Yatay ofset: 0=orta, -2..+2 sağ-sol salınım */
+  function rlzNodeOffset(globalIdx) {
+    const wave = [0, 1, 2, 1, 0, -1, -2, -1];
+    return wave[globalIdx % wave.length];
+  }
+
+  function rlzRenderSection(section, sectionIdx, state, content) {
+    const sectionDone = section.units.every((u) => rlzGetUnitProgress(state, u.id).stars >= 1);
+    let pathHtml = "";
+    let globalIdx = 0;
+
+    section.units.forEach((unit, unitIdx) => {
+      const progress = rlzGetUnitProgress(state, unit.id);
+      const unlocked = rlzIsUnitUnlocked(state, content.sections, sectionIdx, unitIdx);
+      const lessonsDone = Math.min(RLZ_LESSONS_PER_UNIT, progress.lessonsDone || 0);
+      const isUnitDone = progress.stars >= 5;
+      const safeUnitId = unit.id.replace(/'/g, "\\'");
+
+      // Ünite başlık banner'ı (Duolingo'daki yeşil "1. KISIM, 4. ÜNİTE" üstbarı)
+      pathHtml += `
+        <div class="rlz5-unit-banner ${isUnitDone ? "is-done" : ""} ${unlocked ? "" : "is-locked"}">
+          <div class="rlz5-banner-text">
+            <span class="rlz5-banner-kicker">${rlzEsc(section.kicker)}, ${unitIdx + 1}. ÜNİTE</span>
+            <strong>${rlzEsc(unit.title)}</strong>
+          </div>
+          <button type="button" class="rlz5-banner-guide" aria-label="Ünite rehberi" title="${rlzEsc(unit.subtitle || unit.title)}">📋</button>
+        </div>`;
+
+      // Ders düğümleri (5 ders + 1 ünite testi = 6 düğüm)
+      for (let lIdx = 0; lIdx <= RLZ_LESSONS_PER_UNIT; lIdx += 1) {
+        const isTest = lIdx === RLZ_LESSONS_PER_UNIT;
+        const done = isTest ? isUnitDone : lIdx < lessonsDone;
+        const current = !done && unlocked && (isTest ? lessonsDone >= RLZ_LESSONS_PER_UNIT : lIdx === lessonsDone);
+        const status = done ? "done" : current ? "current" : "locked";
+        const type = rlzNodeType(lIdx, RLZ_LESSONS_PER_UNIT);
+        const offset = rlzNodeOffset(globalIdx);
+        const onclick = (status !== "locked")
+          ? `onclick="rlz5StartLesson('${safeUnitId}', ${isTest ? -1 : lIdx}, ${isTest})"`
+          : "";
+        const ariaLabel = isTest ? `Ünite ${unitIdx + 1} testi` : `${unit.title} - Ders ${lIdx + 1}`;
+        const showMascot = current ? `<div class="rlz5-mascot-bubble">🦉</div>` : "";
+
+        pathHtml += `
+          <div class="rlz5-path-row" data-offset="${offset}">
+            <div class="rlz5-node-wrap ${status === "current" ? "is-current" : ""}">
+              ${showMascot}
+              <button type="button" class="rlz5-node rlz5-node-${type} is-${status}" ${status === "locked" ? "disabled" : onclick} aria-label="${rlzEsc(ariaLabel)}">
+                <span class="rlz5-node-icon">${rlzNodeIcon(type, status)}</span>
+              </button>
+              ${current && !done ? `<div class="rlz5-node-cta">BAŞLAT</div>` : ""}
+            </div>
+          </div>`;
+        globalIdx += 1;
+      }
+
+      // Hazine sandığı (her ünite sonunda)
+      const chestStatus = isUnitDone ? "done" : (unlocked && lessonsDone >= RLZ_LESSONS_PER_UNIT ? "current" : "locked");
+      pathHtml += `
+        <div class="rlz5-path-row" data-offset="${rlzNodeOffset(globalIdx)}">
+          <div class="rlz5-node-wrap">
+            <button type="button" class="rlz5-node rlz5-node-chest is-${chestStatus}" disabled aria-label="Hazine sandığı (otomatik açılır)">
+              <span class="rlz5-node-icon">${chestStatus === "done" ? "📦" : "🎁"}</span>
+            </button>
+          </div>
+        </div>`;
+      globalIdx += 1;
+    });
+
+    return `
+      <section class="rlz5-section" style="--rlz-main:${section.color.main};--rlz-deep:${section.color.deep};--rlz-light:${section.color.light}">
+        <header class="rlz5-section-divider">
+          <span></span>
+          <div>
+            <span class="rlz5-section-kicker">${rlzEsc(section.kicker)}</span>
+            <h2>${rlzEsc(section.title)}${sectionDone ? " 🏆" : ""}</h2>
+          </div>
+          <span></span>
+        </header>
+        <div class="rlz5-path-track">${pathHtml}</div>
+      </section>`;
+  }
+
+  // Geri uyumluluk için (artık doğrudan kullanılmıyor)
+  function rlzRenderUnit() { return ""; }
+
+  /* --- LESSON SCREEN --- */
+  function rlzRenderLesson() {
+    const root = rlzRoot();
+    if (!root || !RLZ_SESSION) return;
+    const { lesson, state } = RLZ_SESSION;
+    const c = lesson.challenges[lesson.current];
+    const total = lesson.challenges.length;
+    const pct = Math.round((lesson.current / total) * 100);
+    root.innerHTML = `
+      <div class="rlz5-lesson-shell">
+        <header class="rlz5-lesson-head">
+          <button type="button" class="rlz5-close" onclick="rlz5Quit()" aria-label="Çık">×</button>
+          <div class="rlz5-progress"><i style="width:${pct}%"></i></div>
+          <div class="rlz5-lesson-hearts">❤️ <b>${state.hearts}</b></div>
+        </header>
+        <main class="rlz5-challenge-area">
+          <div class="rlz5-challenge-meta">
+            <span>${rlzEsc(c.topic || lesson.unitTitle)}</span>
+            <b>${rlzTypeLabel(c.type)} · ${lesson.current + 1}/${total}</b>
+          </div>
+          ${rlzRenderChallenge(c)}
+          ${c.feedback ? rlzRenderFeedback(c) : ""}
+        </main>
+        <footer class="rlz5-lesson-footer">
+          <button type="button" class="rlz5-skip" onclick="rlz5Skip()">${c.checked ? "" : "Atla"}</button>
+          <button type="button" class="rlz5-check ${rlzCanCheck(c) ? "ready" : ""}" onclick="rlz5Check()">${c.checked ? "Devam Et" : "Kontrol Et"}</button>
+        </footer>
+      </div>`;
+  }
+
+  function rlzTypeLabel(type) {
+    return ({ gap: "Boşluğu Tamamla", match: "Eşleştirme", quiz: "Çoktan Seçmeli", translate: "Çeviri", listen: "Dinle ve Anla" })[type] || "Etkinlik";
+  }
+
+  function rlzRenderChallenge(c) {
+    if (c.type === "gap") {
+      const parts = String(c.item.sentence).split(/_+/);
+      return `
+        <h2 class="rlz5-prompt">Boşluğu doldur</h2>
+        <div class="rlz5-mascot-row"><div class="rlz5-mascot">🦉</div><div class="rlz5-speech">${rlzEsc(parts[0])}<span class="rlz5-blank ${c.selected ? "filled" : ""}">${c.selected ? rlzEsc(c.selected) : "______"}</span>${rlzEsc(parts[1] || "")}</div></div>
+        ${c.item.hintTr ? `<p class="rlz5-hint">İpucu: ${rlzEsc(c.item.hintTr)}</p>` : ""}
+        <div class="rlz5-bank">${c.bank.map((w, i) => `<button type="button" class="rlz5-word ${c.selected === w ? "selected" : ""}" onclick="rlz5SelectWord(${i})" ${c.checked ? "disabled" : ""}>${rlzEsc(w)}</button>`).join("")}</div>`;
+    }
+    if (c.type === "translate") {
+      return `
+        <h2 class="rlz5-prompt">Türkçeden İngilizceye çevir</h2>
+        <div class="rlz5-mascot-row"><div class="rlz5-mascot">📚</div><div class="rlz5-speech"><small>Türkçe</small>${rlzEsc(c.item.tr)}</div></div>
+        <div class="rlz5-answer-slot ${c.selected ? "filled" : ""}">${c.selected ? rlzEsc(c.selected) : "İngilizce karşılığını seç"}</div>
+        <div class="rlz5-bank">${c.bank.map((w, i) => `<button type="button" class="rlz5-word ${c.selected === w ? "selected" : ""}" onclick="rlz5SelectWord(${i})" ${c.checked ? "disabled" : ""}>${rlzEsc(w)}</button>`).join("")}</div>`;
+    }
+    if (c.type === "quiz") {
+      return `
+        <h2 class="rlz5-prompt">Doğru cevabı seç</h2>
+        <div class="rlz5-speech question">${rlzEsc(c.item.question)}</div>
+        <div class="rlz5-options">
+          ${c.item.options.map((opt, i) => `
+            <button type="button" class="rlz5-option ${c.selected === i ? "selected" : ""} ${c.checked && i === c.item.answer ? "correct" : ""} ${c.checked && c.selected === i && i !== c.item.answer ? "wrong" : ""}" onclick="rlz5SelectQuiz(${i})" ${c.checked ? "disabled" : ""}>
+              <span class="rlz5-option-key">${String.fromCharCode(65 + i)}</span>${rlzEsc(opt)}
+            </button>`).join("")}
+        </div>`;
+    }
+    if (c.type === "listen") {
+      return `
+        <h2 class="rlz5-prompt">Dinle ve Türkçe anlamı seç</h2>
+        <div class="rlz5-listen-bar">
+          <button type="button" class="rlz5-listen-big" onclick="rlz5Listen(false)" aria-label="Dinle">🔊</button>
+          <button type="button" class="rlz5-listen-small" onclick="rlz5Listen(true)" aria-label="Yavaş">🐢</button>
+        </div>
+        <div class="rlz5-options">
+          ${c.options.map((opt, i) => `
+            <button type="button" class="rlz5-option ${c.selected === i ? "selected" : ""} ${c.checked && opt.correct ? "correct" : ""} ${c.checked && c.selected === i && !opt.correct ? "wrong" : ""}" onclick="rlz5SelectListen(${i})" ${c.checked ? "disabled" : ""}>
+              ${rlzEsc(opt.text)}
+            </button>`).join("")}
+        </div>`;
+    }
+    if (c.type === "match") {
+      return `
+        <h2 class="rlz5-prompt">Eşleşen kelimeleri bul</h2>
+        <p class="rlz5-helper">Önce İngilizce, sonra Türkçe karşılığını seç. Eşleşen: ${c.matched.length}/${c.pairs.length}${c.wrong.length ? ` · Hata: ${c.wrong.length}` : ""}</p>
+        <div class="rlz5-match">
+          <div>${c.left.map((it) => `<button type="button" class="rlz5-match-btn ${c.selectedLeft === it.id ? "selected" : ""} ${c.matched.includes(it.id) ? "done" : ""}" onclick="rlz5Match('left','${rlzEsc(it.id)}')" ${c.matched.includes(it.id) || c.checked ? "disabled" : ""}>${rlzEsc(it.text)}</button>`).join("")}</div>
+          <div>${c.right.map((it) => `<button type="button" class="rlz5-match-btn ${c.selectedRight === it.id ? "selected" : ""} ${c.matched.includes(it.id) ? "done" : ""}" onclick="rlz5Match('right','${rlzEsc(it.id)}')" ${c.matched.includes(it.id) || c.checked ? "disabled" : ""}>${rlzEsc(it.text)}</button>`).join("")}</div>
+        </div>`;
+    }
+    return `<h2 class="rlz5-prompt">Etkinlik bulunamadı</h2>`;
+  }
+
+  function rlzRenderFeedback(c) {
+    const cls = c.correct ? "ok" : "bad";
+    const title = c.correct ? "Harika! Doğru" : "Üzgünüm, doğru cevap:";
+    const xp = c.correct ? `<span class="rlz5-fb-xp">+${c.earnedXp || RLZ_XP_PER_CORRECT} XP${c.earnedGems ? ` · +${c.earnedGems} 💎` : ""}</span>` : "";
+    return `
+      <div class="rlz5-feedback ${cls}">
+        <div class="rlz5-fb-icon">${c.correct ? "✓" : "✕"}</div>
+        <div class="rlz5-fb-body">
+          <strong>${title}</strong>
+          ${!c.correct ? `<div class="rlz5-fb-correct">${rlzEsc(c.feedback?.correctText || "")}</div>` : ""}
+          ${c.feedback?.hint ? `<div class="rlz5-fb-hint">${rlzEsc(c.feedback.hint)}</div>` : ""}
+          ${xp}
+        </div>
+      </div>`;
+  }
+
+  function rlzCompleteLesson() {
+    const session = RLZ_SESSION;
+    if (!session) return;
+    const { state, unit, isUnitTest } = session;
+    const lesson = session.lesson;
+    const accuracy = lesson.correct / Math.max(1, lesson.correct + lesson.wrong);
+    const progress = rlzGetUnitProgress(state, unit.id);
+    if (isUnitTest) {
+      progress.stars = Math.max(progress.stars || 0, accuracy >= 0.9 ? 5 : accuracy >= 0.75 ? 4 : 3);
+    } else {
+      const lessonNum = Math.max(progress.lessonsDone || 0, session.lessonIdx + 1);
+      progress.lessonsDone = lessonNum;
+      const baseStars = Math.min(4, Math.floor((lessonNum / RLZ_LESSONS_PER_UNIT) * 4));
+      progress.stars = Math.max(progress.stars || 0, baseStars);
+    }
+    state.unitProgress[unit.id] = progress;
+    state.lessonsCompleted = (state.lessonsCompleted || 0) + 1;
+    const bonusXp = RLZ_XP_LESSON_BONUS + (accuracy >= 0.95 ? 10 : 0);
+    const bonusGems = RLZ_GEMS_LESSON_BONUS + (accuracy >= 0.9 ? 3 : 0);
+    state.xp = (state.xp || 0) + bonusXp;
+    state.gems = (state.gems || 0) + bonusGems;
+    rlzMarkDaily(state);
+    rlzSyncExternalStreak();
+    rlzSave(state);
+    rlzRenderLessonComplete({
+      accuracyPct: Math.round(accuracy * 100),
+      bonusXp, bonusGems,
+      lessonXp: lesson.correct * RLZ_XP_PER_CORRECT,
+      durationSec: Math.round((Date.now() - session.startedAt) / 1000),
+      isUnitTest, stars: progress.stars
+    });
+  }
+
+  function rlzRenderLessonComplete(info) {
+    const root = rlzRoot();
+    if (!root) return;
+    const stars = "⭐".repeat(info.stars || 0) + "☆".repeat(Math.max(0, 5 - (info.stars || 0)));
+    root.innerHTML = `
+      <div class="rlz5-complete">
+        <div class="rlz5-complete-card">
+          <div class="rlz5-complete-rays"></div>
+          <div class="rlz5-complete-icon">${info.isUnitTest ? "🏆" : "🎉"}</div>
+          <h2>${info.isUnitTest ? "Ünite testini tamamladın!" : "Ders tamamlandı!"}</h2>
+          <p>${info.accuracyPct}% doğru oranı · ${info.durationSec} saniye</p>
+          <div class="rlz5-complete-stats">
+            <div class="rlz5-cs xp"><strong>+${info.lessonXp + info.bonusXp}</strong><span>XP</span></div>
+            <div class="rlz5-cs gem"><strong>+${info.bonusGems}</strong><span>Kristal</span></div>
+            <div class="rlz5-cs star"><strong>${stars}</strong><span>Yıldız</span></div>
+          </div>
+          <button type="button" class="rlz5-btn-primary" onclick="rlz5Home()">Devam Et</button>
+        </div>
+      </div>`;
+  }
+
+  function rlzShowOutOfHearts(state) {
+    const root = rlzRoot();
+    if (!root) return;
+    const ms = rlzMsToNextHeart(state);
+    root.innerHTML = `
+      <div class="rlz5-empty">
+        <div class="rlz5-empty-card">
+          <div class="rlz5-broken-heart">💔</div>
+          <h2>Canların bitti!</h2>
+          <p>Yeni can için <strong>${rlzFmtMs(ms)}</strong> bekle ya da kristal kullan.</p>
+          <div class="rlz5-empty-actions">
+            <button type="button" class="rlz5-btn-secondary" onclick="rlz5Home()">Geri Dön</button>
+            <button type="button" class="rlz5-btn-primary" onclick="rlz5BuyHearts()">Tüm Canları Doldur (50 💎)</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /* --- ACTIONS (window-exposed) --- */
+  function rlz5StartLesson(unitId, lessonIdx, isUnitTest) {
+    const content = rlzBuildContent();
+    const state = rlzRefillHearts(rlzLoad());
+    if (state.hearts <= 0) { rlzShowOutOfHearts(state); return; }
+    let unit = null;
+    let sectionIdx = 0;
+    for (let s = 0; s < content.sections.length; s += 1) {
+      const found = content.sections[s].units.find((u) => u.id === unitId);
+      if (found) { unit = found; sectionIdx = s; break; }
+    }
+    if (!unit) return;
+    const lesson = rlzBuildLesson(unit, content, !!isUnitTest);
+    if (!lesson.challenges.length) {
+      const root = rlzRoot();
+      if (root) root.innerHTML = `<div class="rlz5-empty"><div class="rlz5-empty-card"><h2>Bu ünite için soru yok</h2><p>Çalışma/Ezber/Boşluk/Sınav modüllerine bu konuyla ilgili içerik ekle.</p><button type="button" class="rlz5-btn-primary" onclick="rlz5Home()">Geri Dön</button></div></div>`;
+      return;
+    }
+    RLZ_SESSION = { state, unit, sectionIdx, lessonIdx, isUnitTest, lesson, startedAt: Date.now() };
+    rlzRenderLesson();
+  }
+
+  function rlz5SelectWord(index) {
+    const c = RLZ_SESSION?.lesson?.challenges[RLZ_SESSION.lesson.current];
+    if (!c || c.checked) return;
+    if (c.type === "gap" || c.type === "translate") c.selected = c.bank[index];
+    rlzRenderLesson();
+  }
+  function rlz5SelectQuiz(index) {
+    const c = RLZ_SESSION?.lesson?.challenges[RLZ_SESSION.lesson.current];
+    if (!c || c.checked || c.type !== "quiz") return;
+    c.selected = index;
+    rlzRenderLesson();
+  }
+  function rlz5SelectListen(index) {
+    const c = RLZ_SESSION?.lesson?.challenges[RLZ_SESSION.lesson.current];
+    if (!c || c.checked || c.type !== "listen") return;
+    c.selected = index;
+    rlzRenderLesson();
+  }
+  function rlz5Match(side, id) {
+    const c = RLZ_SESSION?.lesson?.challenges[RLZ_SESSION.lesson.current];
+    if (!c || c.type !== "match" || c.checked || c.matched.includes(id)) return;
+    if (side === "left") c.selectedLeft = id;
+    if (side === "right") c.selectedRight = id;
+    if (c.selectedLeft && c.selectedRight) {
+      if (c.selectedLeft === c.selectedRight) c.matched.push(c.selectedLeft);
+      else c.wrong.push([c.selectedLeft, c.selectedRight]);
+      c.selectedLeft = null;
+      c.selectedRight = null;
+    }
+    rlzRenderLesson();
+  }
+  function rlz5Listen(slow) {
+    const c = RLZ_SESSION?.lesson?.challenges[RLZ_SESSION.lesson.current];
+    if (!c || c.type !== "listen") return;
+    c.played = true;
+    rlzSpeak(c.item.en, !!slow);
+    rlzRenderLesson();
+  }
+  function rlz5Check() {
+    if (RLZ_CLICK_LOCK) return;
+    RLZ_CLICK_LOCK = true;
+    setTimeout(() => { RLZ_CLICK_LOCK = false; }, 220);
+
+    const session = RLZ_SESSION;
+    if (!session) return;
+    const lesson = session.lesson;
+    const c = lesson.challenges[lesson.current];
+    if (!c) return;
+
+    if (c.checked) {
+      lesson.current += 1;
+      if (lesson.current >= lesson.challenges.length) { rlzCompleteLesson(); return; }
+      rlzRenderLesson();
+      return;
+    }
+    if (!rlzCanCheck(c)) return;
+
+    const result = rlzEvaluate(c);
+    c.checked = true;
+    c.correct = result.ok;
+    c.feedback = result;
+    c.earnedXp = result.ok ? RLZ_XP_PER_CORRECT : 0;
+    c.earnedGems = (result.ok && (lesson.correct + 1) % 5 === 0) ? 1 : 0;
+
+    const state = session.state;
+    if (result.ok) {
+      lesson.correct += 1;
+      state.totalCorrect = (state.totalCorrect || 0) + 1;
+      state.xp = (state.xp || 0) + c.earnedXp;
+      if (c.earnedGems) state.gems = (state.gems || 0) + c.earnedGems;
+    } else {
+      lesson.wrong += 1;
+      state.totalWrong = (state.totalWrong || 0) + 1;
+      state.hearts = Math.max(0, (state.hearts || RLZ_MAX_HEARTS) - 1);
+      if (state.hearts === RLZ_MAX_HEARTS - 1) state.heartsRefilledAt = Date.now();
+      lesson.challenges.push(JSON.parse(JSON.stringify({
+        ...c,
+        id: `${c.id}_retry`,
+        selected: null, selectedLeft: null, selectedRight: null,
+        matched: c.type === "match" ? [] : undefined,
+        wrong: c.type === "match" ? [] : undefined,
+        checked: false, correct: false, feedback: null, retry: true
+      })));
+    }
+    rlzSave(state);
+    rlzRenderLesson();
+    if (state.hearts <= 0) setTimeout(() => rlzShowOutOfHearts(state), 800);
+  }
+  function rlz5Skip() {
+    const session = RLZ_SESSION;
+    if (!session) return;
+    const c = session.lesson.challenges[session.lesson.current];
+    if (!c || c.checked) { rlz5Check(); return; }
+    c.selected = c.type === "quiz" || c.type === "listen" ? -1 : "__SKIP__";
+    rlz5Check();
+  }
+  function rlz5Quit() {
+    if (!RLZ_SESSION) { rlz5Home(); return; }
+    if (confirm("Dersten çıkmak istediğine emin misin? İlerlemen kaydedilmez.")) {
+      RLZ_SESSION = null;
+      rlzRenderHome();
+    }
+  }
+  function rlz5Home() {
+    RLZ_SESSION = null;
+    rlzRenderHome();
+  }
+  function rlz5BuyHearts() {
+    const state = rlzLoad();
+    if ((state.gems || 0) < 50) { alert("Yeterli kristalin yok. Ders çözerek kristal kazan."); return; }
+    state.gems -= 50;
+    state.hearts = RLZ_MAX_HEARTS;
+    state.heartsRefilledAt = Date.now();
+    rlzSave(state);
+    rlzRenderHome();
+  }
+
+  /* --- CSS --- */
+  function rlzInjectCss() {
+    if (document.getElementById("ravzalingo-v5-css-r3")) return;
+    document.getElementById("ravzalingo-v4-css")?.remove();
+    document.getElementById("ravzalingo-v5-css")?.remove();
+    const style = document.createElement("style");
+    style.id = "ravzalingo-v5-css-r3";
+    style.textContent = `
+      .ravzalingo-page{background:#131f24;border-radius:24px;overflow:hidden;min-height:calc(100vh - 130px)}
+      #ravzaLingoRoot,#ravzaLingoRoot *{box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+      .rlz5-shell{min-height:calc(100vh - 130px);padding:20px;color:#fff;background:linear-gradient(180deg,#1a2a32,#0f1a20)}
+      .rlz5-empty{min-height:calc(100vh - 130px);display:grid;place-items:center;padding:24px}
+      .rlz5-empty-card{width:min(100%,440px);padding:30px 24px;border-radius:24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);text-align:center;color:#fff}
+      .rlz5-empty-card h2{font-size:24px;margin-bottom:10px;font-weight:900}
+      .rlz5-empty-card p{color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:18px}
+      .rlz5-empty-actions{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+      .rlz5-broken-heart{font-size:64px;margin-bottom:8px}
+      .rlz5-btn-primary{border:0;border-radius:14px;padding:14px 22px;background:linear-gradient(180deg,#7ee000,#58cc02);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #2f7d00;font-size:14px;letter-spacing:.04em;text-transform:uppercase;width:100%}
+      .rlz5-btn-secondary{border:0;border-radius:14px;padding:14px 22px;background:#384956;color:rgba(255,255,255,.85);font-weight:900;cursor:pointer;font-size:14px;letter-spacing:.04em;text-transform:uppercase;width:100%}
+
+      .rlz5-topbar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;padding:14px 16px;border-radius:18px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.06)}
+      .rlz5-stat{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center;min-height:44px}
+      .rlz5-stat span{font-size:24px;line-height:1}
+      .rlz5-stat b{display:block;font-size:16px;font-weight:900;line-height:1}
+      .rlz5-stat small{display:block;font-size:10px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+      .rlz5-stat.fire b{color:#ff9600}
+      .rlz5-stat.heart b{color:#ff4b4b}
+      .rlz5-stat.xp b{color:#ffd000}
+      .rlz5-stat.gem b{color:#46d5ff}
+      .rlz5-stat.progress b{color:#7ee000}
+
+      /* PATH (gerçek Duolingo görünümü) */
+      .rlz5-path{display:grid;gap:8px}
+      .rlz5-section{position:relative}
+      .rlz5-section-divider{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;padding:24px 8px 14px}
+      .rlz5-section-divider span{height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)}
+      .rlz5-section-divider div{text-align:center;padding:8px 18px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+      .rlz5-section-divider .rlz5-section-kicker{display:block;font-size:10px;letter-spacing:.18em;font-weight:900;color:var(--rlz-main);margin-bottom:4px}
+      .rlz5-section-divider h2{font-family:'Playfair Display',serif;font-size:20px;letter-spacing:-.02em;color:#fff;font-weight:800;line-height:1.1}
+
+      .rlz5-path-track{position:relative;display:grid;gap:18px;padding:8px 0 30px}
+      .rlz5-unit-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 10px;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,var(--rlz-main),var(--rlz-deep));box-shadow:0 6px 0 var(--rlz-deep),0 14px 30px rgba(0,0,0,.25);position:sticky;top:8px;z-index:5}
+      .rlz5-unit-banner.is-done{background:linear-gradient(135deg,#7d5500,#ae8500)}
+      .rlz5-unit-banner.is-locked{background:linear-gradient(135deg,#3a4a55,#1d2b31);box-shadow:0 6px 0 #0b141a}
+      .rlz5-banner-text{display:grid;gap:2px;color:#fff;min-width:0}
+      .rlz5-banner-kicker{display:block;font-size:10px;font-weight:900;letter-spacing:.14em;color:rgba(255,255,255,.85)}
+      .rlz5-banner-text strong{display:block;font-size:18px;font-weight:900;line-height:1.2;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .rlz5-banner-guide{flex-shrink:0;width:42px;height:42px;border:0;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+      .rlz5-banner-guide:hover{background:rgba(255,255,255,.28)}
+
+      .rlz5-path-row{display:flex;justify-content:center;padding:10px 0;position:relative}
+      .rlz5-path-row[data-offset="-2"]{transform:translateX(-110px)}
+      .rlz5-path-row[data-offset="-1"]{transform:translateX(-58px)}
+      .rlz5-path-row[data-offset="0"]{transform:translateX(0)}
+      .rlz5-path-row[data-offset="1"]{transform:translateX(58px)}
+      .rlz5-path-row[data-offset="2"]{transform:translateX(110px)}
+
+      .rlz5-node-wrap{position:relative;display:grid;justify-items:center;gap:10px}
+      .rlz5-node{position:relative;width:78px;height:78px;border:0;border-radius:50%;background:linear-gradient(180deg,var(--rlz-light),var(--rlz-main));box-shadow:0 8px 0 var(--rlz-deep),0 18px 30px rgba(0,0,0,.28),inset 0 8px 12px rgba(255,255,255,.22);color:#fff;cursor:pointer;display:grid;place-items:center;transition:transform .15s ease}
+      .rlz5-node:hover:not(:disabled){transform:translateY(-3px)}
+      .rlz5-node:active:not(:disabled){transform:translateY(2px);box-shadow:0 4px 0 var(--rlz-deep),0 8px 12px rgba(0,0,0,.2)}
+      .rlz5-node:disabled{cursor:not-allowed}
+      .rlz5-node.is-locked{background:linear-gradient(180deg,#4d5e69,#384956);box-shadow:0 6px 0 #1d2b31;color:rgba(255,255,255,.35)}
+      .rlz5-node.is-done{background:linear-gradient(180deg,#ffe066,#ffd000);box-shadow:0 8px 0 #ae8500,0 18px 30px rgba(255,208,0,.22),inset 0 8px 12px rgba(255,255,255,.34);color:#7d5500}
+      .rlz5-node.is-current{animation:rlz5NodePulse 1.4s ease-in-out infinite}
+      .rlz5-node-icon{font-size:34px;line-height:1;display:block}
+      .rlz5-node.is-locked .rlz5-node-icon{filter:grayscale(1) opacity(.7)}
+
+      /* Düğüm tipine göre renk varyasyonu (test ve sandık altın) */
+      .rlz5-node-test{background:linear-gradient(180deg,#ffe066,#ff9600);box-shadow:0 8px 0 #a35a00,0 18px 30px rgba(255,150,0,.22),inset 0 8px 12px rgba(255,255,255,.3)}
+      .rlz5-node-test.is-locked{background:linear-gradient(180deg,#4d5e69,#384956);box-shadow:0 6px 0 #1d2b31}
+      .rlz5-node-chest{background:linear-gradient(180deg,#d49a5e,#a07033);box-shadow:0 8px 0 #6b4818,0 18px 30px rgba(212,154,94,.22),inset 0 8px 12px rgba(255,230,180,.3)}
+      .rlz5-node-chest.is-locked{background:linear-gradient(180deg,#4d5e69,#384956);box-shadow:0 6px 0 #1d2b31;opacity:.6}
+      .rlz5-node-chest.is-done{background:linear-gradient(180deg,#7ee000,#58cc02);box-shadow:0 8px 0 #2f7d00}
+
+      @keyframes rlz5NodePulse{0%,100%{box-shadow:0 8px 0 var(--rlz-deep),0 0 0 0 rgba(255,255,255,.6),0 18px 30px rgba(0,0,0,.28),inset 0 8px 12px rgba(255,255,255,.22)}50%{box-shadow:0 8px 0 var(--rlz-deep),0 0 0 18px rgba(255,255,255,0),0 18px 30px rgba(0,0,0,.28),inset 0 8px 12px rgba(255,255,255,.22)}}
+
+      .rlz5-node-cta{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:#fff;color:var(--rlz-deep);font-weight:900;font-size:11px;padding:6px 12px;border-radius:10px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.18),0 8px 18px rgba(0,0,0,.25)}
+      .rlz5-node-cta:after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #fff}
+
+      .rlz5-mascot-bubble{position:absolute;left:-78px;top:50%;transform:translateY(-50%);width:64px;height:64px;display:grid;place-items:center;font-size:48px;animation:rlz5Bob 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 6px rgba(0,0,0,.32));pointer-events:none}
+      @keyframes rlz5Bob{0%,100%{transform:translateY(-50%) rotate(-3deg)}50%{transform:translateY(calc(-50% - 4px)) rotate(3deg)}}
+
+      .rlz5-footer-info{margin-top:30px;padding:16px;border-radius:16px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.05);text-align:center;color:rgba(255,255,255,.6);font-size:12px;line-height:1.6}
+      .rlz5-footer-info p{margin:4px 0}
+
+      .rlz5-lesson-shell{min-height:calc(100vh - 130px);display:grid;grid-template-rows:auto 1fr auto;gap:18px;padding:20px;color:#fff;background:linear-gradient(180deg,#1a2a32,#0f1a20)}
+      .rlz5-lesson-head{display:grid;grid-template-columns:44px 1fr 80px;align-items:center;gap:12px}
+      .rlz5-close{border:0;background:transparent;color:rgba(255,255,255,.7);font-size:36px;line-height:1;cursor:pointer;padding:0;width:44px;height:44px}
+      .rlz5-progress{height:14px;border-radius:999px;background:#2c3e48;overflow:hidden}
+      .rlz5-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#7ee000,#58cc02);transition:width .35s ease}
+      .rlz5-lesson-hearts{text-align:right;font-weight:900;font-size:18px;color:#ff4b4b}
+
+      .rlz5-challenge-area{display:grid;gap:16px;align-content:start}
+      .rlz5-challenge-meta{display:flex;justify-content:space-between;gap:10px;color:rgba(255,255,255,.55);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+      .rlz5-prompt{font-size:clamp(20px,3.5vw,30px);font-weight:900;line-height:1.15;color:#fff}
+      .rlz5-mascot-row{display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:center}
+      .rlz5-mascot{font-size:48px;line-height:1}
+      .rlz5-speech{padding:18px;border:2px solid #2c3e48;border-radius:18px;background:rgba(255,255,255,.03);font-size:clamp(18px,2.6vw,26px);font-weight:800;line-height:1.4;color:#fff}
+      .rlz5-speech small{display:block;font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-weight:800}
+      .rlz5-speech.question{font-size:clamp(17px,2.6vw,22px)}
+      .rlz5-blank{display:inline-block;min-width:90px;text-align:center;color:#7ee000;border-bottom:3px solid #647987;padding:0 8px}
+      .rlz5-blank.filled{color:#7ee000;border-bottom-color:#58cc02}
+      .rlz5-hint{font-size:13px;color:rgba(255,255,255,.55);font-weight:700}
+      .rlz5-answer-slot{min-height:54px;display:grid;place-items:center;border:2px dashed #41555f;border-radius:16px;color:rgba(255,255,255,.4);font-size:18px;font-weight:900;padding:12px}
+      .rlz5-answer-slot.filled{color:#7ee000;border-style:solid;border-color:#58cc02}
+      .rlz5-bank{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+      .rlz5-word{flex:0 1 auto;border:2px solid #2c3e48;background:#1d2e36;color:#fff;min-height:50px;padding:8px 16px;border-radius:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #0e1a20;font-size:14px;transition:.12s}
+      .rlz5-word:hover{transform:translateY(-1px)}
+      .rlz5-word.selected{border-color:#1cb0f6;color:#1cb0f6;background:rgba(28,176,246,.08)}
+      .rlz5-word:disabled{cursor:default;opacity:.55}
+
+      .rlz5-options{display:grid;gap:10px}
+      .rlz5-option{display:flex;align-items:center;gap:12px;border:2px solid #2c3e48;background:#1d2e36;color:#fff;min-height:54px;padding:10px 16px;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;box-shadow:0 4px 0 #0e1a20;transition:.12s}
+      .rlz5-option:hover:not(:disabled){transform:translateY(-1px)}
+      .rlz5-option:disabled{cursor:default}
+      .rlz5-option-key{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.08);color:rgba(255,255,255,.65);font-size:12px;font-weight:900;flex-shrink:0}
+      .rlz5-option.selected{border-color:#1cb0f6;color:#fff;background:rgba(28,176,246,.1)}
+      .rlz5-option.selected .rlz5-option-key{background:#1cb0f6;color:#fff}
+      .rlz5-option.correct{border-color:#58cc02;background:rgba(88,204,2,.12);color:#7ee000}
+      .rlz5-option.correct .rlz5-option-key{background:#58cc02;color:#fff}
+      .rlz5-option.wrong{border-color:#ff4b4b;background:rgba(255,75,75,.12);color:#ff7b7b}
+      .rlz5-option.wrong .rlz5-option-key{background:#ff4b4b;color:#fff}
+
+      .rlz5-listen-bar{display:flex;gap:10px;margin:8px 0 4px}
+      .rlz5-listen-big{flex:1;border:0;border-radius:18px;padding:18px 22px;background:linear-gradient(180deg,#46d5ff,#1cb0f6);color:#fff;font-size:36px;cursor:pointer;box-shadow:0 6px 0 #0b75a2;line-height:1}
+      .rlz5-listen-small{border:0;border-radius:18px;padding:14px 18px;background:#1d2e36;border:2px solid #2c3e48;color:#fff;font-size:28px;cursor:pointer}
+
+      .rlz5-match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .rlz5-match>div{display:grid;gap:8px}
+      .rlz5-match-btn{border:2px solid #2c3e48;background:#1d2e36;color:#fff;min-height:54px;padding:10px;border-radius:14px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #0e1a20}
+      .rlz5-match-btn.selected{border-color:#1cb0f6;color:#1cb0f6;background:rgba(28,176,246,.08)}
+      .rlz5-match-btn.done{opacity:.4;border-color:#58cc02;color:#7ee000;background:rgba(88,204,2,.08)}
+      .rlz5-match-btn:disabled{cursor:default}
+      .rlz5-helper{color:rgba(255,255,255,.55);font-size:12px;font-weight:800}
+
+      .rlz5-feedback{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;margin-top:12px}
+      .rlz5-feedback.ok{background:rgba(88,204,2,.12);border:2px solid rgba(88,204,2,.22);color:#7ee000}
+      .rlz5-feedback.bad{background:rgba(255,75,75,.12);border:2px solid rgba(255,75,75,.22);color:#ff7b7b}
+      .rlz5-fb-icon{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:20px;flex-shrink:0}
+      .rlz5-feedback.ok .rlz5-fb-icon{background:#58cc02;color:#fff}
+      .rlz5-feedback.bad .rlz5-fb-icon{background:#ff4b4b;color:#fff}
+      .rlz5-fb-body{flex:1;display:grid;gap:4px;color:#fff}
+      .rlz5-fb-body strong{font-size:14px;color:#fff}
+      .rlz5-fb-correct{font-size:15px;font-weight:900}
+      .rlz5-feedback.ok .rlz5-fb-correct{color:#7ee000}
+      .rlz5-feedback.bad .rlz5-fb-correct{color:#ff7b7b}
+      .rlz5-fb-hint{font-size:12px;color:rgba(255,255,255,.65);font-weight:700}
+      .rlz5-fb-xp{display:inline-flex;margin-top:4px;padding:4px 10px;border-radius:999px;background:rgba(255,208,0,.16);color:#ffd000;font-size:11px;font-weight:900;width:max-content}
+
+      .rlz5-lesson-footer{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+      .rlz5-skip{border:0;border-radius:14px;background:transparent;color:rgba(255,255,255,.55);font-weight:900;font-size:13px;cursor:pointer;padding:14px 16px;text-transform:uppercase;letter-spacing:.06em;min-height:54px}
+      .rlz5-check{border:0;border-radius:14px;min-height:54px;padding:0 22px;font-weight:900;cursor:pointer;background:#2c3e48;color:rgba(255,255,255,.45);font-size:15px;text-transform:uppercase;letter-spacing:.06em;transition:.12s}
+      .rlz5-check.ready{background:linear-gradient(180deg,#7ee000,#58cc02);color:#fff;box-shadow:0 5px 0 #2f7d00}
+      .rlz5-check.ready:hover{transform:translateY(-1px)}
+
+      .rlz5-complete{min-height:calc(100vh - 130px);display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 25%,rgba(126,224,0,.18),transparent 35%),linear-gradient(180deg,#1a2a32,#0f1a20);color:#fff}
+      .rlz5-complete-card{position:relative;width:min(100%,460px);padding:32px 26px;border-radius:30px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);overflow:hidden}
+      .rlz5-complete-rays{position:absolute;inset:-80px;background:conic-gradient(from 0deg,transparent,rgba(126,224,0,.18),transparent 25%,rgba(255,255,255,.06),transparent 45%);animation:rlz5Spin 8s linear infinite}
+      .rlz5-complete-icon,.rlz5-complete-card h2,.rlz5-complete-card p,.rlz5-complete-stats,.rlz5-btn-primary{position:relative}
+      .rlz5-complete-icon{font-size:72px;margin-bottom:8px;animation:rlz5Pop .5s ease}
+      .rlz5-complete-card h2{font-family:'Playfair Display',serif;font-size:28px;letter-spacing:-.02em;margin-bottom:6px}
+      .rlz5-complete-card p{color:rgba(255,255,255,.65);margin-bottom:20px}
+      .rlz5-complete-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+      .rlz5-cs{padding:14px 8px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+      .rlz5-cs strong{display:block;font-size:22px;font-weight:900}
+      .rlz5-cs span{display:block;margin-top:4px;font-size:11px;font-weight:900;color:rgba(255,255,255,.55);letter-spacing:.06em;text-transform:uppercase}
+      .rlz5-cs.xp strong{color:#ffd000}
+      .rlz5-cs.gem strong{color:#46d5ff}
+      .rlz5-cs.star strong{color:#ffd000;font-size:18px;letter-spacing:2px}
+      @keyframes rlz5Spin{to{transform:rotate(360deg)}}
+      @keyframes rlz5Pop{from{transform:scale(.7);opacity:.2}to{transform:scale(1);opacity:1}}
+
+      /* ===== MOBİL & TABLET RESPONSIVE ===== */
+      /* Path container hiçbir koşulda yatay scroll çıkarmasın */
+      .rlz5-shell,.rlz5-section,.rlz5-path-track{overflow-x:clip;overflow-x:hidden}
+      .rlz5-path-row{will-change:transform}
+
+      /* Tablet ve küçük masaüstü */
+      @media(max-width:1024px){
+        .rlz5-shell{padding:18px 16px}
+        .rlz5-topbar{padding:12px 14px;gap:10px}
+        .rlz5-stat span{font-size:22px}
+        .rlz5-stat b{font-size:15px}
+      }
+
+      /* Mobil (≤760px) */
+      @media(max-width:760px){
+        .ravzalingo-page{border-radius:0;min-height:calc(100dvh - 80px)}
+        .rlz5-shell{padding:14px 12px;min-height:calc(100dvh - 80px)}
+        .rlz5-lesson-shell{padding:14px 12px;min-height:calc(100dvh - 80px);grid-template-rows:auto 1fr;padding-bottom:90px;position:relative}
+
+        /* TOPBAR: 4 sütun (progress'i sakla, kristali tut) */
+        .rlz5-topbar{grid-template-columns:repeat(4,1fr);padding:10px 8px;gap:6px;position:sticky;top:6px;z-index:6;backdrop-filter:blur(8px)}
+        .rlz5-stat{grid-template-columns:1fr;justify-items:center;text-align:center;gap:2px;min-height:auto}
+        .rlz5-stat span{font-size:20px;line-height:1}
+        .rlz5-stat b{font-size:13px}
+        .rlz5-stat small{display:none}
+        .rlz5-stat.progress{display:none}
+
+        /* SECTION + BANNER */
+        .rlz5-section-divider{padding:14px 4px 6px}
+        .rlz5-section-divider h2{font-size:17px}
+        .rlz5-section-divider div{padding:6px 12px;border-radius:12px}
+        .rlz5-unit-banner{padding:11px 12px;border-radius:14px;top:4px;gap:8px}
+        .rlz5-banner-text strong{font-size:14px}
+        .rlz5-banner-kicker{font-size:9px}
+        .rlz5-banner-guide{width:38px;height:38px;font-size:15px}
+
+        /* PATH NODE'LARI — viewport-relative offset (taşma yok) */
+        .rlz5-path-track{padding:6px 0 24px}
+        .rlz5-path-row{padding:8px 0}
+        .rlz5-node{width:62px;height:62px;box-shadow:0 6px 0 var(--rlz-deep),0 12px 20px rgba(0,0,0,.28),inset 0 6px 10px rgba(255,255,255,.22)}
+        .rlz5-node-icon{font-size:24px}
+        .rlz5-path-row[data-offset="-2"]{transform:translateX(min(-22vw,-70px))}
+        .rlz5-path-row[data-offset="-1"]{transform:translateX(min(-12vw,-38px))}
+        .rlz5-path-row[data-offset="0"]{transform:none}
+        .rlz5-path-row[data-offset="1"]{transform:translateX(max(12vw,38px))}
+        .rlz5-path-row[data-offset="2"]{transform:translateX(max(22vw,70px))}
+
+        /* MASKOT: ekran dışına taşmasın — node altında konumla */
+        .rlz5-mascot-bubble{position:absolute;left:auto;right:-58px;top:-6px;transform:none;width:50px;height:50px;font-size:38px}
+        .rlz5-path-row[data-offset="1"] .rlz5-mascot-bubble,
+        .rlz5-path-row[data-offset="2"] .rlz5-mascot-bubble{right:auto;left:-58px}
+
+        .rlz5-node-cta{font-size:10px;padding:5px 10px;top:-28px}
+
+        /* DERS EKRANI */
+        .rlz5-mascot-row{grid-template-columns:44px 1fr;gap:10px}
+        .rlz5-mascot{font-size:34px}
+        .rlz5-speech{padding:14px;font-size:16px;border-radius:14px;word-break:break-word}
+        .rlz5-prompt{font-size:20px}
+        .rlz5-bank{gap:8px}
+        .rlz5-word{padding:8px 12px;font-size:13px;min-height:48px}
+        .rlz5-option{padding:10px 12px;min-height:52px;font-size:14px;gap:10px}
+        .rlz5-option-key{width:24px;height:24px;font-size:11px}
+        .rlz5-match{grid-template-columns:1fr 1fr;gap:8px}
+        .rlz5-match-btn{min-height:50px;font-size:13px;padding:8px 6px}
+        .rlz5-listen-big{font-size:32px;padding:18px 20px}
+        .rlz5-listen-small{font-size:26px;padding:14px;width:64px}
+        .rlz5-lesson-head{grid-template-columns:40px 1fr 64px;gap:8px;align-items:center}
+        .rlz5-close{font-size:30px;width:40px;height:40px}
+        .rlz5-lesson-hearts{font-size:14px}
+
+        /* FOOTER ALT YAPIŞTIR (scroll esnasında "Kontrol Et" görünsün) */
+        .rlz5-lesson-footer{position:fixed;left:0;right:0;bottom:0;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(15,26,32,.0),#0f1a20 32%);grid-template-columns:auto 1fr;gap:10px;z-index:10}
+        .rlz5-skip{padding:14px 12px;font-size:12px;min-height:50px}
+        .rlz5-check{padding:0 16px;font-size:14px;min-height:50px}
+
+        .rlz5-empty-actions{grid-template-columns:1fr}
+        .rlz5-complete-card{padding:24px 18px;width:100%}
+        .rlz5-complete-icon{font-size:60px}
+        .rlz5-complete-card h2{font-size:22px}
+        .rlz5-complete-stats{grid-template-columns:repeat(3,1fr);gap:8px}
+        .rlz5-cs strong{font-size:18px}
+        .rlz5-cs span{font-size:10px}
+
+        .rlz5-feedback{padding:12px;gap:10px}
+        .rlz5-fb-icon{width:32px;height:32px;font-size:16px}
+        .rlz5-fb-body strong{font-size:13px}
+        .rlz5-fb-correct{font-size:14px}
+
+        .rlz5-footer-info{margin-top:20px;padding:12px;font-size:11px}
+      }
+
+      /* Küçük telefonlar (≤480px) */
+      @media(max-width:480px){
+        .rlz5-shell{padding:12px 10px}
+        .rlz5-lesson-shell{padding:12px 10px;padding-bottom:90px}
+        .rlz5-topbar{padding:8px 6px;gap:4px;border-radius:14px}
+        .rlz5-stat span{font-size:18px}
+        .rlz5-stat b{font-size:12px}
+
+        .rlz5-section-divider{padding:14px 4px 6px}
+        .rlz5-section-divider h2{font-size:16px}
+        .rlz5-section-divider div{padding:6px 10px}
+        .rlz5-unit-banner{padding:10px 12px}
+        .rlz5-banner-text strong{font-size:13px;white-space:normal;line-height:1.25}
+        .rlz5-banner-guide{width:36px;height:36px;font-size:14px}
+
+        .rlz5-prompt{font-size:18px}
+        .rlz5-speech{font-size:15px;padding:12px}
+        .rlz5-blank{min-width:60px;font-size:15px;padding:0 6px}
+        .rlz5-bank{gap:6px}
+        .rlz5-word{padding:7px 10px;font-size:12px;min-height:46px}
+        .rlz5-option{padding:10px;min-height:50px;font-size:13px}
+        .rlz5-match-btn{min-height:48px;font-size:12px}
+        .rlz5-listen-big{font-size:28px;padding:16px}
+        .rlz5-listen-small{font-size:22px;padding:12px;width:54px}
+
+        /* Daha küçük node'lar ve daha sıkı offset */
+        .rlz5-node{width:56px;height:56px;box-shadow:0 5px 0 var(--rlz-deep),0 10px 16px rgba(0,0,0,.28),inset 0 5px 8px rgba(255,255,255,.22)}
+        .rlz5-node-icon{font-size:22px}
+        .rlz5-path-row{padding:6px 0}
+        .rlz5-path-row[data-offset="-2"]{transform:translateX(min(-20vw,-56px))}
+        .rlz5-path-row[data-offset="-1"]{transform:translateX(min(-11vw,-30px))}
+        .rlz5-path-row[data-offset="1"]{transform:translateX(max(11vw,30px))}
+        .rlz5-path-row[data-offset="2"]{transform:translateX(max(20vw,56px))}
+        .rlz5-mascot-bubble{width:42px;height:42px;font-size:32px;right:-46px;top:-2px}
+        .rlz5-path-row[data-offset="1"] .rlz5-mascot-bubble,
+        .rlz5-path-row[data-offset="2"] .rlz5-mascot-bubble{left:-46px}
+        .rlz5-node-cta{font-size:9px;padding:4px 8px;top:-22px}
+
+        .rlz5-complete-stats{grid-template-columns:1fr;gap:8px}
+        .rlz5-cs{padding:10px 8px}
+
+        .rlz5-skip{padding:12px 8px;font-size:11px}
+        .rlz5-check{font-size:13px}
+      }
+
+      /* Çok dar telefon (≤360px) */
+      @media(max-width:360px){
+        .rlz5-shell{padding:10px 8px}
+        .rlz5-topbar{grid-template-columns:repeat(3,1fr)}
+        .rlz5-stat.gem{display:none}
+        .rlz5-banner-text strong{font-size:12px}
+        .rlz5-node{width:50px;height:50px}
+        .rlz5-node-icon{font-size:19px}
+        .rlz5-mascot-bubble{width:36px;height:36px;font-size:28px;right:-40px}
+        .rlz5-path-row[data-offset="1"] .rlz5-mascot-bubble,
+        .rlz5-path-row[data-offset="2"] .rlz5-mascot-bubble{left:-40px}
+      }
+
+      /* Yatay (landscape) telefon — ders ekranı çok yüksek olmasın */
+      @media(max-height:500px) and (orientation:landscape){
+        .rlz5-lesson-shell{min-height:auto;padding-bottom:80px}
+        .rlz5-prompt{font-size:18px}
+        .rlz5-mascot{font-size:30px}
+        .rlz5-speech{padding:10px;font-size:15px}
+        .rlz5-bank{gap:6px}
+        .rlz5-word{min-height:40px;padding:6px 10px;font-size:12px}
+        .rlz5-options{grid-template-columns:1fr 1fr;gap:8px}
+        .rlz5-match{grid-template-columns:1fr 1fr}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function rlzHookNavigate() {
+    if (typeof window.navigate !== "function" || window.__RLZ5_NAV_HOOKED__) return;
+    window.__RLZ5_NAV_HOOKED__ = true;
+    const original = window.navigate;
+    window.navigate = function patchedNavigate(page, ...args) {
+      const result = original.apply(this, [page, ...args]);
+      if (page === "ravzalingo") requestAnimationFrame(() => { RLZ_SESSION = null; rlzRenderHome(); });
+      return result;
+    };
+  }
+
+  /* --- WINDOW EXPORTS --- */
+  window.rlz5StartLesson = rlz5StartLesson;
+  window.rlz5SelectWord = rlz5SelectWord;
+  window.rlz5SelectQuiz = rlz5SelectQuiz;
+  window.rlz5SelectListen = rlz5SelectListen;
+  window.rlz5Match = rlz5Match;
+  window.rlz5Listen = rlz5Listen;
+  window.rlz5Check = rlz5Check;
+  window.rlz5Skip = rlz5Skip;
+  window.rlz5Quit = rlz5Quit;
+  window.rlz5Home = rlz5Home;
+  window.rlz5BuyHearts = rlz5BuyHearts;
+  window.renderRavzaLingo = rlzRenderHome;
+  window.resetRavzaLingoV5 = function () { localStorage.removeItem(RLZ_STATE_KEY); RLZ_SESSION = null; RLZ_CONTENT_CACHE = null; rlzRenderHome(); };
+
+  function rlzInit() {
+    rlzInjectCss();
+    rlzEnsureMarkup();
+    rlzHookNavigate();
+    const page = document.getElementById("ravzalingo");
+    if (page?.classList.contains("active")) rlzRenderHome();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", rlzInit);
+  else rlzInit();
+})();

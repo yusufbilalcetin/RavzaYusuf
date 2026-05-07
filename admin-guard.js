@@ -1,5 +1,3 @@
-<<<<<<< ours
-<<<<<<< ours
 import {
   doc,
   getDoc,
@@ -7,10 +5,6 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-=======
->>>>>>> theirs
-=======
->>>>>>> theirs
 export const ADMIN_SECURITY_PATH = {
   collection: "admin_meta",
   docId: "security"
@@ -38,10 +32,8 @@ export function clearAdminSession() {
   sessionStorage.removeItem(SESSION_KEY);
 }
 
-<<<<<<< ours
-<<<<<<< ours
 export function getFutureAuthNote() {
-  return "This guard is front-end only. Move admin access to Firebase Auth and request.auth based Firestore rules before production.";
+  return "Bu koruma sadece ön yüz tabanlıdır. Production aşamasında admin yazma izinlerini Firebase Auth + request.auth ile sınırlandır.";
 }
 
 function revealWorkspace(gate, app) {
@@ -52,20 +44,20 @@ function revealWorkspace(gate, app) {
 function renderSetupTemplate(note) {
   return `
     <div class="guard-copy">
-      <h2>Create admin passcode</h2>
-      <p class="helper-copy">This project is currently protected by a front-end draft workspace guard. Set a passcode now, then move to Firebase Auth later.</p>
+      <h2>Yönetici şifresi oluştur</h2>
+      <p class="helper-copy">Bu çalışma alanı şu anda istemci taraflı bir kapı ile korunuyor. Şimdi bir şifre belirle, sonra Firebase Auth'a geçiş yap.</p>
       <p class="auth-note">${note}</p>
     </div>
     <form class="guard-form" data-mode="setup">
       <label class="guard-field">
-        <span>New passcode</span>
-        <input type="password" name="passcode" autocomplete="new-password" placeholder="Enter a secure passcode" required>
+        <span>Yeni şifre</span>
+        <input type="password" name="passcode" autocomplete="new-password" placeholder="En az 6 karakterli bir şifre" required>
       </label>
       <label class="guard-field">
-        <span>Repeat passcode</span>
-        <input type="password" name="confirmPasscode" autocomplete="new-password" placeholder="Repeat passcode" required>
+        <span>Şifre tekrar</span>
+        <input type="password" name="confirmPasscode" autocomplete="new-password" placeholder="Aynı şifreyi tekrar yaz" required>
       </label>
-      <button class="guard-button" type="submit">Save passcode and open workspace</button>
+      <button class="guard-button" type="submit">Şifreyi kaydet ve paneli aç</button>
       <p class="guard-message" data-auth-message></p>
     </form>
   `;
@@ -74,16 +66,16 @@ function renderSetupTemplate(note) {
 function renderLoginTemplate(note) {
   return `
     <div class="guard-copy">
-      <h2>Admin sign in</h2>
-      <p class="helper-copy">Student pages only read published collections. Sign in to continue working on draft content.</p>
+      <h2>Yönetici girişi</h2>
+      <p class="helper-copy">Öğrenci sayfaları yalnızca yayınlanmış içerikleri okur. Taslak çalışmak için aşağıdan şifreni gir.</p>
       <p class="auth-note">${note}</p>
     </div>
     <form class="guard-form" data-mode="login">
       <label class="guard-field">
-        <span>Passcode</span>
-        <input type="password" name="passcode" autocomplete="current-password" placeholder="Enter passcode" required>
+        <span>Şifre</span>
+        <input type="password" name="passcode" autocomplete="current-password" placeholder="Şifreni gir" required>
       </label>
-      <button class="guard-button" type="submit">Open draft workspace</button>
+      <button class="guard-button" type="submit">Paneli aç</button>
       <p class="guard-message" data-auth-message></p>
     </form>
   `;
@@ -130,18 +122,18 @@ export async function ensureAdminAccess({
         const passcode = String(formData.get("passcode") || "").trim();
 
         if (!passcode) {
-          setMessage("Passcode is required.", true);
+          setMessage("Şifre boş bırakılamaz.", true);
           return;
         }
 
         if (form.dataset.mode === "setup") {
           const confirmPasscode = String(formData.get("confirmPasscode") || "").trim();
           if (passcode.length < 6) {
-            setMessage("Use at least 6 characters for the admin passcode.", true);
+            setMessage("Şifre en az 6 karakter olmalı.", true);
             return;
           }
           if (passcode !== confirmPasscode) {
-            setMessage("Passcodes do not match.", true);
+            setMessage("Şifreler birbiriyle eşleşmiyor.", true);
             return;
           }
 
@@ -161,7 +153,7 @@ export async function ensureAdminAccess({
 
         const passcodeHash = await hashText(passcode);
         if (passcodeHash !== security?.passcodeHash) {
-          setMessage("Incorrect passcode.", true);
+          setMessage("Şifre hatalı.", true);
           return;
         }
 
@@ -173,14 +165,4 @@ export async function ensureAdminAccess({
 
     mount();
   });
-=======
-// Front-end guard only. Replace this later with Firebase Auth + request.auth rules.
-export function getFutureAuthNote() {
-  return "Bu koruma sadece ön yüz tabanlıdır. Production aşamasında admin yazma izinlerini request.auth ile sınırlandır.";
->>>>>>> theirs
-=======
-// Front-end guard only. Replace this later with Firebase Auth + request.auth rules.
-export function getFutureAuthNote() {
-  return "Bu koruma sadece ön yüz tabanlıdır. Production aşamasında admin yazma izinlerini request.auth ile sınırlandır.";
->>>>>>> theirs
 }
