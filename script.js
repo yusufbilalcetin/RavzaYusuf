@@ -20,7 +20,7 @@ const TOPICS = [
 <div class="content-card">
   <h3>Kaynaktan birebir kelime listesi</h3>
   <p>Bu bölüm doğrudan verdiğin <strong>1A Word List</strong> kaynağından sayfaya taşındı. Aşağıdaki tablo kelime, definition ve example sentence bölümlerini içerir.</p>
-  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word/Phrase</th><th>Definition</th><th>Example Sentence</th></tr></thead><tbody><tr><td>Researchers</td><td>People who carry out studies to gain knowledge or discover information</td><td>Researchers are working on new ways to reduce air pollution.</td></tr><tr><td>Evidence</td><td>Information or facts used to support an idea or claim</td><td>There is strong evidence that exercise improves mental health.</td></tr><tr><td>Survey</td><td>A method of collecting information by asking people questions</td><td>The teacher did a survey to find out students’ favourite books.</td></tr><tr><td>The average</td><td>A typical value calculated by dividing the total by the number of items</td><td>The average score in the exam was 75.</td></tr><tr><td>Scale</td><td>A system used to measure or compare levels of something</td><td>The pain is measured on a scale from 1 to 10.</td></tr><tr><td>Rank</td><td>To arrange items or people in order based on quality or importance</td><td>Students were ranked according to their test results.</td></tr><tr><td>Likely</td><td>Something that has a high chance of happening</td><td>It is likely that it will rain tomorrow.</td></tr><tr><td>Overall</td><td>Considering everything; in general</td><td>Overall, the project was a success.</td></tr><tr><td>Beyond</td><td>Outside the limits of something or more than expected</td><td>His kindness goes beyond what we imagined.</td></tr><tr><td>Create a new image</td><td>To change how others see or think about you</td><td>The company tried to create a new image after the scandal.</td></tr><tr><td>Go about</td><td>To begin or deal with something in a particular way</td><td>How should we go about solving this problem?</td></tr><tr><td>Proof</td><td>Clear information that confirms something is true</td><td>She showed proof of her identity at the airport.</td></tr><tr><td>Seek to</td><td>To try or attempt to achieve something</td><td>The organization seeks to help poor communities.</td></tr><tr><td>Stand out</td><td>To be noticeable or different from others</td><td>Her bright dress made her stand out in the crowd.</td></tr><tr><td>Solicitor</td><td>A lawyer who gives legal advice and prepares documents</td><td>He contacted a solicitor for help with his contract.</td></tr><tr><td>For fun</td><td>Done for enjoyment, not for a serious purpose</td><td>She paints for fun in her free time.</td></tr><tr><td>Birth certificate</td><td>An official document that records a person’s birth details</td><td>You need a birth certificate to apply for a passport.</td></tr><tr><td>Feel sorry</td><td>To feel pity or sadness for someone</td><td>I feel sorry for him because he lost his job.</td></tr><tr><td>Maiden name</td><td>A woman’s family name before marriage</td><td>She still uses her maiden name at work.</td></tr><tr><td>Full name</td><td>A person’s complete name including all given names and surname</td><td>Please write your full name on the form.</td></tr><tr><td>Nickname</td><td>An informal name used instead of someone’s real name</td><td>His nickname at school was “Ace.”</td></tr><tr><td>Be named after</td><td>To be given the same name as another person</td><td>She was named after her grandmother.</td></tr><tr><td>Initials</td><td>The first letters of a person’s names</td><td>His initials are A.K.</td></tr><tr><td>Brand name</td><td>The official name used by a company for its product</td><td>This brand name is known worldwide.</td></tr><tr><td>Common</td><td>Frequently seen or used by many people</td><td>It’s common to see tourists in this area.</td></tr><tr><td>Old-fashioned</td><td>Not modern; belonging to an earlier time</td><td>That style of clothing looks old-fashioned now.</td></tr><tr><td>Celebrity</td><td>A well-known public figure</td><td>The restaurant is popular with celebrities.</td></tr><tr><td>Suit (verb)</td><td>To look good on someone or be appropriate for them</td><td>That colour really suits you.</td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word/Phrase</th><th>Definition</th><th>Example Sentence</th></tr></thead><tbody><tr><td>Researchers</td><td>People who carry out studies to gain knowledge or discover information</td><td>Researchers are working on new ways to reduce air pollution.</td></tr><tr><td>Evidence</td><td>Information or facts used to support an idea or claim</td><td>There is strong evidence that exercise improves mental health.</td></tr><tr><td>Survey</td><td>A method of collecting information by asking people questions</td><td>The teacher did a survey to find out students' favourite books.</td></tr><tr><td>The average</td><td>A typical value calculated by dividing the total by the number of items</td><td>The average score in the exam was 75.</td></tr><tr><td>Scale</td><td>A system used to measure or compare levels of something</td><td>The pain is measured on a scale from 1 to 10.</td></tr><tr><td>Rank</td><td>To arrange items or people in order based on quality or importance</td><td>Students were ranked according to their test results.</td></tr><tr><td>Likely</td><td>Something that has a high chance of happening</td><td>It is likely that it will rain tomorrow.</td></tr><tr><td>Overall</td><td>Considering everything; in general</td><td>Overall, the project was a success.</td></tr><tr><td>Beyond</td><td>Outside the limits of something or more than expected</td><td>His kindness goes beyond what we imagined.</td></tr><tr><td>Create a new image</td><td>To change how others see or think about you</td><td>The company tried to create a new image after the scandal.</td></tr><tr><td>Go about</td><td>To begin or deal with something in a particular way</td><td>How should we go about solving this problem?</td></tr><tr><td>Proof</td><td>Clear information that confirms something is true</td><td>She showed proof of her identity at the airport.</td></tr><tr><td>Seek to</td><td>To try or attempt to achieve something</td><td>The organization seeks to help poor communities.</td></tr><tr><td>Stand out</td><td>To be noticeable or different from others</td><td>Her bright dress made her stand out in the crowd.</td></tr><tr><td>Solicitor</td><td>A lawyer who gives legal advice and prepares documents</td><td>He contacted a solicitor for help with his contract.</td></tr><tr><td>For fun</td><td>Done for enjoyment, not for a serious purpose</td><td>She paints for fun in her free time.</td></tr><tr><td>Birth certificate</td><td>An official document that records a person's birth details</td><td>You need a birth certificate to apply for a passport.</td></tr><tr><td>Feel sorry</td><td>To feel pity or sadness for someone</td><td>I feel sorry for him because he lost his job.</td></tr><tr><td>Maiden name</td><td>A woman's family name before marriage</td><td>She still uses her maiden name at work.</td></tr><tr><td>Full name</td><td>A person's complete name including all given names and surname</td><td>Please write your full name on the form.</td></tr><tr><td>Nickname</td><td>An informal name used instead of someone's real name</td><td>His nickname at school was "Ace."</td></tr><tr><td>Be named after</td><td>To be given the same name as another person</td><td>She was named after her grandmother.</td></tr><tr><td>Initials</td><td>The first letters of a person's names</td><td>His initials are A.K.</td></tr><tr><td>Brand name</td><td>The official name used by a company for its product</td><td>This brand name is known worldwide.</td></tr><tr><td>Common</td><td>Frequently seen or used by many people</td><td>It's common to see tourists in this area.</td></tr><tr><td>Old-fashioned</td><td>Not modern; belonging to an earlier time</td><td>That style of clothing looks old-fashioned now.</td></tr><tr><td>Celebrity</td><td>A well-known public figure</td><td>The restaurant is popular with celebrities.</td></tr><tr><td>Suit (verb)</td><td>To look good on someone or be appropriate for them</td><td>That colour really suits you.</td></tr></tbody></table></div>
 </div>
 <div class="content-card">
   <h3>Nasıl çalışılmalı?</h3>
@@ -128,7 +128,7 @@ const TOPICS = [
 <div class="content-card">
   <h3>What is an adjective?</h3>
   <p><strong>An adjective is a word that we use to describe places, people, or things.</strong></p>
-  <p>Tom has a big house. (how is this house?) It’s a big house.</p>
+  <p>Tom has a big house. (how is this house?) It's a big house.</p>
   <div class="warning-box">
     <p><strong>When we use an adjective with a noun, please add an article (a/an).</strong></p>
     <p>Suzan is beautiful girl. = WRONG</p>
@@ -148,7 +148,7 @@ const TOPICS = [
 </div>
 <div class="content-card">
   <h3>Adjective + one / ones</h3>
-  <p>We use one/ones with singular and plural countable nouns so we don’t repeat what we are saying or writing.</p>
+  <p>We use one/ones with singular and plural countable nouns so we don't repeat what we are saying or writing.</p>
   <div class="source-panel">
     <p><strong>A:</strong> Can you give me that pen, please?</p>
     <p><strong>B:</strong> Yes. Which one?</p>
@@ -163,12 +163,12 @@ const TOPICS = [
 <div class="content-card">
   <h3>Comparative and superlative adjectives</h3>
   <p>Use comparative to compare two things, people or places.</p>
-  <p>Use superlatives to say what is the “least” or “most” of something/someone in a place or group.</p>
+  <p>Use superlatives to say what is the "least" or "most" of something/someone in a place or group.</p>
   <div class="info-box">
     <p><strong>To make comparative adjectives:</strong> -r, -er and -ier + than (for one syllable adjectives)</p>
     <p>Turkey is colder than Cyprus in the winter.</p>
   </div>
-  <p><strong>With one-syllable adjectives that end in “-ed” in comparatives, we use more:</strong></p>
+  <p><strong>With one-syllable adjectives that end in "-ed" in comparatives, we use more:</strong></p>
   <ul>
     <li>more bored</li>
     <li>more pleased</li>
@@ -240,7 +240,7 @@ const TOPICS = [
   <div class="source-panel">
     <p><strong>have</strong>: I have a car. → State of possession – Present Simple</p>
     <p><strong>have</strong>: I am having lunch. → An action – Present Continuous</p>
-    <p><strong>think</strong>: I think it’s a good idea. → Opinion – Present Simple</p>
+    <p><strong>think</strong>: I think it's a good idea. → Opinion – Present Simple</p>
     <p><strong>think</strong>: I am thinking about moving abroad. → Process of thinking – Present Continuous</p>
     <p><strong>see</strong>: I see what you mean. → Understanding – Present Simple</p>
     <p><strong>see</strong>: I am seeing the dentist tomorrow. → Planned appointment – Present Continuous</p>
@@ -249,13 +249,13 @@ const TOPICS = [
 <div class="content-card">
   <h3>Present Continuous for Future Arrangements</h3>
   <p>We use the Present Continuous to talk about future events that have already been arranged or planned.</p>
-  <p>We’re flying to Istanbul this weekend.</p>
-  <p>I’m meeting my friends for dinner tonight.</p>
+  <p>We're flying to Istanbul this weekend.</p>
+  <p>I'm meeting my friends for dinner tonight.</p>
 </div>
 <div class="content-card">
   <h3>Present Simple for Timetabled Events</h3>
   <p>The Present Simple is used to talk about future events that are on a schedule or timetable, such as transportation or programs.</p>
-  <p>The flight departs at 12 o’clock tomorrow.</p>
+  <p>The flight departs at 12 o'clock tomorrow.</p>
   <p>What time does Jane arrive in London?</p>
 </div>
 `,
@@ -297,28 +297,28 @@ const TOPICS = [
   <h3>Possessive 's</h3>
   <p>We use <strong>('s)</strong> to show that something belongs to someone.</p>
   <ul>
-    <li>Lara’s backpack is on the chair.</li>
-    <li>This is Tom’s car.</li>
+    <li>Lara's backpack is on the chair.</li>
+    <li>This is Tom's car.</li>
   </ul>
 </div>
 <div class="content-card">
   <h3>Plural possessives</h3>
-  <p>When the noun is plural and ends with <strong>s</strong>, just add an apostrophe (’).</p>
+  <p>When the noun is plural and ends with <strong>s</strong>, just add an apostrophe (').</p>
   <ul>
-    <li>The teachers’ room is upstairs.</li>
+    <li>The teachers' room is upstairs.</li>
   </ul>
-  <p>Irregular plurals that don’t end in s use <strong>'s</strong>.</p>
+  <p>Irregular plurals that don't end in s use <strong>'s</strong>.</p>
   <ul>
-    <li>Children’s playground is closed today.</li>
-    <li>Women’s voices were heard outside.</li>
+    <li>Children's playground is closed today.</li>
+    <li>Women's voices were heard outside.</li>
   </ul>
 </div>
 <div class="content-card">
   <h3>Two names</h3>
-  <p>If two people share one thing, add ’s to the second name only.</p>
-  <p><em>Emma and Mia’s house is very modern.</em></p>
-  <p>If they don’t share, add ’s to both:</p>
-  <p><em>Emma’s and Mia’s bags are different.</em></p>
+  <p>If two people share one thing, add 's to the second name only.</p>
+  <p><em>Emma and Mia's house is very modern.</em></p>
+  <p>If they don't share, add 's to both:</p>
+  <p><em>Emma's and Mia's bags are different.</em></p>
 </div>
 <div class="content-card">
   <h3>Of structure and own</h3>
@@ -393,19 +393,19 @@ const TOPICS = [
     <li>I was reading a book when the phone rang.</li>
     <li>She was cooking dinner at 6 PM.</li>
     <li>They were playing football while it started raining.</li>
-    <li>What were you doing at 10 o’clock last night?</li>
+    <li>What were you doing at 10 o'clock last night?</li>
   </ul>
 </div>
 <div class="content-card">
   <h3>Used to</h3>
-  <p>We use <strong>used to</strong> to talk about things we did regularly in the past but don’t do anymore.</p>
+  <p>We use <strong>used to</strong> to talk about things we did regularly in the past but don't do anymore.</p>
   <ul>
     <li>Positive: Subject + used to + verb 1</li>
-    <li>Negative: Subject + didn’t use to + verb 1</li>
+    <li>Negative: Subject + didn't use to + verb 1</li>
     <li>Question: Did + subject + use to + verb 1</li>
   </ul>
   <div class="warning-box">
-    <p>Don't use “used to” for short-term past events.</p>
+    <p>Don't use "used to" for short-term past events.</p>
     <p>Incorrect: I used to live in Italy (for only two months).</p>
     <p>Correct: I lived in Italy for two months.</p>
   </div>
@@ -461,9 +461,9 @@ const TOPICS = [
   <h3>Prepositions of movement</h3>
   <p>These prepositions describe movements from one place to another. There is movement.</p>
   <p>He walked across the street. / The dog ran towards the boy. / We cycled along the river.</p>
-  <div class="table-wrap"><table class="source-table"><thead><tr><th>Preposition</th><th>Usage &amp; Example</th></tr></thead><tbody><tr><td>to</td><td>Movement to a place – I’m going to the gym.</td></tr><tr><td>through</td><td>Inside an enclosed space – The car drove through the tunnel.</td></tr><tr><td>across</td><td>From one side to the other – She swam across the lake.</td></tr><tr><td>along</td><td>Following a line/path – We walked along the beach.</td></tr><tr><td>over</td><td>Above something – The plane flew over the city.</td></tr><tr><td>under</td><td>Beneath something – They crawled under the fence.</td></tr><tr><td>into</td><td>Entering a space – He went into the room.</td></tr><tr><td>out of</td><td>Exiting a space – She came out of the shop.</td></tr><tr><td>up</td><td>Movement upward – They climbed up the stairs.</td></tr><tr><td>down</td><td>Movement downward – He ran down the hill.</td></tr><tr><td>past</td><td>Moving by something – We walked past the bakery.</td></tr><tr><td>towards</td><td>In the direction of – The child ran towards her mother.</td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Preposition</th><th>Usage &amp; Example</th></tr></thead><tbody><tr><td>to</td><td>Movement to a place – I'm going to the gym.</td></tr><tr><td>through</td><td>Inside an enclosed space – The car drove through the tunnel.</td></tr><tr><td>across</td><td>From one side to the other – She swam across the lake.</td></tr><tr><td>along</td><td>Following a line/path – We walked along the beach.</td></tr><tr><td>over</td><td>Above something – The plane flew over the city.</td></tr><tr><td>under</td><td>Beneath something – They crawled under the fence.</td></tr><tr><td>into</td><td>Entering a space – He went into the room.</td></tr><tr><td>out of</td><td>Exiting a space – She came out of the shop.</td></tr><tr><td>up</td><td>Movement upward – They climbed up the stairs.</td></tr><tr><td>down</td><td>Movement downward – He ran down the hill.</td></tr><tr><td>past</td><td>Moving by something – We walked past the bakery.</td></tr><tr><td>towards</td><td>In the direction of – The child ran towards her mother.</td></tr></tbody></table></div>
   <div class="warning-box">
-    <p>"The dog ran towards me." (It didn’t reach me.)</p>
+    <p>"The dog ran towards me." (It didn't reach me.)</p>
     <p>"The dog ran to me." (It reached me.)</p>
   </div>
 </div>
@@ -471,14 +471,14 @@ const TOPICS = [
   <h3>Dependent prepositions</h3>
   <p>Some verbs and adjectives must be followed by specific prepositions.</p>
   <h4 class="mini-title">After verbs</h4>
-  <div class="table-wrap"><table class="source-table"><thead><tr><th>Verb + Preposition</th><th>Example</th></tr></thead><tbody><tr><td>wait for</td><td>She’s waiting for the bus.</td></tr><tr><td>believe in</td><td>I believe in myself.</td></tr><tr><td>ask for</td><td>He asked for a refund.</td></tr><tr><td>rely on</td><td>You can rely on me.</td></tr><tr><td>argue about</td><td>They argued about politics.</td></tr><tr><td>apply for</td><td>I applied for the job.</td></tr><tr><td>pay for</td><td>She paid for the tickets.</td></tr><tr><td>talk about</td><td>We talked about the movie.</td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Verb + Preposition</th><th>Example</th></tr></thead><tbody><tr><td>wait for</td><td>She's waiting for the bus.</td></tr><tr><td>believe in</td><td>I believe in myself.</td></tr><tr><td>ask for</td><td>He asked for a refund.</td></tr><tr><td>rely on</td><td>You can rely on me.</td></tr><tr><td>argue about</td><td>They argued about politics.</td></tr><tr><td>apply for</td><td>I applied for the job.</td></tr><tr><td>pay for</td><td>She paid for the tickets.</td></tr><tr><td>talk about</td><td>We talked about the movie.</td></tr></tbody></table></div>
   <h4 class="mini-title">After adjectives</h4>
-  <div class="table-wrap"><table class="source-table"><thead><tr><th>Adjective + Preposition</th><th>Example</th></tr></thead><tbody><tr><td>good at</td><td>He’s good at painting.</td></tr><tr><td>interested in</td><td>She’s interested in science.</td></tr><tr><td>tired of</td><td>I’m tired of waiting.</td></tr><tr><td>proud of</td><td>They’re proud of their son.</td></tr><tr><td>angry with/at</td><td>I’m angry with him / angry at the delay.</td></tr><tr><td>worried about</td><td>He’s worried about the exam.</td></tr><tr><td>ready for</td><td>We’re ready for the trip.</td></tr><tr><td>different from</td><td>This song is different from the original.</td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Adjective + Preposition</th><th>Example</th></tr></thead><tbody><tr><td>good at</td><td>He's good at painting.</td></tr><tr><td>interested in</td><td>She's interested in science.</td></tr><tr><td>tired of</td><td>I'm tired of waiting.</td></tr><tr><td>proud of</td><td>They're proud of their son.</td></tr><tr><td>angry with/at</td><td>I'm angry with him / angry at the delay.</td></tr><tr><td>worried about</td><td>He's worried about the exam.</td></tr><tr><td>ready for</td><td>We're ready for the trip.</td></tr><tr><td>different from</td><td>This song is different from the original.</td></tr></tbody></table></div>
   <div class="info-box">
-    <p><strong>Use verb + ing after prepositions:</strong> I’m looking forward to seeing you. / She believes in working hard.</p>
+    <p><strong>Use verb + ing after prepositions:</strong> I'm looking forward to seeing you. / She believes in working hard.</p>
   </div>
   <div class="warning-box">
-    <p><strong>Verbs that don’t need prepositions:</strong> ask, discuss, enter, marry</p>
+    <p><strong>Verbs that don't need prepositions:</strong> ask, discuss, enter, marry</p>
     <p>We discussed the problem. / He entered the room. / She married him.</p>
   </div>
 </div>
@@ -518,25 +518,25 @@ const TOPICS = [
     difficulty: "medium",
     summaryHtml: `
 <div class="content-card">
-  <h3>Will / won’t + Verb 1</h3>
+  <h3>Will / won't + Verb 1</h3>
   <p><strong>When do we use it?</strong></p>
   <ul>
     <li>Predictions (based on beliefs or opinions): I think it will rain tomorrow.</li>
     <li>Future facts (unchangeable future events): The sun will rise at 6:45 AM.</li>
-    <li>Instant decisions: I’m tired. I’ll go to bed now.</li>
-    <li>Promises: I won’t tell anyone your secret.</li>
+    <li>Instant decisions: I'm tired. I'll go to bed now.</li>
+    <li>Promises: I won't tell anyone your secret.</li>
     <li>Offers & suggestions: Shall I help you with your bags? / Shall we go out tonight?</li>
   </ul>
   <div class="info-box">
     <p><strong>Positive:</strong> Subject + will + verb1</p>
-    <p><strong>Negative:</strong> Subject + won’t + verb1</p>
+    <p><strong>Negative:</strong> Subject + won't + verb1</p>
   </div>
 </div>
 <div class="content-card">
   <h3>Be going to + verb 1</h3>
   <ul>
-    <li>For planned actions (decided before the moment of speaking): I’m going to start a new course next month.</li>
-    <li>For predictions with evidence: Look at those dark clouds! It’s going to rain.</li>
+    <li>For planned actions (decided before the moment of speaking): I'm going to start a new course next month.</li>
+    <li>For predictions with evidence: Look at those dark clouds! It's going to rain.</li>
   </ul>
   <div class="info-box">
     <p><strong>Positive:</strong> Subject + am/is/are + going to + verb1</p>
@@ -547,11 +547,11 @@ const TOPICS = [
   <h3>Present Continuous for future arrangements</h3>
   <p>Scheduled plans with a specific time or arrangement:</p>
   <ul>
-    <li>I’m meeting my friend at 6 PM.</li>
-    <li>We’re flying to Italy next week.</li>
-    <li>She’s having dinner with her boss tomorrow.</li>
+    <li>I'm meeting my friend at 6 PM.</li>
+    <li>We're flying to Italy next week.</li>
+    <li>She's having dinner with her boss tomorrow.</li>
   </ul>
-  <div class="table-wrap"><table class="source-table"><thead><tr><th>Form</th><th>Used for</th><th>Example</th></tr></thead><tbody><tr><td>Will</td><td>Instant decisions, promises, predictions</td><td>I’ll call you later.</td></tr><tr><td>Be Going to</td><td>Plans and evidence-based predictions</td><td>It’s going to snow. Look at the sky!</td></tr><tr><td>Present Continuous</td><td>Arranged events or appointments</td><td>I’m seeing the doctor on Friday.</td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Form</th><th>Used for</th><th>Example</th></tr></thead><tbody><tr><td>Will</td><td>Instant decisions, promises, predictions</td><td>I'll call you later.</td></tr><tr><td>Be Going to</td><td>Plans and evidence-based predictions</td><td>It's going to snow. Look at the sky!</td></tr><tr><td>Present Continuous</td><td>Arranged events or appointments</td><td>I'm seeing the doctor on Friday.</td></tr></tbody></table></div>
 </div>
 <div class="content-card">
   <h3>Future in the past</h3>
@@ -603,7 +603,7 @@ const TOPICS = [
     <p><strong>Structure:</strong> If + Present Simple, will + Verb1</p>
     <p>If it rains, we will stay at home.</p>
     <p>If I study hard, I will pass the exam.</p>
-    <p>She will miss the bus if she doesn’t hurry.</p>
+    <p>She will miss the bus if she doesn't hurry.</p>
   </div>
   <p><strong>Key points:</strong></p>
   <ul>
@@ -615,18 +615,18 @@ const TOPICS = [
 </div>
 <div class="content-card">
   <h3>Second Conditional</h3>
-  <p>We use the Second Conditional to talk about hypothetical situations — things that probably won’t happen, or are imaginary.</p>
+  <p>We use the Second Conditional to talk about hypothetical situations — things that probably won't happen, or are imaginary.</p>
   <div class="info-box">
     <p><strong>Structure:</strong> If + Past Simple, would + Verb1</p>
     <p>If I won the lottery, I would travel the world.</p>
     <p>She would be happy if she got the job.</p>
-    <p>If I were you, I wouldn’t do that.</p>
+    <p>If I were you, I wouldn't do that.</p>
   </div>
   <div class="warning-box">
     <p>With I / he / she / it we often use <strong>were</strong> instead of was in formal English.</p>
     <p>If I were rich, I would buy a mansion.</p>
   </div>
-  <p>The if part uses past simple, but it’s not about the past — it’s about unreal or imagined situations.</p>
+  <p>The if part uses past simple, but it's not about the past — it's about unreal or imagined situations.</p>
 </div>
 <div class="content-card">
   <h3>1st vs 2nd Conditional</h3>
@@ -1699,6 +1699,1480 @@ const SUPPLEMENTAL_QUIZ_QUESTIONS = {
 
 Object.entries(SUPPLEMENTAL_QUIZ_QUESTIONS).forEach(([id, questions]) => addTopicQuestions(id, questions));
 
+const RAVZA_SOURCE_TOPICS = [
+  {
+    id: "readingreviews",
+    unit: "Reading 1",
+    title: "Reading: The Power of Online Reviews",
+    subtitle: "Main idea · reference · inference · vocabulary in context",
+    time: 34,
+    difficulty: "medium",
+    summaryHtml: `
+<div class="lesson-hero">
+  <span class="emoji-title">📖 Reading 1</span>
+  <h3>The Power of Online Reviews</h3>
+  <p>Bu metin, online yorumların modern alışverişte müşteri kararlarını nasıl etkilediğini anlatıyor. Ana fikir: insanlar artık sadece reklama değil, diğer kullanıcıların deneyimlerine de güveniyor.</p>
+</div>
+<div class="content-card">
+  <h3>📖 Metnin Genel Konusu</h3>
+  <p>Online reviews, yani internet yorumları, satın alma kararlarını etkileyen güçlü bir kaynak haline gelmiştir. Metin; güven, müşteri memnuniyeti, negatif yorumların etkisi, şirketlerin geri bildirimlere cevap vermesi ve fake reviews konusunda dikkatli olma fikri etrafında ilerler.</p>
+  <div class="timeline-box">
+    <span>Geçmişte şirketler bilgiyi kontrol ederdi</span>
+    <strong>→</strong>
+    <span>İnternetle müşteriler yorum yazmaya başladı</span>
+    <strong>→</strong>
+    <span>Yorumlar satın alma kararını etkiler hale geldi</span>
+  </div>
+</div>
+<div class="content-card">
+  <h3>📌 Paragraf Paragraf Türkçe Açıklama</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Paragraf</th><th>Ana Fikir</th><th>Türkçe Açıklama</th></tr></thead><tbody><tr><td>1</td><td>Reviews build trust</td><td>İnsanlar ürün almadan önce yorum okur. Reklamdan çok diğer kullanıcıların deneyimine güvenebilirler.</td></tr><tr><td>2</td><td>Information control changed</td><td>Eskiden ürün bilgisini şirketler kontrol ederdi; internetle müşteriler kolayca fikir paylaşmaya başladı.</td></tr><tr><td>3</td><td>Positive / negative reviews matter</td><td>Çok sayıda olumlu yorum ürünü daha seçilebilir yapar; fazla negatif yorum güçlü bir markayı bile zayıflatabilir.</td></tr><tr><td>4</td><td>Companies respond</td><td>Şirketler ürün ve hizmetlerini geliştirir, bazıları şikayetlere doğrudan cevap verir.</td></tr><tr><td>5</td><td>Not all reviews are reliable</td><td>Bazı yorumlar sahte olabilir; bu yüzden yorumları eleştirel okumak gerekir.</td></tr><tr><td>6</td><td>Conclusion</td><td>Online yorumlar modern alışverişin önemli bir parçasıdır; ürün başarısı kalite kadar insanların ne söylediğine de bağlıdır.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>🔑 Önemli Kelimeler</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word</th><th>Türkçe</th><th>Metindeki Görevi</th><th>Example</th></tr></thead><tbody><tr><td>trust</td><td>güvenmek / güven</td><td>Müşterilerin diğer kullanıcılara inanmasını anlatır.</td><td>Customers trust other users more than advertisements.</td></tr><tr><td>advertisement</td><td>reklam</td><td>Şirketin kendini tanıtma yolu.</td><td>Reviews can be more persuasive than advertisements.</td></tr><tr><td>customer satisfaction</td><td>müşteri memnuniyeti</td><td>Şirketlerin dikkat etmesi gereken ana konu.</td><td>Businesses must pay attention to customer satisfaction.</td></tr><tr><td>affect</td><td>etkilemek</td><td>Negatif yorumların satışa etkisini anlatır.</td><td>A single negative review can affect many buyers.</td></tr><tr><td>reliable</td><td>güvenilir</td><td>Yorumların doğru olup olmadığını sorgular.</td><td>Not all reviews are reliable.</td></tr><tr><td>essential</td><td>çok önemli / gerekli</td><td>Online yorumların modern alışverişteki yerini vurgular.</td><td>Reviews are an essential part of shopping.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>🧠 Reading Soru Çözme Mantığı</h3>
+  <div class="lesson-grid">
+    <div class="visual-note"><strong>Main idea:</strong><br>Tek bir örnek değil, bütün metnin ortak mesajını ara.</div>
+    <div class="visual-note"><strong>Reference:</strong><br>this / it / they gibi kelimelerden önceki cümleye dön.</div>
+    <div class="visual-note"><strong>Inference:</strong><br>Metinde birebir yazmayan ama metinden çıkarılabilen sonucu seç.</div>
+  </div>
+</div>
+<div class="content-card mini-summary-card">
+  <h3>📦 Mini Özet</h3>
+  <ul>
+    <li>Metnin ana fikri: Online yorumlar müşteri kararlarını etkiler.</li>
+    <li>Negatif yorumlar potansiyel alıcıları etkileyebilir.</li>
+    <li>Şirketler yorumlar sayesinde ürün ve hizmetlerini geliştirmeye çalışır.</li>
+    <li>Fake reviews olabilir; bu yüzden yorumları dikkatli okumak gerekir.</li>
+  </ul>
+</div>
+`,
+    keyPoints: [
+      "Main idea sorusunda cevap: online reviews influence customer decisions.",
+      "Reference sorularında this çoğunlukla hemen önceki fikre döner.",
+      "Inference için metnin uyarısını yakala: customers should be careful when reading reviews."
+    ],
+    quiz: [
+      makeQuestion("What is the main idea of the text?", ["People never trust advertisements.", "Online reviews influence customer decisions.", "Brands are more important than products."], 1, "Metnin genel mesajı online yorumların müşteri kararlarını etkilemesidir."),
+      makeQuestion("Which statement is true according to the text?", ["Negative reviews can affect sales.", "Customers cannot share opinions online.", "Reviews are not important anymore."], 0, "Metinde tek bir negatif yorumun potansiyel alıcıları etkileyebileceği söylenir."),
+      makeQuestion("Why are online reviews powerful?", ["Because people read them before buying.", "Because they are always true.", "Because companies always write them."], 0, "İnsanlar satın almadan önce birkaç yorum okuduğu için güçlüdür."),
+      makeQuestion("What do companies do because of reviews?", ["They ignore customers.", "They improve products and respond to feedback.", "They stop selling products."], 1, "Metin şirketlerin ürün/hizmet geliştirdiğini ve şikayetlere cevap verdiğini anlatır."),
+      makeQuestion("Which detail is NOT mentioned in the text?", ["Fake reviews", "Customer trust", "Product prices"], 2, "Metinde fiyatlardan bahsedilmez."),
+      makeQuestion("The word 'affect' is closest in meaning to:", ["influence", "create", "describe"], 0, "Affect = etkilemek, yani influence."),
+      makeQuestion("The word 'essential' is closest in meaning to:", ["important", "unnecessary", "simple"], 0, "Essential burada 'çok önemli / gerekli' anlamındadır."),
+      makeQuestion("In paragraph 2, 'this situation' refers to:", ["companies controlling information", "buying products online", "reading comments"], 0, "Hemen önce şirketlerin ürün bilgilerini kontrol etmesinden bahsedilir."),
+      makeQuestion("In paragraph 4, 'this' refers to:", ["answering complaints", "selling products", "advertising"], 0, "This, şirketlerin online şikayetlere cevap vermesini gösterir."),
+      makeQuestion("What can be inferred from the text?", ["Customers should be careful when reading reviews.", "All reviews are reliable.", "Companies do not read reviews."], 0, "Fake reviews kısmı müşterilerin dikkatli olması gerektiğini ima eder.")
+    ]
+  },
+  {
+    id: "readingwork",
+    unit: "Reading 2",
+    title: "Reading: The Changing World of Work",
+    subtitle: "Remote work · gig economy · automation · lifelong learning",
+    time: 42,
+    difficulty: "medium",
+    summaryHtml: `
+<div class="lesson-hero">
+  <span class="emoji-title">💼 Reading 2</span>
+  <h3>The Changing World of Work</h3>
+  <p>Bu reading, çalışma hayatının uzaktan çalışma, gig economy, teknoloji, automation ve lifelong learning ile nasıl değiştiğini anlatıyor.</p>
+</div>
+<div class="content-card">
+  <h3>📖 Metnin Genel Konusu</h3>
+  <p>Metin, insanların çalışma şekillerinin hızla değiştiğini söyler. Remote work zaman kazandırabilir ama izolasyon yaratabilir. Gig economy özgürlük verir ama iş güvencesi daha azdır. Automation bazı işleri değiştirir; bu yüzden yeni beceri ve sürekli öğrenme önem kazanır.</p>
+</div>
+<div class="content-card">
+  <h3>📌 Paragraf Haritası</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Paragraf</th><th>Konu</th><th>Türkçe Mantık</th></tr></thead><tbody><tr><td>1</td><td>Introduction</td><td>Geçmişte insanlar uzun süre aynı işte çalışırdı; bugün iş dünyası hızla değişiyor.</td></tr><tr><td>2</td><td>Remote work</td><td>İnternet ve teknoloji sayesinde birçok çalışan evden veya dünyanın herhangi bir yerinden çalışabilir.</td></tr><tr><td>3</td><td>Advantages</td><td>Ulaşım zamanı azalır, evde daha rahat çalışma ortamı oluşur, şirketler maliyet düşürebilir.</td></tr><tr><td>4</td><td>Disadvantages</td><td>İzolasyon, online iletişim zorluğu ve iş/özel hayat sınırının karışması sorun olabilir.</td></tr><tr><td>5</td><td>Gig economy</td><td>İnsanlar tek bir şirkette tam zamanlı çalışmak yerine kısa süreli proje işleri yapabilir.</td></tr><tr><td>6</td><td>Automation / AI</td><td>Teknoloji tekrarlı işleri değiştirdiği için çalışanların rekabetçi kalmak adına yeni beceriler öğrenmesi gerekir.</td></tr><tr><td>7</td><td>Lifelong learning</td><td>Online kurslar, eğitim programları ve sürekli gelişim modern iş hayatında daha önemlidir.</td></tr><tr><td>8-9</td><td>Conclusion</td><td>Değişim hem avantaj hem zorluk getirir; başarılı olmak için esneklik ve öğrenmeye açıklık gerekir.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>🔑 Önemli Kelimeler</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word / Phrase</th><th>Türkçe</th><th>Not</th><th>Example</th></tr></thead><tbody><tr><td>remote work</td><td>uzaktan çalışma</td><td>Evden veya herhangi bir yerden çalışma.</td><td>Remote work became common during the pandemic.</td></tr><tr><td>commute</td><td>işe gidip gelmek</td><td>Ev-iş arası günlük yolculuk.</td><td>Employees save time because they do not commute.</td></tr><tr><td>isolated</td><td>yalnız / izole</td><td>Yüz yüze iletişim azalınca hissedilebilir.</td><td>Some employees feel isolated.</td></tr><tr><td>gig economy</td><td>kısa süreli iş ekonomisi</td><td>Freelance/proje bazlı iş modeli.</td><td>People take short-term jobs or projects.</td></tr><tr><td>job security</td><td>iş güvencesi</td><td>Gig economy içinde daha az olabilir.</td><td>It means less job security.</td></tr><tr><td>automation</td><td>otomasyon</td><td>Tekrarlı işleri makinelerin yapması.</td><td>Automation is replacing some traditional jobs.</td></tr><tr><td>lifelong learning</td><td>hayat boyu öğrenme</td><td>Sürekli beceri geliştirme.</td><td>Education and lifelong learning are more important.</td></tr><tr><td>adapt</td><td>uyum sağlamak</td><td>Yeni teknoloji ve modellere uyma.</td><td>Workers need to adapt to new challenges.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>🧠 Grammar Sinyalleri</h3>
+  <ul>
+    <li><strong>Present Perfect:</strong> have become, has changed → geçmişten bugüne gelen değişim.</li>
+    <li><strong>Comparatives:</strong> more comfortable, more productive → iki durumu karşılaştırır.</li>
+    <li><strong>Modals:</strong> can, may, need to → olasılık, yetenek veya gereklilik anlatır.</li>
+    <li><strong>Condition-like logic:</strong> To succeed, individuals must be flexible → başarı için gerekli şart gibi okunur.</li>
+  </ul>
+</div>
+<div class="content-card mini-summary-card">
+  <h3>📦 Mini Özet</h3>
+  <ul>
+    <li>Ana fikir: çalışma dünyası remote work, gig economy ve automation ile değişiyor.</li>
+    <li>Remote work hem avantaj hem dezavantaj taşır.</li>
+    <li>Gelecekte çalışanlar esnek, öğrenmeye açık ve teknolojiye uyumlu olmalı.</li>
+  </ul>
+</div>
+`,
+    keyPoints: [
+      "Main idea: The world of work is changing in many ways.",
+      "Remote work avantaj ve dezavantajları birlikte anlatılır.",
+      "Inference sorularında yazar değişimi tamamen kötü değil, avantaj ve zorlukları olan bir süreç gibi sunar."
+    ],
+    quiz: [
+      makeQuestion("What is the main idea of the text?", ["The world of work is changing in many ways.", "Offices are always better than homes.", "Technology is not useful for workers."], 0, "Metin remote work, gig economy ve automation gibi değişimleri anlatır."),
+      makeQuestion("Which statement is true according to the text?", ["Remote work became more common after COVID-19.", "Employees prefer long commutes.", "Companies do not benefit from remote work."], 0, "Metinde remote work'ün COVID-19 döneminde özellikle yaygınlaştığı söylenir."),
+      makeQuestion("What is one advantage of remote work?", ["Saving time on commuting", "More office expenses", "Less communication"], 0, "Uzaktan çalışmada işe gidip gelme süresi azalabilir."),
+      makeQuestion("What is one disadvantage of remote work?", ["Difficulty separating work and personal life", "Too much face-to-face communication", "Higher transportation costs"], 0, "Ev ve iş aynı alanda olunca sınır koymak zorlaşabilir."),
+      makeQuestion("What is the gig economy?", ["Doing short-term jobs or projects", "Working in one job for life", "Working only in offices"], 0, "Gig economy kısa süreli iş/proje mantığıdır."),
+      makeQuestion("The word 'efficient' is closest in meaning to:", ["effective", "slow", "expensive"], 0, "Efficient burada etkili/verimli anlamına yakındır."),
+      makeQuestion("The word 'isolated' is closest in meaning to:", ["alone", "connected", "successful"], 0, "Isolated = yalnız/izole hissetmek."),
+      makeQuestion("The word 'repetitive' is closest in meaning to:", ["repeated", "creative", "different"], 0, "Repetitive tekrarlanan iş demektir."),
+      makeQuestion("In paragraph 2, 'this' refers to:", ["remote work becoming common", "office jobs", "working in factories"], 0, "This, remote work'ün yaygınlaşmasını gösterir."),
+      makeQuestion("In paragraph 6, 'those' refers to:", ["jobs", "machines", "companies"], 0, "Those, traditional jobs ifadesine döner."),
+      makeQuestion("What can be inferred about future workers?", ["They should adapt to changes.", "They will not use technology.", "They will not need education."], 0, "Metin sürekli öğrenme ve uyum sağlamanın önemli olduğunu söyler."),
+      makeQuestion("What is the writer's opinion about workplace change?", ["It brings both advantages and challenges.", "It is completely negative.", "It should be stopped."], 0, "Yazar hem avantajları hem zorlukları dengeli şekilde anlatır.")
+    ]
+  },
+  {
+    id: "vocabcontext",
+    unit: "Vocabulary",
+    title: "Vocabulary Practice & Context Test",
+    subtitle: "Fill-gap word box · vocabulary practice · workbook words · context test",
+    time: 46,
+    difficulty: "medium",
+    summaryHtml: `
+<div class="lesson-hero">
+  <span class="emoji-title">🔤 Vocabulary Lab</span>
+  <h3>Kaynak Dosyalardan Kelime Pratiği</h3>
+  <p>Bu bölüm; Fill in the Gaps, Vocabulary Practice, Intermediate Vocab Test, Workbook Vocabulary ve English File wordlist dosyalarındaki kelimeleri bağlam içinde çalışmak için hazırlandı.</p>
+</div>
+<div class="content-card">
+  <h3>🧠 Çalışma Mantığı</h3>
+  <p>Bu kelimeler tek tek ezberlenecek kelimeler değil; cümlede nasıl yer aldıklarını görmen gerekir. Özellikle phrasal verb, adjective + preposition ve verb pattern olan kelimelerde kalıbı birlikte çalış.</p>
+  <div class="lesson-grid">
+    <div class="visual-note"><strong>Kelime</strong><br>meaning + word type</div>
+    <div class="visual-note"><strong>Bağlam</strong><br>sentence içinde anlam</div>
+    <div class="visual-note"><strong>Kalıp</strong><br>preposition / particle / collocation</div>
+  </div>
+</div>
+<div class="content-card">
+  <h3>📌 Fill in the Gaps Word Box</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word / Phrase</th><th>Türkçe</th><th>Türü</th><th>Example</th><th>Türkçesi</th></tr></thead><tbody><tr><td>heal</td><td>iyileştirmek</td><td>verb</td><td>The doctor gave her medicine to heal faster.</td><td>Doktor daha hızlı iyileşmesi için ilaç verdi.</td></tr><tr><td>unusual</td><td>alışılmadık</td><td>adjective</td><td>It was an unusual situation.</td><td>Alışılmadık bir durumdu.</td></tr><tr><td>punishment</td><td>ceza</td><td>noun</td><td>Your punishment will be more serious.</td><td>Cezan daha ciddi olacak.</td></tr><tr><td>on purpose</td><td>bilerek</td><td>phrase</td><td>He broke the glass on purpose.</td><td>Bardağı bilerek kırdı.</td></tr><tr><td>denied</td><td>inkar etti</td><td>verb</td><td>She denied that she took the money.</td><td>Parayı aldığını inkar etti.</td></tr><tr><td>allowed</td><td>izinli</td><td>verb/adjective</td><td>Students are not allowed to use phones.</td><td>Öğrencilerin telefon kullanmasına izin verilmez.</td></tr><tr><td>according to</td><td>-e göre</td><td>phrase</td><td>According to the teacher, this is important.</td><td>Öğretmene göre bu önemli.</td></tr><tr><td>opportunity</td><td>fırsat</td><td>noun</td><td>This job is a great opportunity.</td><td>Bu iş büyük bir fırsat.</td></tr><tr><td>reputation</td><td>itibar / ün</td><td>noun</td><td>The restaurant has a good reputation.</td><td>Restoranın iyi bir itibarı var.</td></tr><tr><td>postpone</td><td>ertelemek</td><td>verb</td><td>Let's postpone the meeting.</td><td>Toplantıyı erteleyelim.</td></tr><tr><td>take on</td><td>üstlenmek</td><td>phrasal verb</td><td>She decided to take on a new project.</td><td>Yeni bir projeyi üstlenmeye karar verdi.</td></tr><tr><td>rejected</td><td>reddedildi</td><td>verb</td><td>He was rejected because of his lack of experience.</td><td>Deneyim eksikliği yüzünden reddedildi.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>🧩 Vocabulary Practice Kelimeleri</h3>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Word / Phrase</th><th>Türkçe</th><th>Kullanım Notu</th><th>Example</th></tr></thead><tbody><tr><td>undisputed</td><td>tartışmasız</td><td>Herkesin kabul ettiği sonuç.</td><td>The result was undisputed.</td></tr><tr><td>aim</td><td>amaç</td><td>main aim / clear aim şeklinde sık gelir.</td><td>His main aim is to improve his English.</td></tr><tr><td>keen on</td><td>meraklı / düşkün</td><td>keen on + noun / V-ing.</td><td>She is keen on learning about cultures.</td></tr><tr><td>upmarket</td><td>lüks / kaliteli</td><td>Restoran, ürün, bölge için kullanılır.</td><td>They chose an upmarket restaurant.</td></tr><tr><td>eager to</td><td>hevesli</td><td>eager to + verb1.</td><td>I am eager to start my new course.</td></tr><tr><td>soak up</td><td>içine çekmek / tadını çıkarmak</td><td>Atmosphere ile sık kullanılır.</td><td>Visitors soak up the atmosphere.</td></tr><tr><td>frugal</td><td>tutumlu</td><td>Para harcamakta dikkatli.</td><td>He is frugal and never wastes money.</td></tr><tr><td>at the bottom of</td><td>en altında</td><td>Table/list sıralaması için.</td><td>Our team is at the bottom of the table.</td></tr><tr><td>achievement</td><td>başarı</td><td>Emek sonucu elde edilen başarı.</td><td>Finishing the marathon was an achievement.</td></tr><tr><td>make it</td><td>başarmak / varmak</td><td>Bir yere ulaşmak veya başarılı olmak.</td><td>After hours of walking, we made it.</td></tr><tr><td>security screener</td><td>güvenlik kontrol görevlisi</td><td>Airport context.</td><td>The security screener checked the passengers.</td></tr><tr><td>one-way flight</td><td>tek yön uçuş</td><td>Return yoksa kullanılır.</td><td>She booked a one-way flight.</td></tr></tbody></table></div>
+</div>
+<div class="content-card">
+  <h3>⚠️ Sık Karışanlar</h3>
+  <div class="warning-box">
+    <p><strong>keen on + V-ing:</strong> She is keen on learning. <strong>Yanlış:</strong> keen on learn.</p>
+    <p><strong>eager to + V1:</strong> She is eager to start. <strong>Yanlış:</strong> eager to starting.</p>
+    <p><strong>prevent from + V-ing:</strong> The noise prevented me from concentrating.</p>
+    <p><strong>good at + V-ing:</strong> She is good at making friends.</p>
+  </div>
+</div>
+<div class="content-card mini-summary-card">
+  <h3>📦 Mini Özet</h3>
+  <ul>
+    <li>Phrasal verbs particle ile ezberlenir: call off, get over, fill in, give up, set up.</li>
+    <li>Adjective + preposition kalıpları önemlidir: good at, interested in, keen on.</li>
+    <li>Vocabulary sorularında cümlenin anlamı kadar gramer kalıbı da doğru cevabı verir.</li>
+  </ul>
+</div>
+`,
+    keyPoints: [
+      "Fill-gap kelimelerinde anlamı cümle içinde düşün: denied, allowed, according to, take on.",
+      "Vocabulary Practice kelimelerinde kalıp önemlidir: keen on + V-ing, eager to + V1.",
+      "Intermediate Vocab Test kaynaklı sorularda phrasal verbs, collocations ve prepositions birlikte çalışılmalı."
+    ],
+    quiz: [
+      makeQuestion("The result of the match was ________; everyone agreed on it.", ["remote", "undisputed", "eager"], 1, "Undisputed, herkesin kabul ettiği ve tartışmasız olan sonuç için kullanılır."),
+      makeQuestion("She is very ________ learning about different cultures.", ["keen on", "eager to", "upmarket"], 0, "Keen on + V-ing kullanılır: keen on learning."),
+      makeQuestion("Visitors come here to ________ the beautiful atmosphere.", ["soak up", "screen", "aim"], 0, "Soak up the atmosphere, ortamın tadını çıkarmak / içine çekmek demektir."),
+      makeQuestion("We had to ________ our trip because of bad weather.", ["call off", "turn up", "get over"], 0, "Call off, bir etkinliği veya planı iptal etmek demektir."),
+      makeQuestion("Please ________ the form before submitting it.", ["fill in", "take off", "put out"], 0, "Fill in a form, form doldurmak anlamındadır."),
+      makeQuestion("He finally ________ his fear of flying.", ["got over", "took off", "turned up"], 0, "Get over, bir korku/sorun/rahatsızlığı aşmak demektir."),
+      makeQuestion("She is very good ________ making friends.", ["at", "in", "for"], 0, "Good at + V-ing doğru kalıptır."),
+      makeQuestion("He was rejected because of his lack of ________.", ["experience", "reputation", "punishment"], 0, "Lack of experience, deneyim eksikliği demektir."),
+      makeQuestion("Let's ________ the meeting until tomorrow.", ["postpone", "heal", "deny"], 0, "Postpone, ertelemek anlamına gelir."),
+      makeQuestion("He broke the glass ________ because he was angry.", ["on purpose", "according to", "unaware"], 0, "On purpose, bilerek/kasten demektir.")
+    ]
+  }
+];
+
+TOPICS.push(...RAVZA_SOURCE_TOPICS);
+
+appendTopicHtml("wordlist1a", `
+<div class="content-card">
+  <h3>📚 Kaynaklardan ek vocabulary paketi</h3>
+  <p>1A Word List'e ek olarak Vocabulary Practice, Fill in the Gaps, Workbook Vocabulary ve Intermediate Vocab Test dosyalarında geçen kelimeler aynı mantıkla çalışılmalı: anlam + cümle + kalıp.</p>
+  <div class="table-wrap"><table class="source-table"><thead><tr><th>Kelime / Phrase</th><th>Türkçe</th><th>Kaynak Mantığı</th><th>Örnek</th></tr></thead><tbody><tr><td>take up / go on / turn up</td><td>başlamak-almak / devam etmek / ortaya çıkmak</td><td>Phrasal verb seçeneklerinde anlamı cümleden çıkar.</td><td>The meeting went on so long.</td></tr><tr><td>particular</td><td>titiz / seçici</td><td>Work context içinde dikkatli ve detaycı kişi.</td><td>She is particular about her work.</td></tr><tr><td>call off</td><td>iptal etmek</td><td>Plan/trip/meeting ile kullanılır.</td><td>We called off our trip.</td></tr><tr><td>make up excuses</td><td>bahane uydurmak</td><td>Collocation olarak ezberle.</td><td>He always makes up excuses.</td></tr><tr><td>afford</td><td>parası yetmek</td><td>Can/can't afford + noun / to verb.</td><td>I can't afford a new phone.</td></tr><tr><td>prevent from</td><td>-den alıkoymak</td><td>prevent someone from + V-ing.</td><td>The noise prevented me from concentrating.</td></tr><tr><td>look forward to</td><td>dört gözle beklemek</td><td>to burada preposition; ardından V-ing gelir.</td><td>I'm looking forward to seeing you.</td></tr><tr><td>support yourself</td><td>kendi geçimini sağlamak</td><td>Workbook vocabulary.</td><td>She works hard to support herself.</td></tr><tr><td>qualify for</td><td>hak kazanmak / şartları sağlamak</td><td>for preposition ile kullanılır.</td><td>He qualified for a visa.</td></tr><tr><td>bizarre</td><td>çok tuhaf</td><td>Strange / unusual anlam alanı.</td><td>They chose bizarre names.</td></tr></tbody></table></div>
+</div>
+`);
+
+const RAVZA_EXTENDED_QUIZ_QUESTIONS = {
+  wordlist1a: [
+    makeQuestion("Which word means 'people who carry out studies'?", ["researchers", "screeners", "hoteliers"], 0, "Researchers araştırma yapan kişiler anlamındadır."),
+    makeQuestion("Which sentence uses 'proof' correctly?", ["She showed proof of her identity.", "She proofed a coffee.", "He proof to school."], 0, "Proof, bir şeyin doğru olduğunu gösteren kanıt anlamındaki isimdir."),
+    makeQuestion("'Likely' means:", ["probable", "impossible", "ancient"], 0, "Likely, olma ihtimali yüksek olan şeyleri anlatır."),
+    makeQuestion("Which phrase means 'to be noticeable'?", ["stand out", "go about", "feel sorry"], 0, "Stand out, fark edilmek / öne çıkmak demektir."),
+    makeQuestion("Which phrase means 'to meet the requirements'?", ["qualify for", "support yourself", "dye your hair"], 0, "Qualify for, bir şeye hak kazanmak / şartları sağlamak anlamındadır.")
+  ],
+  objectpronouns: [
+    makeQuestion("Choose the correct object pronoun: 'I saw Anna and called ___ later.'", ["she", "her", "hers"], 1, "Call fiilinden sonra object pronoun gerekir: her."),
+    makeQuestion("Which pattern is correct when the direct object is a pronoun?", ["lend it to her", "lend her it to", "lend to her it"], 0, "Direct object pronoun it önce gelir, sonra to + person."),
+    makeQuestion("In 'Mary gave me some money', 'me' is:", ["indirect object", "direct object", "possessive adjective"], 0, "Me, parayı alan kişidir; indirect object olur."),
+    makeQuestion("Which sentence is wrong?", ["She cooked dinner for me.", "She sent a message to me.", "She took the book for me to school."], 2, "Take hareket yönüyle genellikle to alır: took the book to me/school."),
+    makeQuestion("After a preposition, use:", ["subject pronoun", "object pronoun", "possessive adjective only"], 1, "Preposition sonrası object pronoun kullanılır: to her, for us, with them.")
+  ],
+  adjectives: [
+    makeQuestion("Choose the correct sentence.", ["It is a poisonous snake.", "It is a snake poisonous.", "It is poisonous a snake."], 0, "Adjective genellikle noun'dan önce gelir: a poisonous snake."),
+    makeQuestion("'Good' comparative form is:", ["gooder", "better", "more good"], 1, "Good düzensizdir: good - better - the best."),
+    makeQuestion("Use 'one/ones': 'I like the blue shoes, but the red ___ are cheaper.'", ["one", "ones", "it"], 1, "Shoes çoğul olduğu için ones kullanılır."),
+    makeQuestion("Which means a small difference?", ["a bit more expensive", "much more expensive", "the most expensive"], 0, "A bit + comparative küçük fark anlatır."),
+    makeQuestion("Which means the largest difference?", ["a bit taller", "much taller", "as tall as"], 1, "Much + comparative büyük fark anlatır.")
+  ],
+  presenttenses: [
+    makeQuestion("Choose the stative use.", ["I have a car.", "I am having lunch.", "I am seeing the dentist."], 0, "Have possession anlamındaysa stative olur ve present simple kullanılır."),
+    makeQuestion("Choose the action use of 'think'.", ["I think it is true.", "I am thinking about moving.", "Do you think it is good?"], 1, "Thinking about moving bir düşünme sürecidir; continuous olabilir."),
+    makeQuestion("'He always goes abroad' uses present simple because:", ["it is a habit/frequency", "it is happening now", "it is passive"], 0, "Always bir frequency adverb olduğu için present simple sinyali verir."),
+    makeQuestion("'Are you going away this weekend?' is:", ["future arrangement", "timetable", "past habit"], 0, "Present continuous, ayarlanmış gelecek plan için kullanılır."),
+    makeQuestion("Which is correct for a timetable?", ["The train leaves at 6.30.", "The train is leave at 6.30.", "The train leaving at 6.30."], 0, "Timetable/schedule için present simple kullanılır.")
+  ],
+  possessives: [
+    makeQuestion("Choose the correct plural possessive.", ["the teachers' room", "the teacher's room for many teachers", "the teachers room"], 0, "Çoğul isim -s ile biterse sadece apostrophe eklenir."),
+    makeQuestion("Irregular plural possessive is:", ["childrens' toys", "children's toys", "childrens toys"], 1, "Children -s ile bitmeyen irregular plural olduğu için children's olur."),
+    makeQuestion("If Emma and Mia share one house:", ["Emma's and Mia's house", "Emma and Mia's house", "Emma and Mia house"], 1, "Ortak sahiplikte 's sadece ikinci isme gelir."),
+    makeQuestion("Which phrase is a double possessive?", ["a friend of mine", "a mine friend", "a friend of my"], 0, "A friend of mine doğru double possessive yapısıdır."),
+    makeQuestion("'She has her own room' means:", ["emphasis on possession", "no possession", "a room belongs to another person"], 0, "Own sahipliği özellikle vurgular.")
+  ],
+  pasttenses: [
+    makeQuestion("Which is correct?", ["Did you went?", "Did you go?", "Did you gone?"], 1, "Did ile fiil yalın hale döner."),
+    makeQuestion("Past continuous form is:", ["was/were + V-ing", "did + V2", "had + V3"], 0, "Past continuous: was/were + V-ing."),
+    makeQuestion("Choose the interrupted action.", ["I was watching TV when you arrived.", "I watch TV every day.", "I have watched TV."], 0, "Devam eden eylem was watching, bölen eylem arrived."),
+    makeQuestion("Negative used to form is:", ["didn't used to", "didn't use to", "wasn't use to"], 1, "Did sonrası yalın form gelir: didn't use to."),
+    makeQuestion("'I used to play tennis' means:", ["a past habit no longer true", "a future plan", "an action happening now"], 0, "Used to geçmiş alışkanlık veya eski durum anlatır.")
+  ],
+  prepositions: [
+    makeQuestion("Choose the correct sentence.", ["She is interested in astrology.", "She is interested on astrology.", "She is interested at astrology."], 0, "Interested in sabit kalıptır."),
+    makeQuestion("Which is correct?", ["We discussed about the problem.", "We discussed the problem.", "We discussed for the problem."], 1, "Discuss bu yapıda preposition almaz."),
+    makeQuestion("After a preposition, use:", ["verb + ing", "to + verb always", "past simple only"], 0, "Preposition sonrası fiil gelirse -ing kullanılır."),
+    makeQuestion("Movement from one side to the other is:", ["across", "under", "between"], 0, "Across, bir taraftan diğer tarafa hareketi anlatır."),
+    makeQuestion("'The plane flew over the city' uses over to show:", ["movement above something", "inside something", "next to something"], 0, "Over, bir şeyin üstünden geçme hareketidir.")
+  ],
+  futureforms: [
+    makeQuestion("Which use of will is shown: 'I'll have a coffee, please.'", ["instant decision", "arranged plan", "evidence prediction"], 0, "Konuşma anında verilen karar: will."),
+    makeQuestion("'I promise I won't do it again' is:", ["promise", "timetable", "past plan"], 0, "Promise için will/won't kullanılır."),
+    makeQuestion("Which uses going to for intention?", ["I'm going to buy a phone.", "I'll open the door.", "The train leaves at 9."], 0, "Önceden karar verilmiş niyet için going to kullanılır."),
+    makeQuestion("Future in the past uses:", ["was/were going to", "will going to", "am going yesterday"], 0, "Geçmişteki gelecek planı: was/were going to."),
+    makeQuestion("Which is a suggestion with shall?", ["Shall we go out tonight?", "Will we went out?", "We shall to go."], 0, "Shall I/we...? öneri/tekliflerde kullanılır.")
+  ],
+  conditionals12: [
+    makeQuestion("First conditional structure is:", ["If + present simple, will + verb1", "If + past perfect, would have + V3", "If + past simple, would + V2"], 0, "First conditional gerçek/olası gelecek için kullanılır."),
+    makeQuestion("Second conditional structure is:", ["If + past simple, would + verb1", "If + present, will + V3", "If + V-ing, can"], 0, "Second conditional hayali/gerçek dışı durumlar içindir."),
+    makeQuestion("Unless means:", ["if not", "because", "although"], 0, "Unless = if not."),
+    makeQuestion("Which is a first conditional with modal?", ["If you study, you can pass.", "If you studied, you passed.", "If studying, pass."], 0, "Main clause will yerine can gibi modal alabilir."),
+    makeQuestion("Could in second conditional often expresses:", ["possibility/ability", "certainty only", "past perfect"], 0, "Could hayali durumda olasılık/yetenek anlatabilir.")
+  ],
+  perfect: [
+    makeQuestion("Present perfect form is:", ["have/has + V3", "am/is/are + V-ing", "did + V2"], 0, "Present Perfect Simple: have/has + past participle."),
+    makeQuestion("Use 'since' with:", ["a starting point", "a period of time", "a repeated noun"], 0, "Since başlangıç noktası ile kullanılır."),
+    makeQuestion("Use 'for' with:", ["a period of time", "a starting point only", "a question word"], 0, "For süre miktarı ile kullanılır."),
+    makeQuestion("'I've just bought shoes' means:", ["very recent action", "future arrangement", "old habit"], 0, "Just çok yakın zamanda olmuş eylemi gösterir."),
+    makeQuestion("Which is correct with a finished past time?", ["I watched it last weekend.", "I have watched it last weekend.", "I have been watch it last weekend."], 0, "Belirli geçmiş zaman varsa past simple kullanılır.")
+  ],
+  perfectcont: [
+    makeQuestion("Present perfect continuous form is:", ["have/has been + V-ing", "have/has + V3", "was/were + V-ing"], 0, "Form: have/has been + V-ing."),
+    makeQuestion("'My hands are dirty. I have been repairing my bike.' focuses on:", ["activity and present result", "a completed count only", "future schedule"], 0, "Süreç ve şimdiki sonuç vurgulanır."),
+    makeQuestion("Which time expression fits PPC?", ["lately", "yesterday at 5", "in 1997"], 0, "Lately/recently PPC ile çok sık kullanılır."),
+    makeQuestion("With stative verbs like know, use:", ["present perfect simple", "present perfect continuous normally", "future continuous"], 0, "Know gibi stative verbs continuous ile normalde kullanılmaz."),
+    makeQuestion("Which is correct?", ["I've been waiting since 10 o'clock.", "I'm waiting since 10 o'clock.", "I wait since 10 o'clock."], 0, "Geçmişte başlayıp şimdi devam eden süreç için present perfect continuous uygundur.")
+  ],
+  modals: [
+    makeQuestion("Past obligation uses:", ["had to", "musted", "must to"], 0, "Must'ın past formu olarak zorunlulukta had to kullanılır."),
+    makeQuestion("Mustn't means:", ["prohibition", "no necessity", "advice"], 0, "Mustn't yasak anlamındadır."),
+    makeQuestion("Don't have to means:", ["not necessary", "forbidden", "impossible"], 0, "Don't have to zorunluluk yok demektir."),
+    makeQuestion("Needn't + verb uses:", ["infinitive without to", "to + verb", "V-ing only"], 0, "Needn't modal gibi kullanıldığında bare infinitive alır."),
+    makeQuestion("Ought to is similar to:", ["should", "mustn't", "can't"], 0, "Ought to tavsiye verir ve should'a yakındır.")
+  ],
+  verbpatterns: [
+    makeQuestion("Which verb is followed by to-infinitive?", ["decide", "enjoy", "finish"], 0, "Decide to do something kalıbı kullanılır."),
+    makeQuestion("Which verb is followed by gerund?", ["avoid", "want", "agree"], 0, "Avoid + V-ing alır."),
+    makeQuestion("After modal verbs, use:", ["base verb without to", "to + verb", "V-ing only"], 0, "Modal verbs sonrası bare infinitive gelir."),
+    makeQuestion("Negative infinitive is:", ["not to go", "to not went", "not going to"], 0, "Infinitive olumsuzu not + to + verb şeklindedir."),
+    makeQuestion("Let and make are followed by:", ["object + base verb", "object + to + verb", "object + V-ing"], 0, "Let/make + object + bare infinitive kullanılır.")
+  ],
+  causative: [
+    makeQuestion("Causative form is:", ["have + object + V3", "have + V1 + object", "be + object + V-ing"], 0, "Have something done: have + object + past participle."),
+    makeQuestion("'I cleaned my car' means:", ["I did it myself.", "Someone did it for me.", "It was impossible."], 0, "Cümlede işi kişi kendi yapıyor."),
+    makeQuestion("'I had my car cleaned' means:", ["I arranged/paid someone to do it.", "I cleaned it myself.", "I will buy a car."], 0, "Causative yapıda işi başkası yapar."),
+    makeQuestion("Question form is:", ["Did you have your eyes tested?", "Had you your eyes test?", "Did you had your eyes tested?"], 0, "Auxiliary did ile base form have kullanılır."),
+    makeQuestion("Get something done is:", ["a common alternative to have something done", "always passive future", "wrong in English"], 0, "Get something done konuşma dilinde yaygın alternatiftir.")
+  ],
+  passive: [
+    makeQuestion("Present simple passive is:", ["am/is/are + V3", "am/is/are + V-ing", "have/has + V3"], 0, "Present simple passive: am/is/are + past participle."),
+    makeQuestion("Present continuous passive is:", ["am/is/are being + V3", "am/is/are + V3", "has been + V-ing"], 0, "Continuous passive: be being + V3."),
+    makeQuestion("Past perfect passive is:", ["had been + V3", "was being + V3", "has been + V3"], 0, "Past perfect passive: had been + past participle."),
+    makeQuestion("Use passive when:", ["the doer is unknown or not important", "the subject must always be a person", "we never want formal style"], 0, "Passive, eylemi yapan bilinmiyorsa/önemsizse çok kullanılır."),
+    makeQuestion("'by' is used to show:", ["the agent/doer", "the time only", "the object pronoun"], 0, "Passive içinde yapan kişi önemliyse by + agent kullanılır.")
+  ],
+  reported: [
+    makeQuestion("Reported statements often change:", ["tense, pronouns, time expressions", "only spelling", "only punctuation"], 0, "Dolaylı anlatımda tense, zamir ve zaman ifadeleri değişebilir."),
+    makeQuestion("Reported yes/no questions use:", ["if/whether", "do/did question order", "must only"], 0, "Yes/no questions reported speech'te if/whether alır."),
+    makeQuestion("Reported questions use:", ["statement word order", "question word order", "no subject"], 0, "She asked me what I wanted, not what did I want."),
+    makeQuestion("Reported imperatives use:", ["tell/ask + object + to-infinitive", "say + to + object + V-ing", "ask + object + V2"], 0, "Emir/rica aktarımında tell/ask + object + to do kullanılır."),
+    makeQuestion("'tomorrow' often changes to:", ["the next day", "the day before", "that day"], 0, "Reported speech'te tomorrow → the next day olur.")
+  ],
+  conditionals3: [
+    makeQuestion("Third conditional talks about:", ["imaginary past situations", "real future situations", "habits now"], 0, "Third conditional geçmişte farklı olabilecek hayali sonuçları anlatır."),
+    makeQuestion("If-clause form is:", ["if + past perfect", "if + present simple", "if + present continuous"], 0, "Third conditional if + past perfect kullanır."),
+    makeQuestion("Result clause form is:", ["would have + V3", "will + verb1", "would + verb1"], 0, "Sonuç cümlesi would have + past participle olur."),
+    makeQuestion("'I'd known' can mean:", ["I had known", "I would known", "I did known"], 0, "Third conditional if-clause içinde 'd = had olabilir."),
+    makeQuestion("Past perfect in narratives shows:", ["the earlier past action", "a future plan", "a current habit"], 0, "İki geçmiş olaydan önce olanı past perfect alır.")
+  ],
+  auxiliaries: [
+    makeQuestion("Be as an auxiliary appears in:", ["continuous and passive forms", "only possessives", "only object pronouns"], 0, "Be, continuous ve passive yapılarda yardımcı fiildir."),
+    makeQuestion("Do as an auxiliary appears in:", ["present/past simple questions and negatives", "present perfect", "passive voice only"], 0, "Do/does/did simple tense soru ve olumsuzlarında kullanılır."),
+    makeQuestion("Have as an auxiliary appears in:", ["perfect tenses", "comparatives", "object pronouns"], 0, "Have/has/had perfect tense yardımcı fiilidir."),
+    makeQuestion("Which sentence uses have as a main verb?", ["I have two brothers.", "I have seen him.", "I have been working."], 0, "Have possession anlamında ana fiildir."),
+    makeQuestion("Which is correct?", ["Does she speak English?", "Does she speaks English?", "Is she speak English?"], 0, "Present simple question: does + subject + verb1.")
+  ]
+};
+
+Object.entries(RAVZA_EXTENDED_QUIZ_QUESTIONS).forEach(([id, questions]) => addTopicQuestions(id, questions));
+
+function buildDetailedStudyHtml(data) {
+  return `
+<div class="content-card deep-study-card">
+  <h3>🧑‍🏫 Ravza için detaylı anlatım</h3>
+  <p><strong>Bu konuda asıl hedef:</strong> ${data.goal}</p>
+  <p>${data.logic}</p>
+  <div class="lesson-grid">
+    <div class="visual-note"><strong>1. Önce anlamı yakala</strong><br>${data.meaning}</div>
+    <div class="visual-note"><strong>2. Sonra yapıyı kur</strong><br>${data.structure}</div>
+    <div class="visual-note"><strong>3. En son kontrol et</strong><br>${data.check}</div>
+  </div>
+</div>
+<div class="content-card">
+  <h3>🧩 Soru çözerken adım adım</h3>
+  <ul class="keypoint-list">
+    ${data.steps.map((step) => `<li class="keypoint-item">${step}</li>`).join("")}
+  </ul>
+</div>
+<div class="content-card">
+  <h3>⚠️ Ravza'nın dikkat etmesi gereken hata</h3>
+  <div class="warning-box">
+    <p><strong>Tipik hata:</strong> ${data.trap}</p>
+    <p><strong>Doğru düşünme:</strong> ${data.fix}</p>
+  </div>
+</div>
+<div class="content-card mini-summary-card">
+  <h3>🎯 Konu sonunda kendine sor</h3>
+  <ul>
+    ${data.selfCheck.map((item) => `<li>${item}</li>`).join("")}
+  </ul>
+</div>
+`;
+}
+
+const DETAILED_STUDY_EXPLANATIONS = {
+  wordlist1a: {
+    goal: "kelimeyi sadece Türkçe karşılığıyla değil, hangi cümlede hangi anlamı verdiğiyle hatırlamak.",
+    logic: "Vocabulary sorularında doğru cevap çoğu zaman tek bir kelime bilgisiyle değil, cümlenin bağlamıyla bulunur. Mesela evidence 'kanıt' demektir ama strong evidence kalıbında daha akademik ve sınavlık bir kullanım kazanır.",
+    meaning: "Cümlede boşluğun isim mi, fiil mi, sıfat mı istediğini bul. Sonra anlamı daralt.",
+    structure: "Collocation kontrol et: strong evidence, do a survey, stand out in a crowd, be named after someone.",
+    check: "Seçtiğin kelime cümlede hem gramer hem anlam olarak doğal duruyor mu?",
+    steps: [
+      "Önce boşluktan önce ve sonra gelen kelimelere bak: article varsa çoğu zaman noun gelir.",
+      "Definition ile example sentence'i birlikte oku; sadece tek kelime ezberi kısa sürede unutulur.",
+      "Phrasal verb ise particle'i ayırma: stand out, go about, take on, call off gibi bütün olarak düşün.",
+      "Benzer kelimeleri ayır: evidence genel destekleyici kanıt, proof daha net ispat hissi verir."
+    ],
+    trap: "Kelimeyi Türkçeden İngilizceye birebir çevirmek.",
+    fix: "Önce cümlenin ihtiyacını bul, sonra kaynak örneklerdeki kullanımı hatırla.",
+    selfCheck: ["Bu kelimenin türünü biliyor muyum?", "Bir örnek cümle kurabiliyor muyum?", "Yanına gelen preposition/particle var mı?"]
+  },
+  objectpronouns: {
+    goal: "direct object, indirect object ve object pronoun sırasını cümlede hızlıca görmek.",
+    logic: "Bu konu aslında 'kim neyi kime veriyor/gönderiyor/gösteriyor?' sorusudur. Şey direct object, kişi genellikle indirect object olur. Pronoun gelince sıra daha hassas hale gelir.",
+    meaning: "What? sorusu direct object'i; to whom / for whom? sorusu indirect object'i buldurur.",
+    structure: "Noun varsa Mary gave me a book; pronoun varsa Mary gave it to me yapısı daha güvenlidir.",
+    check: "to / for sonrasında subject pronoun değil object pronoun kullandın mı?",
+    steps: [
+      "Önce fiili bul: give, send, lend, show, buy, cook gibi iki nesne alabilir mi?",
+      "Sonra şeyi bul: a book, a message, it, them.",
+      "Kişiyi bul: me, her, us, them.",
+      "Preposition sonrası her zaman object pronoun kullan: to her, for us, with them."
+    ],
+    trap: "I gave it to she gibi subject pronoun kullanmak.",
+    fix: "Preposition gördüğünde otomatik object pronoun düşün: she değil her, they değil them.",
+    selfCheck: ["Direct object ne?", "Indirect object kim?", "to mu for mu gerekiyor?"]
+  },
+  adjectives: {
+    goal: "sıfatları isimle, one/ones ile, comparative ve superlative yapılarla doğru kullanmak.",
+    logic: "Adjective konusu sadece 'güzel, uzun, pahalı' demek değildir. İngilizce cümlede sıfatın nerede duracağı, isim tekrarından kaçınmak için one/ones kullanımı ve karşılaştırmanın derecesi önemlidir.",
+    meaning: "Sıfat bir kişi/şey/yeri anlatır: big house, ambitious person, expensive phone.",
+    structure: "Tekil sayılabilir isimde a/an unutma; comparative için than, superlative için genellikle the kullan.",
+    check: "Sıfat isimden önce mi? Tekil isimde article var mı? one/ones sayılabilir isim yerine mi geldi?",
+    steps: [
+      "Adjective + noun varsa kelime sırasını kontrol et: a beautiful girl.",
+      "İki şey karşılaştırılıyorsa comparative kullan: bigger than, more expensive than.",
+      "Bir grup içinde en diyorsan superlative kullan: the biggest, the most expensive.",
+      "Fark küçükse a bit, büyükse much + comparative kullan."
+    ],
+    trap: "Suzan is beautiful girl ya da more better gibi iki comparative'i üst üste kullanmak.",
+    fix: "Tekil noun önüne article ekle; irregular adjective formlarını ayrı ezberle: good-better-best, bad-worse-worst.",
+    selfCheck: ["Tekil noun varsa a/an var mı?", "than gerekiyor mu?", "one/ones sayılabilir noun yerine mi kullanıldı?"]
+  },
+  presenttenses: {
+    goal: "Present Simple, Present Continuous, stative verbs ve future arrangement farkını netleştirmek.",
+    logic: "Bu konuda zaman adı 'present' olsa da bazen gelecek anlatılır. Present Simple alışkanlık ve timetable için, Present Continuous şu an/temporary durum ve ayarlanmış gelecek plan için kullanılır.",
+    meaning: "always/every day gibi ifadeler rutin; now/at the moment geçici veya şu an; tomorrow with arrangement plan gösterir.",
+    structure: "Present Simple: subject + V1/s. Present Continuous: am/is/are + V-ing.",
+    check: "Fiil stative mi action mı? have/think/see gibi çift anlamlı fiillerde anlamı doğru okudun mu?",
+    steps: [
+      "Cümlede frequency adverb varsa Present Simple düşün.",
+      "Şu anda veya bu aralar devam eden eylem varsa Present Continuous düşün.",
+      "Flight/train/class timetable ise Present Simple kullan.",
+      "Kişisel ayarlanmış plan varsa Present Continuous kullan: I'm meeting..."
+    ],
+    trap: "I am knowing veya I am believing gibi stative verb'i continuous yapmak.",
+    fix: "Duygu, düşünce, sahiplik ve durum fiilleri genellikle simple kalır: I know, I believe, I have.",
+    selfCheck: ["Bu bir rutin mi?", "Bu bir temporary action mı?", "Fiil stative anlamda mı?"]
+  },
+  possessives: {
+    goal: "sahiplik anlatırken 's, plural apostrophe, of ve own yapılarını doğru seçmek.",
+    logic: "Possessives konusu 'kimin?' sorusudur. İnsanlarda 's çok doğal, cansız varlıklarda of yapısı sık görülür. Own ise 'kendine ait' vurgusu verir.",
+    meaning: "Tom's car = Tom'un arabası; the door of the car = arabanın kapısı; her own room = kendine ait odası.",
+    structure: "Plural -s ile bitiyorsa sadece apostrophe: teachers'. Irregular plural ise 's: children's.",
+    check: "Bir şey iki kişiye ortak mı ait, ayrı ayrı mı? Buna göre 's yeri değişir.",
+    steps: [
+      "Sahip kişi/insansa önce possessive 's düşün.",
+      "Çoğul isim -s ile bitiyorsa apostrophe sona gelir.",
+      "İki kişi tek şeye sahipse 's ikinci isme gelir.",
+      "Own varsa vurgu vardır: my own, her own, a friend of mine."
+    ],
+    trap: "Teachers's room veya childrens' playground yazmak.",
+    fix: "-s ile biten regular plural: teachers'. -s ile bitmeyen irregular plural: children's.",
+    selfCheck: ["Sahip tekil mi çoğul mu?", "İsim -s ile bitiyor mu?", "Ortak sahiplik mi ayrı sahiplik mi?"]
+  },
+  pasttenses: {
+    goal: "Past Simple, Past Continuous ve used to yapılarını olay sırasına göre seçmek.",
+    logic: "Geçmiş zaman sorularında önce olayın bitti mi, bir anda mı oldu, yoksa arka planda devam mı ediyordu diye düşün. Used to ise artık doğru olmayan eski alışkanlıkları anlatır.",
+    meaning: "Past Simple bitmiş olay; Past Continuous geçmişte devam eden arka plan; used to eski alışkanlık/eski durum.",
+    structure: "Did ile soru/olumsuzda fiil yalınlaşır. Past Continuous: was/were + V-ing.",
+    check: "Cümlede when/while var mı? Biri uzun eylem, biri bölen kısa eylem olabilir.",
+    steps: [
+      "Belirli geçmiş zaman varsa Past Simple düşün.",
+      "Geçmişte belirli anda devam eden eylem varsa Past Continuous kullan.",
+      "Artık olmayan eski alışkanlık için used to kullan.",
+      "Did/didn't sonrası V2 kullanma; fiili V1 yap."
+    ],
+    trap: "Did you went? veya didn't used to demek.",
+    fix: "Did gelirse fiil V1 olur: Did you go? / didn't use to.",
+    selfCheck: ["Olay tamamlandı mı?", "Arka plan eylemi var mı?", "Bu eski ama artık yok olan bir alışkanlık mı?"]
+  },
+  prepositions: {
+    goal: "place, movement ve dependent preposition yapılarını ezber değil mantıkla ayırmak.",
+    logic: "Preposition küçük görünür ama anlamı tamamen değiştirir. in/on/under yer bildirir; across/through/along hareketin yolunu gösterir; interested in, good at gibi yapılar ise sabit kalıp olarak öğrenilir.",
+    meaning: "Place = nerede? Movement = nereye/nasıl hareket ediyor? Dependent = hangi fiil/sıfat hangi preposition ile gelir?",
+    structure: "Preposition sonrası fiil gelirse çoğunlukla V-ing kullanılır: interested in learning.",
+    check: "Bu preposition yer mi, hareket mi, yoksa sabit kalıp mı?",
+    steps: [
+      "Nesne sabit duruyorsa place prepositions düşün.",
+      "Hareket varsa across, through, along, over, towards gibi seçenekleri anlamla ayır.",
+      "Verb/adjective + preposition listelerini kalıp olarak çalış.",
+      "Preposition sonrası to olsa bile fiil -ing olabilir: looking forward to seeing."
+    ],
+    trap: "Discuss about the problem veya interested on demek.",
+    fix: "Bazı fiiller preposition almaz: discuss the problem. Bazı sıfatlar sabittir: interested in, good at.",
+    selfCheck: ["Yer mi hareket mi?", "Bu sabit kalıp mı?", "Sonrasında fiil varsa -ing gerekiyor mu?"]
+  },
+  futureforms: {
+    goal: "will, be going to, present continuous ve future in the past yapılarını bağlama göre seçmek.",
+    logic: "Gelecek anlatırken tek bir yapı yoktur. Will konuşma anındaki karar, söz, teklif ve fikir tahmini verir. Going to önceden niyet veya görünen kanıtı anlatır. Present Continuous ayarlanmış planı anlatır.",
+    meaning: "I think = opinion prediction; Look at those clouds = evidence; tomorrow at 6 with a person = arrangement.",
+    structure: "will + V1, am/is/are going to + V1, am/is/are + V-ing, was/were going to + V1.",
+    check: "Karar şimdi mi verildi, daha önce mi planlandı, yoksa takvime mi bağlı?",
+    steps: [
+      "Anlık karar, söz veya teklif varsa will seç.",
+      "Görünen kanıt ya da önceden karar varsa going to seç.",
+      "Saat/yer/kişiyle organize plan varsa Present Continuous kullan.",
+      "Geçmişte planlandı ama olmadıysa was/were going to kullan."
+    ],
+    trap: "Her gelecek cümlesine will koymak.",
+    fix: "Önce bağlamı oku: plan mı, kanıt mı, anlık karar mı, fixed arrangement mı?",
+    selfCheck: ["Evidence var mı?", "Plan önceden mi yapılmış?", "Bu konuşma anındaki karar mı?"]
+  },
+  conditionals12: {
+    goal: "First Conditional ile gerçek olası gelecek, Second Conditional ile hayali durum kurmak.",
+    logic: "Conditional cümlelerde if kısmı ve sonuç kısmı birbiriyle zaman uyumu ister. First conditional gerçekçi ihtimal, second conditional hayali veya düşük ihtimal anlatır.",
+    meaning: "If it rains, we will stay home = olabilir. If I won the lottery, I would travel = hayali.",
+    structure: "First: If + Present Simple, will/can/imperative + V1. Second: If + Past Simple, would/could + V1.",
+    check: "Bu durum gerçekçi bir gelecek ihtimali mi, yoksa hayali mi?",
+    steps: [
+      "If-clause içindeki zamanı bul.",
+      "First conditional ise if kısmında will kullanma.",
+      "Second conditional'da past form geçmiş anlam vermez; hayali durum kurar.",
+      "unless = if not anlamını unutma."
+    ],
+    trap: "If it will rain gibi if kısmında will kullanmak.",
+    fix: "First conditional if kısmı present simple alır: If it rains, I will stay.",
+    selfCheck: ["Gerçek ihtimal mi?", "Hayali durum mu?", "would/could farkı anlamı değiştiriyor mu?"]
+  },
+  perfect: {
+    goal: "Present Perfect Simple ile geçmiş-şimdi bağlantısını ve for/since mantığını kurmak.",
+    logic: "Present Perfect Simple geçmişte olmuş ama şimdiyle bağlantısı olan şeyi anlatır. Deneyim, yeni haber, tamamlanmış sonuç veya geçmişte başlayıp şimdi süren durumlarda kullanılır.",
+    meaning: "I've finished = sonuç şimdi önemli. I've known her for years = geçmişte başladı, hâlâ geçerli.",
+    structure: "Subject + have/has + V3. for + süre, since + başlangıç noktası.",
+    check: "Cümlede belirli bitmiş geçmiş zaman var mı? Varsa Past Simple gerekebilir.",
+    steps: [
+      "ever/never deneyim sorusu olabilir.",
+      "just/already/yet tamamlanma veya beklenen sonuç anlatır.",
+      "for süre miktarı, since başlangıç noktasıdır.",
+      "Stative verbs ile devam eden durumlarda simple perfect kullan."
+    ],
+    trap: "I have watched it yesterday veya since two years demek.",
+    fix: "Yesterday varsa Past Simple; süre miktarı varsa for two years kullan.",
+    selfCheck: ["Geçmiş-şimdi bağlantısı var mı?", "V3 kullandım mı?", "for/since doğru mu?"]
+  },
+  perfectcont: {
+    goal: "Present Perfect Continuous ile süreç, tekrar ve görünür sonucu anlatmak.",
+    logic: "Bu yapı işi bitmiş bitmemiş diye değil, eylemin süresini ve şimdiki etkisini vurgular. Eller kirliyse 'I've been repairing' sürece dikkat çeker.",
+    meaning: "I've been studying = bir süredir çalışıyorum; süreç önemli.",
+    structure: "Subject + have/has been + V-ing.",
+    check: "Cümlede lately/recently/how long/all day gibi süreç ipucu var mı?",
+    steps: [
+      "Görünür sonuç varsa continuous düşün: tired, wet, dirty, sweating.",
+      "How long soruları çoğu zaman perfect continuous ister.",
+      "Work/live bazen simple veya continuous olabilir.",
+      "Know/believe gibi stative verbs continuous yapılmaz."
+    ],
+    trap: "I've been knowing her for years demek.",
+    fix: "Stative verb ise simple perfect kullan: I've known her for years.",
+    selfCheck: ["Süreç mi sonuç mu?", "Visible result var mı?", "Fiil stative mi?"]
+  },
+  modals: {
+    goal: "have to, must, needn't, mustn't, should ve ought to farkını anlamak.",
+    logic: "Modals of obligation konusu zorunluluk derecesini anlatır. Mustn't yasak, don't have to gerek yok, should tavsiye, have to dış zorunluluk hissi verir.",
+    meaning: "You mustn't drive = yasak. You don't have to drive = gerek yok.",
+    structure: "Modal sonrası V1 gelir. Have to tense değiştirebilir: had to, will have to.",
+    check: "Cümlede yasak mı var, zorunluluk mu, yoksa sadece tavsiye mi?",
+    steps: [
+      "Kural/kanun/dış zorunluluk varsa have to düşün.",
+      "Kişisel güçlü zorunluluk veya güçlü tavsiye varsa must olabilir.",
+      "Yasak varsa mustn't kullan.",
+      "Gerek yoksa don't have to veya needn't kullan."
+    ],
+    trap: "mustn't ile don't have to'yu aynı sanmak.",
+    fix: "Mustn't = yapma, yasak. Don't have to = istersen yapmayabilirsin.",
+    selfCheck: ["Yasak mı?", "Gerek yok mu?", "Tavsiye mi?"]
+  },
+  ability: {
+    goal: "can, could, be able to ve deduction modals arasındaki anlam farkını yakalamak.",
+    logic: "Can/could yetenek ve izin anlatır ama her tense'te kullanılamaz. Be able to daha esnektir. Deduction kısmında ise must, can't, might/could kanıta göre eminlik derecesi verir.",
+    meaning: "can = şimdi yapabilir; could = geçmiş genel yetenek; was able to = belirli bir olayda başardı.",
+    structure: "can/could/must/might + V1; be able to farklı tense'lerle kullanılabilir.",
+    check: "Bu yetenek mi, izin mi, yoksa mantıksal çıkarım mı?",
+    steps: [
+      "Şimdiki yetenek için can kullan.",
+      "Geçmiş genel yetenek için could kullan.",
+      "Tek bir geçmiş başarı için was/were able to kullan.",
+      "Deduction'da must eminlik, can't imkansızlık, might/could olasılık gösterir."
+    ],
+    trap: "will can veya I like can read demek.",
+    fix: "Future için will be able to; gerund için being able to kullan.",
+    selfCheck: ["Tense can/could için uygun mu?", "Specific success mı?", "Eminlik derecesi ne?"]
+  },
+  phrasal: {
+    goal: "phrasal verb türlerini ve pronoun yerini doğru kullanmak.",
+    logic: "Phrasal verb sadece fiil + küçük kelime değildir; anlam çoğu zaman tamamen değişir. Bazıları nesne almaz, bazıları ayrılabilir, bazıları asla ayrılmaz.",
+    meaning: "turn off = kapatmak, look after = bakmak, look forward to = heyecanla beklemek.",
+    structure: "Type 1 no object; Type 2 separable; Type 3 inseparable.",
+    check: "Nesne noun mu pronoun mu? Fiil ayrılabilir mi?",
+    steps: [
+      "Phrasal verb'in nesne alıp almadığını kontrol et.",
+      "Separable ise noun iki yerde de olabilir: turn off the light / turn the light off.",
+      "Pronoun varsa ortada olmalı: turn it off.",
+      "Inseparable ise parçalama: look after him, look forward to it."
+    ],
+    trap: "turn off it veya look him after demek.",
+    fix: "Pronoun rule ve separable/inseparable bilgisini birlikte kontrol et.",
+    selfCheck: ["Type 1, 2, 3 hangisi?", "Pronoun var mı?", "Particle sabit mi?"]
+  },
+  verbpatterns: {
+    goal: "fiilden sonra to-infinitive, bare infinitive, gerund veya object + infinitive gelip gelmediğini bilmek.",
+    logic: "İngilizcede bazı fiiller kendinden sonra özel bir yapı ister. Bu konu ezber gibi görünür ama gruplara ayırınca kolaylaşır: want to, enjoy doing, let someone do, allow someone to do.",
+    meaning: "Verb pattern yanlış olursa cümle anlam olarak anlaşılır gibi olsa bile gramerde hata olur.",
+    structure: "to + V1, V1 without to, V-ing, object + to + V1.",
+    check: "Ana fiilden sonra gelen ikinci fiil hangi formda olmalı?",
+    steps: [
+      "Want/decide/agree/hope gibi fiillerden sonra to-infinitive düşün.",
+      "Enjoy/avoid/finish/mind gibi fiillerden sonra gerund düşün.",
+      "Modal, let, make sonrası bare infinitive kullan.",
+      "Ask/tell/allow/want someone to do yapısını object ile kur."
+    ],
+    trap: "I enjoy to read veya She can to swim demek.",
+    fix: "Fiilin ait olduğu grubu hatırla: enjoy reading, can swim.",
+    selfCheck: ["Fiilden sonra to mu geliyor?", "V-ing mi gerekiyor?", "Object + infinitive mi?"]
+  },
+  causative: {
+    goal: "have/get something done yapısıyla bir işi başkasına yaptırmayı anlatmak.",
+    logic: "Bu yapı 'ben yaptım' değil, 'ben yaptırdım' demektir. Saç kestirmek, araba temizletmek, fotoğraf çektirmek gibi işler için çok kullanılır.",
+    meaning: "I cleaned my car = kendim yaptım. I had my car cleaned = başkasına yaptırdım.",
+    structure: "have/get + object + V3. Tense have/get üzerinde değişir.",
+    check: "İşi gerçekten subject mi yaptı, yoksa biri mi yaptı?",
+    steps: [
+      "Önce object'i bul: hair, car, phone, roof.",
+      "Sonra past participle kullan: cut, cleaned, repaired, painted.",
+      "Soru/olumsuzda do/did yardımcı fiilini doğru kullan.",
+      "Konuşma dilinde get something done alternatifini hatırla."
+    ],
+    trap: "I had cut my hair ile I had my hair cut farkını kaçırmak.",
+    fix: "Object + V3 yan yana geliyorsa causative anlamı kontrol et.",
+    selfCheck: ["İşi kim yaptı?", "Object ne?", "Fiil V3 mü?"]
+  },
+  passive: {
+    goal: "Passive voice ile odağı işi yapandan işe/sonuca çevirmek.",
+    logic: "Passive kullanınca 'kim yaptı?' yerine 'ne oldu?' öne çıkar. Yapan kişi bilinmiyorsa, önemsizse veya resmi üslup gerekiyorsa passive doğal olur.",
+    meaning: "They built the bridge = yapan önemli. The bridge was built = köprü/sonuç önemli.",
+    structure: "be + V3. Tense be üzerinde taşınır: is done, was done, has been done, will be done.",
+    check: "Active cümledeki object passive cümlenin subject'i oldu mu?",
+    steps: [
+      "Active cümlenin tense'ini bul.",
+      "Object'i başa al.",
+      "Aynı tense'te uygun be formunu seç.",
+      "Fiili her zaman V3 yap; yapan önemliyse by ekle."
+    ],
+    trap: "Passive'te V3 yerine V1/V2 kullanmak.",
+    fix: "Passive'in değişmeyen parçası V3'tür; zaman be kısmında değişir.",
+    selfCheck: ["Tense doğru mu?", "be + V3 var mı?", "by gerekli mi?"]
+  },
+  reported: {
+    goal: "direct speech'i reported speech'e çevirirken tense, pronoun ve word order değişimini yönetmek.",
+    logic: "Reported speech birinin sözünü aktarmaktır. Artık konuşma anından uzaklaştığın için tense ve zaman ifadeleri değişebilir; sorularda normal soru sırası kaybolur.",
+    meaning: "I am tired → She said she was tired. Are you ready? → She asked if I was ready.",
+    structure: "said/told + reported statement; asked + if/whether veya question word + statement order.",
+    check: "Bu bir cümle mi, soru mu, emir/rica mı?",
+    steps: [
+      "Statement ise tense backshift ve pronoun değişimini kontrol et.",
+      "Yes/no question ise if/whether kullan.",
+      "Wh-question ise question word kalır ama düz cümle sırası gelir.",
+      "Emir/rica ise ask/tell + object + to infinitive kullan."
+    ],
+    trap: "She asked me what did I want demek.",
+    fix: "Reported questions statement order ister: what I wanted.",
+    selfCheck: ["Backshift gerekiyor mu?", "if/whether mi?", "Question order düzeldi mi?"]
+  },
+  conditionals3: {
+    goal: "Third Conditional ile geçmişte gerçekleşmeyen durumları ve pişmanlıkları anlatmak.",
+    logic: "Bu yapı geçmişi değiştiremeyiz ama 'eğer şöyle olsaydı böyle olurdu' diye hayali sonuç kurar. Bu yüzden hem if kısmı hem sonuç kısmı geçmişin daha gramerli bir versiyonunu alır.",
+    meaning: "If I'd known, I would have called = bilseydim arardım ama bilmedim/arayıp aramadım.",
+    structure: "If + past perfect, would have + V3.",
+    check: "Gerçek geçmişte bu durum olmadı mı? Pişmanlık/hypothetical past var mı?",
+    steps: [
+      "If kısmında had + V3 kur.",
+      "Sonuç kısmında would have + V3 kur.",
+      "'d kısaltmasının had veya would olabileceğini bağlamdan ayır.",
+      "Past perfect'in diğer kullanımını da hatırla: iki geçmiş olaydan önce olan."
+    ],
+    trap: "If I would have known demek.",
+    fix: "If kısmında would kullanma; had known kullan.",
+    selfCheck: ["Geçmişte gerçekleşmedi mi?", "If + had V3 var mı?", "Would have + V3 var mı?"]
+  },
+  auxiliaries: {
+    goal: "be, do ve have fiillerinin ana fiil mi yardımcı fiil mi olduğunu ayırmak.",
+    logic: "Be/do/have bazen cümlenin anlam fiilidir, bazen sadece grameri taşır. Bu ayrımı görürsen soru, olumsuz, continuous, perfect ve passive yapılar daha kolay çözülür.",
+    meaning: "I have a car = ana fiil. I have seen it = auxiliary. She is happy = ana fiil. She is working = auxiliary.",
+    structure: "do simple tense soru/olumsuz; be continuous/passive; have perfect tense yardımcı fiilidir.",
+    check: "Bu kelime cümlede anlam mı veriyor, yoksa tense yapısını mı kuruyor?",
+    steps: [
+      "Simple tense soru/olumsuzda do/does/did ara.",
+      "Continuous veya passive varsa be yardımcı fiilini bul.",
+      "Perfect tense varsa have/has/had yardımcı fiilini bul.",
+      "Ana fiil have/be/do olduğunda anlamını ayrıca çevir."
+    ],
+    trap: "Does he is tired? gibi iki yardımcı fiili yanlış birleştirmek.",
+    fix: "Cümlenin yapısını seç: be cümlesi mi, simple tense mi, perfect mi?",
+    selfCheck: ["Ana fiil hangisi?", "Yardımcı fiil hangisi?", "Soru/olumsuz hangi auxiliary ile kurulmalı?"]
+  },
+  readingreviews: {
+    goal: "Reading metninde ana fikir, referans ve çıkarım sorularını metne bağlı çözmek.",
+    logic: "Reading 1 online yorumların güven, müşteri kararı ve şirket davranışı üzerindeki etkisini anlatır. Soruları çözerken kendi fikrini değil, metinde desteklenen fikri seçmelisin.",
+    meaning: "Her paragrafın bir görevi var: giriş, değişim, etki, şirket tepkisi, sahte yorum uyarısı, sonuç.",
+    structure: "Main idea tüm metni kapsar; reference sorusu önceki cümleye döner; inference metinden çıkarılabilir ama birebir yazmayabilir.",
+    check: "Seçenek metinde açıkça destekleniyor mu, yoksa fazla genelleme mi?",
+    steps: [
+      "Ana fikir sorusunda tek detay değil bütün metnin ortak mesajını seç.",
+      "this/it/they sorularında önceki cümleye dön.",
+      "Vocabulary in context sorusunda kelimeyi cümledeki işleviyle düşün.",
+      "Inference sorusunda metnin uyarılarını ve sonuç paragrafını kullan."
+    ],
+    trap: "All reviews are reliable gibi metnin tersini söyleyen seçeneğe gitmek.",
+    fix: "Fake reviews paragrafı yorumların dikkatli okunması gerektiğini gösterir.",
+    selfCheck: ["Cevap metinde destekleniyor mu?", "Bu ana fikir mi detay mı?", "Referans kelime neye dönüyor?"]
+  },
+  readingwork: {
+    goal: "Reading 2'de değişen iş dünyasını avantaj/dezavantaj dengesiyle anlamak.",
+    logic: "Metin remote work, gig economy, automation ve lifelong learning kavramlarını anlatır. Yazar değişimi tek taraflı vermez; hem fırsat hem zorluk olarak sunar.",
+    meaning: "Remote work zaman kazandırabilir ama izolasyon getirebilir. Gig economy özgürlük verir ama job security azaltabilir.",
+    structure: "Paragrafları trend başlıklarına ayır: remote work, advantages, disadvantages, gig economy, automation, education.",
+    check: "Seçenek metnin dengeli tonuna uyuyor mu?",
+    steps: [
+      "Ana fikirde bütün trendleri kapsayan seçeneği seç.",
+      "Advantage/disadvantage sorularında ilgili paragrafı bul.",
+      "Vocabulary sorularında kelimeyi iş dünyası bağlamıyla düşün.",
+      "Inference sorularında adapt, learn, flexible gibi sonuç kelimelerine bak."
+    ],
+    trap: "Metni sadece remote work metni sanmak.",
+    fix: "Metin daha geniş: çalışma dünyasının birçok yönden değişmesi.",
+    selfCheck: ["Bu paragraf hangi trendi anlatıyor?", "Avantaj mı dezavantaj mı?", "Sonuç paragrafı ne öneriyor?"]
+  },
+  vocabcontext: {
+    goal: "karışık vocabulary sorularında anlam, collocation ve grammar pattern'i birlikte kullanmak.",
+    logic: "Bu bölümde kelimeler tek konuya bağlı değil; phrasal verbs, adjectives, prepositions ve collocations birlikte gelir. Bu yüzden cevabı sadece Türkçe anlamla değil kalıpla da kontrol etmelisin.",
+    meaning: "keen on learning, eager to start, prevent from concentrating gibi kalıplar doğru cevabı belirler.",
+    structure: "Phrasal verb particle ile; adjective preposition ile; verb pattern ikinci fiilin formuyla çalışılır.",
+    check: "Seçenek cümledeki boşluğa hem anlam hem yapı olarak uyuyor mu?",
+    steps: [
+      "Boşluktan sonra V-ing varsa keen on, good at, prevent from gibi kalıpları düşün.",
+      "to + V1 varsa eager to, decide to, want to gibi yapıları kontrol et.",
+      "Object varsa phrasal verb'in separable/inseparable olup olmadığını düşün.",
+      "Collocationları bütün olarak ezberle: make a decision, meet expectations, keep in touch."
+    ],
+    trap: "Sadece Türkçe anlamı tuttu diye grameri yanlış kelimeyi seçmek.",
+    fix: "Cevap hem anlamı hem kalıbı aynı anda sağlamalı.",
+    selfCheck: ["Bu kelime hangi preposition ile gelir?", "Sonrasında V-ing mi V1 mi var?", "Bu collocation doğal mı?"]
+  }
+};
+
+Object.entries(DETAILED_STUDY_EXPLANATIONS).forEach(([id, data]) => appendTopicHtml(id, buildDetailedStudyHtml(data)));
+
+function buildSourceLockedTeacherLesson(data) {
+  const rows = data.formulas.map((row) => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td></tr>`).join("");
+  const examples = data.examples.map((item) => `
+    <div class="source-panel example-card">
+      <p><strong>English:</strong> ${item.en}</p>
+      <p><strong>Türkçe:</strong> ${item.tr}</p>
+      <p><strong>Öğretmen notu:</strong> ${item.note}</p>
+    </div>
+  `).join("");
+  const mistakes = data.mistakes.map((item) => `
+    <div class="warning-box mistake-card">
+      <p><strong>Yanlış:</strong> ${item.wrong}</p>
+      <p><strong>Doğru:</strong> ${item.correct}</p>
+      <p><strong>Neden?</strong> ${item.why}</p>
+    </div>
+  `).join("");
+
+  return `
+<div class="lesson-hero source-locked-lesson">
+  <span class="emoji-title">📌 Kaynak kilitli ders</span>
+  <h3>${data.title}</h3>
+  <p>${data.intro}</p>
+</div>
+<div class="content-card source-locked-card">
+  <h3>📚 Kullanılan kaynak</h3>
+  <p>${data.source}</p>
+</div>
+<div class="content-card">
+  <h3>🧑‍🏫 Profesyonel öğretmen anlatımı</h3>
+  <p>${data.teacher}</p>
+  <ul class="keypoint-list">
+    ${data.rules.map((rule) => `<li class="keypoint-item">${rule}</li>`).join("")}
+  </ul>
+</div>
+<div class="content-card">
+  <h3>🧩 Formül ve kullanım haritası</h3>
+  <div class="table-wrap">
+    <table class="source-table">
+      <thead><tr><th>Bölüm</th><th>Yapı / Kelime</th><th>Kaynak örneği</th><th>Türkçe mantık</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+</div>
+<div class="content-card">
+  <h3>✅ Kaynak örnekleriyle anlatım</h3>
+  ${examples}
+</div>
+<div class="content-card">
+  <h3>⚠️ Sık yapılan hatalar</h3>
+  ${mistakes}
+</div>
+<div class="content-card mini-summary-card">
+  <h3>📦 Mini özet</h3>
+  <ul>${data.summary.map((item) => `<li>${item}</li>`).join("")}</ul>
+</div>
+`;
+}
+
+const SOURCE_LOCKED_TEACHER_LESSONS = {
+  wordlist1a: {
+    title: "1A Word List - kelimeyi cümlede öğrenme",
+    source: "1A WORD LIST.docx, Fill in the gaps.docx, VOCABULARY PRACTICE.docx, INTERMEDIATE VOCAB TEST 1A-3B.docx ve Vocabulary_List 1B Workbook.pdf içindeki kelime/kullanım listeleri.",
+    intro: "Bu ders sadece kelime anlamı ezberletmez; kelimenin cümlede hangi görevi aldığını öğretir. 🎯",
+    teacher: "Ravza, vocabulary çalışırken kelimeyi tek başına görürsen akılda kalması zor olur. Kaynaklardaki mantık şu: kelime + definition + example sentence birlikte öğrenilecek. Mesela evidence sadece 'kanıt' değil; strong evidence kalıbında bir fikri destekleyen bilgi demek. Survey ise insanlara soru sorarak bilgi toplama yöntemi. Bu yüzden her kelimeyi küçük bir sahne gibi düşün.",
+    rules: [
+      "📌 Noun kelimeleri article ve adjective ile tanı: strong evidence, a survey, a reputation.",
+      "📌 Phrasal verbleri tek parça öğren: stand out, go about, take on, call off, get over.",
+      "📌 Adjective + preposition kalıplarını birlikte tut: keen on, good at, interested in.",
+      "📌 Collocationları cümleyle ezberle: make a decision, meet expectations, keep in touch."
+    ],
+    formulas: [
+      ["Academic words", "researchers / evidence / survey / average", "There is strong evidence that exercise improves mental health.", "Akademik metinlerde bilgi, araştırma ve sonuç anlatır."],
+      ["Name words", "maiden name / full name / nickname / initials", "She still uses her maiden name at work.", "Kimlik ve isimle ilgili reading/vocabulary alanı."],
+      ["Context verbs", "deny / postpone / reject / trust", "She denied that she took the money.", "Cümlede olayın anlamını taşıyan fiiller."],
+      ["Phrasal verbs", "call off / fill in / give up / take on", "Please fill in the form before submitting it.", "Particle anlamı değiştirir; birlikte öğrenilir."]
+    ],
+    examples: [
+      { en: "Researchers are working on new ways to reduce air pollution.", tr: "Araştırmacılar hava kirliliğini azaltmanın yeni yolları üzerinde çalışıyor.", note: "Researchers kelimesi insan grubunu anlatan çoğul isimdir." },
+      { en: "The teacher did a survey to find out students' favourite books.", tr: "Öğretmen öğrencilerin en sevdiği kitapları öğrenmek için anket yaptı.", note: "Survey kaynakta bilgi toplama yöntemi olarak geçiyor." },
+      { en: "Her bright dress made her stand out in the crowd.", tr: "Parlak elbisesi onun kalabalıkta öne çıkmasını sağladı.", note: "Stand out bir phrasal verb; dikkat çekmek anlamı verir." }
+    ],
+    mistakes: [
+      { wrong: "I am keen on learn cultures.", correct: "I am keen on learning cultures.", why: "Kaynak vocabulary practice mantığında keen on + V-ing gerekir." },
+      { wrong: "Please fill the form.", correct: "Please fill in the form.", why: "Kaynak testinde form doldurmak için fill in kullanılır." }
+    ],
+    summary: ["Kelimeyi anlam + tür + örnek cümle ile öğren.", "Phrasal verb ve preposition kalıplarını ayırma.", "Boşluk sorularında önce cümlenin istediği kelime türünü bul."]
+  },
+  objectpronouns: {
+    title: "1A Object Pronouns - nesne ve kelime sırası",
+    source: "INTER-PLUS GRAMMAR NOTES 1A.docx ve WhatsApp 1A Grammar Bank görselindeki pronouns, direct/indirect object pronouns ve word order bölümü.",
+    intro: "Bu konu 'kim, neyi, kime?' sorusunu doğru sıraya koyma dersidir. 🧭",
+    teacher: "Direct object genellikle eylemden etkilenen şeydir; indirect object ise o şeyin gittiği kişidir. Kaynakta David repaired his car örneği direct object mantığını, They sent him a postcard örneği indirect object mantığını gösterir. Eğer direct object pronoun olursa İngilizce sıra daha netleşir: James will lend it to her.",
+    rules: [
+      "📌 Direct object: what? sorusuna cevap verir.",
+      "📌 Indirect object: to whom? / for whom? sorusuna cevap verir.",
+      "📌 Preposition sonrası object pronoun gelir: to her, for me, to us.",
+      "📌 Verb + indirect object + direct object veya verb + direct object + to/for + person yapıları kullanılır."
+    ],
+    formulas: [
+      ["Direct object", "verb + thing", "David repaired his car.", "Tamir edilen şey direct object olur."],
+      ["Indirect object", "verb + person + thing", "They sent him a postcard.", "Kartı alan kişi indirect object olur."],
+      ["Pronoun object", "verb + it/them + to/for + person", "James will lend it to her.", "Pronoun olan şey prepositiondan önce gelir."],
+      ["Object pronouns", "me / you / him / her / us / them", "I gave them to her.", "to/for sonrası subject değil object pronoun gelir."]
+    ],
+    examples: [
+      { en: "Mary gave me some money.", tr: "Mary bana biraz para verdi.", note: "Me, parayı alan kişidir; indirect object." },
+      { en: "They sent it to me.", tr: "Onu bana gönderdiler.", note: "It direct object pronoun olduğu için to me yapısı kullanılır." },
+      { en: "She found them for me.", tr: "Onları benim için buldu.", note: "Kaynakta for kullanılan verb pattern mantığına uyar." }
+    ],
+    mistakes: [
+      { wrong: "I gave them to she.", correct: "I gave them to her.", why: "to sonrasında subject pronoun değil object pronoun kullanılır." },
+      { wrong: "James will lend to her it.", correct: "James will lend it to her.", why: "Direct object pronoun it, to her kısmından önce gelir." }
+    ],
+    summary: ["What? = direct object.", "To whom/for whom? = indirect object.", "Preposition sonrası her zaman object pronoun kullan."]
+  },
+  adjectives: {
+    title: "1B Adjectives - sıfat, one/ones ve karşılaştırma",
+    source: "1B- GRAMMAR - ADJECTIVES.docx, Vocabulary_List 1B Workbook.pdf ve WhatsApp 1B Grammar Bank görselindeki adjectives sayfası.",
+    intro: "Bu ders sıfatı sadece anlam olarak değil, cümledeki yerine göre kullanmayı öğretir. ✨",
+    teacher: "Kaynakta adjective, insanları, yerleri ve şeyleri anlatan kelime olarak veriliyor. Tom has a big house örneğinde big, house kelimesini anlatır. Eğer sıfat + tekil sayılabilir isim varsa a/an unutulmaz: Suzan is a beautiful girl. One/ones ise aynı ismi tekrar etmemek için kullanılır.",
+    rules: [
+      "📌 Adjective genellikle noun'dan önce gelir: a big house.",
+      "📌 Tekil countable noun varsa a/an gerekir.",
+      "📌 one tekil countable noun yerine, ones çoğul countable noun yerine kullanılır.",
+      "📌 Comparative iki şeyi karşılaştırır; superlative bir gruptaki en uç noktayı anlatır.",
+      "📌 a bit küçük fark, much büyük fark gösterir."
+    ],
+    formulas: [
+      ["Adjective + noun", "a/an + adjective + noun", "Suzan is a beautiful girl.", "Tekil isimde article gerekir."],
+      ["One / ones", "adjective + one/ones", "The blue one. / The red ones.", "İsim tekrarını engeller."],
+      ["Comparative", "comparative + than", "Turkey is colder than Cyprus.", "İki şeyi karşılaştırır."],
+      ["Superlative", "the + superlative", "the most difficult exercise", "Bir grup içindeki en durumunu anlatır."]
+    ],
+    examples: [
+      { en: "Can you give me that pen? Which one? The blue one.", tr: "Bana şu kalemi verir misin? Hangisi? Mavi olan.", note: "Pen tekil olduğu için one kullanılır." },
+      { en: "The book is more expensive than the pen.", tr: "Kitap kalemden daha pahalı.", note: "Expensive uzun sıfat olduğu için more + adjective kullanılır." },
+      { en: "iPhones are much more expensive than Redmi.", tr: "iPhone'lar Redmi'den çok daha pahalı.", note: "Much farkın büyük olduğunu gösterir." }
+    ],
+    mistakes: [
+      { wrong: "Suzan is beautiful girl.", correct: "Suzan is a beautiful girl.", why: "Beautiful + girl yapısında girl tekil countable noun olduğu için a gerekir." },
+      { wrong: "This is more better.", correct: "This is better.", why: "Better zaten comparative formdur; more eklenmez." }
+    ],
+    summary: ["Sıfat + tekil isimde article kontrol et.", "one/ones sadece countable nouns ile kullanılır.", "a bit ve much farkın büyüklüğünü anlatır."]
+  },
+  presenttenses: {
+    title: "2A Present Tenses - simple, continuous ve stative verbs",
+    source: "Present Tenses- 2A Interplus.docx ve WhatsApp 2A Grammar Bank görselindeki present tenses sayfası.",
+    intro: "Bu ders present yapıların sadece şimdiki zaman olmadığını, bazen gelecek plan ve timetable anlattığını gösterir. 🕒",
+    teacher: "Present Simple rutin, sıklık ve timetable için kullanılır. Present Continuous şu an olan, geçici olan veya ayarlanmış gelecek planları anlatır. Kaynakta have, think ve see gibi fiillerin iki anlamı olabileceği vurgulanır. I have a car stative; I am having lunch action. Yani fiile değil, fiilin cümledeki anlamına bakılır.",
+    rules: [
+      "📌 Present Simple: habits, routines, frequency, timetables.",
+      "📌 Present Continuous: now, temporary actions, future arrangements.",
+      "📌 Stative verbs normalde continuous olmaz: know, like, believe, want.",
+      "📌 have / think / see anlamına göre action veya non-action olabilir."
+    ],
+    formulas: [
+      ["Present Simple", "subject + V1/s", "She goes abroad a lot.", "Alışkanlık ve sıklık anlatır."],
+      ["Present Continuous", "am/is/are + V-ing", "He's working today.", "Bugün geçici/şu anki durum."],
+      ["Future arrangement", "am/is/are + V-ing", "I'm meeting my friends tonight.", "Ayarlanmış gelecek plan."],
+      ["Timetable future", "present simple", "The train leaves at 6.30.", "Kişisel plan değil, tarife." ]
+    ],
+    examples: [
+      { en: "I think it's a good idea.", tr: "Bence bu iyi bir fikir.", note: "Think burada opinion olduğu için Present Simple." },
+      { en: "I am thinking about moving abroad.", tr: "Yurt dışına taşınmayı düşünüyorum.", note: "Think burada düşünme süreci; continuous olabilir." },
+      { en: "What time does your flight arrive in New York?", tr: "Uçağın New York'a saat kaçta varıyor?", note: "Flight timetable olduğu için Present Simple." }
+    ],
+    mistakes: [
+      { wrong: "I am knowing the answer.", correct: "I know the answer.", why: "Know stative verb olduğu için normalde continuous kullanılmaz." },
+      { wrong: "The flight is leaving at 6.30. (timetable vurgusu)", correct: "The flight leaves at 6.30.", why: "Kaynakta timetable future için Present Simple anlatılır." }
+    ],
+    summary: ["Rutin = Present Simple.", "Şu an/geçici/arrangement = Present Continuous.", "Stative verbs için anlam kontrolü yap."]
+  },
+  possessives: {
+    title: "2B Possessives - 's, of ve own",
+    source: "_POSSESSIVES_- INTERPLUS 2B.docx ve WhatsApp 2B Grammar Bank görselindeki possessives sayfası.",
+    intro: "Bu ders sahiplik ve ilişkiyi İngilizcede doğal şekilde kurmayı öğretir. 🔑",
+    teacher: "Possessives konusu 'kimin?' sorusuna cevap verir. Kaynakta Mark's jacket, my sister's boyfriend gibi örneklerle 's anlatılır. Plural nouns -s ile bitiyorsa sadece apostrophe gelir: teachers' room. Irregular plurals ise children's gibi 's alır. Own ise sahipliği vurgular.",
+    rules: [
+      "📌 İnsan/kişi sahipliğinde possessive 's çok yaygındır.",
+      "📌 Regular plural -s ile bitiyorsa sadece apostrophe eklenir.",
+      "📌 Irregular plural -s ile bitmiyorsa 's alır.",
+      "📌 İki kişi tek şeye sahipse 's sadece ikinci isme gelir.",
+      "📌 of ve own yapıları kaynakta ayrı kurallar olarak verilir."
+    ],
+    formulas: [
+      ["Possessive 's", "person + 's + noun", "That's Mark's jacket.", "Mark'a ait ceket."],
+      ["Plural possessive", "plural -s + apostrophe", "the teachers' room", "Birden fazla öğretmene ait oda."],
+      ["Irregular plural", "children + 's", "children's playground", "Çocuklara ait oyun alanı."],
+      ["Own", "possessive adjective + own + noun", "She has her own room.", "Kendine ait olma vurgusu."]
+    ],
+    examples: [
+      { en: "Emma and Mia's house is very modern.", tr: "Emma ve Mia'nın evi çok modern.", note: "Tek evi paylaşıyorlarsa 's ikinci isme gelir." },
+      { en: "Emma's and Mia's bags are different.", tr: "Emma'nın ve Mia'nın çantaları farklı.", note: "Ayrı ayrı sahiplik varsa iki isme de 's gelir." },
+      { en: "The door of the car was open.", tr: "Arabanın kapısı açıktı.", note: "Cansız şeylerde of yapısı doğal olabilir." }
+    ],
+    mistakes: [
+      { wrong: "teachers's room", correct: "teachers' room", why: "Regular plural -s ile bittiği için sadece apostrophe gerekir." },
+      { wrong: "childrens' playground", correct: "children's playground", why: "Children irregular pluraldır ve -s ile bitmez." }
+    ],
+    summary: ["Kişilerde 's kullan.", "Plural -s sonunda apostrophe kullan.", "Own sahipliği vurgular."]
+  },
+  pasttenses: {
+    title: "3A Past Simple, Past Continuous, Used to",
+    source: "INTER-plus 3a.docx ve WhatsApp 3A Grammar Bank görselindeki past simple, past continuous, used to sayfası.",
+    intro: "Bu ders geçmişte olay mı, arka plan mı, eski alışkanlık mı anlattığını ayırmayı öğretir. ⏳",
+    teacher: "Kaynakta Past Simple bitmiş geçmiş eylemler için, Past Continuous geçmişte belirli anda devam eden eylem için, used to ise artık doğru olmayan eski alışkanlık ve durumlar için veriliyor. Did ile soru kurduğunda fiili V2 yapmazsın; bu en önemli sınav hatasıdır.",
+    rules: [
+      "📌 Past Simple: finished past action.",
+      "📌 Past Continuous: was/were + V-ing, geçmişte devam eden eylem.",
+      "📌 Used to: geçmiş alışkanlık veya eski durum; artık geçerli olmayabilir.",
+      "📌 Did/didn't sonrası fiil V1 olur."
+    ],
+    formulas: [
+      ["Past Simple", "subject + V2", "I visited my grandparents last weekend.", "Geçmişte bitmiş eylem."],
+      ["Past Simple question", "did + subject + V1", "Did you go to school yesterday?", "Did geldiği için go kullanılır."],
+      ["Past Continuous", "was/were + V-ing", "I was watching TV when you arrived.", "Arka planda devam eden eylem."],
+      ["Used to", "used to + V1", "Luke used to have long hair.", "Eskiden doğru olan durum." ]
+    ],
+    examples: [
+      { en: "She was tired after the long trip.", tr: "Uzun yolculuktan sonra yorgundu.", note: "To be geçmişte was/were ile kurulur." },
+      { en: "I was watching TV when you arrived.", tr: "Sen geldiğinde televizyon izliyordum.", note: "Watching uzun eylem, arrived bölen kısa eylemdir." },
+      { en: "They didn't use to live in London.", tr: "Eskiden Londra'da yaşamazlardı.", note: "Olumsuzda didn't use to olur." }
+    ],
+    mistakes: [
+      { wrong: "Did you went to school?", correct: "Did you go to school?", why: "Did yardımcı fiili geçmişi taşıdığı için ana fiil V1 olur." },
+      { wrong: "They didn't used to live there.", correct: "They didn't use to live there.", why: "Didn't sonrası used değil use gelir." }
+    ],
+    summary: ["Bitmiş geçmiş = Past Simple.", "Geçmişte devam eden arka plan = Past Continuous.", "Eski alışkanlık = used to."]
+  },
+  prepositions: {
+    title: "3B Prepositions - place, movement, dependent",
+    source: "GRAMMAR BANK- INTER-PLUS 3B.docx ve WhatsApp 3B Grammar Bank görselindeki prepositions sayfası.",
+    intro: "Bu ders küçük prepositionların büyük anlam farkı oluşturduğunu gösterir. 🗺️",
+    teacher: "Kaynak prepositions of place, movement ve dependent prepositions olarak üç ana grup verir. Place nerede olduğunu gösterir: in, on, under. Movement hareket yolunu gösterir: across, through, along, over. Dependent prepositions ise fiil/sıfatla kalıp olarak gelir: wait for, interested in, good at.",
+    rules: [
+      "📌 Place prepositions konum anlatır.",
+      "📌 Movement prepositions hareketin yolunu anlatır.",
+      "📌 Dependent prepositions ezber değil kalıp olarak öğrenilir.",
+      "📌 Preposition sonrası fiil gelirse -ing form gelir.",
+      "📌 ask, discuss, enter, marry, tell gibi bazı fiiller bu kullanımda preposition almaz."
+    ],
+    formulas: [
+      ["Place", "in / on / under / next to", "The shoes are in the closet.", "Konum bildirir."],
+      ["Movement", "across / through / along / over", "He walked across the street.", "Hareket yönü/yolu bildirir."],
+      ["Dependent verb", "wait for / believe in", "We waited for the film to start.", "Fiille birlikte sabit gelir."],
+      ["After preposition", "preposition + V-ing", "I'm looking forward to seeing you.", "to burada prepositiondır." ]
+    ],
+    examples: [
+      { en: "The cat is under the bed.", tr: "Kedi yatağın altında.", note: "Under place prepositiondır." },
+      { en: "We walked along the beach.", tr: "Sahil boyunca yürüdük.", note: "Along bir çizgi/yol boyunca hareketi anlatır." },
+      { en: "She is interested in astrology.", tr: "Astrolojiyle ilgileniyor.", note: "Interested in sabit adjective + preposition kalıbıdır." }
+    ],
+    mistakes: [
+      { wrong: "We discussed about the problem.", correct: "We discussed the problem.", why: "Kaynakta discuss preposition almayan fiiller arasında verilir." },
+      { wrong: "I'm looking forward to see you.", correct: "I'm looking forward to seeing you.", why: "Preposition to sonrasında V-ing gelir." }
+    ],
+    summary: ["Place = nerede?", "Movement = nasıl/nereye hareket?", "Dependent = kalıp preposition."]
+  },
+  futureforms: {
+    title: "4A Future Forms - will, going to, arrangement",
+    source: "FUTURE FORMS- 4B INTER-PLUS.docx ve WhatsApp 4A Grammar Bank görselindeki future forms sayfası.",
+    intro: "Bu ders geleceği tek kalıpla değil, niyet/kanıt/karar ayrımıyla anlatmayı öğretir. 🔮",
+    teacher: "Kaynak will/won't yapısını predictions, future facts, instant decisions, promises, offers ve suggestions için verir. Be going to ise plans and intentions ve evidence-based predictions için kullanılır. Present Continuous ayarlanmış gelecek planlarda geçer. Future in the past için was/were going to kullanılır.",
+    rules: [
+      "📌 will: belief/opinion prediction, future fact, instant decision, promise, offer.",
+      "📌 shall I / shall we: offer ve suggestion.",
+      "📌 be going to: önceden planlanmış niyet veya görünen kanıta dayalı tahmin.",
+      "📌 Present Continuous: arranged future plan.",
+      "📌 was/were going to: geçmişteki gerçekleşmeyen plan."
+    ],
+    formulas: [
+      ["Will", "will + V1", "I think it will rain tomorrow.", "Fikir/tahmin veya anlık karar."],
+      ["Going to", "am/is/are going to + V1", "I'm going to start a new course.", "Önceden karar verilmiş plan."],
+      ["Arrangement", "am/is/are + V-ing", "I'm meeting my friend at 6 PM.", "Plan organize edilmiş."],
+      ["Future in the past", "was/were going to + V1", "I was going to call you, but I forgot.", "Geçmişte plan vardı ama olmadı." ]
+    ],
+    examples: [
+      { en: "I'm tired. I'll go to bed now.", tr: "Yorgunum. Şimdi yatacağım.", note: "Karar konuşma anında veriliyor; will." },
+      { en: "Look at those dark clouds! It's going to rain.", tr: "Şu kara bulutlara bak! Yağmur yağacak.", note: "Görünen kanıt var; going to." },
+      { en: "Shall we go out tonight?", tr: "Bu akşam dışarı çıkalım mı?", note: "Shall we suggestion verir." }
+    ],
+    mistakes: [
+      { wrong: "Look at those clouds! It will rain. (kanıt vurgusunda)", correct: "Look at those clouds! It's going to rain.", why: "Kaynakta görünen kanıta dayalı tahmin için going to verilir." },
+      { wrong: "I was will call you.", correct: "I was going to call you.", why: "Future in the past yapısı was/were going to ile kurulur." }
+    ],
+    summary: ["Will = anlık karar/söz/teklif/fikir tahmini.", "Going to = plan veya kanıt.", "Present Continuous = ayarlanmış gelecek plan."]
+  },
+  conditionals12: {
+    title: "4B First and Second Conditionals",
+    source: "First and Second Conditional-4B GRAMMAR.docx ve WhatsApp 4B Grammar Bank görselindeki first and second conditionals sayfası.",
+    intro: "Bu ders gerçekçi gelecek ihtimali ile hayali durum arasındaki farkı öğretir. 🌦️",
+    teacher: "First Conditional gerçek veya muhtemel gelecek durumları anlatır. If kısmında Present Simple, sonuç kısmında will + verb1 kullanılır. Kaynak ayrıca can, imperatives ve other modals kullanımını da verir. Second Conditional ise hayali veya gerçek dışı durumları anlatır; if kısmında Past Simple, sonuçta would + verb1 kullanılır.",
+    rules: [
+      "📌 First Conditional: real/likely future.",
+      "📌 If + Present Simple, will + V1.",
+      "📌 First conditional result clause can, might, must, should veya imperative alabilir.",
+      "📌 Second Conditional: hypothetical/unreal present or future.",
+      "📌 If I were you tavsiye kalıbında were kullanılır."
+    ],
+    formulas: [
+      ["First Conditional", "If + Present Simple, will + V1", "If it rains, we will stay at home.", "Gerçekçi gelecek ihtimali."],
+      ["First + modal", "If + present, can/might/must + V1", "She can buy a new book if she loses it again.", "Sonuçta will yerine modal olabilir."],
+      ["Second Conditional", "If + Past Simple, would + V1", "If I won the lottery, I would travel.", "Hayali durum."],
+      ["Advice", "If I were you, I would...", "If I were you, I wouldn't do that.", "Tavsiye verirken kullanılır." ]
+    ],
+    examples: [
+      { en: "If I study hard, I will pass the exam.", tr: "Çok çalışırsam sınavı geçeceğim.", note: "Olası gelecek sonucu; first conditional." },
+      { en: "If I had more money, I would buy a new phone.", tr: "Daha çok param olsaydı yeni telefon alırdım.", note: "Hayali durum; second conditional." },
+      { en: "I won't go unless you go, too.", tr: "Sen de gitmezsen gitmem.", note: "Unless = if not." }
+    ],
+    mistakes: [
+      { wrong: "If it will rain, we will stay home.", correct: "If it rains, we will stay home.", why: "First conditional if clause içinde Present Simple kullanılır." },
+      { wrong: "If I was you, I would...", correct: "If I were you, I would...", why: "Kaynakta tavsiye kalıbında only were kullanımı vurgulanır." }
+    ],
+    summary: ["First = gerçekçi gelecek.", "Second = hayali durum.", "Unless = if not."]
+  },
+  perfect: {
+    title: "5A Present Perfect Simple",
+    source: "WhatsApp 5A Grammar Bank görseli ve t-021-present-perfect-simple-progressive.pdf içindeki present perfect alıştırmaları.",
+    intro: "Bu ders geçmişte olan ama şimdiyle bağlantısı süren durumları anlatır. 🔗",
+    teacher: "Present Perfect Simple, kaynakta past experiences, recent news, yet/already, for/since ve non-action verbs ile devam eden durumlar için veriliyor. Yapı have/has + past participle şeklindedir. Eğer olayın tam zamanı verilirse Past Simple'a dönersin.",
+    rules: [
+      "📌 Form: have/has + V3.",
+      "📌 Experience: Have you ever watched a foreign TV series?",
+      "📌 Recent news: just kullanılır.",
+      "📌 Yet soru/olumsuzda; already olumlu cümlede sık görülür.",
+      "📌 for + period, since + starting point."
+    ],
+    formulas: [
+      ["Positive", "subject + have/has + V3", "I've used Netflix.", "Deneyim veya sonuç."],
+      ["Negative", "haven't/hasn't + V3", "I haven't used Amazon Prime.", "Henüz/hiç olmamış durum."],
+      ["Question", "Have/Has + subject + V3?", "Have you ever watched a foreign TV series?", "Deneyim sorusu."],
+      ["For / since", "for + period / since + point", "We've had a smart TV since last month.", "Geçmişten şimdiye bağ." ]
+    ],
+    examples: [
+      { en: "He's just sent me a text.", tr: "Az önce bana mesaj gönderdi.", note: "Just çok yakın zamanda olmuş olayı gösterir." },
+      { en: "I've known him for 20 years.", tr: "Onu 20 yıldır tanıyorum.", note: "Know non-action verb olduğu için simple perfect kullanılır." },
+      { en: "Have you finished reading the newspaper?", tr: "Gazeteyi okumayı bitirdin mi?", note: "t-021 kaynağındaki present perfect soru mantığı." }
+    ],
+    mistakes: [
+      { wrong: "I have watched it last weekend.", correct: "I watched it last weekend.", why: "Belirli bitmiş geçmiş zaman varsa Past Simple kullanılır." },
+      { wrong: "I've been knowing him for 20 years.", correct: "I've known him for 20 years.", why: "Know stative verb olduğu için continuous kullanılmaz." }
+    ],
+    summary: ["have/has + V3.", "Geçmiş + şimdi bağlantısı.", "for/since, just/already/yet ipuçlarını takip et."]
+  },
+  perfectcont: {
+    title: "5B Present Perfect Continuous",
+    source: "WhatsApp 5B Grammar Bank görseli, 9780521189392_excerpt.pdf ve t-021-present-perfect-simple-progressive.pdf.",
+    intro: "Bu ders süreç ve görünür sonucu anlatır: ne yaptın ve bu şimdi nasıl belli oluyor? 🧪",
+    teacher: "Present Perfect Continuous, kaynaklarda repeated/continuous actions that started in the past and continue now, visible present results, lately/recently ve all morning/all week gibi ifadelerle anlatılır. Cambridge excerpt içindeki paint örneği basit farkı gösterir: has been painting süreç, has painted sonuç.",
+    rules: [
+      "📌 Form: have/has been + V-ing.",
+      "📌 Süreç, tekrar ve visible result vurgular.",
+      "📌 lately, recently, all day, all morning, how long ile sık gelir.",
+      "📌 Stative verbs normalde continuous almaz.",
+      "📌 Work/live iki yapıda da bazen kullanılabilir."
+    ],
+    formulas: [
+      ["Positive", "have/has been + V-ing", "I've been studying for my exam.", "Süreç devam ediyor veya etkisi var."],
+      ["Question", "Have/Has + subject + been + V-ing?", "What have you been doing lately?", "Yakın dönem süreç sorusu."],
+      ["Visible result", "have/has been + V-ing", "She has been running for hours.", "Sonuç bedende/ortamda görülür."],
+      ["Simple vs continuous", "has painted / has been painting", "She has painted her bedroom.", "Simple sonuç, continuous süreç." ]
+    ],
+    examples: [
+      { en: "I'm so tired because I have been working so hard lately.", tr: "Çok yorgunum çünkü son zamanlarda çok sıkı çalışıyorum.", note: "t-021 kaynağındaki lately + süreç örneği." },
+      { en: "Look at how she's sweating. She has probably been running for hours.", tr: "Nasıl terlediğine bak. Muhtemelen saatlerdir koşuyor.", note: "Visible result var: sweating." },
+      { en: "I've been looking for it for hours and haven't found it yet.", tr: "Saatlerdir onu arıyorum ve hâlâ bulamadım.", note: "Süreç + henüz sonuç yok mantığı." }
+    ],
+    mistakes: [
+      { wrong: "I'm waiting since 10 o'clock.", correct: "I've been waiting since 10 o'clock.", why: "Geçmişte başlayıp şimdi süren eylem için present perfect continuous gerekir." },
+      { wrong: "I've been seeing a great programme last night.", correct: "I saw a great programme last night.", why: "When/last night gibi bitmiş zaman verilirse Past Simple kullanılır." }
+    ],
+    summary: ["have/has been + V-ing.", "Süreç ve visible result.", "Stative verb varsa simple perfect düşün."]
+  },
+  modals: {
+    title: "6A Obligation, Necessity, Prohibition, Advice",
+    source: "WhatsApp 6A Grammar Bank görselindeki obligation, necessity, prohibition, advice sayfası.",
+    intro: "Bu ders zorunluluk, gerek yok, yasak ve tavsiye arasındaki farkı netleştirir. 🚦",
+    teacher: "Kaynakta have to bütün zamanlarda zorunluluk için, must özellikle present ve speaker'ın güçlü gördüğü zorunluluk için verilir. Don't have to ve needn't no obligation/no necessity anlatır. Mustn't ise prohibition yani yasak demektir. Should ve ought to tavsiye verir.",
+    rules: [
+      "📌 have to: all kinds of obligation; all tenses.",
+      "📌 must: obligation, present/future; speaker sees it as important.",
+      "📌 don't have to / needn't: no necessity.",
+      "📌 mustn't: prohibition, dangerous or wrong.",
+      "📌 should / ought to: advice."
+    ],
+    formulas: [
+      ["Obligation", "have to / must + V1", "I have to work every evening.", "Zorunluluk."],
+      ["No necessity", "don't have to / needn't + V1", "You don't have to pay me now.", "Gerek yok."],
+      ["Prohibition", "mustn't + V1", "You mustn't be rude to customers.", "Yasak."],
+      ["Advice", "should / ought to + V1", "You should try that restaurant.", "Tavsiye." ]
+    ],
+    examples: [
+      { en: "You mustn't serve alcohol to people under 18.", tr: "18 yaşından küçüklere alkol servis etmemelisin/edemezsin.", note: "Bu tavsiye değil, yasak." },
+      { en: "You don't have to drive. We can get the bus.", tr: "Araba kullanmak zorunda değilsin. Otobüse binebiliriz.", note: "No necessity." },
+      { en: "She oughtn't to spend so much on clothes.", tr: "Kıyafetlere bu kadar çok harcamamalı.", note: "Ought to should ile benzer tavsiye verir." }
+    ],
+    mistakes: [
+      { wrong: "You mustn't drive = You don't have to drive.", correct: "Mustn't yasak, don't have to gerek yok.", why: "Kaynak bu iki yapının completely different olduğunu vurgular." },
+      { wrong: "You should to try it.", correct: "You should try it.", why: "Should sonrası bare infinitive gelir." }
+    ],
+    summary: ["mustn't = yasak.", "don't have to = gerek yok.", "should/ought to = tavsiye."]
+  },
+  ability: {
+    title: "6B Can, Could, Be able to + Deduction",
+    source: "UNIT 6B - Interplus Can,could,able to- Deduction.docx ve WhatsApp 6B Grammar Bank görseli.",
+    intro: "Bu ders yetenek, izin, olasılık ve mantıksal çıkarımı aynı çatı altında öğretir. 🧠",
+    teacher: "Can present ability/possibility/permission için kullanılır ve sadece present formu vardır; past formu could'dur. Be able to bütün tense'lere yayılabilir: will be able to, have been able to, being able to. Deduction kısmında can't imkansızlık, must güçlü eminlik, might/could olasılık gösterir.",
+    rules: [
+      "📌 can + V1: present ability, possibility, permission.",
+      "📌 could + V1: past general ability veya polite request.",
+      "📌 be able to: farklı tense ve formlarda kullanılır.",
+      "📌 Specific successful past action için was/were able to veya managed to daha uygundur.",
+      "📌 Deduction: can't, must, might/could + V1."
+    ],
+    formulas: [
+      ["Present ability", "can + V1", "She can swim.", "Şu an yapabiliyor."],
+      ["Past ability", "could + V1", "When I was 5, I could dance well.", "Genel geçmiş yetenek."],
+      ["Future ability", "will be able to + V1", "She will be able to join us tomorrow.", "Gelecekte yapabilecek."],
+      ["Deduction", "must/can't/might + V1", "He must be at home.", "Kanıta göre çıkarım." ]
+    ],
+    examples: [
+      { en: "I have been able to drive a car since 2011.", tr: "2011'den beri araba sürebiliyorum.", note: "Present perfect için be able to gerekir." },
+      { en: "I like being able to read quickly.", tr: "Hızlı okuyabilmeyi seviyorum.", note: "Gerund form: being able to." },
+      { en: "She can't be at work yet. It's only 7.30.", tr: "Henüz işte olamaz. Saat daha 7.30.", note: "Can't deduction: bunun doğru olmadığına eminiz." }
+    ],
+    mistakes: [
+      { wrong: "She will can join us.", correct: "She will be able to join us.", why: "Future ability için will can değil, will be able to kullanılır." },
+      { wrong: "I like can read quickly.", correct: "I like being able to read quickly.", why: "Like sonrası burada gerund yapı gerekir." }
+    ],
+    summary: ["can/could sınırlı; be able to esnek.", "Specific past success = was/were able to.", "Deduction'da must/can't/might ile eminlik derecesini göster."]
+  },
+  phrasal: {
+    title: "7A Phrasal Verbs - type 1, type 2, type 3",
+    source: "Phrasal Verbs.pptx ve WhatsApp 7A Grammar Bank görselindeki phrasal verbs sayfası.",
+    intro: "Bu ders phrasal verbleri ezber listesi değil, nesne davranışına göre öğretir. 🔗",
+    teacher: "Kaynak phrasal verbs konusunu üç tipe ayırır. Type 1 nesne almaz ve ayrılamaz: go away, eat out, get up. Type 2 nesne alır ve ayrılabilir: turn off the lights / turn the lights off. Pronoun varsa ortada olur: turn it off. Type 3 nesne alır ama ayrılamaz: look for the keys, look after her children, look forward to her wedding day.",
+    rules: [
+      "📌 Type 1: no object, inseparable.",
+      "📌 Type 2: object var, separable.",
+      "📌 Type 2 pronoun rule: pronoun ortada olur.",
+      "📌 Type 3: object var ama inseparable.",
+      "📌 İki particle içeren phrasal verbs genellikle ayrılmaz."
+    ],
+    formulas: [
+      ["Type 1", "verb + particle", "She gets up early.", "Nesne yok, ayrılmaz."],
+      ["Type 2 noun", "verb + object + particle / verb + particle + object", "Turn the music down. / Turn down the music.", "Noun iki yerde olabilir."],
+      ["Type 2 pronoun", "verb + pronoun + particle", "I'll call her back.", "Pronoun ortada zorunlu."],
+      ["Type 3", "verb + particle + object", "She looks after her children.", "Ayrılmaz." ]
+    ],
+    examples: [
+      { en: "They usually eat out at the weekends.", tr: "Hafta sonları genellikle dışarıda yemek yerler.", note: "Type 1, object yok." },
+      { en: "Jane forgot to turn off the lights.", tr: "Jane ışıkları kapatmayı unuttu.", note: "Type 2, noun object olduğu için ayrılabilir." },
+      { en: "Sarah is looking forward to her wedding day.", tr: "Sarah düğün gününü heyecanla bekliyor.", note: "Type 3/çok parçalı yapı; ayrılmaz." }
+    ],
+    mistakes: [
+      { wrong: "I'll call back her.", correct: "I'll call her back.", why: "Pronoun object separable phrasal verbde ortada olur." },
+      { wrong: "She gets early up.", correct: "She gets up early.", why: "Get up Type 1; verb ve particle ayrılmaz." }
+    ],
+    summary: ["Type 1 object almaz.", "Type 2 ayrılabilir ama pronoun ortada olur.", "Type 3 ayrılmaz."]
+  },
+  verbpatterns: {
+    title: "7B Verb Patterns",
+    source: "7B VERB PATTERNS- INTERPLUS.docx ve WhatsApp 7B Grammar Bank görseli.",
+    intro: "Bu ders fiilden sonra hangi form geleceğini öğretir: to, V-ing, yalın fiil veya object + infinitive. 🧩",
+    teacher: "Kaynak verb patterns konusunu dört ana yapıya ayırır: infinitive with to, infinitive without to, gerund ve object + infinitive. Want, decide, hope, agree gibi fiiller to + verb alır. Modal verbs sonrası to gelmez. Enjoy, finish, avoid gibi fiiller gerund alır. Allow, ask, tell gibi fiiller object + to-infinitive ile gelir.",
+    rules: [
+      "📌 to-infinitive: agree, decide, hope, want, would like, need, plan.",
+      "📌 bare infinitive: modal verbs; ayrıca let ve make.",
+      "📌 gerund: enjoy, finish, avoid, keep, mind, suggest, practice.",
+      "📌 phrasal verb sonrası gelen fiil genellikle V-ing olur.",
+      "📌 object + infinitive: ask/tell/allow/want somebody to do."
+    ],
+    formulas: [
+      ["To-infinitive", "verb + to + V1", "She decided to stay at home.", "Karar/istek sonrası to gelir."],
+      ["Bare infinitive", "modal + V1", "She can drive very well.", "Modal sonrası to yok."],
+      ["Gerund", "verb + V-ing", "I enjoy reading books.", "Enjoy sonrası V-ing."],
+      ["Object + infinitive", "verb + object + to + V1", "Karen's teacher allowed her to leave.", "Object kimin yaptığını gösterir." ]
+    ],
+    examples: [
+      { en: "They agreed to help us.", tr: "Bize yardım etmeyi kabul ettiler.", note: "Agree + to-infinitive." },
+      { en: "You ought to apologize.", tr: "Özür dilemelisin.", note: "Ought modal-like exception olarak to alır." },
+      { en: "Watching TV helps me relax.", tr: "Televizyon izlemek rahatlamama yardım eder.", note: "Gerund subject olarak kullanılabilir." }
+    ],
+    mistakes: [
+      { wrong: "She can to swim.", correct: "She can swim.", why: "Modal sonrası to kullanılmaz." },
+      { wrong: "I enjoy to read.", correct: "I enjoy reading.", why: "Enjoy gerund alır." }
+    ],
+    summary: ["Fiilden sonra gelen ikinci fiilin formunu öğren.", "Modal sonrası to yok.", "Enjoy/avoid/finish sonrası V-ing."]
+  },
+  causative: {
+    title: "8A Have Something Done",
+    source: "WhatsApp 8A Grammar Bank görselindeki have something done sayfası.",
+    intro: "Bu ders bir işi kendin yapmak ile başkasına yaptırmak arasındaki farkı öğretir. 🛠️",
+    teacher: "Kaynak have + object + past participle yapısını, bir işi bizim için başka biri yaptığında kullanır. I cleaned my car kendim yaptım demektir; I had my car cleaned ise birine yaptırdım. Get something done da kaynakta have yerine kullanılabilen alternatif olarak verilir.",
+    rules: [
+      "📌 have + object + V3: bir işi başkasına yaptırmak.",
+      "📌 Any tense ile kullanılabilir: have, had, am having, will have.",
+      "📌 Questions/negatives auxiliary ile kurulur.",
+      "📌 get something done konuşma dilinde alternatif olabilir.",
+      "📌 Yapan kişiyi belirtmek istersen by kullan."
+    ],
+    formulas: [
+      ["Basic", "have + object + V3", "I had my car cleaned.", "Arabayı ben temizlemedim, yaptırdım."],
+      ["Present continuous", "am/is/are having + object + V3", "I'm having my hair cut tomorrow.", "Planlanmış yaptırma."],
+      ["Future", "will / be going to have + object + V3", "We're going to have the carpets cleaned.", "Gelecekte yaptırılacak iş."],
+      ["Get alternative", "get + object + V3", "I'm going to get my hair cut.", "Have ile benzer anlam." ]
+    ],
+    examples: [
+      { en: "How often do you have your car serviced?", tr: "Arabanı ne sıklıkla servise götürürsün/bakım yaptırırsın?", note: "Car serviced işi başkasına yaptırılır." },
+      { en: "I don't have the flat cleaned. I clean it myself.", tr: "Daireyi temizletmem. Kendim temizlerim.", note: "Kaynakta self-action ile causative karşılaştırılır." },
+      { en: "We had our wedding photos taken by the same photographer.", tr: "Düğün fotoğraflarımızı aynı fotoğrafçıya çektirdik.", note: "Yapan kişi by ile verilir." }
+    ],
+    mistakes: [
+      { wrong: "I had cleaned my car yesterday. (yaptırdım demek istiyorsan)", correct: "I had my car cleaned yesterday.", why: "Causative için object + V3 gerekir." },
+      { wrong: "Did you had your hair cut?", correct: "Did you have your hair cut?", why: "Did sonrası have base form olur." }
+    ],
+    summary: ["Have/get + object + V3.", "Kendin yapmadın, yaptırdın.", "Tense have/get üzerinde değişir."]
+  },
+  passive: {
+    title: "8B Passive Voice",
+    source: "WhatsApp 8B Grammar Bank görselindeki passive forms sayfası.",
+    intro: "Bu ders odağı yapan kişiden olaya ve sonuca taşır. 🏛️",
+    teacher: "Passive voice kaynakta forms of the passive tablosuyla verilir: present simple, present continuous, present perfect, past simple, past continuous, past perfect, future, infinitive, gerund. Ana fikir: subject artık işi yapan değil, işten etkilenen şey olabilir. Yapan kişi bilinmiyorsa veya önemli değilse passive çok kullanılır.",
+    rules: [
+      "📌 Passive temel yapı: be + V3.",
+      "📌 Tense be üzerinde değişir; V3 sabit kalır.",
+      "📌 Yapan kişi önemliyse by + agent kullanılır.",
+      "📌 Processes, reports ve formal style için sık kullanılır.",
+      "📌 Active/passive odağı değiştirir."
+    ],
+    formulas: [
+      ["Present simple", "am/is/are + V3", "The site is visited by thousands of people.", "Düzenli/genel passive."],
+      ["Present continuous", "am/is/are being + V3", "The castle is being restored.", "Şu anda işlem görüyor."],
+      ["Present perfect", "has/have been + V3", "The King's body has never been found.", "Geçmişten şimdiye sonuç."],
+      ["Future/modal", "will be / can be + V3", "When will the new museum be built?", "Gelecek veya modal passive." ]
+    ],
+    examples: [
+      { en: "My phone has been stolen.", tr: "Telefonum çalındı.", note: "Kimin çaldığı bilinmiyor veya önemli değil." },
+      { en: "The Sagrada Familia was designed by Antoni Gaudi.", tr: "Sagrada Familia Antoni Gaudi tarafından tasarlandı.", note: "Yapan kişi önemliyse by kullanılır." },
+      { en: "Rice is grown in Valencia.", tr: "Valencia'da pirinç yetiştirilir.", note: "Passive daha formal style verebilir." }
+    ],
+    mistakes: [
+      { wrong: "The museum will built.", correct: "The museum will be built.", why: "Future passive will be + V3 ister." },
+      { wrong: "The castle is restoring.", correct: "The castle is being restored.", why: "Present continuous passive için is being + V3 gerekir." }
+    ],
+    summary: ["Passive = be + V3.", "Tense be kısmında değişir.", "Odağı yapan kişiden etkilenen şeye taşır."]
+  },
+  reported: {
+    title: "9A Reported Speech",
+    source: "WhatsApp 9A Grammar Bank görselindeki reported speech sayfası.",
+    intro: "Bu ders birinin söylediği şeyi doğrudan değil, aktararak anlatmayı öğretir. 🗣️",
+    teacher: "Reported speech kaynakta statements, word changes, reported questions, imperatives and requests olarak verilir. Direct speech'teki pronouns, possessive adjectives, time expressions ve tense değişebilir. Sorularda soru sırası değil, düz cümle sırası kullanılır. Requests için ask/tell + object + to-infinitive yapısı gelir.",
+    rules: [
+      "📌 Statements tense backshift alabilir.",
+      "📌 tomorrow -> the next day, yesterday -> the day before gibi time changes olur.",
+      "📌 Yes/no questions if/whether kullanır.",
+      "📌 Reported questions statement word order ister.",
+      "📌 Imperatives/requests: tell/ask + object + to infinitive."
+    ],
+    formulas: [
+      ["Statement", "said/told + that + clause", "She said that she had a good memory.", "Söz aktarılır."],
+      ["Time change", "tomorrow -> the next day", "He said he'd see me the next day.", "Zaman ifadesi değişir."],
+      ["Yes/no question", "asked + if/whether + statement order", "He asked if I had been to Australia.", "Soru düz sıraya döner."],
+      ["Request", "asked/told + object + to + V1", "She asked me to close the window.", "Rica/emir aktarımı." ]
+    ],
+    examples: [
+      { en: "She asked me what I wanted to do.", tr: "Bana ne yapmak istediğimi sordu.", note: "What did I want değil; statement order." },
+      { en: "He told me not to forget.", tr: "Bana unutmamamı söyledi.", note: "Negative imperative: not to + verb." },
+      { en: "She asked us to wait there.", tr: "Bizden orada beklememizi istedi.", note: "Request yapısı ask + object + to infinitive." }
+    ],
+    mistakes: [
+      { wrong: "She asked me what did I want.", correct: "She asked me what I wanted.", why: "Reported question düz cümle sırası ister." },
+      { wrong: "He told me don't forget.", correct: "He told me not to forget.", why: "Reported imperative negative: not to + V1." }
+    ],
+    summary: ["Statements backshift alabilir.", "Questions düz cümle sırasına döner.", "Requests object + to infinitive ile aktarılır."]
+  },
+  conditionals3: {
+    title: "9B Third Conditional and Past Perfect",
+    source: "WhatsApp 9B Grammar Bank görselindeki third conditional and other uses of past perfect sayfası.",
+    intro: "Bu ders geçmişte olmayan bir durumu hayal edip sonucunu anlatmayı öğretir. 🕰️",
+    teacher: "Third conditional kaynakta hypothetical/imaginary past situations and consequences olarak anlatılır. If clause past perfect alır, result clause would have + past participle alır. Ayrıca past perfect narratives içinde daha önce olan geçmiş olayı göstermek için kullanılır.",
+    rules: [
+      "📌 Third conditional: unreal/hypothetical past.",
+      "📌 If + past perfect, would have + V3.",
+      "📌 'd kısaltması had veya would olabilir.",
+      "📌 Past perfect iki geçmiş olaydan daha önce olanı gösterir.",
+      "📌 Reported speech içinde present perfect/past simple past perfect'e dönebilir."
+    ],
+    formulas: [
+      ["If clause", "if + had + V3", "If I'd known his number...", "Geçmişte bilmedim ama hayal kuruyorum."],
+      ["Result", "would have + V3", "...I would have called him.", "Geçmişte farklı sonuç olurdu."],
+      ["Past perfect order", "had + V3", "The flight had already closed.", "Daha önce olan geçmiş olay."],
+      ["Reported past", "had + V3", "She said they'd never been married long.", "Aktarımda önceki geçmiş." ]
+    ],
+    examples: [
+      { en: "If I'd known his number, I would have called him.", tr: "Numarasını bilseydim onu arardım.", note: "Ama gerçekte bilmiyordum." },
+      { en: "When we arrived at the departure gate, the flight had already closed.", tr: "Kapıya vardığımızda uçuş çoktan kapanmıştı.", note: "Flight closed daha önce oldu." },
+      { en: "If I hadn't gone to university, I wouldn't have met my wife.", tr: "Üniversiteye gitmeseydim eşimle tanışmazdım.", note: "Geçmişe dair hayali sonuç." }
+    ],
+    mistakes: [
+      { wrong: "If I would have known...", correct: "If I had known...", why: "Third conditional if clause içinde would kullanılmaz." },
+      { wrong: "I would called him.", correct: "I would have called him.", why: "Result clause would have + V3 ister." }
+    ],
+    summary: ["Geçmiş hayali durum.", "If + had V3.", "Would have + V3."]
+  },
+  auxiliaries: {
+    title: "10A Be, Do and Have - main verbs and auxiliaries",
+    source: "WhatsApp 10A Grammar Bank görselindeki be, do and have sayfası.",
+    intro: "Bu ders be/do/have fiillerinin bazen ana fiil, bazen yardımcı fiil olduğunu öğretir. ⚙️",
+    teacher: "Kaynak be, do ve have fiillerini main verb and auxiliary olarak ayırır. Be cümlede durum bildirebilir veya continuous/passive yardımcı fiili olabilir. Do ana fiil olarak yapmak anlamına gelir veya simple tense soru/olumsuzlarını kurar. Have possession anlatabilir veya perfect tense yardımcı fiili olabilir.",
+    rules: [
+      "📌 be main verb: I was sensitive when I was a child.",
+      "📌 be auxiliary: continuous ve passive yapılarda kullanılır.",
+      "📌 do main verb: I did my homework.",
+      "📌 do auxiliary: present/past simple questions and negatives.",
+      "📌 have main verb possession; have auxiliary perfect tense."
+    ],
+    formulas: [
+      ["Be main", "am/is/are/was/were + noun/adjective", "I was very sensitive.", "Durum bildirir."],
+      ["Be auxiliary", "be + V-ing / be + V3", "They are coming. / My car has been stolen.", "Continuous/passive kurar."],
+      ["Do auxiliary", "do/does/did + V1", "Where do they live?", "Simple tense soru."],
+      ["Have auxiliary", "have/has/had + V3", "I haven't seen him recently.", "Perfect tense kurar." ]
+    ],
+    examples: [
+      { en: "What are you doing?", tr: "Ne yapıyorsun?", note: "Are yardımcı fiil, doing ana fiildir." },
+      { en: "She doesn't speak English.", tr: "İngilizce konuşmaz.", note: "Doesn't simple present negative yardımcı fiilidir." },
+      { en: "He's having a shower at the moment.", tr: "Şu anda duş alıyor.", note: "Have burada action anlamında main verb; is yardımcı fiildir." }
+    ],
+    mistakes: [
+      { wrong: "Does he feeling homesick?", correct: "Is he feeling homesick?", why: "Feeling present continuous olduğu için be auxiliary gerekir." },
+      { wrong: "Where does they live?", correct: "Where do they live?", why: "They öznesi do alır." }
+    ],
+    summary: ["Be continuous/passive kurabilir.", "Do simple tense soru/olumsuz kurar.", "Have perfect tense kurar veya sahiplik anlatır."]
+  },
+  readingreviews: {
+    title: "Reading 1 - The Power of Online Reviews",
+    source: "reading 1.docx içindeki metin, comprehension questions, vocabulary in context, reference ve inference soruları.",
+    intro: "Bu ders reading metnini paragraf paragraf okuyup soru çözme stratejisine dönüştürür. 📖",
+    teacher: "Metnin ana fikri online reviews influence customer decisions. Paragraflar önce alışveriş öncesi yorum okuma alışkanlığını, sonra şirketlerin bilgi kontrolünü kaybetmesini, ardından positive/negative reviews etkisini anlatır. Son kısım fake reviews uyarısıyla eleştirel okuma gerektiğini söyler.",
+    rules: [
+      "📌 Main idea sorusunda tüm metni kapsayan cevabı seç.",
+      "📌 Vocabulary in context sorusunda kelimeyi cümledeki anlamıyla düşün.",
+      "📌 Reference sorusunda this/it kelimesinden önceki fikre dön.",
+      "📌 Inference sorusunda metnin ima ettiği ama birebir söylemediği sonucu seç.",
+      "📌 Kendi fikrini değil, metinde desteklenen fikri işaretle."
+    ],
+    formulas: [
+      ["Main idea", "whole text meaning", "Online reviews influence customer decisions.", "Metnin ortak mesajı."],
+      ["Vocabulary", "affect = influence", "A single negative review can affect buyers.", "Etkilemek anlamı."],
+      ["Reference", "this situation", "companies controlled information", "Önceki fikre döner."],
+      ["Inference", "be careful", "Not all reviews are reliable.", "Sahte yorum uyarısı." ]
+    ],
+    examples: [
+      { en: "Customers trust other users more than advertisements.", tr: "Müşteriler reklamlardan çok diğer kullanıcılara güvenir.", note: "Metnin güven mantığını verir." },
+      { en: "A single negative review can affect many potential buyers.", tr: "Tek bir olumsuz yorum birçok potansiyel alıcıyı etkileyebilir.", note: "Negative review etkisi." },
+      { en: "Not all reviews are reliable.", tr: "Tüm yorumlar güvenilir değildir.", note: "Inference sorusunda dikkatli okuma sonucunu destekler." }
+    ],
+    mistakes: [
+      { wrong: "All reviews are reliable.", correct: "Not all reviews are reliable.", why: "Metin fake reviews olabileceğini söyler." },
+      { wrong: "Product prices are mentioned as a main detail.", correct: "Product prices are not mentioned.", why: "Kaynak sorusunda NOT mentioned cevabı product prices'tır." }
+    ],
+    summary: ["Ana fikir: online reviews customer decisions etkiler.", "Reference sorularında önceki cümleye dön.", "Fake reviews = dikkatli/eleştirel okuma."]
+  },
+  readingwork: {
+    title: "Reading 2 - The Changing World of Work",
+    source: "READING 2.docx içindeki metin ve comprehension/vocabulary/reference/inference soruları.",
+    intro: "Bu ders modern iş dünyasını reading stratejisiyle anlamayı öğretir. 💼",
+    teacher: "Metin iş dünyasının remote work, gig economy, automation ve lifelong learning nedeniyle değiştiğini anlatır. Yazar tek taraflı konuşmaz: remote work zaman kazandırır ama isolated hissettirebilir; gig economy özgürlük verir ama job security azaltabilir; automation bazı işleri değiştirir ve workers need to develop new skills sonucuna bağlanır.",
+    rules: [
+      "📌 Main idea: The world of work is changing in many ways.",
+      "📌 Advantage/disadvantage soruları ilgili paragraftan çözülür.",
+      "📌 Vocabulary: efficient, isolated, repetitive gibi kelimeleri context ile bul.",
+      "📌 Reference: this ve those kelimeleri önceki fikre/isme döner.",
+      "📌 Inference: future workers should adapt to changes."
+    ],
+    formulas: [
+      ["Remote work", "work from home/anywhere", "Employees can work from home.", "Teknolojiyle çalışma yeri değişir."],
+      ["Advantage", "save time / comfortable", "Employees do not need to commute.", "Ulaşım zamanı azalır."],
+      ["Disadvantage", "isolated / communication difficult", "Some employees feel isolated.", "Yüz yüze iletişim azalır."],
+      ["Future skill", "adapt / lifelong learning", "Workers need to develop new skills.", "Değişime uyum gerekir." ]
+    ],
+    examples: [
+      { en: "Remote work offers several advantages.", tr: "Uzaktan çalışma birçok avantaj sunar.", note: "Bu paragrafta saving time ve comfort anlatılır." },
+      { en: "Some employees feel isolated.", tr: "Bazı çalışanlar yalnız hisseder.", note: "Disadvantage sorusu için ana ipucu." },
+      { en: "Education and lifelong learning have become more important than ever.", tr: "Eğitim ve hayat boyu öğrenme her zamankinden daha önemli hale geldi.", note: "Metnin sonuç mantığını güçlendirir." }
+    ],
+    mistakes: [
+      { wrong: "The text is only about remote work.", correct: "The text is about many changes in the world of work.", why: "Metin gig economy, automation ve lifelong learning de anlatır." },
+      { wrong: "The writer says workplace change is completely negative.", correct: "It brings both advantages and challenges.", why: "Metin dengeli bir ton kullanır." }
+    ],
+    summary: ["Remote work + gig economy + automation ana konular.", "Avantaj ve dezavantajları ayır.", "Gelecek çalışanları adapt ve learn mantığıyla anlatılır."]
+  },
+  vocabcontext: {
+    title: "Vocabulary Practice & Context Test",
+    source: "VOCABULARY PRACTICE.docx, INTERMEDIATE VOCAB TEST 1A-3B.docx, Fill in the gaps.docx ve Vocabulary_List 1B Workbook.pdf.",
+    intro: "Bu ders karışık kelime sorularını anlam, kalıp ve cümle yapısıyla çözmeyi öğretir. 🧠",
+    teacher: "Kaynaklardaki vocabulary soruları tek tek kelime anlamı değil, context bilgisi ister. Undisputed herkesin kabul ettiği sonuç için; eager to + verb1, keen on + V-ing, prevent from + V-ing gibi kalıplar ise gramer bilgisiyle çözülür. Phrasal verbs de testte çok yer alır: call off, fill in, give up, set up, look forward to.",
+    rules: [
+      "📌 Kelime türünü bul: noun, verb, adjective, phrase.",
+      "📌 Preposition kalıplarını birlikte öğren.",
+      "📌 Phrasal verbs particle ile ezberlenir.",
+      "📌 Collocations doğal İngilizce verir: make a decision, meet expectations.",
+      "📌 Cümlenin anlamı ve grameri aynı anda doğru olmalı."
+    ],
+    formulas: [
+      ["Adjective pattern", "keen on + V-ing", "She is keen on learning.", "on sonrası V-ing gelir."],
+      ["Infinitive pattern", "eager to + V1", "I am eager to start.", "to sonrası base verb."],
+      ["Phrasal verb", "call off / fill in", "We called off our trip.", "Particle anlamın parçası."],
+      ["Preposition + ing", "prevent from + V-ing", "The noise prevented me from concentrating.", "from sonrası V-ing." ]
+    ],
+    examples: [
+      { en: "The result of the match was undisputed.", tr: "Maçın sonucu tartışmasızdı.", note: "Everyone agreed on it ipucu undisputed verir." },
+      { en: "He finally got over his fear of flying.", tr: "Uçma korkusunu sonunda aştı.", note: "Get over kaynak testinde overcome anlamıyla kullanılır." },
+      { en: "I'm really looking forward to the weekend.", tr: "Hafta sonunu gerçekten dört gözle bekliyorum.", note: "Look forward to kaynak testindeki phrasal/preposition kalıbıdır." }
+    ],
+    mistakes: [
+      { wrong: "She is good in making friends.", correct: "She is good at making friends.", why: "Kaynak testte good at + V-ing kullanılır." },
+      { wrong: "He apologized about being late.", correct: "He apologized for being late.", why: "Apologize for kaynak testinde doğru prepositiondır." }
+    ],
+    summary: ["Meaning + pattern birlikte düşün.", "Phrasal verbs particle ile öğren.", "Vocabulary sorusu çoğu zaman grammar sorusudur."]
+  }
+};
+
+Object.entries(SOURCE_LOCKED_TEACHER_LESSONS).forEach(([id, data]) => appendTopicHtml(id, buildSourceLockedTeacherLesson(data)));
+
 const MEMORIZATION_CARDS = [
   { id: "mem-1", front: "Researchers", back: "Araştırmacılar" },
   { id: "mem-2", front: "Evidence", back: "Kanıt" },
@@ -1833,6 +3307,100 @@ const ADDITIONAL_MEMORY_CARDS = [
 ];
 
 MEMORIZATION_CARDS.push(...ADDITIONAL_MEMORY_CARDS);
+
+const SOURCE_MEMORY_CARDS = [
+  { id: "mem-127", front: "Heal", back: "İyileştirmek" },
+  { id: "mem-128", front: "Unusual", back: "Alışılmadık" },
+  { id: "mem-129", front: "Punishment", back: "Ceza" },
+  { id: "mem-130", front: "On purpose", back: "Bilerek / kasten" },
+  { id: "mem-131", front: "Deny", back: "İnkar etmek" },
+  { id: "mem-132", front: "Be allowed to", back: "İzinli olmak" },
+  { id: "mem-133", front: "According to", back: "-e göre" },
+  { id: "mem-134", front: "Bride", back: "Gelin" },
+  { id: "mem-135", front: "Opportunity", back: "Fırsat" },
+  { id: "mem-136", front: "Ticklish", back: "Gıdıklanan / gıdıklanmaya hassas" },
+  { id: "mem-137", front: "Reputation", back: "İtibar / ün" },
+  { id: "mem-138", front: "Unconscious", back: "Bilinci kapalı" },
+  { id: "mem-139", front: "Make up", back: "Barışmak / uydurmak" },
+  { id: "mem-140", front: "Unaware", back: "Habersiz / farkında olmayan" },
+  { id: "mem-141", front: "Trust", back: "Güvenmek / güven" },
+  { id: "mem-142", front: "Postpone", back: "Ertelemek" },
+  { id: "mem-143", front: "Fall out", back: "Kavga etmek / arası bozulmak" },
+  { id: "mem-144", front: "Lawyer", back: "Avukat" },
+  { id: "mem-145", front: "Take on", back: "Üstlenmek" },
+  { id: "mem-146", front: "Reject", back: "Reddetmek" },
+  { id: "mem-147", front: "Undisputed", back: "Tartışmasız" },
+  { id: "mem-148", front: "Aim", back: "Amaç / hedef" },
+  { id: "mem-149", front: "Keen on", back: "Meraklı / düşkün" },
+  { id: "mem-150", front: "Upmarket", back: "Lüks / üst segment" },
+  { id: "mem-151", front: "Eager to", back: "Hevesli / istekli" },
+  { id: "mem-152", front: "Soak up", back: "Tadını çıkarmak / içine çekmek" },
+  { id: "mem-153", front: "Hotelier", back: "Otelci" },
+  { id: "mem-154", front: "Frugal", back: "Tutumlu" },
+  { id: "mem-155", front: "At the bottom of", back: "En altında" },
+  { id: "mem-156", front: "Achievement", back: "Başarı" },
+  { id: "mem-157", front: "Remote", back: "Uzak / kumanda" },
+  { id: "mem-158", front: "Follower", back: "Takipçi" },
+  { id: "mem-159", front: "Tweet", back: "Tweet atmak / paylaşmak" },
+  { id: "mem-160", front: "High-speed train", back: "Yüksek hızlı tren" },
+  { id: "mem-161", front: "One-way flight", back: "Tek yön uçuş" },
+  { id: "mem-162", front: "Final leg", back: "Yolculuğun son bölümü" },
+  { id: "mem-163", front: "Make it", back: "Başarmak / varmak" },
+  { id: "mem-164", front: "Big hug", back: "Sıkı sarılma" },
+  { id: "mem-165", front: "Item", back: "Ürün / madde" },
+  { id: "mem-166", front: "Security screener", back: "Güvenlik kontrol görevlisi" },
+  { id: "mem-167", front: "Go on", back: "Devam etmek" },
+  { id: "mem-168", front: "Particular", back: "Titiz / seçici" },
+  { id: "mem-169", front: "Call off", back: "İptal etmek" },
+  { id: "mem-170", front: "Get on with", back: "İyi geçinmek" },
+  { id: "mem-171", front: "Meet expectations", back: "Beklentileri karşılamak" },
+  { id: "mem-172", front: "Get over", back: "Atlatmak / aşmak" },
+  { id: "mem-173", front: "Accused of", back: "İle suçlanmış" },
+  { id: "mem-174", front: "Run into", back: "Tesadüfen karşılaşmak" },
+  { id: "mem-175", front: "Due to", back: "Nedeniyle" },
+  { id: "mem-176", front: "Prevent from", back: "Alıkoymak / engellemek" },
+  { id: "mem-177", front: "Afford", back: "Parası yetmek" },
+  { id: "mem-178", front: "Annoy", back: "Rahatsız etmek" },
+  { id: "mem-179", front: "Set up", back: "Kurmak" },
+  { id: "mem-180", front: "Keep in touch", back: "İletişimde kalmak" },
+  { id: "mem-181", front: "Remind of", back: "Hatırlatmak / benzetmek" },
+  { id: "mem-182", front: "As soon as", back: "-er ermez" },
+  { id: "mem-183", front: "Hand in", back: "Teslim etmek" },
+  { id: "mem-184", front: "Apologize for", back: "İçin özür dilemek" },
+  { id: "mem-185", front: "Interested in", back: "İlgili / meraklı" },
+  { id: "mem-186", front: "Look up", back: "Sözlükte aramak" },
+  { id: "mem-187", front: "Make a decision", back: "Karar vermek" },
+  { id: "mem-188", front: "Would rather", back: "Tercih etmek" },
+  { id: "mem-189", front: "Good at", back: "-de iyi" },
+  { id: "mem-190", front: "Save money", back: "Para biriktirmek" },
+  { id: "mem-191", front: "Bizarre", back: "Çok tuhaf" },
+  { id: "mem-192", front: "A wide range", back: "Geniş yelpaze" },
+  { id: "mem-193", front: "Subtle shade", back: "İnce renk tonu" },
+  { id: "mem-194", front: "Slight hint", back: "Hafif ipucu / ton" },
+  { id: "mem-195", front: "Torch", back: "El feneri" },
+  { id: "mem-196", front: "Reveal", back: "Ortaya çıkarmak" },
+  { id: "mem-197", front: "Synchronized", back: "Eş zamanlı" },
+  { id: "mem-198", front: "Consultation", back: "Danışma / görüşme" },
+  { id: "mem-199", front: "Promote", back: "Desteklemek / geliştirmek" },
+  { id: "mem-200", front: "Treatment", back: "Tedavi" },
+  { id: "mem-201", front: "Analysis", back: "Analiz" },
+  { id: "mem-202", front: "Exchange", back: "Değiş tokuş yapmak" },
+  { id: "mem-203", front: "Support yourself", back: "Kendi geçimini sağlamak" },
+  { id: "mem-204", front: "Civil partner", back: "Resmi partner" },
+  { id: "mem-205", front: "Qualify for", back: "Hak kazanmak / şartları sağlamak" },
+  { id: "mem-206", front: "Restriction", back: "Kısıtlama" },
+  { id: "mem-207", front: "Remote work", back: "Uzaktan çalışma" },
+  { id: "mem-208", front: "Commute", back: "İşe gidip gelmek" },
+  { id: "mem-209", front: "Gig economy", back: "Kısa süreli iş ekonomisi" },
+  { id: "mem-210", front: "Automation", back: "Otomasyon" },
+  { id: "mem-211", front: "Lifelong learning", back: "Hayat boyu öğrenme" },
+  { id: "mem-212", front: "Adapt", back: "Uyum sağlamak" },
+  { id: "mem-213", front: "Potential buyer", back: "Potansiyel alıcı" },
+  { id: "mem-214", front: "Feedback", back: "Geri bildirim" },
+  { id: "mem-215", front: "Reliable review", back: "Güvenilir yorum" }
+];
+
+MEMORIZATION_CARDS.push(...SOURCE_MEMORY_CARDS);
 
 const RECAP_CARDS = [
   {
@@ -2304,6 +3872,33 @@ const ADDITIONAL_RECAP_CARDS = [
 ];
 
 RECAP_CARDS.push(...ADDITIONAL_RECAP_CARDS);
+
+RECAP_CARDS.push(
+  {
+    unit: "Reading",
+    title: "Online Reviews",
+    formula: "main idea + reference + inference",
+    rule: "Metnin ortak mesajı online yorumların müşteri kararlarını etkilediğidir. this / it gibi referanslarda bir önceki fikre dön.",
+    example: "Online reviews influence customer decisions and force companies to improve.",
+    trap: "Fake reviews kısmı 'all reviews are reliable' sonucunu değil, dikkatli okuma gerektiğini gösterir."
+  },
+  {
+    unit: "Reading",
+    title: "Changing World of Work",
+    formula: "remote work + gig economy + automation + lifelong learning",
+    rule: "Metin değişimi dengeli anlatır: avantajlar ve zorluklar birlikte gelir.",
+    example: "Workers need to develop new skills to remain competitive.",
+    trap: "Yazar değişimi tamamen kötü veya tamamen iyi demiyor; both advantages and challenges."
+  },
+  {
+    unit: "Vocabulary",
+    title: "Context Vocabulary",
+    formula: "meaning + collocation + grammar pattern",
+    rule: "Kelimeleri tek başına değil kalıpla çalış: keen on + V-ing, eager to + V1, prevent from + V-ing.",
+    example: "She is keen on learning languages. / The noise prevented me from concentrating.",
+    trap: "keen on learn değil; keen on learning."
+  }
+);
 
 const TOTAL = TOPICS.length;
 const QUESTION_BANK = TOPICS.flatMap((topic) =>
@@ -4826,66 +6421,66 @@ document.addEventListener("keydown", (event) => {
     const lowerQuestion = questionText.toLowerCase();
 
     let rule = "Bu soruda doğru cevabı bulmak için önce cümlenin istediği yapıyı belirlemek gerekir.";
-    let whyCorrect = `Doğru cevap “${correctText}” çünkü cümlenin anlamına ve konu kuralına en uygun seçenek budur.`;
+    let whyCorrect = `Doğru cevap "${correctText}" çünkü cümlenin anlamına ve konu kuralına en uygun seçenek budur.`;
     let whySelected = "";
     let tip = "Benzer sorularda önce anahtar kelimeyi, sonra cümlenin zamanını ve anlamını kontrol et.";
 
     if (lowerTopic.includes("future") || /will|going to|shall|tomorrow|cloud|plan|future/i.test(questionText)) {
       rule = "Future Forms sorularında önce kararın ne zaman verildiğine ve elimizde kanıt olup olmadığına bakılır.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlede gelecek anlamı vardır ve yapı, bağlama göre doğru gelecek zaman formunu ister.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü cümlede gelecek anlamı vardır ve yapı, bağlama göre doğru gelecek zaman formunu ister.`;
       tip = "Kanıt varsa genellikle be going to; anlık karar, söz verme veya teklif varsa will/shall; ayarlanmış plan varsa present continuous kullanılır.";
       if (/cloud|look at|evidence|kanıt/i.test(questionText + " " + baseExplanation)) {
-        whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlede görünen bir kanıt vardır. “Look at those black clouds” gibi ifadeler yağmurun olacağına dair kanıt verdiği için “be going to” kullanılır.`;
+        whyCorrect = `"${correctText}" doğru cevaptır. Çünkü cümlede görünen bir kanıt vardır. "Look at those black clouds" gibi ifadeler yağmurun olacağına dair kanıt verdiği için "be going to" kullanılır.`;
         tip = "İpucu: Gözle görülen kanıt = be going to. Sadece kişisel tahmin = will olabilir.";
       }
     } else if (lowerTopic.includes("passive") || lowerQuestion.includes("passive")) {
       rule = "Passive Voice sorularında odak eylemi yapan kişi değil, eylemden etkilenen nesnedir. Yapı genelde be + V3 şeklindedir.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlenin passive karşılığı yapılırken nesne başa alınır ve fiil uygun zamanda be + V3 yapılır.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü cümlenin passive karşılığı yapılırken nesne başa alınır ve fiil uygun zamanda be + V3 yapılır.`;
       tip = "Active cümledeki object passive cümlede subject olur. Present Simple passive için is/are + V3, Past Simple passive için was/were + V3 kullanılır.";
     } else if (lowerTopic.includes("present tense") || lowerTopic.includes("present tenses")) {
       rule = "Present Tenses sorularında fiilin durum fiili mi, eylem fiili mi olduğuna ve cümlenin şu an mı, genel alışkanlık mı, plan mı anlattığına bakılır.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümledeki zaman ve anlam bu present tense kullanımını gerektirir.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü cümledeki zaman ve anlam bu present tense kullanımını gerektirir.`;
       tip = "Stative verbs genelde continuous almaz. Timetable için present simple, ayarlanmış gelecek plan için present continuous kullanılır.";
     } else if (lowerTopic.includes("condition")) {
       rule = "Conditional sorularında if cümlesinin zamanı ve sonuç cümlesindeki yardımcı yapı birlikte kontrol edilir.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu cümledeki koşul yapısı doğru zaman uyumunu ister.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü bu cümledeki koşul yapısı doğru zaman uyumunu ister.`;
       tip = "1st conditional: if + present simple, will + verb1. 2nd conditional: if + past simple, would + verb1. 3rd conditional: if + had V3, would have V3.";
     } else if (lowerTopic.includes("perfect")) {
       rule = "Perfect tense sorularında eylemin geçmişle bağlantısı, süresi ve şu ana etkisi kontrol edilir.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümle geçmişte başlayıp şimdiyle bağlantısı olan bir anlam taşıyor.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü cümle geçmişte başlayıp şimdiyle bağlantısı olan bir anlam taşıyor.`;
       tip = "for süreyi, since başlangıç noktasını gösterir. already/yet/just gibi kelimeler present perfect ile sık kullanılır.";
     } else if (lowerTopic.includes("modal") || lowerTopic.includes("can") || lowerTopic.includes("could") || lowerTopic.includes("able")) {
       rule = "Modal sorularında anlam çok önemlidir: yetenek, izin, zorunluluk, yasak veya mantıksal çıkarım olabilir.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü cümlenin anlamı bu modal yapıyı gerektirir.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü cümlenin anlamı bu modal yapıyı gerektirir.`;
       tip = "can şimdiki yetenek/izin, could geçmiş genel yetenek, be able to farklı zamanlarda yetenek için kullanılır. must güçlü çıkarım, can't imkansızlık anlatır.";
     } else if (lowerTopic.includes("phrasal")) {
       rule = "Phrasal verb sorularında fiil + particle birlikte düşünülür. Bazı phrasal verbler ayrılabilir, bazıları ayrılamaz.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu phrasal verb cümledeki anlamı doğru şekilde tamamlar.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü bu phrasal verb cümledeki anlamı doğru şekilde tamamlar.`;
       tip = "Nesne zamirse ayrılabilen phrasal verblerde zamir araya gelir: turn it off, call her back.";
     } else if (lowerTopic.includes("pronoun")) {
       rule = "Pronoun sorularında özne, nesne ve iyelik görevleri ayrılmalıdır.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu cümlede kelime nesne/iyelik görevine uygun biçimde kullanılmalıdır.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü bu cümlede kelime nesne/iyelik görevine uygun biçimde kullanılmalıdır.`;
       tip = "Preposition sonrasında object pronoun kullanılır: to her, for them, with us.";
     } else if (lowerTopic.includes("adjective")) {
       rule = "Adjective sorularında sıfatın isimden önce geldiği, comparative/superlative yapısı ve one/ones kullanımı kontrol edilir.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü sıfat yapısı cümlenin karşılaştırma veya tanımlama anlamına uygundur.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü sıfat yapısı cümlenin karşılaştırma veya tanımlama anlamına uygundur.`;
       tip = "Tekil sayılabilir isimde a/an gerekir. Büyük fark için much + comparative, küçük fark için a bit + comparative kullanılır.";
     } else if (lowerTopic.includes("preposition")) {
       rule = "Preposition sorularında fiil/sıfat ile gelen sabit edat ve cümlenin hareket mi konum mu anlattığı kontrol edilir.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü bu kelime cümlenin istediği edat veya hareket anlamını verir.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü bu kelime cümlenin istediği edat veya hareket anlamını verir.`;
       tip = "Preposition sonrası genelde -ing gelir. discuss, enter, marry gibi bazı fiiller ekstra preposition almaz.";
     } else if (lowerTopic.includes("reported")) {
       rule = "Reported Speech sorularında zaman kayması, kişi zamirleri ve soru kelime sırası kontrol edilir.";
-      whyCorrect = `“${correctText}” doğru cevaptır. Çünkü aktarılmış cümlede doğru zaman ve düz cümle sırası kullanılmalıdır.`;
+      whyCorrect = `"${correctText}" doğru cevaptır. Çünkü aktarılmış cümlede doğru zaman ve düz cümle sırası kullanılmalıdır.`;
       tip = "Reported question içinde do/does/did kullanılmaz; kelime sırası düz cümle gibi olur: where I lived.";
     }
 
     if (item.status === "correct") {
-      whySelected = `Sen “${selectedText}” seçtin ve bu doğru. Cümledeki anahtar bilgi doğru yapıyı seçmeni sağlamış.`;
+      whySelected = `Sen "${selectedText}" seçtin ve bu doğru. Cümledeki anahtar bilgi doğru yapıyı seçmeni sağlamış.`;
     } else if (item.status === "empty") {
       whySelected = "Bu soruyu boş bıraktın. Boş sorularda önce seçenekleri elemek iyi olur: cümlenin zamanı, anlamı ve anahtar kelimesiyle uyuşmayan seçenekleri çıkar.";
     } else {
-      whySelected = `Sen “${selectedText}” seçtin; ancak bu seçenek cümlenin istediği dilbilgisi/anlam kuralıyla tam uyuşmuyor. Doğru cevap “${correctText}” olmalı.`;
+      whySelected = `Sen "${selectedText}" seçtin; ancak bu seçenek cümlenin istediği dilbilgisi/anlam kuralıyla tam uyuşmuyor. Doğru cevap "${correctText}" olmalı.`;
     }
 
     const base = baseExplanation
@@ -4965,8 +6560,8 @@ document.addEventListener("keydown", (event) => {
 
     if (topicTitle.includes("future") || /will|going to|shall|tomorrow|cloud|plan|future/.test(merged)) {
       if (/cloud|look at|kanıt|kanita|evidence/.test(merged)) {
-        correctReason = `Cümlede görünen kanıt vardır. Bu yüzden geleceğe dair tahmin “be going to” yapısıyla verilir.`;
-        wrongReason = `Bu seçenek görünen kanıta dayalı gelecek tahmini mantığını tam karşılamaz. Bu bağlamda “${correctText}” daha uygundur.`;
+        correctReason = `Cümlede görünen kanıt vardır. Bu yüzden geleceğe dair tahmin "be going to" yapısıyla verilir.`;
+        wrongReason = `Bu seçenek görünen kanıta dayalı gelecek tahmini mantığını tam karşılamaz. Bu bağlamda "${correctText}" daha uygundur.`;
       } else {
         correctReason = `Bu seçenek gelecek zaman bağlamını doğru kurduğu için uygundur.`;
         wrongReason = `Bu seçenek gelecek zaman kullanımındaki bağlama uymadığı için elenir.`;
@@ -5010,7 +6605,7 @@ document.addEventListener("keydown", (event) => {
       return `Bu şık doğru cevaptır. Neden doğru? ${correctReason}${baseExplanation ? ` Ek kural: ${baseExplanation}` : ""}`;
     }
     if (isSelected) {
-      return `Bu şık senin seçimin, fakat doğru değildir. Neden olmaz? ${wrongReason} Bu yüzden doğru cevap “${correctText}” olmalıdır.`;
+      return `Bu şık senin seçimin, fakat doğru değildir. Neden olmaz? ${wrongReason} Bu yüzden doğru cevap "${correctText}" olmalıdır.`;
     }
     return `Bu şık doğru değildir. Neden olmaz? ${wrongReason}`;
   }
@@ -5790,7 +7385,7 @@ document.addEventListener("keydown", (event) => {
     try { s = s.normalize("NFKC"); } catch {}
     s = s.toLowerCase();
     // Apostrof / tire varyasyonları
-    s = s.replace(/[‘’ʼ‛`´]/g, "'");
+    s = s.replace(/[''''`´]/g, "'");
     s = s.replace(/[–—−]/g, "-");
     // Türkçe → ASCII eşlemeleri (klavye farkı toleransı için)
     const map = {
@@ -7403,7 +8998,7 @@ document.addEventListener("keydown", (event) => {
     if (topic.includes("future") || /will|going to|shall|tomorrow|cloud|plan|future/.test(merged)) {
       if (/cloud|look at|kanıt|kanita|evidence/.test(merged)) {
         correctReason = "Cümlede görünen kanıt vardır. Görünen kanıta dayalı gelecek tahminlerinde genellikle be going to kullanılır.";
-        wrongReason = `Bu seçenek görünen kanıta dayalı gelecek tahmini mantığını tam karşılamaz. Bu bağlamda “${correctText}” daha uygundur.`;
+        wrongReason = `Bu seçenek görünen kanıta dayalı gelecek tahmini mantığını tam karşılamaz. Bu bağlamda "${correctText}" daha uygundur.`;
       } else {
         correctReason = "Bu seçenek cümlenin gelecek zaman bağlamını doğru kurar.";
         wrongReason = "Bu seçenek gelecek zaman kullanımındaki bağlama uymadığı için elenir.";
@@ -7427,7 +9022,7 @@ document.addEventListener("keydown", (event) => {
 
     if (isCorrect && isSelected) return `Bu şık senin seçimin ve doğru cevaptır. ${correctReason}${base ? ` Ek açıklama: ${base}` : ""}`;
     if (isCorrect) return `Bu şık doğru cevaptır. ${correctReason}${base ? ` Ek açıklama: ${base}` : ""}`;
-    if (isSelected) return `Bu şık senin seçimin, fakat doğru değildir. ${wrongReason} Bu yüzden doğru cevap “${correctText}” olmalıdır.`;
+    if (isSelected) return `Bu şık senin seçimin, fakat doğru değildir. ${wrongReason} Bu yüzden doğru cevap "${correctText}" olmalıdır.`;
     return `Bu şık doğru değildir. ${wrongReason}`;
   }
 
@@ -7673,7 +9268,7 @@ const FILL_GAP_EXERCISES = [
     description: "Akademik kelimeleri cümle içinde doğru bağlama yerleştir.",
     items: [
       { id: "fg-vocab-1", sentence: "Researchers found strong ________ that regular exercise improves mental health.", answer: "evidence", hintType: "noun", hintFirstLetter: "e", hintTr: "kanıt", explanation: "Evidence, bir düşünceyi destekleyen bilgi veya kanıt anlamındadır." },
-      { id: "fg-vocab-2", sentence: "The teacher did a ________ to learn students’ favourite books.", answer: "survey", hintType: "noun", hintFirstLetter: "s", hintTr: "anket", explanation: "Survey, insanlara soru sorarak bilgi toplama yöntemidir." },
+      { id: "fg-vocab-2", sentence: "The teacher did a ________ to learn students' favourite books.", answer: "survey", hintType: "noun", hintFirstLetter: "s", hintTr: "anket", explanation: "Survey, insanlara soru sorarak bilgi toplama yöntemidir." },
       { id: "fg-vocab-3", sentence: "Her bright dress made her ________ in the crowd.", answer: "stand out", hintType: "phrasal verb", hintFirstLetter: "s", hintTr: "öne çıkmak", explanation: "Stand out, diğerlerinden farklı ya da dikkat çekici olmak demektir." },
       { id: "fg-vocab-4", sentence: "Overall, the project was a great ________.", answer: "success", hintType: "noun", hintFirstLetter: "s", hintTr: "başarı", explanation: "Success, başarılı sonuç anlamındadır." },
       { id: "fg-vocab-5", sentence: "It is ________ that it will rain tomorrow.", answer: "likely", hintType: "adjective", hintFirstLetter: "l", hintTr: "muhtemel", explanation: "Likely, gerçekleşme ihtimali yüksek olan durumlar için kullanılır." }
@@ -7685,7 +9280,7 @@ const FILL_GAP_EXERCISES = [
     items: [
       { id: "fg-obj-1", sentence: "I bought a book and gave ________ to Ravza.", answer: "it", hintType: "object pronoun", hintFirstLetter: "i", hintTr: "onu", explanation: "Book tekil nesne olduğu için object pronoun olarak it kullanılır." },
       { id: "fg-obj-2", sentence: "Yusuf sent ________ a postcard from Istanbul.", answer: "her", hintType: "object pronoun", hintFirstLetter: "h", hintTr: "ona", explanation: "Ravza için object pronoun her kullanılır." },
-      { id: "fg-obj-3", sentence: "Please give the keys to ________.", answer: "me", hintType: "object pronoun", hintFirstLetter: "m", hintTr: "bana", explanation: "Preposition to’dan sonra object pronoun gelir: to me." },
+      { id: "fg-obj-3", sentence: "Please give the keys to ________.", answer: "me", hintType: "object pronoun", hintFirstLetter: "m", hintTr: "bana", explanation: "Preposition to'dan sonra object pronoun gelir: to me." },
       { id: "fg-obj-4", sentence: "She found the answer and showed ________ to us.", answer: "it", hintType: "object pronoun", hintFirstLetter: "i", hintTr: "onu", explanation: "Answer tekil nesne olduğu için it kullanılır." },
       { id: "fg-obj-5", sentence: "They invited ________ to the party.", answer: "us", hintType: "object pronoun", hintFirstLetter: "u", hintTr: "bizi", explanation: "Invite fiilinden sonra object pronoun gerekir: us." }
     ]
@@ -7696,7 +9291,7 @@ const FILL_GAP_EXERCISES = [
     items: [
       { id: "fg-adj-1", sentence: "Suzan is ________ beautiful girl.", answer: "a", hintType: "article", hintFirstLetter: "a", hintTr: "bir", explanation: "Tekil countable noun önünde article gerekir: a beautiful girl." },
       { id: "fg-adj-2", sentence: "This book is ________ expensive than that pen.", answer: "more", hintType: "comparative", hintFirstLetter: "m", hintTr: "daha", explanation: "Expensive uzun sıfat olduğu için comparative yapısı more expensive olur." },
-      { id: "fg-adj-3", sentence: "That is the ________ film I have ever seen.", answer: "worst", hintType: "superlative", hintFirstLetter: "w", hintTr: "en kötü", explanation: "Bad kelimesinin superlative hali worst’tür." },
+      { id: "fg-adj-3", sentence: "That is the ________ film I have ever seen.", answer: "worst", hintType: "superlative", hintFirstLetter: "w", hintTr: "en kötü", explanation: "Bad kelimesinin superlative hali worst'tür." },
       { id: "fg-adj-4", sentence: "Can you give me the blue ________?", answer: "one", hintType: "pronoun", hintFirstLetter: "o", hintTr: "olan", explanation: "Tekil countable noun tekrarlanmasın diye one kullanılır." },
       { id: "fg-adj-5", sentence: "iPhones are ________ more expensive than many phones.", answer: "much", hintType: "intensifier", hintFirstLetter: "m", hintTr: "çok daha", explanation: "Büyük farkı vurgulamak için much + comparative kullanılır." }
     ]
@@ -7720,7 +9315,7 @@ const FILL_GAP_EXERCISES = [
       { id: "fg-pos-2", sentence: "The ________ room is upstairs.", answer: "teachers'", hintType: "plural possessive", hintFirstLetter: "t", hintTr: "öğretmenlerin", explanation: "Plural noun s ile bitiyorsa sadece apostrophe eklenir: teachers'." },
       { id: "fg-pos-3", sentence: "The door ________ the car was open.", answer: "of", hintType: "preposition", hintFirstLetter: "o", hintTr: "-in", explanation: "Cansız nesnelerde of yapısı doğaldır." },
       { id: "fg-pos-4", sentence: "She has her ________ room.", answer: "own", hintType: "emphasis", hintFirstLetter: "o", hintTr: "kendi", explanation: "Own sahipliği vurgular." },
-      { id: "fg-pos-5", sentence: "Emma and Mia’s ________ is very modern.", answer: "house", hintType: "noun", hintFirstLetter: "h", hintTr: "ev", explanation: "İki kişi aynı şeye sahipse 's ikinci isme gelir: Emma and Mia's house." }
+      { id: "fg-pos-5", sentence: "Emma and Mia's ________ is very modern.", answer: "house", hintType: "noun", hintFirstLetter: "h", hintTr: "ev", explanation: "İki kişi aynı şeye sahipse 's ikinci isme gelir: Emma and Mia's house." }
     ]
   },
   {
@@ -7731,7 +9326,7 @@ const FILL_GAP_EXERCISES = [
       { id: "fg-past-2", sentence: "I ________ a book when the phone rang.", answer: "was reading", hintType: "past continuous", hintFirstLetter: "w", hintTr: "okuyordum", explanation: "Geçmişte devam eden eylem past continuous ile anlatılır." },
       { id: "fg-past-3", sentence: "We ________ to the beach every weekend when we were children.", answer: "used to go", hintType: "used to", hintFirstLetter: "u", hintTr: "giderdik", explanation: "Geçmişte düzenli yapılan ama artık yapılmayan alışkanlık used to ile kurulur." },
       { id: "fg-past-4", sentence: "She ________ dinner at 6 PM yesterday.", answer: "was cooking", hintType: "past continuous", hintFirstLetter: "w", hintTr: "pişiriyordu", explanation: "Belirli geçmiş anda devam eden eylem past continuous ister." },
-      { id: "fg-past-5", sentence: "I didn’t ________ to like broccoli.", answer: "use", hintType: "negative used to", hintFirstLetter: "u", hintTr: "eskiden", explanation: "Olumsuzda didn’t use to kullanılır; used değil." }
+      { id: "fg-past-5", sentence: "I didn't ________ to like broccoli.", answer: "use", hintType: "negative used to", hintFirstLetter: "u", hintTr: "eskiden", explanation: "Olumsuzda didn't use to kullanılır; used değil." }
     ]
   },
   {
@@ -7742,7 +9337,7 @@ const FILL_GAP_EXERCISES = [
       { id: "fg-prep-2", sentence: "I am interested ________ learning English.", answer: "in", hintType: "adjective + preposition", hintFirstLetter: "i", hintTr: "ile ilgilenmek", explanation: "Interested in sabit bir yapıdır." },
       { id: "fg-prep-3", sentence: "We walked ________ the beach.", answer: "along", hintType: "movement", hintFirstLetter: "a", hintTr: "boyunca", explanation: "Along, bir çizgi veya yol boyunca hareketi anlatır." },
       { id: "fg-prep-4", sentence: "The cat is ________ the bed.", answer: "under", hintType: "place", hintFirstLetter: "u", hintTr: "altında", explanation: "Under, bir şeyin altında olma durumunu anlatır." },
-      { id: "fg-prep-5", sentence: "I am looking forward to ________ you.", answer: "seeing", hintType: "verb + ing", hintFirstLetter: "s", hintTr: "görmeyi", explanation: "Preposition to’dan sonra verb + ing gelir: looking forward to seeing." }
+      { id: "fg-prep-5", sentence: "I am looking forward to ________ you.", answer: "seeing", hintType: "verb + ing", hintFirstLetter: "s", hintTr: "görmeyi", explanation: "Preposition to'dan sonra verb + ing gelir: looking forward to seeing." }
     ]
   },
   {
@@ -7762,8 +9357,8 @@ const FILL_GAP_EXERCISES = [
     items: [
       { id: "fg-cond12-1", sentence: "If it rains tomorrow, we ________ stay at home.", answer: "will", hintType: "first conditional", hintFirstLetter: "w", hintTr: "kalacağız", explanation: "First conditional: If + present simple, will + verb1." },
       { id: "fg-cond12-2", sentence: "If I won the lottery, I ________ travel the world.", answer: "would", hintType: "second conditional", hintFirstLetter: "w", hintTr: "seyahat ederdim", explanation: "Second conditional: If + past simple, would + verb1." },
-      { id: "fg-cond12-3", sentence: "If I ________ you, I wouldn’t do that.", answer: "were", hintType: "advice phrase", hintFirstLetter: "w", hintTr: "senin yerinde olsam", explanation: "Tavsiye verirken If I were you kalıbı kullanılır." },
-      { id: "fg-cond12-4", sentence: "We can’t help you ________ you tell us the problem.", answer: "unless", hintType: "if not", hintFirstLetter: "u", hintTr: "-mezsen", explanation: "Unless = if not anlamındadır." },
+      { id: "fg-cond12-3", sentence: "If I ________ you, I wouldn't do that.", answer: "were", hintType: "advice phrase", hintFirstLetter: "w", hintTr: "senin yerinde olsam", explanation: "Tavsiye verirken If I were you kalıbı kullanılır." },
+      { id: "fg-cond12-4", sentence: "We can't help you ________ you tell us the problem.", answer: "unless", hintType: "if not", hintFirstLetter: "u", hintTr: "-mezsen", explanation: "Unless = if not anlamındadır." },
       { id: "fg-cond12-5", sentence: "If she knew the answer, she ________ help us.", answer: "could", hintType: "possibility", hintFirstLetter: "c", hintTr: "yardım edebilirdi", explanation: "Could olasılık veya yetenek anlatır." }
     ]
   },
@@ -7791,11 +9386,11 @@ const FILL_GAP_EXERCISES = [
   },
   {
     id: "fg-modals-obligation", title: "Modals of Obligation", category: "Modals", topicId: "modals", level: "Medium",
-    description: "Have to, must, mustn’t, don’t have to ve should farklarını çalış.",
+    description: "Have to, must, mustn't, don't have to ve should farklarını çalış.",
     items: [
       { id: "fg-mod-1", sentence: "I ________ buy a new fridge last week.", answer: "had to", hintType: "past obligation", hintFirstLetter: "h", hintTr: "zorunda kaldım", explanation: "Geçmiş zorunluluk için had to kullanılır." },
-      { id: "fg-mod-2", sentence: "You ________ spill anything on the sofa.", answer: "mustn't", hintType: "prohibition", hintFirstLetter: "m", hintTr: "yapmamalısın/yasak", explanation: "Mustn’t yasak veya güçlü uyarı bildirir." },
-      { id: "fg-mod-3", sentence: "We ________ be at the airport until 5.00.", answer: "don't have to", hintType: "no necessity", hintFirstLetter: "d", hintTr: "zorunda değiliz", explanation: "Don’t have to gerekli değil anlamına gelir." },
+      { id: "fg-mod-2", sentence: "You ________ spill anything on the sofa.", answer: "mustn't", hintType: "prohibition", hintFirstLetter: "m", hintTr: "yapmamalısın/yasak", explanation: "Mustn't yasak veya güçlü uyarı bildirir." },
+      { id: "fg-mod-3", sentence: "We ________ be at the airport until 5.00.", answer: "don't have to", hintType: "no necessity", hintFirstLetter: "d", hintTr: "zorunda değiliz", explanation: "Don't have to gerekli değil anlamına gelir." },
       { id: "fg-mod-4", sentence: "You ________ study a little every day.", answer: "should", hintType: "advice", hintFirstLetter: "s", hintTr: "yapmalısın", explanation: "Should tavsiye vermek için kullanılır." },
       { id: "fg-mod-5", sentence: "Students ________ be quiet during the exam.", answer: "must", hintType: "strong obligation", hintFirstLetter: "m", hintTr: "zorunda", explanation: "Must güçlü zorunluluk bildirir." }
     ]
@@ -7807,7 +9402,7 @@ const FILL_GAP_EXERCISES = [
       { id: "fg-abil-1", sentence: "When I was five, I ________ swim well.", answer: "could", hintType: "past ability", hintFirstLetter: "c", hintTr: "yapabiliyordum", explanation: "Geçmiş genel yetenek için could kullanılır." },
       { id: "fg-abil-2", sentence: "She ________ join us tomorrow.", answer: "will be able to", hintType: "future ability", hintFirstLetter: "w", hintTr: "katılabilecek", explanation: "Future ability için will be able to kullanılır." },
       { id: "fg-abil-3", sentence: "He ________ be at home; the lights are on.", answer: "must", hintType: "deduction", hintFirstLetter: "m", hintTr: "olmalı", explanation: "Must güçlü olumlu tahmin bildirir." },
-      { id: "fg-abil-4", sentence: "She ________ be Kate. Kate is in Italy.", answer: "can't", hintType: "negative deduction", hintFirstLetter: "c", hintTr: "olamaz", explanation: "Can’t güçlü olumsuz tahmin veya imkânsızlık bildirir." },
+      { id: "fg-abil-4", sentence: "She ________ be Kate. Kate is in Italy.", answer: "can't", hintType: "negative deduction", hintFirstLetter: "c", hintTr: "olamaz", explanation: "Can't güçlü olumsuz tahmin veya imkânsızlık bildirir." },
       { id: "fg-abil-5", sentence: "I like ________ able to read quickly.", answer: "being", hintType: "gerund", hintFirstLetter: "b", hintTr: "olabilmek", explanation: "Like sonrası burada gerund yapı kullanılır: being able to." }
     ]
   },
@@ -7815,7 +9410,7 @@ const FILL_GAP_EXERCISES = [
     id: "fg-phrasal-verbs", title: "Phrasal Verbs", category: "Phrasal Verbs", topicId: "phrasal", level: "Hard",
     description: "Separable, inseparable ve pronoun kuralını çalış.",
     items: [
-      { id: "fg-phr-1", sentence: "Your phone is ringing. Please turn ________ off.", answer: "it", hintType: "pronoun rule", hintFirstLetter: "i", hintTr: "onu", explanation: "Separable phrasal verb’de pronoun araya girer: turn it off." },
+      { id: "fg-phr-1", sentence: "Your phone is ringing. Please turn ________ off.", answer: "it", hintType: "pronoun rule", hintFirstLetter: "i", hintTr: "onu", explanation: "Separable phrasal verb'de pronoun araya girer: turn it off." },
       { id: "fg-phr-2", sentence: "I am looking ________ my keys.", answer: "for", hintType: "inseparable phrasal verb", hintFirstLetter: "f", hintTr: "aramak", explanation: "Look for = aramak anlamındadır ve ayrılmaz." },
       { id: "fg-phr-3", sentence: "She looks ________ her little brother.", answer: "after", hintType: "phrasal verb", hintFirstLetter: "a", hintTr: "ilgilenmek", explanation: "Look after = bakmak/ilgilenmek anlamındadır." },
       { id: "fg-phr-4", sentence: "We are looking forward ________ seeing you.", answer: "to", hintType: "three-word phrasal verb", hintFirstLetter: "t", hintTr: "dört gözle beklemek", explanation: "Look forward to + V-ing kullanılır." },
@@ -7859,10 +9454,10 @@ const FILL_GAP_EXERCISES = [
     id: "fg-reported-speech", title: "Reported Speech", category: "Reported Speech", topicId: "reported", level: "Hard",
     description: "Backshift, reported questions ve requests yapılarını çalış.",
     items: [
-      { id: "fg-rep-1", sentence: "She said that she ________ find her purse.", answer: "couldn't", hintType: "backshift", hintFirstLetter: "c", hintTr: "bulamadı", explanation: "Can reported speech’te could olur." },
-      { id: "fg-rep-2", sentence: "He asked me where I ________.", answer: "lived", hintType: "reported question", hintFirstLetter: "l", hintTr: "yaşadım", explanation: "Reported question’da düz cümle sırası kullanılır." },
+      { id: "fg-rep-1", sentence: "She said that she ________ find her purse.", answer: "couldn't", hintType: "backshift", hintFirstLetter: "c", hintTr: "bulamadı", explanation: "Can reported speech'te could olur." },
+      { id: "fg-rep-2", sentence: "He asked me where I ________.", answer: "lived", hintType: "reported question", hintFirstLetter: "l", hintTr: "yaşadım", explanation: "Reported question'da düz cümle sırası kullanılır." },
       { id: "fg-rep-3", sentence: "They asked us ________ fill in the form.", answer: "to", hintType: "request", hintFirstLetter: "t", hintTr: "-mek", explanation: "Request yapısı ask + object + to infinitive şeklindedir." },
-      { id: "fg-rep-4", sentence: "He said he would see me the ________ day.", answer: "next", hintType: "time change", hintFirstLetter: "n", hintTr: "ertesi", explanation: "Tomorrow reported speech’te the next day olur." },
+      { id: "fg-rep-4", sentence: "He said he would see me the ________ day.", answer: "next", hintType: "time change", hintFirstLetter: "n", hintTr: "ertesi", explanation: "Tomorrow reported speech'te the next day olur." },
       { id: "fg-rep-5", sentence: "She asked me ________ I was coming with them.", answer: "if", hintType: "yes/no reported question", hintFirstLetter: "i", hintTr: "-ip -mediğimi", explanation: "Yes/no reported questions için if veya whether kullanılır." }
     ]
   },
@@ -7873,7 +9468,7 @@ const FILL_GAP_EXERCISES = [
       { id: "fg-third-1", sentence: "If I had known his number, I would have ________ him.", answer: "called", hintType: "third conditional", hintFirstLetter: "c", hintTr: "arardım", explanation: "Third conditional result: would have + V3." },
       { id: "fg-third-2", sentence: "If we had missed the bus, we ________ have got home late.", answer: "would", hintType: "third conditional", hintFirstLetter: "w", hintTr: "olurdu", explanation: "Third conditional ana cümlede would have + V3 kullanılır." },
       { id: "fg-third-3", sentence: "When we arrived, the train had ________.", answer: "left", hintType: "past perfect", hintFirstLetter: "l", hintTr: "ayrılmıştı", explanation: "Daha önce olan geçmiş olay past perfect ile anlatılır." },
-      { id: "fg-third-4", sentence: "If they had been invited, they would have ________.", answer: "gone", hintType: "third conditional", hintFirstLetter: "g", hintTr: "giderlerdi", explanation: "Go fiilinin V3 hali gone’dır." },
+      { id: "fg-third-4", sentence: "If they had been invited, they would have ________.", answer: "gone", hintType: "third conditional", hintFirstLetter: "g", hintTr: "giderlerdi", explanation: "Go fiilinin V3 hali gone'dır." },
       { id: "fg-third-5", sentence: "If she had studied, she would have ________ the exam.", answer: "passed", hintType: "third conditional", hintFirstLetter: "p", hintTr: "geçerdi", explanation: "Would have + V3 yapısı kullanılır." }
     ]
   },
@@ -7889,6 +9484,58 @@ const FILL_GAP_EXERCISES = [
     ]
   }
 ];
+
+FILL_GAP_EXERCISES.push(
+  {
+    id: "fg-reading-reviews",
+    title: "Reading 1 / Online Reviews",
+    category: "Vocabulary",
+    topicId: "readingreviews",
+    level: "Medium",
+    description: "Reading 1 metnindeki ana kelimeleri cümle içinde tamamla.",
+    items: [
+      { id: "fg-read1-1", sentence: "Customers often ________ other users more than advertisements.", answer: "trust", hintType: "reading vocabulary", hintFirstLetter: "t", hintTr: "güvenmek", explanation: "Reading 1'in ilk paragrafında trust, müşterilerin diğer kullanıcıların yorumlarına güvenmesini anlatır." },
+      { id: "fg-read1-2", sentence: "A single negative review can ________ many potential buyers.", answer: "affect", hintType: "verb", hintFirstLetter: "a", hintTr: "etkilemek", explanation: "Affect = influence, yani etkilemek." },
+      { id: "fg-read1-3", sentence: "Businesses must pay more attention to customer ________.", answer: "satisfaction", hintType: "noun", hintFirstLetter: "s", hintTr: "memnuniyet", explanation: "Customer satisfaction, müşteri memnuniyeti demektir." },
+      { id: "fg-read1-4", sentence: "Not all reviews are ________.", answer: "reliable", hintType: "adjective", hintFirstLetter: "r", hintTr: "güvenilir", explanation: "Metin bazı yorumların sahte olabileceğini, bu yüzden hepsinin güvenilir olmadığını söyler." },
+      { id: "fg-read1-5", sentence: "Online reviews have become an ________ part of modern shopping.", answer: "essential", hintType: "adjective", hintFirstLetter: "e", hintTr: "çok önemli", explanation: "Essential, gerekli/çok önemli anlamındadır." }
+    ]
+  },
+  {
+    id: "fg-reading-work",
+    title: "Reading 2 / Changing World of Work",
+    category: "Vocabulary",
+    topicId: "readingwork",
+    level: "Medium",
+    description: "Remote work, gig economy ve automation kelimelerini reading bağlamında çalış.",
+    items: [
+      { id: "fg-read2-1", sentence: "The rise of ________ work is one of the biggest changes in recent years.", answer: "remote", hintType: "adjective", hintFirstLetter: "r", hintTr: "uzaktan", explanation: "Remote work, uzaktan çalışma anlamındadır." },
+      { id: "fg-read2-2", sentence: "Employees can save time because they do not need to ________ every day.", answer: "commute", hintType: "verb", hintFirstLetter: "c", hintTr: "işe gidip gelmek", explanation: "Commute, ev ile iş arasında gidip gelmek demektir." },
+      { id: "fg-read2-3", sentence: "Some employees feel ________ because they do not interact face-to-face.", answer: "isolated", hintType: "adjective", hintFirstLetter: "i", hintTr: "yalnız", explanation: "Isolated, yalnız/izole hissetmek demektir." },
+      { id: "fg-read2-4", sentence: "In the gig ________, people take short-term jobs or projects.", answer: "economy", hintType: "noun phrase", hintFirstLetter: "e", hintTr: "ekonomi", explanation: "Gig economy, kısa süreli iş/proje sistemidir." },
+      { id: "fg-read2-5", sentence: "Automation and artificial intelligence are replacing some ________ jobs.", answer: "traditional", hintType: "adjective", hintFirstLetter: "t", hintTr: "geleneksel", explanation: "Metinde automation'ın bazı traditional jobs türlerini değiştirdiği anlatılır." },
+      { id: "fg-read2-6", sentence: "Workers need to ________ to new technologies.", answer: "adapt", hintType: "verb", hintFirstLetter: "a", hintTr: "uyum sağlamak", explanation: "Adapt to, bir şeye uyum sağlamak demektir." }
+    ]
+  },
+  {
+    id: "fg-source-vocabulary",
+    title: "Source Vocabulary / Mixed Practice",
+    category: "Vocabulary",
+    topicId: "vocabcontext",
+    level: "Medium",
+    description: "Fill in the gaps, Vocabulary Practice ve Vocab Test kaynaklarındaki kelimelerle karışık pratik.",
+    items: [
+      { id: "fg-src-1", sentence: "The result of the match was ________; everyone agreed on it.", answer: "undisputed", hintType: "adjective", hintFirstLetter: "u", hintTr: "tartışmasız", explanation: "Undisputed, kimsenin itiraz etmediği sonuçlar için kullanılır." },
+      { id: "fg-src-2", sentence: "She is very keen ________ learning about different cultures.", answer: "on", hintType: "preposition", hintFirstLetter: "o", hintTr: "-e meraklı", explanation: "Kalıp: keen on + noun/V-ing." },
+      { id: "fg-src-3", sentence: "I am eager ________ start my new course next week.", answer: "to", hintType: "verb pattern", hintFirstLetter: "t", hintTr: "-meye hevesli", explanation: "Kalıp: eager to + verb1." },
+      { id: "fg-src-4", sentence: "We had to ________ our trip because of the bad weather.", answer: "call off", hintType: "phrasal verb", hintFirstLetter: "c", hintTr: "iptal etmek", explanation: "Call off, plan/seyahat/toplantı iptal etmek demektir." },
+      { id: "fg-src-5", sentence: "The noise prevented me from ________.", answer: "concentrating", hintType: "preposition + ing", hintFirstLetter: "c", hintTr: "odaklanmak", explanation: "Prevent someone from + V-ing kalıbı kullanılır." },
+      { id: "fg-src-6", sentence: "Please ________ the form before submitting it.", answer: "fill in", hintType: "phrasal verb", hintFirstLetter: "f", hintTr: "doldurmak", explanation: "Fill in a form, form doldurmak demektir." },
+      { id: "fg-src-7", sentence: "Let's ________ the meeting until tomorrow.", answer: "postpone", hintType: "verb", hintFirstLetter: "p", hintTr: "ertelemek", explanation: "Postpone, bir etkinliği daha sonraya almak demektir." },
+      { id: "fg-src-8", sentence: "She decided to ________ a new project at work.", answer: "take on", hintType: "phrasal verb", hintFirstLetter: "t", hintTr: "üstlenmek", explanation: "Take on a project, bir projeyi üstlenmek demektir." }
+    ]
+  }
+);
 
 let fillGapActiveFilter = "all";
 let activeFillGapExerciseId = null;

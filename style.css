@@ -9091,3 +9091,168 @@ body.dark .device-select-label {
     order: 1;
   }
 }
+
+/* =========================================================
+   SOURCE-BASED LESSON ENRICHMENTS
+   Konu anlatımlarındaki tablo, not ve okuma blokları
+   ========================================================= */
+.lesson-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(18px, 3vw, 28px);
+  margin: 0 0 18px;
+  border-radius: 24px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--navy) 88%, #000 12%), color-mix(in srgb, var(--pink) 72%, var(--navy) 28%));
+  box-shadow: var(--shadow-md);
+}
+
+.lesson-hero h3 {
+  margin: 8px 0 10px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(25px, 4vw, 42px);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.lesson-hero p {
+  max-width: 860px;
+  color: rgba(255,255,255,.84);
+  line-height: 1.75;
+  font-weight: 650;
+}
+
+.emoji-title {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.visual-note,
+.formula-card,
+.example-card,
+.mistake-card,
+.mini-summary-card,
+.grammar-map,
+.word-card {
+  border: 1px solid var(--card-border);
+  background: var(--input-bg);
+  border-radius: 18px;
+  box-shadow: var(--shadow-xs);
+}
+
+.visual-note {
+  padding: 15px;
+  color: var(--text-light);
+  line-height: 1.65;
+}
+
+.visual-note strong {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: var(--navy);
+}
+
+body.dark .visual-note strong {
+  color: var(--pink-bright);
+}
+
+.timeline-box {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+}
+
+.timeline-box span {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--white);
+  border: 1px solid var(--card-border);
+  text-align: center;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.timeline-box strong {
+  color: var(--pink);
+  font-size: 20px;
+}
+
+.formula-card,
+.example-card,
+.mistake-card,
+.grammar-map,
+.word-card {
+  padding: 16px;
+}
+
+.mistake-card {
+  border-color: color-mix(in srgb, var(--warning) 34%, var(--card-border) 66%);
+  background: color-mix(in srgb, var(--warning) 10%, var(--input-bg) 90%);
+}
+
+.mini-summary-card {
+  border-color: color-mix(in srgb, var(--success) 34%, var(--card-border) 66%);
+  background: color-mix(in srgb, var(--success) 8%, var(--input-bg) 92%);
+}
+
+.source-table td,
+.source-table th {
+  vertical-align: top;
+}
+
+.content-card .lesson-grid:first-child {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .lesson-hero {
+    border-radius: 20px;
+    padding: 18px;
+  }
+
+  .timeline-box {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline-box strong {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+
+  .visual-note,
+  .formula-card,
+  .example-card,
+  .mistake-card,
+  .grammar-map,
+  .word-card {
+    border-radius: 16px;
+  }
+}
