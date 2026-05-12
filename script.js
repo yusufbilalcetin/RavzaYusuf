@@ -4158,6 +4158,11 @@ function closeMobileMenu() {
 }
 
 function navigate(pageId) {
+  const isRavzaLingoPage = pageId === "ravzalingo";
+  document.documentElement.classList.toggle("is-ravzalingo-page", isRavzaLingoPage);
+  document.body.classList.toggle("is-ravzalingo-page", isRavzaLingoPage);
+  document.body.classList.toggle("rlz5-page-active", isRavzaLingoPage);
+
   document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
   document.querySelectorAll(".nav-links button").forEach((button) => button.classList.remove("active"));
 
@@ -13234,6 +13239,174 @@ document.addEventListener("DOMContentLoaded", () => {
         .rlz5-goto-activity{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:44px;height:44px;font-size:21px}
         body.rlz5-page-active.rlz5-show-goto .scroll-top-btn{bottom:calc(70px + env(safe-area-inset-bottom,0px))}
       }
+
+
+/* =========================================================
+   FINAL FIX — RAVZALINGO DESKTOP + MOBILE BACKGROUND
+   Sadece RavzaLingo aktifken çalışır.
+   Dosya yolları:
+   - assests/ravzalingo-background.png
+   - assests/ravzalingo-bg-mobile.png
+   ========================================================= */
+body.is-ravzalingo-page,
+body.rlz5-page-active {
+  background: var(--bg) !important;
+}
+
+body.is-ravzalingo-page .content-wrapper,
+body.rlz5-page-active .content-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+  position: relative !important;
+  isolation: isolate !important;
+  background: transparent !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page,
+body.rlz5-page-active .page.ravzalingo-page,
+body.is-ravzalingo-page .page.ravzalingo-page.active,
+body.rlz5-page-active .page.ravzalingo-page.active {
+  position: relative !important;
+  isolation: isolate !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100svh - 78px) !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+body.rlz5-page-active .page.ravzalingo-page.active::before {
+  content: "" !important;
+  position: fixed !important;
+  top: 78px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background-image: url("assests/ravzalingo-background.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
+  transform: translateZ(0) !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+body.rlz5-page-active .page.ravzalingo-page.active::after {
+  content: "" !important;
+  position: fixed !important;
+  top: 78px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(16, 185, 129, .08), transparent 36%),
+    linear-gradient(180deg, rgba(5, 18, 18, .16), rgba(5, 18, 18, .42)) !important;
+}
+
+body.is-ravzalingo-page #ravzaLingoRoot,
+body.rlz5-page-active #ravzaLingoRoot {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: none !important;
+  display: block !important;
+  background: transparent !important;
+}
+
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-shell,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-shell,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-shell,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-shell {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100svh - 78px) !important;
+  background: transparent !important;
+}
+
+/* Kartlar okunabilir kalsın; arka plan tamamen kapanmasın */
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-section-divider > div,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-section-divider > div,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-empty-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-empty-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-summary-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
+  backdrop-filter: blur(12px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.12) !important;
+}
+
+@media (max-width: 1024px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before,
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    left: 0 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body.is-ravzalingo-page .page.ravzalingo-page,
+  body.rlz5-page-active .page.ravzalingo-page,
+  body.is-ravzalingo-page .page.ravzalingo-page.active,
+  body.rlz5-page-active .page.ravzalingo-page.active {
+    min-height: calc(100svh - 70px) !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    top: 70px !important;
+    left: 0 !important;
+    background-image: url("assests/ravzalingo-bg-mobile.png") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    top: 70px !important;
+    left: 0 !important;
+    background:
+      linear-gradient(180deg, rgba(5, 18, 18, .12), rgba(5, 18, 18, .42)) !important;
+  }
+
+  body.is-ravzalingo-page #ravzaLingoRoot .rlz5-shell,
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-shell,
+  body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-shell,
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-shell {
+    min-height: calc(100svh - 70px) !important;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-image: url("assests/ravzalingo-background.png") !important;
+    background-position: center center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-position: center top !important;
+  }
+}
+
+
     `;
     document.head.appendChild(style);
   }
@@ -13244,7 +13417,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const original = window.navigate;
     window.navigate = function patchedNavigate(page, ...args) {
       const result = original.apply(this, [page, ...args]);
+      document.documentElement.classList.toggle("is-ravzalingo-page", page === "ravzalingo");
       document.body.classList.toggle("rlz5-page-active", page === "ravzalingo");
+      document.body.classList.toggle("is-ravzalingo-page", page === "ravzalingo");
       if (page === "ravzalingo") requestAnimationFrame(() => { RLZ_SESSION = null; rlzRenderHome(); rlzUpdateNavButtons(); rlzUpdateStickyTopbar(); });
       else { rlz5CloseTopicModal(); rlzUpdateNavButtons(); rlzUpdateStickyTopbar(); }
       return result;
@@ -13704,7 +13879,10 @@ document.addEventListener("DOMContentLoaded", () => {
     rlzHookScrollTopBtn();
     rlzHookStickyTopbar();
     rlzStartHeartTicker();
-    document.body.classList.toggle("rlz5-page-active", !!document.getElementById("ravzalingo")?.classList.contains("active"));
+    const activeRavza = !!document.getElementById("ravzalingo")?.classList.contains("active");
+    document.documentElement.classList.toggle("is-ravzalingo-page", activeRavza);
+    document.body.classList.toggle("rlz5-page-active", activeRavza);
+    document.body.classList.toggle("is-ravzalingo-page", activeRavza);
     rlzUpdateNavButtons();
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") { rlz5CloseTopicModal(); return; }
@@ -13724,3 +13902,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", rlzInit);
   else rlzInit();
 })();
+
+

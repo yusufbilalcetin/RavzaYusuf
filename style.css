@@ -365,7 +365,7 @@ body.dark .theme-switch::before { transform: translateX(22px); }
 /* ================= MAIN + TOPBAR ================= */
 .main-content {
   flex: 1;
-  margin-left: var(--sidebar-w);
+  margin-left: 0;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -9626,5 +9626,374 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-topbar {
     padding-right: 10px !important;
     padding-top: 12px !important;
     padding-bottom: 18px !important;
+  }
+}
+/* ============================================================
+   RAVZALINGO RESPONSIVE BACKGROUND SYSTEM
+   Sadece RavzaLingo aktifken çalışır.
+   ============================================================ */
+html.is-ravzalingo-page,
+body.is-ravzalingo-page {
+  background: transparent !important;
+}
+
+html.is-ravzalingo-page::before,
+html.is-ravzalingo-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+html.is-ravzalingo-page::before {
+  z-index: -2;
+  background-image: url("assests/ravzalingo-background.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
+}
+
+html.is-ravzalingo-page::after {
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(7, 18, 24, 0.24), rgba(7, 18, 24, 0.60)) !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page,
+body.is-ravzalingo-page .page.ravzalingo-page.active {
+  background-color: transparent !important;
+}
+
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-shell,
+body.is-ravzalingo-page .rlz5-lesson-shell {
+  background: rgba(7, 18, 24, 0.84) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+@media (max-width: 900px) {
+  html.is-ravzalingo-page::before,
+  html.is-ravzalingo-page::after {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  html.is-ravzalingo-page::before {
+    background-image: url("assests/ravzalingo-bg-mobile.png") !important;
+    background-position: center top !important;
+    background-attachment: scroll !important;
+  }
+
+  html.is-ravzalingo-page::after {
+    background: linear-gradient(180deg, rgba(7, 18, 24, 0.18), rgba(7, 18, 24, 0.48));
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  html.is-ravzalingo-page::before {
+    background-image: url("assests/ravzalingo-background.png");
+    background-position: center center;
+    background-size: cover;
+    background-attachment: scroll;
+  }
+}
+
+@media (max-width: 480px) {
+  html.is-ravzalingo-page::before {
+    background-position: center top;
+  }
+}
+
+@media (max-width: 380px) {
+  html.is-ravzalingo-page::before {
+    background-position: center top;
+  }
+}
+
+
+/* =========================================================
+   FINAL FIX — RAVZALINGO DESKTOP + MOBILE BACKGROUND
+   Sadece RavzaLingo aktifken çalışır.
+   Dosya yolları:
+   - assests/ravzalingo-background.png
+   - assests/ravzalingo-bg-mobile.png
+   ========================================================= */
+body.is-ravzalingo-page,
+body.rlz5-page-active {
+  background: var(--bg) !important;
+}
+
+body.is-ravzalingo-page .content-wrapper,
+body.rlz5-page-active .content-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+  position: relative !important;
+  isolation: isolate !important;
+  background: transparent !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page,
+body.rlz5-page-active .page.ravzalingo-page,
+body.is-ravzalingo-page .page.ravzalingo-page.active,
+body.rlz5-page-active .page.ravzalingo-page.active {
+  position: relative !important;
+  isolation: isolate !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100svh - 78px) !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+body.rlz5-page-active .page.ravzalingo-page.active::before {
+  content: "" !important;
+  position: fixed !important;
+  top: 78px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background-image: url("assests/ravzalingo-background.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
+  transform: translateZ(0) !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+body.rlz5-page-active .page.ravzalingo-page.active::after {
+  content: "" !important;
+  position: fixed !important;
+  top: 78px !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(16, 185, 129, .08), transparent 36%),
+    linear-gradient(180deg, rgba(5, 18, 18, .16), rgba(5, 18, 18, .42)) !important;
+}
+
+body.is-ravzalingo-page #ravzaLingoRoot,
+body.rlz5-page-active #ravzaLingoRoot {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: none !important;
+  display: block !important;
+  background: transparent !important;
+}
+
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-shell,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-shell,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-shell,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-shell {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100svh - 78px) !important;
+  background: transparent !important;
+}
+
+/* Kartlar okunabilir kalsın; arka plan tamamen kapanmasın */
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-section-divider > div,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-section-divider > div,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-empty-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-empty-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-summary-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
+  backdrop-filter: blur(12px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.12) !important;
+}
+
+@media (max-width: 1024px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before,
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    left: 0 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body.is-ravzalingo-page .page.ravzalingo-page,
+  body.rlz5-page-active .page.ravzalingo-page,
+  body.is-ravzalingo-page .page.ravzalingo-page.active,
+  body.rlz5-page-active .page.ravzalingo-page.active {
+    min-height: calc(100svh - 70px) !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    top: 70px !important;
+    left: 0 !important;
+    background-image: url("assests/ravzalingo-bg-mobile.png") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    top: 70px !important;
+    left: 0 !important;
+    background:
+      linear-gradient(180deg, rgba(5, 18, 18, .12), rgba(5, 18, 18, .42)) !important;
+  }
+
+  body.is-ravzalingo-page #ravzaLingoRoot .rlz5-shell,
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-shell,
+  body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-shell,
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-shell {
+    min-height: calc(100svh - 70px) !important;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-image: url("assests/ravzalingo-background.png") !important;
+    background-position: center center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-position: center top !important;
+  }
+}
+
+
+/* =========================================================
+   RAVZALINGO NET GÖRSEL / SHARP BACKGROUND FIX
+   Amaç: Arka plan görselinin bulanık/soluk görünmesini engellemek.
+   - Overlay azaltıldı.
+   - Arka plan katmanında blur/filter kullanılmadı.
+   - Kartlarda arka planı bulanıklaştıran backdrop blur kaldırıldı.
+   - Desktop: assests/ravzalingo-background.png
+   - Mobil: assests/ravzalingo-bg-mobile.png
+   ========================================================= */
+html.is-ravzalingo-page::before,
+html.is-ravzalingo-page::after {
+  display: none !important;
+  content: none !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+body.rlz5-page-active .page.ravzalingo-page.active::before {
+  background-image: url("assests/ravzalingo-background.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  opacity: 1 !important;
+  image-rendering: auto !important;
+  transform: translate3d(0,0,0) !important;
+  will-change: auto !important;
+}
+
+body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+body.rlz5-page-active .page.ravzalingo-page.active::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.04),
+    rgba(0, 0, 0, 0.12)
+  ) !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.is-ravzalingo-page #ravzaLingoRoot,
+body.rlz5-page-active #ravzaLingoRoot,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-shell,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-shell,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-shell,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-shell,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-main,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-main {
+  background: transparent !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-section-divider > div,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-section-divider > div,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-empty-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-empty-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-summary-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-stat-card,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-stat-card,
+body.is-ravzalingo-page #ravzaLingoRoot .rlz5-panel,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-panel {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+@media (max-width: 900px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-image: url("assests/ravzalingo-bg-mobile.png") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    opacity: 1 !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.03),
+      rgba(0, 0, 0, 0.10)
+    ) !important;
+  }
+}
+
+
+/* =========================================================
+   RAVZALINGO DESKTOP LEFT GAP FINAL OVERRIDE
+   Sidebar kapalı/tam ekran düzende masaüstünde sol taraf boş kalmasın.
+   ========================================================= */
+body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+body.rlz5-page-active .page.ravzalingo-page.active::before,
+body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+body.rlz5-page-active .page.ravzalingo-page.active::after {
+  left: 0 !important;
+  right: 0 !important;
+}
+
+@media (min-width: 901px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-image: url("assests/ravzalingo-background.png") !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
   }
 }
