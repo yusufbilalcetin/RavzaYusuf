@@ -60,10 +60,7 @@
 
   <main class="main-content">
     <header class="topbar">
-      <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Konu ara… örn: passive, possessives, conditionals" onkeyup="searchTopics(event)">
-      </div>
+      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menüyü aç" aria-expanded="false">☰</button>
       <div class="topbar-right">
         <button class="theme-open-btn" id="theme-open-btn" type="button" onclick="openThemeSheet()" title="Tema Seç">
           <span class="theme-open-icon">✨</span>

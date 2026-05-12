@@ -9256,3 +9256,99 @@ body.dark .visual-note strong {
     border-radius: 16px;
   }
 }
+
+/* =========================================================
+   FINAL FULLSCREEN LAYOUT
+   - Topbar arama alanı siteden kaldırıldı.
+   - Sidebar her ekranda kapalı başlar.
+   - Sol üst menü butonu ile açılır.
+   - Sidebar kapalıyken bütün sayfalar tam ekran genişliğinde çalışır.
+   ========================================================= */
+.search-bar {
+  display: none !important;
+}
+
+.sidebar {
+  transform: translateX(-105%) !important;
+  transition: transform .28s ease, box-shadow .28s ease !important;
+  z-index: 1200 !important;
+}
+
+.sidebar.open {
+  transform: translateX(0) !important;
+  box-shadow: 28px 0 70px rgba(15, 23, 42, .30) !important;
+}
+
+.main-content {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.menu-toggle {
+  display: inline-grid !important;
+  align-items: center;
+  justify-items: center;
+}
+
+.topbar {
+  justify-content: space-between !important;
+  gap: 14px !important;
+}
+
+.topbar-right {
+  margin-left: auto !important;
+}
+
+body.nav-open {
+  overflow: hidden;
+}
+
+body.nav-open .sidebar-backdrop {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  z-index: 1190 !important;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.page,
+.hero,
+.dashboard-grid,
+.panel-grid,
+.hub-grid,
+.exam-pro-shell,
+.detail-shell,
+.quiz-shell,
+.memory-cards-shell,
+.fill-gap-page {
+  max-width: none !important;
+}
+
+@media (min-width: 1025px) {
+  .topbar {
+    padding-left: 22px !important;
+    padding-right: 32px !important;
+  }
+
+  .content-wrapper {
+    padding-left: clamp(24px, 3vw, 46px) !important;
+    padding-right: clamp(24px, 3vw, 46px) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    flex-wrap: nowrap !important;
+  }
+
+  .theme-open-btn span:not(.theme-open-icon),
+  .mode-toggle-text,
+  .topbar-badge {
+    display: none !important;
+  }
+}
