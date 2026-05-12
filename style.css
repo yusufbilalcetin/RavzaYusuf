@@ -9538,3 +9538,93 @@ body.dark .love-brand-main {
   .love-brand-sub { display: none; }
 }
 
+
+
+/* =========================================================
+   RAVZALINGO TAM GENİŞLİK DÜZELTMESİ
+   Kırmızıyla gösterilen sağ/sol boşlukları kapatır.
+   Ana içerik arka planı ekranın tamamına yayılır; kartlar içeride
+   dengeli boşlukla kalır. Masaüstü/tablet/mobil uyumludur.
+   ========================================================= */
+body.rlz5-page-active .content-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+body.rlz5-page-active .page.ravzalingo-page,
+body.rlz5-page-active .page.ravzalingo-page.active {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  background:
+    radial-gradient(circle at 0% 25%, rgba(178, 45, 112, .18), transparent 28%),
+    radial-gradient(circle at 100% 25%, rgba(178, 45, 112, .18), transparent 28%),
+    linear-gradient(180deg, #14252d 0%, #13242c 42%, #101d24 100%) !important;
+  min-height: calc(100vh - 78px) !important;
+}
+
+body.rlz5-page-active #ravzaLingoRoot {
+  width: 100% !important;
+  max-width: none !important;
+  display: block !important;
+  overflow: visible !important;
+}
+
+body.rlz5-page-active #ravzaLingoRoot .rlz5-shell {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100vh - 78px) !important;
+  padding-left: clamp(18px, 4vw, 56px) !important;
+  padding-right: clamp(18px, 4vw, 56px) !important;
+  padding-top: 20px !important;
+  padding-bottom: 28px !important;
+  background:
+    radial-gradient(circle at 0% 38%, rgba(255, 77, 148, .16), transparent 30%),
+    radial-gradient(circle at 100% 36%, rgba(255, 77, 148, .16), transparent 30%),
+    radial-gradient(circle at 50% 0%, rgba(88, 204, 2, .055), transparent 38%),
+    linear-gradient(180deg, #1a2a32 0%, #14252d 48%, #101d24 100%) !important;
+}
+
+body.rlz5-page-active #ravzaLingoRoot .rlz5-path,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-section,
+body.rlz5-page-active #ravzaLingoRoot .rlz5-path-track {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+body.rlz5-page-active #ravzaLingoRoot .rlz5-unit-banner {
+  width: 100% !important;
+}
+
+/* Sabit istatistik barı da yeni tam-genişlik alanına göre ölçülür. */
+body.rlz5-page-active #ravzaLingoRoot .rlz5-topbar {
+  max-width: none !important;
+}
+
+@media (max-width: 1024px) {
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-shell {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body.rlz5-page-active .page.ravzalingo-page,
+  body.rlz5-page-active .page.ravzalingo-page.active {
+    min-height: calc(100dvh - 70px) !important;
+  }
+
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-shell {
+    min-height: calc(100dvh - 70px) !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-top: 12px !important;
+    padding-bottom: 18px !important;
+  }
+}

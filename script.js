@@ -11574,9 +11574,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const style = document.createElement("style");
     style.id = "ravzalingo-v5-css-r3";
     style.textContent = `
-      .ravzalingo-page{background:#131f24;border-radius:24px;overflow:visible;min-height:calc(100vh - 130px)}
+      .ravzalingo-page{background:#131f24;border-radius:0;overflow:visible;min-height:calc(100vh - 130px);width:100%;max-width:none;margin:0}
       #ravzaLingoRoot,#ravzaLingoRoot *{box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
-      .rlz5-shell{min-height:calc(100vh - 130px);padding:20px;color:#fff;background:linear-gradient(180deg,#1a2a32,#0f1a20)}
+      .rlz5-shell{min-height:calc(100vh - 130px);padding:20px clamp(18px,4vw,56px) 28px;color:#fff;background:radial-gradient(circle at 0% 38%,rgba(255,77,148,.16),transparent 30%),radial-gradient(circle at 100% 36%,rgba(255,77,148,.16),transparent 30%),linear-gradient(180deg,#1a2a32,#0f1a20);width:100%;max-width:none}
       .rlz5-empty{min-height:calc(100vh - 130px);display:grid;place-items:center;padding:24px}
       .rlz5-empty-card{width:min(100%,440px);padding:30px 24px;border-radius:24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);text-align:center;color:#fff}
       .rlz5-empty-card h2{font-size:24px;margin-bottom:10px;font-weight:900}
