@@ -10094,11 +10094,54 @@ document.addEventListener("DOMContentLoaded", () => {
    DUOLINGO TARZI STREAK MODÜLÜ
    - Mevcut özellikleri değiştirmez.
    - Çalışma tamamlanınca, quiz bitince, sınav bitince veya ezber/fill-gap pratiği yapılınca bugünü kaydeder.
-   - Veriyi localStorage içinde saklar.
+   - Veriyi Firestore'da (progress/ravza.studyStreak) saklar; localStorage kapatıldı.
    ========================================================= */
 (function initDuolingoStyleStreakModule() {
   const STORAGE_KEY = "ravza_study_streak_v1";
+  const STREAK_FB_FIELD = "studyStreak";
   const DAY_MS = 24 * 60 * 60 * 1000;
+
+  let STREAK_STATE = null;        // bellek içi tek kaynak
+  let STREAK_FB_READY = false;    // Firebase ilk yükleme tamamlandı mı
+  let STREAK_SAVE_TIMER = null;   // debounce zamanlayıcısı
+
+  function normalizeStreakData(raw) {
+    const src = (raw && typeof raw === "object") ? raw : {};
+    return {
+      days: [...new Set((Array.isArray(src.days) ? src.days : []).filter(Boolean))].sort(),
+      best: Number(src.best || 0),
+      lastAction: src.lastAction || null
+    };
+  }
+  async function saveStreakToFirebase(data) {
+    try {
+      await setDoc(progressRef, { [STREAK_FB_FIELD]: data, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (error) { console.warn("Streak Firebase kaydedilemedi:", error); }
+  }
+  async function loadStreakFromFirebase() {
+    let remote = null;
+    try {
+      const snap = await getDoc(progressRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data && data[STREAK_FB_FIELD] && typeof data[STREAK_FB_FIELD] === "object") remote = data[STREAK_FB_FIELD];
+      }
+    } catch (error) { console.warn("Streak Firebase okunamadı:", error); }
+
+    if (remote) {
+      STREAK_STATE = normalizeStreakData(remote);
+    } else {
+      // İlk kez: varsa eski yerel veriyi taşı
+      let legacy = null;
+      try { legacy = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"); } catch (_) {}
+      STREAK_STATE = normalizeStreakData(legacy);
+      try { await saveStreakToFirebase(STREAK_STATE); } catch (_) {}
+    }
+    STREAK_FB_READY = true;
+    // localStorage kapatıldı: eski anahtarı temizle
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    return STREAK_STATE;
+  }
 
   function pad(value) {
     return String(value).padStart(2, "0");
@@ -10122,25 +10165,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function readStreakData() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      return {
-        days: Array.isArray(parsed.days) ? parsed.days.filter(Boolean) : [],
-        best: Number(parsed.best || 0),
-        lastAction: parsed.lastAction || null
-      };
-    } catch (error) {
-      return { days: [], best: 0, lastAction: null };
-    }
+    if (STREAK_STATE) return STREAK_STATE;
+    STREAK_STATE = normalizeStreakData(null);
+    return STREAK_STATE;
   }
 
   function writeStreakData(data) {
-    const normalized = {
-      days: [...new Set(data.days || [])].sort(),
-      best: Number(data.best || 0),
-      lastAction: data.lastAction || null
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    STREAK_STATE = normalizeStreakData(data);
+    if (!STREAK_FB_READY) return; // ilk Firebase yüklemesi bitmeden yazma
+    if (STREAK_SAVE_TIMER) clearTimeout(STREAK_SAVE_TIMER);
+    STREAK_SAVE_TIMER = setTimeout(() => { STREAK_SAVE_TIMER = null; saveStreakToFirebase(STREAK_STATE); }, 600);
   }
 
   function calculateCurrentStreak(days) {
@@ -10290,6 +10324,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const boot = () => {
     attachStreakHooks();
     renderStudyStreak();
+    loadStreakFromFirebase().then(() => renderStudyStreak()).catch(() => {});
   };
 
   if (document.readyState === "loading") {
@@ -10647,7 +10682,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const RLZ_STATE_KEY = "ravzalingo_v5_state";
   const RLZ_MAX_HEARTS = 5;
-  const RLZ_HEART_REFILL_MS = 30 * 60 * 1000;
+  const RLZ_HEART_REFILL_MS = 10 * 60 * 1000;
   const RLZ_LESSON_LENGTH = 6;
   const RLZ_LESSONS_PER_UNIT = 5;
   const RLZ_XP_PER_CORRECT = 10;
@@ -10798,27 +10833,95 @@ document.addEventListener("DOMContentLoaded", () => {
     return palette[index % palette.length];
   }
 
-  /* --- STATE --- */
+  /* --- STATE (Firebase: progress/ravza.ravzaLingo) --- */
+  const RLZ_FB_FIELD = "ravzaLingo";
+  let RLZ_STATE = null;          // bellek içi tek kaynak
+  let RLZ_FB_READY = false;      // Firebase ilk yükleme tamamlandı mı
+  let RLZ_SAVE_TIMER = null;     // debounce zamanlayıcısı
+
   function rlzSafeJson(value, fallback) {
     try { return JSON.parse(value); } catch (_) { return fallback; }
   }
-  function rlzLoad() {
-    const base = {
+  function rlzDefaultState() {
+    return {
       version: 5, xp: 0, gems: 0, hearts: RLZ_MAX_HEARTS, heartsRefilledAt: Date.now(),
       streakDays: [], lastPlayedAt: null, unitProgress: {},
       totalCorrect: 0, totalWrong: 0, lessonsCompleted: 0
     };
-    const raw = localStorage.getItem(RLZ_STATE_KEY);
-    const loaded = raw ? rlzSafeJson(raw, {}) : {};
+  }
+  function rlzNormalizeState(loaded) {
+    const base = rlzDefaultState();
+    const src = (loaded && typeof loaded === "object") ? loaded : {};
     return {
-      ...base, ...loaded,
-      unitProgress: { ...(loaded.unitProgress || {}) },
-      streakDays: Array.isArray(loaded.streakDays) ? loaded.streakDays.slice(-365) : []
+      ...base, ...src,
+      unitProgress: { ...(src.unitProgress || {}) },
+      streakDays: Array.isArray(src.streakDays) ? src.streakDays.slice(-365) : []
     };
   }
+  function rlzLoad() {
+    if (RLZ_STATE) return RLZ_STATE;
+    RLZ_STATE = rlzNormalizeState(null);
+    return RLZ_STATE;
+  }
   function rlzSave(state) {
-    try { localStorage.setItem(RLZ_STATE_KEY, JSON.stringify(state)); }
-    catch (e) { console.warn("RavzaLingo state kaydedilemedi", e); }
+    RLZ_STATE = state;
+    if (!RLZ_FB_READY) return; // ilk Firebase yüklemesi bitmeden yazma (çakışmayı önler)
+    if (RLZ_SAVE_TIMER) clearTimeout(RLZ_SAVE_TIMER);
+    RLZ_SAVE_TIMER = setTimeout(() => { RLZ_SAVE_TIMER = null; rlzSaveToFirebase(RLZ_STATE); }, 600);
+  }
+  async function rlzSaveToFirebase(state) {
+    try {
+      await setDoc(progressRef, { [RLZ_FB_FIELD]: state, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (e) { console.warn("RavzaLingo Firebase kaydedilemedi", e); }
+  }
+  // Kullanıcının kaldığı yer: 1. Bölüm'ün ilk 2 ünitesi (Kelime Listesi, Object Pronouns) tam;
+  // 3. ünite Adjectives'in 1. dersi yapıldı, 2. derste duruyor.
+  const RLZ_SEED_VERSION = 4;
+  function rlzApplyBaselineProgress(state) {
+    try {
+      const content = rlzBuildContent();
+      const sec = content.sections && content.sections[0];
+      if (!sec || !sec.units) return;
+      if (sec.units[0]) state.unitProgress[sec.units[0].id] = { stars: 5, lessonsDone: RLZ_LESSONS_PER_UNIT };
+      if (sec.units[1]) state.unitProgress[sec.units[1].id] = { stars: 5, lessonsDone: RLZ_LESSONS_PER_UNIT };
+      if (sec.units[2]) state.unitProgress[sec.units[2].id] = { stars: 0, lessonsDone: 1 };
+      state.lessonsCompleted = Math.max(Number(state.lessonsCompleted || 0), RLZ_LESSONS_PER_UNIT * 2 + 1);
+    } catch (_) {}
+  }
+  async function rlzLoadFromFirebase() {
+    let remote = null;
+    try {
+      const snap = await getDoc(progressRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data && data[RLZ_FB_FIELD] && typeof data[RLZ_FB_FIELD] === "object") remote = data[RLZ_FB_FIELD];
+      }
+    } catch (e) { console.warn("RavzaLingo Firebase okunamadı", e); }
+
+    let needsWrite = false;
+    if (remote) {
+      RLZ_STATE = rlzNormalizeState(remote);
+    } else {
+      // İlk kez: varsa eski yerel veriyi taşı
+      let legacy = null;
+      try {
+        const raw = localStorage.getItem(RLZ_STATE_KEY);
+        if (raw) legacy = rlzSafeJson(raw, null);
+      } catch (_) {}
+      RLZ_STATE = rlzNormalizeState(legacy);
+      needsWrite = true;
+    }
+    // Baseline ilerlemeyi (Adjectives'e kadar tamam) bir kez uygula
+    if (Number(RLZ_STATE.seedVersion || 0) < RLZ_SEED_VERSION) {
+      rlzApplyBaselineProgress(RLZ_STATE);
+      RLZ_STATE.seedVersion = RLZ_SEED_VERSION;
+      needsWrite = true;
+    }
+    if (needsWrite) { try { await rlzSaveToFirebase(RLZ_STATE); } catch (_) {} }
+    RLZ_FB_READY = true;
+    // localStorage kapatıldı: eski anahtarı temizle
+    try { localStorage.removeItem(RLZ_STATE_KEY); } catch (_) {}
+    return RLZ_STATE;
   }
   function rlzToday() { return new Date().toISOString().slice(0, 10); }
   function rlzMarkDaily(state) {
@@ -11041,6 +11144,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${content.sections.length} bölüm · ${totalUnits} ünite · ${content.lexemes.length} kelime</p>
         </footer>
       </div>`;
+    requestAnimationFrame(rlzUpdateNavButtons);
   }
 
   /* Düğüm tipini lesson sırasına göre belirle (yıldız/kitap/video/dumbbell/sandık/star) */
@@ -11086,7 +11190,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="rlz5-banner-kicker">${rlzEsc(section.kicker)}, ${unitIdx + 1}. ÜNİTE</span>
             <strong>${rlzEsc(unit.title)}</strong>
           </div>
-          <button type="button" class="rlz5-banner-guide" aria-label="Ünite rehberi" title="${rlzEsc(unit.subtitle || unit.title)}">📋</button>
+          <button type="button" class="rlz5-banner-guide" onclick="rlz5ShowTopicModal('${safeUnitId}')" aria-label="Konu özeti" title="${rlzEsc(unit.subtitle || unit.title)} — özet">📋</button>
         </div>`;
 
       // Ders düğümleri (5 ders + 1 ünite testi = 6 düğüm)
@@ -11312,7 +11416,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="rlz5-empty-card">
           <div class="rlz5-broken-heart">💔</div>
           <h2>Canların bitti!</h2>
-          <p>Yeni can için <strong>${rlzFmtMs(ms)}</strong> bekle ya da kristal kullan.</p>
+          <p>Yeni can için <strong id="rlz5HeartCountdown">${rlzFmtMs(ms)}</strong> bekle ya da kristal kullan.</p>
           <div class="rlz5-empty-actions">
             <button type="button" class="rlz5-btn-secondary" onclick="rlz5Home()">Geri Dön</button>
             <button type="button" class="rlz5-btn-primary" onclick="rlz5BuyHearts()">Tüm Canları Doldur (50 💎)</button>
@@ -11794,6 +11898,46 @@ document.addEventListener("DOMContentLoaded", () => {
         .rlz5-options{grid-template-columns:1fr 1fr;gap:8px}
         .rlz5-match{grid-template-columns:1fr 1fr}
       }
+
+      /* --- KONU ÖZETİ POPUP --- */
+      .rlz5-modal-overlay{position:fixed;inset:0;z-index:100000;background:rgba(8,14,18,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s ease}
+      .rlz5-modal-overlay.is-open{opacity:1;visibility:visible}
+      .rlz5-modal{width:min(100%,640px);max-height:88vh;display:flex;flex-direction:column;background:#16242c;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden;transform:translateY(14px) scale(.97);transition:transform .2s ease}
+      .rlz5-modal-overlay.is-open .rlz5-modal{transform:translateY(0) scale(1)}
+      .rlz5-modal-head{position:relative;padding:20px 52px 16px 22px;background:linear-gradient(135deg,#58cc02,#2d7600)}
+      .rlz5-modal-head .rlz5-modal-kicker{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+      .rlz5-modal-head h2{font-size:21px;font-weight:900;margin:4px 0 2px}
+      .rlz5-modal-head p{font-size:13px;opacity:.9;line-height:1.4}
+      .rlz5-modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(0,0,0,.25);color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center}
+      .rlz5-modal-close:hover{background:rgba(0,0,0,.4)}
+      .rlz5-modal-body{padding:18px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+      .rlz5-modal-body h3{font-size:15px;font-weight:900;margin:0 0 8px}
+      .rlz5-modal-keypoints{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+      .rlz5-modal-keypoints ul{margin:0;padding-left:18px}
+      .rlz5-modal-keypoints li{font-size:13.5px;line-height:1.55;margin-bottom:6px;color:rgba(255,255,255,.92)}
+      .rlz5-modal-summary{font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.86)}
+      .rlz5-modal-summary .content-card,.rlz5-modal-summary .lesson-hero,.rlz5-modal-summary .mini-summary-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+      .rlz5-modal-summary h3{font-size:14px;margin:0 0 6px;color:#fff}
+      .rlz5-modal-summary table{width:100%;border-collapse:collapse;font-size:12px}
+      .rlz5-modal-summary th,.rlz5-modal-summary td{border:1px solid rgba(255,255,255,.12);padding:6px 8px;text-align:left;vertical-align:top}
+      .rlz5-modal-summary .table-wrap{overflow-x:auto}
+      .rlz5-modal-summary ul,.rlz5-modal-summary ol{padding-left:18px}
+      .rlz5-modal-foot{display:flex;gap:10px;padding:14px 22px;border-top:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18)}
+      .rlz5-modal-foot button{flex:1}
+
+      /* --- "KALDIĞIM ETKİNLİĞE GİT" BUTONU --- */
+      .rlz5-goto-activity{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:0;background:linear-gradient(135deg,#7ee000,#58cc02);color:#fff;font-size:24px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 12px 28px rgba(40,120,0,.4);z-index:150;display:none;align-items:center;justify-content:center;padding:0;touch-action:manipulation;transition:transform .18s ease}
+      .rlz5-goto-activity:hover{transform:translateY(-3px) scale(1.04)}
+      /* Aşağı butonu yalnızca kaldığın etkinlik ekranda görünmüyorken (aşağıdayken) çıkar; ona gelince gizlenir */
+      body.rlz5-page-active.rlz5-show-goto .rlz5-goto-activity{display:flex}
+      body.rlz5-page-active.rlz5-show-goto .scroll-top-btn{bottom:78px}
+      /* Etkinliğin altına inince: yukarı butonu yeşile döner ve etkinliğe götürür */
+      .scroll-top-btn.rlz5-up-green{background:linear-gradient(135deg,#7ee000,#58cc02)!important;box-shadow:0 12px 28px rgba(40,120,0,.42)}
+      .scroll-top-btn.rlz5-up-green:hover{box-shadow:0 16px 32px rgba(40,120,0,.5)}
+      @media(max-width:480px){
+        .rlz5-goto-activity{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:44px;height:44px;font-size:21px}
+        body.rlz5-page-active.rlz5-show-goto .scroll-top-btn{bottom:calc(70px + env(safe-area-inset-bottom,0px))}
+      }
     `;
     document.head.appendChild(style);
   }
@@ -11804,9 +11948,151 @@ document.addEventListener("DOMContentLoaded", () => {
     const original = window.navigate;
     window.navigate = function patchedNavigate(page, ...args) {
       const result = original.apply(this, [page, ...args]);
-      if (page === "ravzalingo") requestAnimationFrame(() => { RLZ_SESSION = null; rlzRenderHome(); });
+      document.body.classList.toggle("rlz5-page-active", page === "ravzalingo");
+      if (page === "ravzalingo") requestAnimationFrame(() => { RLZ_SESSION = null; rlzRenderHome(); rlzUpdateNavButtons(); });
+      else { rlz5CloseTopicModal(); rlzUpdateNavButtons(); }
       return result;
     };
+  }
+
+  /* --- KONU ÖZETİ POPUP --- */
+  function rlzFindUnit(unitId) {
+    const content = rlzBuildContent();
+    for (const s of content.sections) {
+      const u = s.units.find((x) => x.id === unitId);
+      if (u) return { unit: u, section: s };
+    }
+    return null;
+  }
+  function rlz5ShowTopicModal(unitId) {
+    const found = rlzFindUnit(unitId);
+    if (!found) return;
+    const unit = found.unit;
+    const topic = unit.topic || {};
+    const keyPoints = Array.isArray(topic.keyPoints) ? topic.keyPoints : [];
+    const safeId = String(topic.id || unitId).replace(/'/g, "\\'");
+    rlz5CloseTopicModal();
+    const overlay = document.createElement("div");
+    overlay.className = "rlz5-modal-overlay";
+    overlay.id = "rlz5TopicModal";
+    overlay.innerHTML = `
+      <div class="rlz5-modal" role="dialog" aria-modal="true" aria-label="${rlzEsc(unit.title)} özeti">
+        <div class="rlz5-modal-head">
+          <span class="rlz5-modal-kicker">${rlzEsc(found.section.kicker)} · ${rlzEsc(unit.unit || "")}</span>
+          <h2>${rlzEsc(unit.title)}</h2>
+          ${unit.subtitle ? `<p>${rlzEsc(unit.subtitle)}</p>` : ""}
+          <button type="button" class="rlz5-modal-close" onclick="rlz5CloseTopicModal()" aria-label="Kapat">✕</button>
+        </div>
+        <div class="rlz5-modal-body">
+          ${keyPoints.length ? `<div class="rlz5-modal-keypoints"><h3>🔑 Kritik noktalar</h3><ul>${keyPoints.map((p) => `<li>${rlzEsc(p)}</li>`).join("")}</ul></div>` : ""}
+          ${topic.summaryHtml ? `<div class="rlz5-modal-summary">${topic.summaryHtml}</div>` : (keyPoints.length ? "" : `<p>Bu ünite için henüz özet eklenmemiş.</p>`)}
+        </div>
+        <div class="rlz5-modal-foot">
+          <button type="button" class="rlz5-btn-secondary" onclick="rlz5CloseTopicModal()">Kapat</button>
+          ${typeof window.openStudyTopic === "function" ? `<button type="button" class="rlz5-btn-primary" onclick="rlz5OpenFullTopic('${safeId}')">Çalışma Merkezi'nde Aç</button>` : ""}
+        </div>
+      </div>`;
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) rlz5CloseTopicModal(); });
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
+  }
+  function rlz5CloseTopicModal() {
+    const el = document.getElementById("rlz5TopicModal");
+    if (!el) return;
+    el.classList.remove("is-open");
+    setTimeout(() => { el.remove(); }, 220);
+  }
+  function rlz5OpenFullTopic(topicId) {
+    rlz5CloseTopicModal();
+    if (typeof window.openStudyTopic === "function") {
+      try { window.openStudyTopic(topicId); } catch (_) {}
+    }
+  }
+
+  /* --- "KALDIĞIM ETKİNLİĞE GİT" BUTONU --- */
+  function rlzEnsureGotoActivityBtn() {
+    if (document.getElementById("rlz5GotoActivity")) return;
+    const btn = document.createElement("button");
+    btn.id = "rlz5GotoActivity";
+    btn.type = "button";
+    btn.className = "rlz5-goto-activity";
+    btn.setAttribute("aria-label", "Kaldığım etkinliğe git");
+    btn.title = "Kaldığım etkinliğe git";
+    btn.textContent = "⌄";
+    btn.addEventListener("click", rlz5GotoActivity);
+    document.body.appendChild(btn);
+  }
+  function rlz5GotoActivity() {
+    const page = document.getElementById("ravzalingo");
+    if (!page) return;
+    if (!page.classList.contains("active") && typeof window.navigate === "function") {
+      window.navigate("ravzalingo");
+      setTimeout(() => { rlz5ScrollToCurrentNode(); setTimeout(rlzUpdateNavButtons, 500); }, 250);
+      return;
+    }
+    rlz5ScrollToCurrentNode();
+    setTimeout(rlzUpdateNavButtons, 500);
+  }
+  function rlzCurrentActivityNode() {
+    const root = rlzRoot();
+    if (!root) return null;
+    return root.querySelector(".rlz5-node-wrap.is-current")
+      || root.querySelector(".rlz5-node.is-current")?.closest(".rlz5-path-row")
+      || [...root.querySelectorAll(".rlz5-node:not(.is-locked)")].pop()
+      || null;
+  }
+  function rlz5ScrollToCurrentNode() {
+    const target = rlzCurrentActivityNode();
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  function rlzScrollY() { return window.scrollY || document.documentElement.scrollTop || 0; }
+  // Kullanıcı kaldığı etkinliğin belirgin şekilde aşağısında mı?
+  function rlzIsBelowActivity() {
+    if (RLZ_SESSION) return false;
+    if (!document.body.classList.contains("rlz5-page-active")) return false;
+    const node = rlzCurrentActivityNode();
+    if (!node) return false;
+    const nodeTop = node.getBoundingClientRect().top + rlzScrollY();
+    return rlzScrollY() > nodeTop - 60;
+  }
+  // Kaldığın etkinlik ekranın belirgin şekilde aşağısında mı (yani henüz oraya gelmedin mi)?
+  function rlzActivityBelowViewport() {
+    if (RLZ_SESSION) return false;
+    const node = rlzCurrentActivityNode();
+    if (!node) return false;
+    const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    return node.getBoundingClientRect().top >= vh - 80;
+  }
+  // Buton durumları: aşağı butonunun görünürlüğü / yukarı butonun rengi & başlığı
+  function rlzUpdateNavButtons() {
+    const onPage = document.body.classList.contains("rlz5-page-active");
+    const below = onPage && rlzIsBelowActivity();
+    const showGoto = onPage && !below && rlzActivityBelowViewport();
+    document.body.classList.toggle("rlz5-below-activity", below);
+    document.body.classList.toggle("rlz5-show-goto", showGoto);
+    const upBtn = document.getElementById("scrollTopBtn");
+    if (upBtn) {
+      upBtn.classList.toggle("rlz5-up-green", below);
+      upBtn.title = below ? "Kaldığın etkinliğe çık" : "Yukarı çık";
+    }
+  }
+  // Global "yukarı çık" butonunu RavzaLingo'da iki aşamalı yap:
+  // 1) kaldığın etkinliğin altındaysan → yeşil olur, basınca önce oraya çıkar
+  // 2) etkinlikteysen/üstündeysen → tema rengine döner, en yukarı çıkar (orijinal davranış)
+  function rlzHookScrollTopBtn() {
+    if (window.__RLZ5_SCROLLTOP_HOOKED__) return;
+    window.__RLZ5_SCROLLTOP_HOOKED__ = true;
+    document.addEventListener("click", (e) => {
+      const btn = e.target && e.target.closest && e.target.closest("#scrollTopBtn");
+      if (!btn) return;
+      if (!rlzIsBelowActivity()) return; // bırak, orijinal handler en üste götürsün
+      e.preventDefault();
+      e.stopImmediatePropagation();      // butondaki global click handler çalışmasın
+      rlz5ScrollToCurrentNode();
+      setTimeout(rlzUpdateNavButtons, 500); // gidince yeşil → tema rengine dönsün
+    }, true); // capture: butondaki dinleyicilerden önce çalışır
+    window.addEventListener("scroll", rlzUpdateNavButtons, { passive: true });
+    rlzUpdateNavButtons();
   }
 
   /* --- WINDOW EXPORTS --- */
@@ -11821,15 +12107,65 @@ document.addEventListener("DOMContentLoaded", () => {
   window.rlz5Quit = rlz5Quit;
   window.rlz5Home = rlz5Home;
   window.rlz5BuyHearts = rlz5BuyHearts;
+  window.rlz5ShowTopicModal = rlz5ShowTopicModal;
+  window.rlz5CloseTopicModal = rlz5CloseTopicModal;
+  window.rlz5OpenFullTopic = rlz5OpenFullTopic;
+  window.rlz5GotoActivity = rlz5GotoActivity;
   window.renderRavzaLingo = rlzRenderHome;
-  window.resetRavzaLingoV5 = function () { localStorage.removeItem(RLZ_STATE_KEY); RLZ_SESSION = null; RLZ_CONTENT_CACHE = null; rlzRenderHome(); };
+  window.resetRavzaLingoV5 = function () {
+    RLZ_STATE = rlzNormalizeState(null);
+    RLZ_SESSION = null; RLZ_CONTENT_CACHE = null;
+    if (RLZ_FB_READY) rlzSaveToFirebase(RLZ_STATE);
+    try { localStorage.removeItem(RLZ_STATE_KEY); } catch (_) {}
+    rlzRenderHome();
+  };
+
+  /* --- CAN GERİ SAYIM (gerçek zamanlı) --- */
+  let RLZ_HEART_TICK = null;
+  function rlzStartHeartTicker() {
+    if (RLZ_HEART_TICK) clearInterval(RLZ_HEART_TICK);
+    RLZ_HEART_TICK = setInterval(() => {
+      const page = document.getElementById("ravzalingo");
+      if (!page || !page.classList.contains("active")) return; // sadece görünürken çalış
+      if (RLZ_SESSION) return;                                  // ders ekranındaysa dokunma
+      const root = rlzRoot();
+      const state = RLZ_STATE;
+      if (!root || !state) return;
+      const onHome = !!root.querySelector(".rlz5-topbar");
+      const outOfHeartsEl = document.getElementById("rlz5HeartCountdown");
+      if (!onHome && !outOfHeartsEl) return;                    // başka ekran (ders/özet) ise atla
+
+      if (state.hearts < RLZ_MAX_HEARTS) {
+        const before = state.hearts;
+        rlzRefillHearts(state);
+        if (state.hearts !== before) { rlzSave(state); rlzRenderHome(); return; }
+      }
+      const text = rlzFmtMs(rlzMsToNextHeart(state));
+      if (onHome) {
+        const heartDiv = root.querySelector(".rlz5-stat.heart > div");
+        const small = heartDiv && heartDiv.querySelector("small");
+        if (state.hearts >= RLZ_MAX_HEARTS) { if (small) small.remove(); }
+        else if (small) small.textContent = text;
+        else if (heartDiv) heartDiv.insertAdjacentHTML("beforeend", `<small>${text}</small>`);
+      }
+      if (outOfHeartsEl) outOfHeartsEl.textContent = text;
+    }, 1000);
+  }
 
   function rlzInit() {
     rlzInjectCss();
     rlzEnsureMarkup();
+    rlzEnsureGotoActivityBtn();
     rlzHookNavigate();
-    const page = document.getElementById("ravzalingo");
-    if (page?.classList.contains("active")) rlzRenderHome();
+    rlzHookScrollTopBtn();
+    rlzStartHeartTicker();
+    document.body.classList.toggle("rlz5-page-active", !!document.getElementById("ravzalingo")?.classList.contains("active"));
+    rlzUpdateNavButtons();
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") rlz5CloseTopicModal(); });
+    rlzLoadFromFirebase().then(() => {
+      const page = document.getElementById("ravzalingo");
+      if (page?.classList.contains("active")) rlzRenderHome();
+    }).catch(() => {});
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", rlzInit);
