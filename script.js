@@ -11144,7 +11144,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${content.sections.length} bölüm · ${totalUnits} ünite · ${content.lexemes.length} kelime</p>
         </footer>
       </div>`;
-    requestAnimationFrame(rlzUpdateNavButtons);
+    requestAnimationFrame(() => { rlzUpdateNavButtons(); rlzUpdateStickyTopbar(); });
   }
 
   /* Düğüm tipini lesson sırasına göre belirle (yıldız/kitap/video/dumbbell/sandık/star) */
@@ -11183,14 +11183,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const isUnitDone = progress.stars >= 5;
       const safeUnitId = unit.id.replace(/'/g, "\\'");
 
-      // Ünite başlık banner'ı (Duolingo'daki yeşil "1. KISIM, 4. ÜNİTE" üstbarı)
+      // Unit banner: the wide area opens all topics, the icon opens this unit's study pop-up.
       pathHtml += `
-        <div class="rlz5-unit-banner ${isUnitDone ? "is-done" : ""} ${unlocked ? "" : "is-locked"}">
-          <div class="rlz5-banner-text">
-            <span class="rlz5-banner-kicker">${rlzEsc(section.kicker)}, ${unitIdx + 1}. ÜNİTE</span>
-            <strong>${rlzEsc(unit.title)}</strong>
-          </div>
-          <button type="button" class="rlz5-banner-guide" onclick="rlz5ShowTopicModal('${safeUnitId}')" aria-label="Konu özeti" title="${rlzEsc(unit.subtitle || unit.title)} — özet">📋</button>
+        <div class="rlz5-unit-banner ${isUnitDone ? "is-done" : ""} ${unlocked ? "" : "is-locked"}" data-unit-id="${safeUnitId}" title="${rlzEsc(unit.title)}">
+          <button type="button" class="rlz5-banner-main" data-unit-id="${safeUnitId}" onclick="rlz5ShowAllTopicsModal('${safeUnitId}')" aria-label="Bütün konuları aç">
+            <span class="rlz5-banner-text">
+              <span class="rlz5-banner-kicker">${rlzEsc(section.kicker)}, ${unitIdx + 1}. ÜNİTE</span>
+              <strong>${rlzEsc(unit.title)}</strong>
+            </span>
+          </button>
+          <button type="button" class="rlz5-banner-guide" data-unit-id="${safeUnitId}" onclick="event.stopPropagation(); rlz5ShowStudyTopicModal('${safeUnitId}')" aria-label="${rlzEsc(unit.title)} çalışma pop-up'ını aç" title="Çalışma pop-up">📋</button>
         </div>`;
 
       // Ders düğümleri (5 ders + 1 ünite testi = 6 düğüm)
@@ -11572,7 +11574,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const style = document.createElement("style");
     style.id = "ravzalingo-v5-css-r3";
     style.textContent = `
-      .ravzalingo-page{background:#131f24;border-radius:24px;overflow:hidden;min-height:calc(100vh - 130px)}
+      .ravzalingo-page{background:#131f24;border-radius:24px;overflow:visible;min-height:calc(100vh - 130px)}
       #ravzaLingoRoot,#ravzaLingoRoot *{box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
       .rlz5-shell{min-height:calc(100vh - 130px);padding:20px;color:#fff;background:linear-gradient(180deg,#1a2a32,#0f1a20)}
       .rlz5-empty{min-height:calc(100vh - 130px);display:grid;place-items:center;padding:24px}
@@ -11584,7 +11586,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .rlz5-btn-primary{border:0;border-radius:14px;padding:14px 22px;background:linear-gradient(180deg,#7ee000,#58cc02);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 5px 0 #2f7d00;font-size:14px;letter-spacing:.04em;text-transform:uppercase;width:100%}
       .rlz5-btn-secondary{border:0;border-radius:14px;padding:14px 22px;background:#384956;color:rgba(255,255,255,.85);font-weight:900;cursor:pointer;font-size:14px;letter-spacing:.04em;text-transform:uppercase;width:100%}
 
-      .rlz5-topbar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;padding:14px 16px;border-radius:18px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.06)}
+      .rlz5-topbar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:0;padding:14px 16px;border-radius:18px;background:rgba(13,21,26,.97);border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 26px rgba(0,0,0,.32);backdrop-filter:blur(8px);position:fixed;top:78px;z-index:60}
+      .rlz5-topbar-spacer{height:0;flex-shrink:0}
       .rlz5-stat{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center;min-height:44px}
       .rlz5-stat span{font-size:24px;line-height:1}
       .rlz5-stat b{display:block;font-size:16px;font-weight:900;line-height:1}
@@ -11598,16 +11601,26 @@ document.addEventListener("DOMContentLoaded", () => {
       /* PATH (gerçek Duolingo görünümü) */
       .rlz5-path{display:grid;gap:8px}
       .rlz5-section{position:relative}
-      .rlz5-section-divider{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;padding:24px 8px 14px}
-      .rlz5-section-divider span{height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent)}
-      .rlz5-section-divider div{text-align:center;padding:8px 18px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
-      .rlz5-section-divider .rlz5-section-kicker{display:block;font-size:10px;letter-spacing:.18em;font-weight:900;color:var(--rlz-main);margin-bottom:4px}
-      .rlz5-section-divider h2{font-family:'Playfair Display',serif;font-size:20px;letter-spacing:-.02em;color:#fff;font-weight:800;line-height:1.1}
+      .rlz5-section-divider{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;padding:36px 8px 20px}
+      .rlz5-section-divider>span{height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05) 15%,var(--rlz-main) 50%,rgba(255,255,255,.05) 85%,transparent);opacity:.45}
+      .rlz5-section-divider>div{text-align:center;padding:13px 30px;border-radius:20px;background:linear-gradient(180deg,#1e2d36,#15222b);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 30px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.07);position:relative}
+      .rlz5-section-divider>div::before{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:0 0 20px 20px;background:linear-gradient(90deg,transparent,var(--rlz-main),transparent);opacity:.85}
+      .rlz5-section-divider .rlz5-section-kicker{display:block;height:auto;background:none;font-size:11px;letter-spacing:.26em;font-weight:900;color:var(--rlz-main);margin:0 0 7px;text-transform:uppercase;line-height:1}
+      .rlz5-section-divider h2{font-family:'Playfair Display',serif;font-size:23px;letter-spacing:.01em;color:#fff;font-weight:800;line-height:1.15;margin:0}
 
       .rlz5-path-track{position:relative;display:grid;gap:18px;padding:8px 0 30px}
-      .rlz5-unit-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 10px;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,var(--rlz-main),var(--rlz-deep));box-shadow:0 6px 0 var(--rlz-deep),0 14px 30px rgba(0,0,0,.25);position:sticky;top:8px;z-index:5}
+      .rlz5-unit-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 10px;padding:10px 12px 10px 18px;border-radius:16px;background:linear-gradient(135deg,var(--rlz-main),var(--rlz-deep));box-shadow:0 6px 0 var(--rlz-deep),0 14px 30px rgba(0,0,0,.25);transition:transform .15s ease,filter .15s ease;-webkit-tap-highlight-color:transparent;outline:none}
+      .rlz5-unit-banner:hover{filter:brightness(1.07)}
+      .rlz5-unit-banner:active{transform:translateY(2px);box-shadow:0 3px 0 var(--rlz-deep),0 8px 18px rgba(0,0,0,.3)}
+      .rlz5-unit-banner:focus-visible{box-shadow:0 6px 0 var(--rlz-deep),0 0 0 3px rgba(255,255,255,.4)}
+      .rlz5-unit-banner.is-locked{cursor:default}
+      /* Yapışkan (kayan) ünite banner'ı — stat barının hemen altında durur, JS konumlandırır */
+      .rlz5-unit-sticky{margin:0;box-shadow:0 6px 0 var(--rlz-deep),0 12px 26px rgba(0,0,0,.42)}
       .rlz5-unit-banner.is-done{background:linear-gradient(135deg,#7d5500,#ae8500)}
       .rlz5-unit-banner.is-locked{background:linear-gradient(135deg,#3a4a55,#1d2b31);box-shadow:0 6px 0 #0b141a}
+      .rlz5-banner-main{flex:1;min-width:0;align-self:stretch;border:0;border-radius:12px;background:transparent;color:#fff;text-align:left;cursor:pointer;display:flex;align-items:center;padding:4px 6px 4px 0;outline:none}
+      .rlz5-banner-main:hover{background:rgba(255,255,255,.08)}
+      .rlz5-banner-main:focus-visible,.rlz5-banner-guide:focus-visible{box-shadow:0 0 0 3px rgba(255,255,255,.38)}
       .rlz5-banner-text{display:grid;gap:2px;color:#fff;min-width:0}
       .rlz5-banner-kicker{display:block;font-size:10px;font-weight:900;letter-spacing:.14em;color:rgba(255,255,255,.85)}
       .rlz5-banner-text strong{display:block;font-size:18px;font-weight:900;line-height:1.2;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -11738,8 +11751,10 @@ document.addEventListener("DOMContentLoaded", () => {
       @keyframes rlz5Pop{from{transform:scale(.7);opacity:.2}to{transform:scale(1);opacity:1}}
 
       /* ===== MOBİL & TABLET RESPONSIVE ===== */
-      /* Path container hiçbir koşulda yatay scroll çıkarmasın */
-      .rlz5-shell,.rlz5-section,.rlz5-path-track{overflow-x:clip;overflow-x:hidden}
+      /* Sticky (yapışkan üst bar) bozulmasın: ata kapsayıcılar overflow:visible olmalı */
+      #ravzaLingoRoot,.rlz5-shell,.rlz5-section{overflow:visible!important}
+      /* Salınımlı yol + maskot yatay taşmasını kırp (clip → sticky'yi bozmaz) */
+      .rlz5-path-track{overflow-x:clip}
       .rlz5-path-row{will-change:transform}
 
       /* Tablet ve küçük masaüstü */
@@ -11756,19 +11771,23 @@ document.addEventListener("DOMContentLoaded", () => {
         .rlz5-shell{padding:14px 12px;min-height:calc(100dvh - 80px)}
         .rlz5-lesson-shell{padding:14px 12px;min-height:calc(100dvh - 80px);grid-template-rows:auto 1fr;padding-bottom:90px;position:relative}
 
-        /* TOPBAR: 4 sütun (progress'i sakla, kristali tut) */
-        .rlz5-topbar{grid-template-columns:repeat(4,1fr);padding:10px 8px;gap:6px;position:sticky;top:6px;z-index:6;backdrop-filter:blur(8px)}
+        /* TOPBAR: 4 sütun (progress'i sakla, kristali tut) — site barının altına yapışır */
+        .rlz5-topbar{grid-template-columns:repeat(4,1fr);padding:10px 8px;gap:6px;backdrop-filter:blur(8px);top:70px}
         .rlz5-stat{grid-template-columns:1fr;justify-items:center;text-align:center;gap:2px;min-height:auto}
         .rlz5-stat span{font-size:20px;line-height:1}
         .rlz5-stat b{font-size:13px}
         .rlz5-stat small{display:none}
+        /* Kalp geri sayımı mobilde de her zaman görünsün */
+        .rlz5-stat.heart small{display:block!important;margin-top:1px;font-size:9.5px;color:#ff6b6b;letter-spacing:.04em;font-variant-numeric:tabular-nums}
         .rlz5-stat.progress{display:none}
 
         /* SECTION + BANNER */
-        .rlz5-section-divider{padding:14px 4px 6px}
-        .rlz5-section-divider h2{font-size:17px}
-        .rlz5-section-divider div{padding:6px 12px;border-radius:12px}
-        .rlz5-unit-banner{padding:11px 12px;border-radius:14px;top:4px;gap:8px}
+        .rlz5-section-divider{padding:22px 4px 12px}
+        .rlz5-section-divider h2{font-size:18px}
+        .rlz5-section-divider>div{padding:9px 20px;border-radius:16px}
+        .rlz5-section-divider>div::before{border-radius:0 0 16px 16px}
+        .rlz5-section-divider .rlz5-section-kicker{font-size:10px;letter-spacing:.22em;margin-bottom:5px}
+        .rlz5-unit-banner{padding:11px 12px;border-radius:14px;top:calc(124px + env(safe-area-inset-top,0px));gap:8px}
         .rlz5-banner-text strong{font-size:14px}
         .rlz5-banner-kicker{font-size:9px}
         .rlz5-banner-guide{width:38px;height:38px;font-size:15px}
@@ -11837,9 +11856,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .rlz5-stat span{font-size:18px}
         .rlz5-stat b{font-size:12px}
 
-        .rlz5-section-divider{padding:14px 4px 6px}
-        .rlz5-section-divider h2{font-size:16px}
-        .rlz5-section-divider div{padding:6px 10px}
+        .rlz5-section-divider{padding:20px 4px 10px}
+        .rlz5-section-divider h2{font-size:17px}
+        .rlz5-section-divider>div{padding:8px 18px}
         .rlz5-unit-banner{padding:10px 12px}
         .rlz5-banner-text strong{font-size:13px;white-space:normal;line-height:1.25}
         .rlz5-banner-guide{width:36px;height:36px;font-size:14px}
@@ -11904,26 +11923,555 @@ document.addEventListener("DOMContentLoaded", () => {
       .rlz5-modal-overlay.is-open{opacity:1;visibility:visible}
       .rlz5-modal{width:min(100%,640px);max-height:88vh;display:flex;flex-direction:column;background:#16242c;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden;transform:translateY(14px) scale(.97);transition:transform .2s ease}
       .rlz5-modal-overlay.is-open .rlz5-modal{transform:translateY(0) scale(1)}
-      .rlz5-modal-head{position:relative;padding:20px 52px 16px 22px;background:linear-gradient(135deg,#58cc02,#2d7600)}
-      .rlz5-modal-head .rlz5-modal-kicker{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
-      .rlz5-modal-head h2{font-size:21px;font-weight:900;margin:4px 0 2px}
-      .rlz5-modal-head p{font-size:13px;opacity:.9;line-height:1.4}
-      .rlz5-modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(0,0,0,.25);color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center}
-      .rlz5-modal-close:hover{background:rgba(0,0,0,.4)}
-      .rlz5-modal-body{padding:18px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-      .rlz5-modal-body h3{font-size:15px;font-weight:900;margin:0 0 8px}
-      .rlz5-modal-keypoints{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;margin-bottom:16px}
+      .rlz5-modal-units{width:min(100%,860px)}
+      .rlz5-modal-head{position:relative;display:flex;align-items:center;gap:14px;padding:20px 56px 18px 22px;background:linear-gradient(180deg,#1f2c34,#16222a);border-bottom:1px solid rgba(255,255,255,.08)}
+      .rlz5-modal-icon{flex-shrink:0;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:25px;background:linear-gradient(135deg,#ffc15e,#dd8a1c);box-shadow:0 6px 18px rgba(221,138,28,.35)}
+      .rlz5-modal-headtext{min-width:0}
+      .rlz5-modal-head h2{font-size:22px;font-weight:900;margin:0 0 3px;color:#fff}
+      .rlz5-modal-head p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.4;margin:0}
+      .rlz5-modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:15px;cursor:pointer;display:grid;place-items:center;transition:background .15s}
+      .rlz5-modal-close:hover{background:rgba(255,255,255,.18)}
+      .rlz5-modal-body{padding:16px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+      .rlz5-modal-study{width:min(100%,920px)}
+      .rlz5-modal-keypoints{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+      .rlz5-modal-keypoints h3{font-size:15px;font-weight:900;margin:0 0 8px;color:#fff}
       .rlz5-modal-keypoints ul{margin:0;padding-left:18px}
-      .rlz5-modal-keypoints li{font-size:13.5px;line-height:1.55;margin-bottom:6px;color:rgba(255,255,255,.92)}
-      .rlz5-modal-summary{font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.86)}
-      .rlz5-modal-summary .content-card,.rlz5-modal-summary .lesson-hero,.rlz5-modal-summary .mini-summary-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;margin-bottom:12px}
-      .rlz5-modal-summary h3{font-size:14px;margin:0 0 6px;color:#fff}
-      .rlz5-modal-summary table{width:100%;border-collapse:collapse;font-size:12px}
-      .rlz5-modal-summary th,.rlz5-modal-summary td{border:1px solid rgba(255,255,255,.12);padding:6px 8px;text-align:left;vertical-align:top}
+      .rlz5-modal-keypoints li{font-size:13.5px;line-height:1.55;margin-bottom:6px;color:rgba(255,255,255,.9)}
+      .rlz5-modal-summary{font-size:13.5px;line-height:1.62;color:rgba(255,255,255,.86)}
+      .rlz5-modal-summary .content-card,.rlz5-modal-summary .lesson-hero,.rlz5-modal-summary .mini-summary-card,.rlz5-modal-summary .visual-note{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px 15px;margin-bottom:12px;color:rgba(255,255,255,.88)}
+      .rlz5-modal-summary h3,.rlz5-modal-summary h4{font-size:15px;margin:0 0 8px;color:#fff}
+      .rlz5-modal-summary p,.rlz5-modal-summary li{color:rgba(255,255,255,.84)}
+      .rlz5-modal-summary strong{color:#fff}
       .rlz5-modal-summary .table-wrap{overflow-x:auto}
+      .rlz5-modal-summary table{width:100%;border-collapse:collapse;font-size:12px}
+      .rlz5-modal-summary th,.rlz5-modal-summary td{border:1px solid rgba(255,255,255,.12);padding:7px 8px;text-align:left;vertical-align:top;color:rgba(255,255,255,.82)}
+      .rlz5-modal-summary th{color:#fff;background:rgba(255,255,255,.06)}
       .rlz5-modal-summary ul,.rlz5-modal-summary ol{padding-left:18px}
-      .rlz5-modal-foot{display:flex;gap:10px;padding:14px 22px;border-top:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18)}
+
+      /* Ünite içerikleri tablosu */
+      .rlz5-uc-head,.rlz5-uc-row{display:grid;grid-template-columns:64px 96px 1fr 138px 22px;gap:12px;align-items:center}
+      .rlz5-uc-head{padding:0 16px 8px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.42)}
+      .rlz5-uc-list{display:flex;flex-direction:column;gap:8px}
+      .rlz5-uc-row{width:100%;text-align:left;padding:12px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);color:#fff;cursor:pointer;transition:background .14s,border-color .14s,transform .1s}
+      .rlz5-uc-row:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2)}
+      .rlz5-uc-row:active{transform:scale(.995)}
+      .rlz5-uc-row.is-current{background:linear-gradient(135deg,rgba(88,204,2,.24),rgba(45,118,0,.18));border-color:rgba(88,204,2,.6);box-shadow:0 0 20px rgba(88,204,2,.16)}
+      .rlz5-uc-row.is-locked{opacity:.62}
+      .rlz5-uc-secbadge{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:14px;border:2px solid rgba(255,255,255,.22);color:rgba(255,255,255,.78)}
+      .rlz5-uc-row.is-current .rlz5-uc-secbadge{background:#58cc02;border-color:#9be64f;color:#0a2a05}
+      .rlz5-uc-unit{font-weight:800;font-size:14px;color:rgba(255,255,255,.92)}
+      .rlz5-uc-topic{display:flex;align-items:center;gap:11px;min-width:0;font-weight:800;font-size:15px}
+      .rlz5-uc-ico{flex-shrink:0;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:16px;background:rgba(255,255,255,.08)}
+      .rlz5-uc-row.is-current .rlz5-uc-ico{background:rgba(88,204,2,.28)}
+      .rlz5-uc-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .rlz5-uc-status{justify-self:start;display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid transparent;white-space:nowrap}
+      .rlz5-uc-status-done{background:rgba(88,204,2,.18);color:#8be63c;border-color:rgba(88,204,2,.4)}
+      .rlz5-uc-status-ready{background:rgba(28,176,246,.16);color:#5bccff;border-color:rgba(28,176,246,.35)}
+      .rlz5-uc-status-progress{background:rgba(255,150,0,.16);color:#ffb84d;border-color:rgba(255,150,0,.35)}
+      .rlz5-uc-status-locked{background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.12)}
+      .rlz5-uc-chev{justify-self:end;font-size:21px;line-height:1;color:rgba(255,255,255,.4);transition:transform .14s,color .14s}
+      .rlz5-uc-row:hover .rlz5-uc-chev{color:#fff;transform:translateX(3px)}
+      .rlz5-uc-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+      .rlz5-uc-note{flex:1;min-width:200px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:rgba(255,255,255,.6);line-height:1.4}
+      .rlz5-uc-noteico{flex-shrink:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900;font-style:italic;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.7)}
+      .rlz5-uc-foot .rlz5-uc-progbtn{flex:0 0 auto;width:auto;padding:11px 18px;color:#ffd54f;border:1px solid rgba(255,213,79,.4);background:rgba(255,213,79,.08);text-transform:none;letter-spacing:0;font-size:13px}
+      .rlz5-uc-foot .rlz5-uc-progbtn:hover{background:rgba(255,213,79,.15)}
+      .rlz5-all-list{display:grid;gap:16px}
+      .rlz5-all-section{display:grid;gap:9px}
+      .rlz5-all-title{display:flex;align-items:center;gap:10px;margin:2px 4px 0;color:rgba(255,255,255,.86);font-size:13px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+      .rlz5-all-title::after{content:"";height:1px;flex:1;background:rgba(255,255,255,.10)}
+      .rlz5-all-topic{width:100%;display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;text-align:left;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025);color:#fff;cursor:pointer;transition:background .14s,border-color .14s,transform .1s}
+      .rlz5-all-topic:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+      .rlz5-all-topic.is-current{background:linear-gradient(135deg,rgba(255,213,79,.18),rgba(255,150,0,.10));border-color:rgba(255,213,79,.45)}
+      .rlz5-all-ico{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.08);font-size:20px}
+      .rlz5-all-copy{display:grid;gap:3px;min-width:0}
+      .rlz5-all-copy strong{font-size:15px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .rlz5-all-copy small{color:rgba(255,255,255,.55);font-size:12px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .rlz5-all-status{justify-self:end;font-size:12px;font-weight:900;color:#ffd54f;white-space:nowrap}
+      .rlz5-modal-foot{display:flex;gap:10px;padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18)}
       .rlz5-modal-foot button{flex:1}
+      @media(max-width:620px){
+        .rlz5-modal-units{width:100%;max-height:92vh}
+        .rlz5-modal-head{padding:16px 50px 14px 16px;gap:11px}
+        .rlz5-modal-icon{width:44px;height:44px;font-size:21px}
+        .rlz5-modal-head h2{font-size:18px}
+        .rlz5-modal-head p{font-size:12px}
+        .rlz5-modal-body{padding:12px 12px}
+        .rlz5-uc-head{display:none}
+        .rlz5-uc-row{grid-template-columns:auto 1fr;gap:8px 10px;padding:10px 12px;align-items:center}
+        .rlz5-uc-secbadge{display:none}
+        .rlz5-uc-chev{display:none}
+        .rlz5-uc-unit{grid-row:1;font-size:11px;color:rgba(255,255,255,.5);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+        .rlz5-uc-topic{grid-row:2;grid-column:1/-1;font-size:14px;gap:9px}
+        .rlz5-uc-ico{width:27px;height:27px;font-size:14px}
+        .rlz5-uc-status{grid-row:1;grid-column:2;justify-self:end;padding:4px 10px;font-size:11px}
+        .rlz5-uc-foot{padding:12px}
+        .rlz5-uc-note{font-size:11.5px;min-width:140px}
+        .rlz5-uc-progbtn{width:100%;flex:1 1 100%}
+        .rlz5-all-topic{grid-template-columns:34px 1fr;padding:10px 12px;gap:10px}
+        .rlz5-all-ico{width:34px;height:34px;border-radius:11px;font-size:17px}
+        .rlz5-all-copy strong{font-size:14px;white-space:normal}
+        .rlz5-all-copy small{font-size:11.5px;white-space:normal}
+        .rlz5-all-status{grid-column:2;justify-self:start}
+      }
+
+      /* Tema uyumlu RavzaLingo pop-up ve banner finali */
+      .rlz5-unit-banner{
+        background:
+          radial-gradient(circle at 92% 20%, color-mix(in srgb,var(--rlz-main) 26%, transparent), transparent 34%),
+          linear-gradient(135deg, color-mix(in srgb,var(--white) 94%, var(--rlz-main) 6%), color-mix(in srgb,var(--input-bg) 86%, var(--rlz-deep) 14%));
+        border:1px solid color-mix(in srgb,var(--rlz-main) 34%, var(--card-border) 66%);
+        box-shadow:0 16px 38px rgba(15,23,42,.16), inset 0 1px 0 rgba(255,255,255,.18);
+      }
+      .rlz5-unit-banner.is-done{
+        background:
+          radial-gradient(circle at 92% 20%, color-mix(in srgb,var(--success) 22%, transparent), transparent 34%),
+          linear-gradient(135deg, color-mix(in srgb,var(--white) 92%, var(--success) 8%), color-mix(in srgb,var(--input-bg) 88%, var(--success) 12%));
+        border-color:color-mix(in srgb,var(--success) 38%, var(--card-border) 62%);
+      }
+      .rlz5-unit-banner.is-locked{
+        background:linear-gradient(135deg, color-mix(in srgb,var(--white) 88%, #64748b 12%), color-mix(in srgb,var(--input-bg) 88%, #64748b 12%));
+        border-color:color-mix(in srgb,var(--card-border) 78%, #64748b 22%);
+        box-shadow:0 12px 28px rgba(15,23,42,.12);
+      }
+      .rlz5-banner-main{color:var(--text);border:1px solid transparent}
+      .rlz5-banner-main:hover{background:color-mix(in srgb,var(--rlz-main) 10%, transparent)}
+      .rlz5-banner-main:focus-visible,.rlz5-banner-guide:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--pink) 26%, transparent)}
+      .rlz5-banner-text,.rlz5-banner-text strong{color:var(--text)}
+      .rlz5-banner-kicker{color:color-mix(in srgb,var(--text) 72%, var(--rlz-main) 28%)}
+      .rlz5-banner-guide{
+        background:linear-gradient(135deg, color-mix(in srgb,var(--pink) 72%, var(--navy-light) 28%), var(--pink-bright));
+        border:1px solid color-mix(in srgb,var(--pink-bright) 52%, transparent);
+        color:#fff;
+        box-shadow:0 10px 22px color-mix(in srgb,var(--pink) 24%, transparent);
+      }
+      .rlz5-banner-guide:hover{
+        background:linear-gradient(135deg, var(--pink), var(--pink-bright));
+        filter:brightness(1.04);
+      }
+      body.dark .rlz5-unit-banner{
+        background:
+          radial-gradient(circle at 92% 20%, color-mix(in srgb,var(--rlz-main) 20%, transparent), transparent 34%),
+          linear-gradient(135deg, color-mix(in srgb,var(--white) 88%, var(--rlz-main) 12%), color-mix(in srgb,var(--input-bg) 84%, var(--rlz-deep) 16%));
+        border-color:color-mix(in srgb,var(--rlz-main) 30%, var(--card-border) 70%);
+        box-shadow:0 18px 44px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.06);
+      }
+      body.dark .rlz5-banner-text,
+      body.dark .rlz5-banner-text strong{color:#fff7fb}
+      body.dark .rlz5-banner-kicker{color:color-mix(in srgb,#fff7fb 74%, var(--rlz-main) 26%)}
+
+      .rlz5-modal-overlay{
+        background:rgba(6,10,18,.66);
+        backdrop-filter:blur(14px) saturate(1.12);
+        -webkit-backdrop-filter:blur(14px) saturate(1.12);
+      }
+      .rlz5-modal{
+        width:min(100%,940px);
+        max-height:min(88vh,820px);
+        color:var(--text);
+        background:
+          radial-gradient(circle at 8% 0%, color-mix(in srgb,var(--pink) 14%, transparent), transparent 30%),
+          linear-gradient(180deg, color-mix(in srgb,var(--white) 96%, transparent), color-mix(in srgb,var(--input-bg) 92%, transparent));
+        border:1px solid color-mix(in srgb,var(--card-border) 72%, var(--pink) 28%);
+        border-radius:28px;
+        box-shadow:0 34px 90px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.18);
+      }
+      .rlz5-modal-units,.rlz5-modal-study{width:min(100%,980px)}
+      .rlz5-modal-head{
+        background:transparent;
+        border-bottom:1px solid color-mix(in srgb,var(--card-border) 82%, var(--pink) 18%);
+        padding:22px 62px 20px 24px;
+      }
+      .rlz5-modal-icon{
+        background:linear-gradient(135deg, var(--pink), var(--pink-bright));
+        color:#fff;
+        border-radius:20px;
+        box-shadow:0 16px 34px color-mix(in srgb,var(--pink) 28%, transparent);
+      }
+      .rlz5-modal-head h2{color:var(--text);font-size:25px;letter-spacing:0}
+      .rlz5-modal-head p{color:var(--text-light);font-weight:700}
+      .rlz5-modal-close{
+        background:var(--input-bg);
+        color:var(--text);
+        border:1px solid var(--card-border);
+        box-shadow:var(--shadow-xs);
+      }
+      .rlz5-modal-close:hover{background:color-mix(in srgb,var(--pink-pale) 56%, var(--input-bg))}
+      .rlz5-modal-body{padding:18px 20px;scrollbar-color:var(--pink) transparent}
+      .rlz5-uc-head{color:color-mix(in srgb,var(--text-light) 88%, var(--text) 12%)}
+      .rlz5-uc-row,.rlz5-all-topic{
+        background:color-mix(in srgb,var(--input-bg) 86%, transparent);
+        color:var(--text);
+        border-color:color-mix(in srgb,var(--card-border) 78%, var(--pink) 22%);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+      }
+      .rlz5-uc-row:hover,.rlz5-all-topic:hover{
+        background:color-mix(in srgb,var(--pink-pale) 42%, var(--input-bg));
+        border-color:color-mix(in srgb,var(--pink) 44%, var(--card-border));
+      }
+      .rlz5-uc-row.is-current,.rlz5-all-topic.is-current{
+        background:
+          radial-gradient(circle at 0 0, color-mix(in srgb,var(--pink) 18%, transparent), transparent 34%),
+          color-mix(in srgb,var(--pink-pale) 54%, var(--input-bg));
+        border-color:color-mix(in srgb,var(--pink) 58%, var(--card-border));
+        box-shadow:0 14px 28px color-mix(in srgb,var(--pink) 13%, transparent), inset 0 1px 0 rgba(255,255,255,.10);
+      }
+      .rlz5-uc-row.is-locked,.rlz5-all-topic.is-locked{opacity:.72;filter:saturate(.82)}
+      .rlz5-uc-secbadge,.rlz5-uc-ico,.rlz5-all-ico{
+        background:color-mix(in srgb,var(--pink-pale) 54%, var(--input-bg));
+        color:var(--text);
+        border:1px solid color-mix(in srgb,var(--pink) 20%, var(--card-border));
+      }
+      .rlz5-uc-row.is-current .rlz5-uc-secbadge,.rlz5-uc-row.is-current .rlz5-uc-ico,.rlz5-all-topic.is-current .rlz5-all-ico{
+        background:linear-gradient(135deg,var(--pink),var(--pink-bright));
+        border-color:transparent;
+        color:#fff;
+      }
+      .rlz5-uc-unit,.rlz5-uc-topic,.rlz5-uc-name,.rlz5-all-copy strong{color:var(--text)}
+      .rlz5-all-copy small{color:var(--text-light)}
+      .rlz5-uc-chev{color:color-mix(in srgb,var(--text-light) 72%, transparent)}
+      .rlz5-uc-row:hover .rlz5-uc-chev{color:var(--pink);transform:translateX(3px)}
+      .rlz5-uc-status,.rlz5-all-status{border:1px solid transparent;border-radius:999px;padding:6px 11px;font-size:12px;font-weight:900}
+      .rlz5-uc-status-done,.rlz5-all-status-done,.rlz5-uc-status-ready,.rlz5-all-status-ready{
+        color:var(--success);
+        background:color-mix(in srgb,var(--success) 12%, transparent);
+        border-color:color-mix(in srgb,var(--success) 28%, transparent);
+      }
+      .rlz5-uc-status-progress,.rlz5-all-status-progress{
+        color:var(--warning);
+        background:color-mix(in srgb,var(--warning) 13%, transparent);
+        border-color:color-mix(in srgb,var(--warning) 28%, transparent);
+      }
+      .rlz5-uc-status-locked,.rlz5-all-status-locked{
+        color:var(--text-light);
+        background:color-mix(in srgb,var(--text-light) 10%, transparent);
+        border-color:color-mix(in srgb,var(--text-light) 22%, transparent);
+      }
+      .rlz5-all-title{
+        color:color-mix(in srgb,var(--text) 76%, var(--pink) 24%);
+      }
+      .rlz5-all-title::after{background:color-mix(in srgb,var(--card-border) 78%, var(--pink) 22%)}
+      .rlz5-modal-keypoints,.rlz5-modal-summary .content-card,.rlz5-modal-summary .lesson-hero,.rlz5-modal-summary .mini-summary-card,.rlz5-modal-summary .visual-note{
+        background:color-mix(in srgb,var(--input-bg) 86%, transparent);
+        border-color:color-mix(in srgb,var(--card-border) 78%, var(--pink) 22%);
+        color:var(--text);
+      }
+      .rlz5-modal-keypoints h3,.rlz5-modal-summary h3,.rlz5-modal-summary h4,.rlz5-modal-summary strong{color:var(--text)}
+      .rlz5-modal-keypoints li,.rlz5-modal-summary,.rlz5-modal-summary p,.rlz5-modal-summary li,.rlz5-modal-summary td{color:var(--text)}
+      .rlz5-modal-summary th{color:var(--text);background:color-mix(in srgb,var(--pink-pale) 48%, var(--input-bg))}
+      .rlz5-modal-summary th,.rlz5-modal-summary td{border-color:color-mix(in srgb,var(--card-border) 82%, var(--pink) 18%)}
+      .rlz5-modal-foot{
+        background:color-mix(in srgb,var(--input-bg) 92%, transparent);
+        border-top:1px solid color-mix(in srgb,var(--card-border) 82%, var(--pink) 18%);
+      }
+      .rlz5-uc-note{color:var(--text-light)}
+      .rlz5-uc-noteico{border-color:var(--card-border);color:var(--pink);background:var(--white)}
+      .rlz5-uc-foot .rlz5-uc-progbtn,.rlz5-modal-foot .rlz5-btn-secondary{
+        color:var(--pink);
+        background:color-mix(in srgb,var(--pink-pale) 58%, var(--input-bg));
+        border:1px solid color-mix(in srgb,var(--pink) 32%, var(--card-border));
+        box-shadow:none;
+      }
+      .rlz5-modal-foot .rlz5-btn-primary{
+        background:linear-gradient(135deg,var(--pink),var(--pink-bright));
+        color:#fff;
+        box-shadow:0 12px 28px color-mix(in srgb,var(--pink) 24%, transparent);
+      }
+      body.dark .rlz5-modal{
+        background:
+          radial-gradient(circle at 8% 0%, color-mix(in srgb,var(--pink-bright) 12%, transparent), transparent 30%),
+          linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)),
+          var(--white);
+        border-color:rgba(255,255,255,.12);
+        box-shadow:0 36px 92px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.06);
+      }
+      body.dark .rlz5-modal-head h2,
+      body.dark .rlz5-uc-unit,
+      body.dark .rlz5-uc-topic,
+      body.dark .rlz5-uc-name,
+      body.dark .rlz5-all-copy strong,
+      body.dark .rlz5-modal-keypoints h3,
+      body.dark .rlz5-modal-summary h3,
+      body.dark .rlz5-modal-summary h4,
+      body.dark .rlz5-modal-summary strong{color:#fff7fb}
+      body.dark .rlz5-modal-summary,
+      body.dark .rlz5-modal-keypoints li,
+      body.dark .rlz5-modal-summary p,
+      body.dark .rlz5-modal-summary li,
+      body.dark .rlz5-modal-summary td{color:#f1d6e1}
+
+      /* RavzaLingo teması: iki pop-up ve iki banner aksiyonu aynı oyun dili */
+      #ravzaLingoRoot .rlz5-unit-banner{
+        background:
+          radial-gradient(circle at 92% 16%, rgba(255,255,255,.13), transparent 25%),
+          linear-gradient(135deg,var(--rlz-main),var(--rlz-deep));
+        border:1px solid color-mix(in srgb,var(--rlz-light) 46%, transparent);
+        box-shadow:0 6px 0 var(--rlz-deep),0 18px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.15);
+      }
+      #ravzaLingoRoot .rlz5-unit-banner.is-done{
+        background:
+          radial-gradient(circle at 92% 16%, rgba(255,255,255,.16), transparent 25%),
+          linear-gradient(135deg,#ffd000,#ae8500);
+        border-color:rgba(255,224,102,.48);
+        box-shadow:0 6px 0 #7d5500,0 18px 36px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.18);
+      }
+      #ravzaLingoRoot .rlz5-unit-banner.is-locked{
+        background:linear-gradient(135deg,#40525e,#1d2b31);
+        border-color:rgba(255,255,255,.08);
+        box-shadow:0 6px 0 #0b141a,0 18px 36px rgba(0,0,0,.25);
+      }
+      #ravzaLingoRoot .rlz5-banner-main{
+        color:#fff;
+        border-radius:13px;
+      }
+      #ravzaLingoRoot .rlz5-banner-main:hover{
+        background:rgba(255,255,255,.10);
+      }
+      #ravzaLingoRoot .rlz5-banner-main:focus-visible,
+      #ravzaLingoRoot .rlz5-banner-guide:focus-visible{
+        box-shadow:0 0 0 3px rgba(126,224,0,.34);
+      }
+      #ravzaLingoRoot .rlz5-banner-text,
+      #ravzaLingoRoot .rlz5-banner-text strong,
+      body.dark #ravzaLingoRoot .rlz5-banner-text,
+      body.dark #ravzaLingoRoot .rlz5-banner-text strong{
+        color:#fff;
+      }
+      #ravzaLingoRoot .rlz5-banner-kicker,
+      body.dark #ravzaLingoRoot .rlz5-banner-kicker{
+        color:rgba(255,255,255,.86);
+      }
+      #ravzaLingoRoot .rlz5-banner-guide{
+        background:
+          radial-gradient(circle at 35% 25%, rgba(255,255,255,.22), transparent 34%),
+          linear-gradient(180deg,#ffe066,#ffb800);
+        color:#7d5500;
+        border:1px solid rgba(255,255,255,.20);
+        box-shadow:0 5px 0 #a37d00,0 12px 24px rgba(0,0,0,.20);
+      }
+      #ravzaLingoRoot .rlz5-banner-guide:hover{
+        background:linear-gradient(180deg,#fff0a3,#ffd000);
+        filter:none;
+        transform:translateY(-1px);
+      }
+
+      .rlz5-modal-overlay{
+        background:rgba(5,12,16,.74);
+        backdrop-filter:blur(15px) saturate(1.1);
+        -webkit-backdrop-filter:blur(15px) saturate(1.1);
+      }
+      .rlz5-modal,
+      body.dark .rlz5-modal{
+        color:#fff;
+        background:
+          radial-gradient(circle at 8% 0%, rgba(126,224,0,.10), transparent 30%),
+          radial-gradient(circle at 96% 4%, rgba(28,176,246,.10), transparent 26%),
+          linear-gradient(180deg,#1a2a32,#101a20);
+        border:1px solid rgba(126,151,163,.36);
+        border-radius:28px;
+        box-shadow:0 34px 92px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.07);
+      }
+      .rlz5-modal-units,
+      .rlz5-modal-study{
+        width:min(100%,980px);
+      }
+      .rlz5-modal-head{
+        background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
+        border-bottom:1px solid rgba(255,255,255,.08);
+      }
+      .rlz5-modal-icon{
+        background:
+          radial-gradient(circle at 34% 24%,rgba(255,255,255,.28),transparent 34%),
+          linear-gradient(180deg,#ffe066,#ff9600);
+        color:#7d5500;
+        border:1px solid rgba(255,255,255,.18);
+        box-shadow:0 7px 0 #a35a00,0 18px 36px rgba(255,150,0,.20);
+      }
+      .rlz5-modal-head h2,
+      body.dark .rlz5-modal-head h2{
+        color:#fff;
+        font-weight:950;
+      }
+      .rlz5-modal-head p{
+        color:rgba(255,255,255,.66);
+      }
+      .rlz5-modal-close{
+        background:rgba(255,255,255,.08);
+        color:#fff;
+        border:1px solid rgba(255,255,255,.09);
+        box-shadow:0 8px 18px rgba(0,0,0,.22);
+      }
+      .rlz5-modal-close:hover{
+        background:rgba(255,255,255,.15);
+      }
+      .rlz5-modal-body{
+        scrollbar-color:#7ee000 transparent;
+      }
+      .rlz5-modal-body::-webkit-scrollbar{width:10px}
+      .rlz5-modal-body::-webkit-scrollbar-track{background:transparent}
+      .rlz5-modal-body::-webkit-scrollbar-thumb{
+        background:linear-gradient(180deg,#7ee000,#58cc02);
+        border-radius:999px;
+        border:3px solid #101a20;
+      }
+      .rlz5-uc-head{
+        color:rgba(255,255,255,.58);
+      }
+      .rlz5-uc-row,
+      .rlz5-all-topic{
+        background:rgba(255,255,255,.035);
+        color:#fff;
+        border:1px solid rgba(255,255,255,.09);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+      }
+      .rlz5-uc-row:hover,
+      .rlz5-all-topic:hover{
+        background:rgba(255,255,255,.065);
+        border-color:rgba(126,224,0,.36);
+      }
+      .rlz5-uc-row.is-current,
+      .rlz5-all-topic.is-current{
+        background:
+          radial-gradient(circle at 0 0,rgba(255,224,102,.16),transparent 35%),
+          linear-gradient(135deg,rgba(255,208,0,.22),rgba(163,125,0,.12));
+        border-color:rgba(255,208,0,.72);
+        box-shadow:0 16px 32px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10);
+      }
+      .rlz5-uc-row.is-locked,
+      .rlz5-all-topic.is-locked{
+        opacity:.70;
+        filter:saturate(.78);
+      }
+      .rlz5-uc-secbadge,
+      .rlz5-uc-ico,
+      .rlz5-all-ico{
+        background:rgba(255,255,255,.08);
+        color:#fff;
+        border:1px solid rgba(255,255,255,.10);
+      }
+      .rlz5-uc-row.is-current .rlz5-uc-secbadge,
+      .rlz5-uc-row.is-current .rlz5-uc-ico,
+      .rlz5-all-topic.is-current .rlz5-all-ico{
+        background:linear-gradient(180deg,#ffe066,#ffd000);
+        color:#7d5500;
+        border-color:rgba(255,255,255,.22);
+      }
+      .rlz5-uc-unit,
+      .rlz5-uc-topic,
+      .rlz5-uc-name,
+      .rlz5-all-copy strong,
+      body.dark .rlz5-uc-unit,
+      body.dark .rlz5-uc-topic,
+      body.dark .rlz5-uc-name,
+      body.dark .rlz5-all-copy strong{
+        color:#fff;
+      }
+      .rlz5-all-copy small{
+        color:rgba(255,255,255,.58);
+      }
+      .rlz5-uc-chev{
+        color:rgba(255,255,255,.52);
+      }
+      .rlz5-uc-row:hover .rlz5-uc-chev{
+        color:#7ee000;
+      }
+      .rlz5-uc-status-done,
+      .rlz5-all-status-done,
+      .rlz5-uc-status-ready,
+      .rlz5-all-status-ready{
+        color:#7ee000;
+        background:rgba(88,204,2,.14);
+        border-color:rgba(126,224,0,.34);
+      }
+      .rlz5-uc-status-progress,
+      .rlz5-all-status-progress{
+        color:#ffd000;
+        background:rgba(255,208,0,.13);
+        border-color:rgba(255,208,0,.32);
+      }
+      .rlz5-uc-status-locked,
+      .rlz5-all-status-locked{
+        color:rgba(255,255,255,.55);
+        background:rgba(255,255,255,.05);
+        border-color:rgba(255,255,255,.10);
+      }
+      .rlz5-all-title{
+        color:rgba(255,255,255,.86);
+      }
+      .rlz5-all-title::after{
+        background:linear-gradient(90deg,rgba(255,255,255,.10),transparent);
+      }
+      .rlz5-modal-keypoints,
+      .rlz5-modal-summary .content-card,
+      .rlz5-modal-summary .lesson-hero,
+      .rlz5-modal-summary .mini-summary-card,
+      .rlz5-modal-summary .visual-note{
+        background:rgba(255,255,255,.035);
+        border-color:rgba(126,224,0,.18);
+        color:rgba(255,255,255,.88);
+      }
+      .rlz5-modal-keypoints h3,
+      .rlz5-modal-summary h3,
+      .rlz5-modal-summary h4,
+      .rlz5-modal-summary strong,
+      body.dark .rlz5-modal-keypoints h3,
+      body.dark .rlz5-modal-summary h3,
+      body.dark .rlz5-modal-summary h4,
+      body.dark .rlz5-modal-summary strong{
+        color:#fff;
+      }
+      .rlz5-modal-keypoints li,
+      .rlz5-modal-summary,
+      .rlz5-modal-summary p,
+      .rlz5-modal-summary li,
+      .rlz5-modal-summary td,
+      body.dark .rlz5-modal-summary,
+      body.dark .rlz5-modal-keypoints li,
+      body.dark .rlz5-modal-summary p,
+      body.dark .rlz5-modal-summary li,
+      body.dark .rlz5-modal-summary td{
+        color:rgba(255,255,255,.86);
+      }
+      .rlz5-modal-summary th{
+        color:#fff;
+        background:rgba(126,224,0,.09);
+      }
+      .rlz5-modal-summary th,
+      .rlz5-modal-summary td{
+        border-color:rgba(126,224,0,.16);
+      }
+      .rlz5-modal-foot{
+        background:rgba(0,0,0,.22);
+        border-top:1px solid rgba(255,255,255,.08);
+      }
+      .rlz5-uc-note{
+        color:rgba(255,255,255,.62);
+      }
+      .rlz5-uc-noteico{
+        background:rgba(255,255,255,.07);
+        border-color:rgba(255,255,255,.14);
+        color:#7ee000;
+      }
+      .rlz5-uc-foot .rlz5-uc-progbtn,
+      .rlz5-modal-foot .rlz5-btn-secondary{
+        color:#7ee000;
+        background:rgba(88,204,2,.10);
+        border:1px solid rgba(126,224,0,.30);
+        box-shadow:none;
+      }
+      .rlz5-uc-foot .rlz5-uc-progbtn:hover,
+      .rlz5-modal-foot .rlz5-btn-secondary:hover{
+        background:rgba(88,204,2,.16);
+      }
+      .rlz5-modal-foot .rlz5-btn-primary{
+        background:linear-gradient(180deg,#7ee000,#58cc02);
+        color:#fff;
+        border:0;
+        box-shadow:0 5px 0 #2f7d00,0 14px 26px rgba(40,120,0,.28);
+      }
+      .rlz5-modal-foot .rlz5-btn-primary:hover{
+        filter:brightness(1.04);
+      }
 
       /* --- "KALDIĞIM ETKİNLİĞE GİT" BUTONU --- */
       .rlz5-goto-activity{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:0;background:linear-gradient(135deg,#7ee000,#58cc02);color:#fff;font-size:24px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 12px 28px rgba(40,120,0,.4);z-index:150;display:none;align-items:center;justify-content:center;padding:0;touch-action:manipulation;transition:transform .18s ease}
@@ -11949,13 +12497,13 @@ document.addEventListener("DOMContentLoaded", () => {
     window.navigate = function patchedNavigate(page, ...args) {
       const result = original.apply(this, [page, ...args]);
       document.body.classList.toggle("rlz5-page-active", page === "ravzalingo");
-      if (page === "ravzalingo") requestAnimationFrame(() => { RLZ_SESSION = null; rlzRenderHome(); rlzUpdateNavButtons(); });
-      else { rlz5CloseTopicModal(); rlzUpdateNavButtons(); }
+      if (page === "ravzalingo") requestAnimationFrame(() => { RLZ_SESSION = null; rlzRenderHome(); rlzUpdateNavButtons(); rlzUpdateStickyTopbar(); });
+      else { rlz5CloseTopicModal(); rlzUpdateNavButtons(); rlzUpdateStickyTopbar(); }
       return result;
     };
   }
 
-  /* --- KONU ÖZETİ POPUP --- */
+  /* --- "ÜNİTE İÇERİKLERİ" POPUP (bir bölümün tüm ünite listesi) --- */
   function rlzFindUnit(unitId) {
     const content = rlzBuildContent();
     for (const s of content.sections) {
@@ -11964,7 +12512,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return null;
   }
-  function rlz5ShowTopicModal(unitId) {
+  function rlzUnitStatus(state, sections, sectionIdx, unitIdx, unit) {
+    const prog = rlzGetUnitProgress(state, unit.id);
+    const unlocked = rlzIsUnitUnlocked(state, sections, sectionIdx, unitIdx);
+    if ((prog.stars || 0) >= 5) return { cls: "done", label: "Tamamlandı", icon: "✓" };
+    if (!unlocked) return { cls: "locked", label: "Kilitli", icon: "🔒" };
+    if ((prog.lessonsDone || 0) > 0) return { cls: "progress", label: "Devam ediyor", icon: "▸" };
+    return { cls: "ready", label: "Hazır", icon: "✓" };
+  }
+  function rlz5ShowStudyTopicModal(unitId) {
     const found = rlzFindUnit(unitId);
     if (!found) return;
     const unit = found.unit;
@@ -11976,20 +12532,122 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.className = "rlz5-modal-overlay";
     overlay.id = "rlz5TopicModal";
     overlay.innerHTML = `
-      <div class="rlz5-modal" role="dialog" aria-modal="true" aria-label="${rlzEsc(unit.title)} özeti">
+      <div class="rlz5-modal rlz5-modal-study" role="dialog" aria-modal="true" aria-label="${rlzEsc(unit.title)} çalışma pop-up">
         <div class="rlz5-modal-head">
-          <span class="rlz5-modal-kicker">${rlzEsc(found.section.kicker)} · ${rlzEsc(unit.unit || "")}</span>
-          <h2>${rlzEsc(unit.title)}</h2>
-          ${unit.subtitle ? `<p>${rlzEsc(unit.subtitle)}</p>` : ""}
+          <span class="rlz5-modal-icon" aria-hidden="true">📋</span>
+          <div class="rlz5-modal-headtext">
+            <h2>${rlzEsc(unit.title)}</h2>
+            <p>${rlzEsc(unit.subtitle || unit.unit || found.section.title)}</p>
+          </div>
           <button type="button" class="rlz5-modal-close" onclick="rlz5CloseTopicModal()" aria-label="Kapat">✕</button>
         </div>
         <div class="rlz5-modal-body">
-          ${keyPoints.length ? `<div class="rlz5-modal-keypoints"><h3>🔑 Kritik noktalar</h3><ul>${keyPoints.map((p) => `<li>${rlzEsc(p)}</li>`).join("")}</ul></div>` : ""}
-          ${topic.summaryHtml ? `<div class="rlz5-modal-summary">${topic.summaryHtml}</div>` : (keyPoints.length ? "" : `<p>Bu ünite için henüz özet eklenmemiş.</p>`)}
+          ${keyPoints.length ? `<div class="rlz5-modal-keypoints"><h3>Kritik Noktalar</h3><ul>${keyPoints.map((p) => `<li>${rlzEsc(p)}</li>`).join("")}</ul></div>` : ""}
+          ${topic.summaryHtml ? `<div class="rlz5-modal-summary">${topic.summaryHtml}</div>` : (keyPoints.length ? "" : `<p>Bu konu için henüz çalışma içeriği eklenmemiş.</p>`)}
         </div>
         <div class="rlz5-modal-foot">
           <button type="button" class="rlz5-btn-secondary" onclick="rlz5CloseTopicModal()">Kapat</button>
           ${typeof window.openStudyTopic === "function" ? `<button type="button" class="rlz5-btn-primary" onclick="rlz5OpenFullTopic('${safeId}')">Çalışma Merkezi'nde Aç</button>` : ""}
+        </div>
+      </div>`;
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) rlz5CloseTopicModal(); });
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
+  }
+  function rlz5ShowTopicModal(unitId) {
+    const found = rlzFindUnit(unitId);
+    if (!found) return;
+    const content = rlzBuildContent();
+    const section = found.section;
+    const sectionIdx = content.sections.indexOf(section);
+    const state = rlzLoad();
+    const units = section.units || [];
+    rlz5CloseTopicModal();
+    const rowsHtml = units.map((u, i) => {
+      const st = rlzUnitStatus(state, content.sections, sectionIdx, i, u);
+      const sid = String(u.id).replace(/'/g, "\\'");
+      const isCur = u.id === unitId;
+      return `
+        <button type="button" class="rlz5-uc-row${isCur ? " is-current" : ""}${st.cls === "locked" ? " is-locked" : ""}" onclick="rlz5GoToUnit('${sid}')" title="${rlzEsc(u.title)}">
+          <span class="rlz5-uc-secbadge">${section.number}</span>
+          <span class="rlz5-uc-unit">${i + 1}. Ünite</span>
+          <span class="rlz5-uc-topic"><span class="rlz5-uc-ico">${rlzEsc(u.icon || "📄")}</span><span class="rlz5-uc-name">${rlzEsc(u.title)}</span></span>
+          <span class="rlz5-uc-status rlz5-uc-status-${st.cls}">${st.icon} ${st.label}</span>
+          <span class="rlz5-uc-chev" aria-hidden="true">›</span>
+        </button>`;
+    }).join("");
+    const overlay = document.createElement("div");
+    overlay.className = "rlz5-modal-overlay";
+    overlay.id = "rlz5TopicModal";
+    overlay.innerHTML = `
+      <div class="rlz5-modal rlz5-modal-units" role="dialog" aria-modal="true" aria-label="${rlzEsc(section.title)} ünite içerikleri">
+        <div class="rlz5-modal-head">
+          <span class="rlz5-modal-icon" aria-hidden="true">📖</span>
+          <div class="rlz5-modal-headtext">
+            <h2>Ünite İçerikleri</h2>
+            <p>${rlzEsc(section.kicker || section.title)} ders listesi</p>
+          </div>
+          <button type="button" class="rlz5-modal-close" onclick="rlz5CloseTopicModal()" aria-label="Kapat">✕</button>
+        </div>
+        <div class="rlz5-modal-body">
+          <div class="rlz5-uc-head">
+            <span>Section</span><span>Ünite</span><span>Konu</span><span>Durum</span><span></span>
+          </div>
+          <div class="rlz5-uc-list">${rowsHtml}</div>
+        </div>
+        <div class="rlz5-modal-foot rlz5-uc-foot">
+          <span class="rlz5-uc-note"><span class="rlz5-uc-noteico">i</span> Tüm üniteleri tamamlayarak bölümü bitirmeye bir adım daha yaklaşırsın.</span>
+          <button type="button" class="rlz5-btn-secondary rlz5-uc-progbtn" onclick="rlz5UnitsProgressView()">📊 İlerlemeyi Görüntüle</button>
+        </div>
+      </div>`;
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) rlz5CloseTopicModal(); });
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
+  }
+  function rlz5ShowAllTopicsModal(activeUnitId = "") {
+    const content = rlzBuildContent();
+    const state = rlzLoad();
+    rlz5CloseTopicModal();
+    const sectionsHtml = content.sections.map((section, sectionIdx) => {
+      const rows = (section.units || []).map((u, i) => {
+        const st = rlzUnitStatus(state, content.sections, sectionIdx, i, u);
+        const sid = String(u.id).replace(/'/g, "\\'");
+        const isCur = u.id === activeUnitId;
+        return `
+          <button type="button" class="rlz5-all-topic${isCur ? " is-current" : ""}${st.cls === "locked" ? " is-locked" : ""}" onclick="rlz5OpenFullTopic('${sid}')" title="${rlzEsc(u.title)}">
+            <span class="rlz5-all-ico">${rlzEsc(u.icon || "📄")}</span>
+            <span class="rlz5-all-copy">
+              <strong>${rlzEsc(u.title)}</strong>
+              <small>${rlzEsc(u.unit || section.title)}${u.subtitle ? " · " + rlzEsc(u.subtitle) : ""}</small>
+            </span>
+            <span class="rlz5-all-status rlz5-all-status-${st.cls}">${st.icon} ${st.label}</span>
+          </button>`;
+      }).join("");
+      return `
+        <section class="rlz5-all-section">
+          <div class="rlz5-all-title">${rlzEsc(section.kicker || section.title)} · ${rlzEsc(section.title)}</div>
+          ${rows}
+        </section>`;
+    }).join("");
+    const overlay = document.createElement("div");
+    overlay.className = "rlz5-modal-overlay";
+    overlay.id = "rlz5TopicModal";
+    overlay.innerHTML = `
+      <div class="rlz5-modal rlz5-modal-units" role="dialog" aria-modal="true" aria-label="Bütün konular">
+        <div class="rlz5-modal-head">
+          <span class="rlz5-modal-icon" aria-hidden="true">📚</span>
+          <div class="rlz5-modal-headtext">
+            <h2>Bütün Konular</h2>
+            <p>Çalışmak istediğin konuyu seç</p>
+          </div>
+          <button type="button" class="rlz5-modal-close" onclick="rlz5CloseTopicModal()" aria-label="Kapat">✕</button>
+        </div>
+        <div class="rlz5-modal-body">
+          <div class="rlz5-all-list">${sectionsHtml}</div>
+        </div>
+        <div class="rlz5-modal-foot rlz5-uc-foot">
+          <span class="rlz5-uc-note"><span class="rlz5-uc-noteico">i</span> Geniş alan bütün konuları açar; sağdaki küçük buton sadece o konunun çalışma pop-up'ını açar.</span>
+          <button type="button" class="rlz5-btn-secondary rlz5-uc-progbtn" onclick="rlz5UnitsProgressView()">📊 İlerlemeyi Görüntüle</button>
         </div>
       </div>`;
     overlay.addEventListener("click", (e) => { if (e.target === overlay) rlz5CloseTopicModal(); });
@@ -12002,11 +12660,29 @@ document.addEventListener("DOMContentLoaded", () => {
     el.classList.remove("is-open");
     setTimeout(() => { el.remove(); }, 220);
   }
-  function rlz5OpenFullTopic(topicId) {
+  function rlz5GoToUnit(unitId) {
     rlz5CloseTopicModal();
-    if (typeof window.openStudyTopic === "function") {
-      try { window.openStudyTopic(topicId); } catch (_) {}
+    const go = () => {
+      const root = rlzRoot();
+      const banner = root && root.querySelector('.rlz5-unit-banner[data-unit-id="' + String(unitId).replace(/"/g, '\\"') + '"]');
+      if (banner) banner.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    const page = document.getElementById("ravzalingo");
+    if (page && !page.classList.contains("active") && typeof window.navigate === "function") {
+      window.navigate("ravzalingo");
+      setTimeout(go, 300);
+    } else {
+      setTimeout(go, 60);
     }
+  }
+  function rlz5UnitsProgressView() {
+    rlz5CloseTopicModal();
+    if (typeof window.navigate === "function") { try { window.navigate("ravzalingo"); } catch (_) {} }
+    setTimeout(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, 80);
+  }
+  // Geriye uyumluluk (eski isim)
+  function rlz5OpenFullTopic(topicId) {
+    if (typeof window.openStudyTopic === "function") { rlz5CloseTopicModal(); try { window.openStudyTopic(topicId); } catch (_) {} }
   }
 
   /* --- "KALDIĞIM ETKİNLİĞE GİT" BUTONU --- */
@@ -12095,6 +12771,122 @@ document.addEventListener("DOMContentLoaded", () => {
     rlzUpdateNavButtons();
   }
 
+  /* --- YAPIŞKAN ÜST BAR: kalıcı olarak position:fixed + yer tutucu (overflow/sticky sorunlarından bağımsız) --- */
+  let RLZ_FIXBAR_RAF = null;
+  function rlzSiteHeaderH() {
+    const h = document.querySelector(".main-content > .topbar") || document.querySelector(".topbar");
+    return h ? Math.round(h.getBoundingClientRect().height) : 0;
+  }
+  function rlzLayoutFixedTopbar() {
+    RLZ_FIXBAR_RAF = null;
+    const root = rlzRoot();
+    if (!root) return;
+    const bar = root.querySelector(".rlz5-topbar");
+    if (!bar) return;
+    if (!document.body.classList.contains("rlz5-page-active")) return; // sayfa açık değilse dokunma
+    let spacer = root.querySelector(".rlz5-topbar-spacer");
+    if (!spacer) {
+      spacer = document.createElement("div");
+      spacer.className = "rlz5-topbar-spacer";
+      bar.parentNode.insertBefore(spacer, bar.nextSibling);
+    }
+    // spacer (akışta, block, width:auto) → içerik kutusunun sol/genişliğini yansıtır
+    const sr = spacer.getBoundingClientRect();
+    bar.style.left = Math.round(sr.left) + "px";
+    bar.style.width = Math.round(sr.width) + "px";
+    bar.style.top = rlzSiteHeaderH() + "px";
+    // genişlik atandıktan sonra gerçek yüksekliği ölç ve yer tutucuyu ayarla (+ margin payı)
+    spacer.style.height = (Math.round(bar.getBoundingClientRect().height) + 20) + "px";
+    rlzUpdateUnitSticky();
+  }
+  // Stat barının alt kenarının ekrandaki konumu
+  function rlzTopbarBottom() {
+    const root = rlzRoot();
+    const bar = root && root.querySelector(".rlz5-topbar");
+    if (bar) { const r = bar.getBoundingClientRect(); if (r.height) return Math.round(r.bottom); }
+    return rlzSiteHeaderH();
+  }
+  function rlzEnsureUnitStickyBanner() {
+    const root = rlzRoot();
+    if (!root) return null;
+    let el = root.querySelector("#rlz5UnitSticky");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "rlz5UnitSticky";
+      el.className = "rlz5-unit-banner rlz5-unit-sticky";
+      el.style.display = "none";
+      root.appendChild(el);
+    }
+    return el;
+  }
+  // Kayan ünite banner'ı: stat barının altına gizlenen ünitenin başlığını orada gösterir
+  function rlzUpdateUnitSticky() {
+    const sticky = (rlzRoot() ? rlzRoot().querySelector("#rlz5UnitSticky") : null);
+    if (!document.body.classList.contains("rlz5-page-active") || RLZ_SESSION) {
+      if (sticky) sticky.style.display = "none";
+      return;
+    }
+    const root = rlzRoot();
+    if (!root) return;
+    const el = rlzEnsureUnitStickyBanner();
+    if (!el) return;
+    const banners = Array.prototype.slice.call(root.querySelectorAll(".rlz5-unit-banner")).filter((b) => b.id !== "rlz5UnitSticky");
+    if (!banners.length) { el.style.display = "none"; return; }
+    const lineTop = rlzTopbarBottom() + 6;
+    let active = null, next = null;
+    for (let i = 0; i < banners.length; i += 1) {
+      const r = banners[i].getBoundingClientRect();
+      if (r.bottom <= lineTop) active = banners[i];
+      else { next = banners[i]; break; }
+    }
+    if (!active) { el.style.display = "none"; return; }
+    const ar = active.getBoundingClientRect();
+    el.innerHTML = active.innerHTML;
+    let cls = "rlz5-unit-banner rlz5-unit-sticky";
+    if (active.classList.contains("is-done")) cls += " is-done";
+    if (active.classList.contains("is-locked")) cls += " is-locked";
+    el.className = cls;
+    el.id = "rlz5UnitSticky";
+    el.dataset.unitId = active.dataset.unitId || "";
+    el.title = active.title || "";
+    el.onclick = function (event) {
+      if (event?.target?.closest?.(".rlz5-banner-main,.rlz5-banner-guide")) return;
+      if (el.dataset.unitId) rlz5ShowAllTopicsModal(el.dataset.unitId);
+    };
+    const section = active.closest(".rlz5-section");
+    if (section) {
+      const cs = getComputedStyle(section);
+      el.style.setProperty("--rlz-main", cs.getPropertyValue("--rlz-main"));
+      el.style.setProperty("--rlz-deep", cs.getPropertyValue("--rlz-deep"));
+      el.style.setProperty("--rlz-light", cs.getPropertyValue("--rlz-light"));
+    }
+    el.style.position = "fixed";
+    el.style.left = Math.round(ar.left) + "px";
+    el.style.width = Math.round(ar.width) + "px";
+    el.style.zIndex = "55";
+    el.style.display = "flex";
+    // sıradaki banner yaklaşırsa "yukarı it" efekti
+    let y = lineTop;
+    const sh = el.getBoundingClientRect().height || ar.height;
+    if (next) {
+      const nr = next.getBoundingClientRect();
+      if (nr.top < lineTop + sh) y = Math.max(rlzTopbarBottom() - sh + 6, nr.top - sh);
+    }
+    el.style.top = Math.round(y) + "px";
+  }
+  function rlzScheduleFixedTopbar() {
+    if (RLZ_FIXBAR_RAF != null) return;
+    RLZ_FIXBAR_RAF = requestAnimationFrame(rlzLayoutFixedTopbar);
+  }
+  // Eski isimlerle uyumluluk (çağrı yerleri korunsun)
+  function rlzUpdateStickyTopbar() { rlzLayoutFixedTopbar(); }
+  function rlzHookStickyTopbar() {
+    if (window.__RLZ5_FIXBAR__) return;
+    window.__RLZ5_FIXBAR__ = true;
+    window.addEventListener("resize", rlzScheduleFixedTopbar, { passive: true });
+    window.addEventListener("scroll", rlzScheduleFixedTopbar, { passive: true });
+  }
+
   /* --- WINDOW EXPORTS --- */
   window.rlz5StartLesson = rlz5StartLesson;
   window.rlz5SelectWord = rlz5SelectWord;
@@ -12107,9 +12899,13 @@ document.addEventListener("DOMContentLoaded", () => {
   window.rlz5Quit = rlz5Quit;
   window.rlz5Home = rlz5Home;
   window.rlz5BuyHearts = rlz5BuyHearts;
+  window.rlz5ShowStudyTopicModal = rlz5ShowStudyTopicModal;
   window.rlz5ShowTopicModal = rlz5ShowTopicModal;
+  window.rlz5ShowAllTopicsModal = rlz5ShowAllTopicsModal;
   window.rlz5CloseTopicModal = rlz5CloseTopicModal;
   window.rlz5OpenFullTopic = rlz5OpenFullTopic;
+  window.rlz5GoToUnit = rlz5GoToUnit;
+  window.rlz5UnitsProgressView = rlz5UnitsProgressView;
   window.rlz5GotoActivity = rlz5GotoActivity;
   window.renderRavzaLingo = rlzRenderHome;
   window.resetRavzaLingoV5 = function () {
@@ -12158,10 +12954,19 @@ document.addEventListener("DOMContentLoaded", () => {
     rlzEnsureGotoActivityBtn();
     rlzHookNavigate();
     rlzHookScrollTopBtn();
+    rlzHookStickyTopbar();
     rlzStartHeartTicker();
     document.body.classList.toggle("rlz5-page-active", !!document.getElementById("ravzalingo")?.classList.contains("active"));
     rlzUpdateNavButtons();
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") rlz5CloseTopicModal(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { rlz5CloseTopicModal(); return; }
+      if (e.key === "Enter" || e.key === " ") {
+        const guide = e.target && e.target.closest && e.target.closest(".rlz5-banner-guide[data-unit-id]");
+        if (guide && guide.dataset.unitId) { e.preventDefault(); rlz5ShowStudyTopicModal(guide.dataset.unitId); return; }
+        const main = e.target && e.target.closest && e.target.closest(".rlz5-banner-main[data-unit-id]");
+        if (main && main.dataset.unitId) { e.preventDefault(); rlz5ShowAllTopicsModal(main.dataset.unitId); }
+      }
+    });
     rlzLoadFromFirebase().then(() => {
       const page = document.getElementById("ravzalingo");
       if (page?.classList.contains("active")) rlzRenderHome();
