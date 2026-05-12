@@ -3,6 +3,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -61,6 +62,12 @@
   <main class="main-content">
     <header class="topbar">
       <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menüyü aç" aria-expanded="false">☰</button>
+      <a class="topbar-love-brand" href="#dashboard" onclick="navigate('dashboard'); return false;" aria-label="Yusuf ve Ravza öğrenme yolculuğu ana sayfa">
+        <span class="love-brand-spark love-brand-spark-left" aria-hidden="true">✦</span>
+        <span class="love-brand-main">Yusuf <span class="love-heart" aria-hidden="true">♥</span> Ravza</span>
+        <span class="love-brand-sub">Öğrenme Yolculuğu</span>
+        <span class="love-brand-spark love-brand-spark-right" aria-hidden="true">✦</span>
+      </a>
       <div class="topbar-right">
         <button class="theme-open-btn" id="theme-open-btn" type="button" onclick="openThemeSheet()" title="Tema Seç">
           <span class="theme-open-icon">✨</span>

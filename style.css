@@ -9352,3 +9352,189 @@ body.nav-open .sidebar-backdrop {
     display: none !important;
   }
 }
+
+/* ==========================================================
+   Yusuf ♥ Ravza üst başlık alanı
+   Kırmızı işaretlenen boş alan için romantik ve responsive logo
+   ========================================================== */
+.topbar-love-brand {
+  position: relative;
+  min-width: 280px;
+  max-width: 520px;
+  flex: 1 1 360px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-decoration: none;
+  color: var(--text);
+  line-height: 1;
+  padding: 8px 18px 7px;
+  border-radius: 22px;
+  isolation: isolate;
+  transition: transform .22s ease, filter .22s ease;
+}
+
+.topbar-love-brand::before {
+  content: "";
+  position: absolute;
+  inset: 4px 8px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 22% 20%, rgba(255, 113, 160, .22), transparent 34%),
+    radial-gradient(circle at 78% 18%, rgba(255, 207, 116, .18), transparent 32%),
+    linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.06));
+  border: 1px solid color-mix(in srgb, var(--pink) 22%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.32),
+    0 14px 34px rgba(123,23,49,.08);
+  opacity: .72;
+}
+
+body.dark .topbar-love-brand::before {
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 103, 150, .24), transparent 34%),
+    radial-gradient(circle at 80% 20%, rgba(255, 213, 128, .18), transparent 32%),
+    linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.015));
+  border-color: rgba(255, 129, 170, .22);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 18px 42px rgba(0,0,0,.18),
+    0 0 32px rgba(255, 83, 130, .08);
+}
+
+.topbar-love-brand:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.05);
+}
+
+.love-brand-main {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 2.8vw, 38px);
+  font-weight: 700;
+  letter-spacing: .015em;
+  color: #6f1830;
+  text-shadow: 0 2px 10px rgba(255, 184, 201, .35);
+  white-space: nowrap;
+}
+
+body.dark .love-brand-main {
+  color: #ffe4c8;
+  text-shadow:
+    0 0 8px rgba(255, 137, 173, .34),
+    0 0 18px rgba(255, 192, 120, .18),
+    0 2px 10px rgba(0,0,0,.28);
+}
+
+.love-heart {
+  display: inline-block;
+  margin: 0 .12em;
+  color: #ff3f72;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: .82em;
+  filter: drop-shadow(0 0 7px rgba(255, 63, 114, .48));
+  animation: loveHeartPulse 2.6s ease-in-out infinite;
+}
+
+.love-brand-sub {
+  position: relative;
+  font-size: clamp(11px, 1.25vw, 16px);
+  font-weight: 800;
+  letter-spacing: .015em;
+  color: var(--pink-bright);
+  white-space: nowrap;
+  text-shadow: 0 1px 10px rgba(255, 137, 173, .18);
+}
+
+.love-brand-sub::before,
+.love-brand-sub::after {
+  content: "";
+  display: inline-block;
+  width: 42px;
+  height: 1px;
+  margin: 0 10px 4px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity: .72;
+}
+
+.love-brand-spark {
+  position: absolute;
+  top: 13px;
+  color: #ffd36b;
+  font-size: 12px;
+  opacity: .92;
+  text-shadow: 0 0 10px rgba(255, 211, 107, .55);
+  animation: loveSparkBlink 2.2s ease-in-out infinite;
+}
+.love-brand-spark-left { left: 30px; }
+.love-brand-spark-right { right: 30px; animation-delay: .8s; }
+
+.topbar-love-brand::after {
+  content: "♥";
+  position: absolute;
+  right: 56px;
+  bottom: 16px;
+  color: rgba(255, 80, 126, .72);
+  font-size: 11px;
+  text-shadow: 0 0 8px rgba(255, 80, 126, .36);
+}
+
+@keyframes loveHeartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+@keyframes loveSparkBlink {
+  0%, 100% { opacity: .38; transform: scale(.88) rotate(0deg); }
+  45% { opacity: 1; transform: scale(1.18) rotate(12deg); }
+}
+
+@media (max-width: 1024px) {
+  .topbar-love-brand {
+    min-width: 220px;
+    flex: 1 1 auto;
+    padding-inline: 10px;
+  }
+  .love-brand-main { font-size: clamp(22px, 3.4vw, 32px); }
+  .love-brand-sub::before,
+  .love-brand-sub::after { width: 24px; margin-inline: 7px; }
+}
+
+@media (max-width: 768px) {
+  .topbar-love-brand {
+    order: 2;
+    min-width: 0;
+    flex: 1 1 calc(100% - 58px);
+    max-width: none;
+    padding: 7px 8px 6px;
+  }
+  .topbar-right { order: 3; width: 100%; justify-content: flex-end; }
+  .love-brand-main { font-size: clamp(22px, 7vw, 30px); }
+  .love-brand-sub { font-size: 12px; }
+  .love-brand-spark-left { left: 14px; }
+  .love-brand-spark-right { right: 14px; }
+  .topbar-love-brand::after { right: 34px; bottom: 12px; }
+}
+
+@media (max-width: 520px) {
+  .topbar-love-brand {
+    flex-basis: calc(100% - 52px);
+    align-items: flex-start;
+    padding-left: 12px;
+  }
+  .topbar-love-brand::before { inset: 3px 0; }
+  .love-brand-main { font-size: clamp(20px, 7vw, 26px); }
+  .love-brand-sub { font-size: 11px; }
+  .love-brand-sub::before,
+  .love-brand-sub::after,
+  .love-brand-spark,
+  .topbar-love-brand::after { display: none; }
+}
+
+@media (max-width: 360px) {
+  .love-brand-main { font-size: 19px; }
+  .love-brand-sub { display: none; }
+}
+
