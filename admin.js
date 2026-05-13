@@ -1,244 +1,226 @@
 import { db } from "./firebase-config.js";
-import { ensureAdminAccess, clearAdminSession } from "./admin-guard.js";
+import { DEFAULT_TOPICS, DEFAULT_QUIZZES, DEFAULT_EXAMS } from "./content-defaults.js";
 import {
+  collection,
   doc,
   getDoc,
-  setDoc,
-  deleteDoc,
-  collection,
   getDocs,
-  writeBatch,
-  query,
-  orderBy,
   limit,
-  serverTimestamp
+  orderBy,
+  query
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-const BLOCK_TYPES = [
-  { value: "paragraph", label: "Paragraf" },
-  { value: "heading", label: "Alt Başlık" },
-  { value: "info", label: "Bilgi Kutusu (mavi)" },
-  { value: "warning", label: "Uyarı (sarı)" },
-  { value: "formula", label: "Formül (pembe)" },
-  { value: "customHTML", label: "Özel HTML" }
-];
-
-const ID_PATTERN = /^[a-z0-9_-]+$/i;
-
-const state = {
-  general: {},
-  dashboard: { stats: [], cards: [] },
-  nav: [],
-  pages: [],
-  quizzes: {},
-  visits: [],
-  filteredVisits: [],
-  activePageIndex: null,
-  deletedPageIds: new Set(),
-  deletedQuizIds: new Set(),
-  pendingRenames: {},
-  unsaved: false
-};
+const ADMIN_PASSWORD = "ravza2025";
+const SESSION_KEY = "yusuf_ravza_admin_demo_session";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-function setStatus(text, type = "normal") {
-  const badge = $("#statusBadge");
-  if (!badge) return;
-  badge.textContent = text;
-  badge.className = `status-badge ${type === "normal" ? "" : type}`.trim();
-}
+const data = {
+  overviewStats: [
+    { icon: "◎", value: "152", label: "Toplam Kullanıcı", growth: "Bu ay +18%" },
+    { icon: "▣", value: "128", label: "Toplam İçerik", growth: "Bu ay +12%" },
+    { icon: "?", value: "356", label: "Toplam Quiz", growth: "Bu ay +24%" },
+    { icon: "☑", value: "64", label: "Toplam Sınav", growth: "Bu ay +9%" },
+    { icon: "▤", value: "215", label: "Ezber Kartı", growth: "Bu ay +31%" }
+  ],
+  users: [
+    { name: "Ravza Y.", email: "ravza@example.com", role: "Öğrenci", date: "8 May 2025", status: "Aktif" },
+    { name: "Ayşe K.", email: "ayse@example.com", role: "Öğrenci", date: "7 May 2025", status: "Aktif" },
+    { name: "Zeynep T.", email: "zeynep@example.com", role: "Öğrenci", date: "6 May 2025", status: "Aktif" },
+    { name: "Emre A.", email: "emre@example.com", role: "Öğrenci", date: "5 May 2025", status: "Pasif" },
+    { name: "Melisa D.", email: "melisa@example.com", role: "Öğrenci", date: "4 May 2025", status: "Aktif" }
+  ],
+  content: [
+    { title: "Kelime Listesi", type: "Kelime", date: "8 May 2025", status: "Yayında" },
+    { title: "Present Perfect Tense", type: "Dilbilgisi", date: "7 May 2025", status: "Yayında" },
+    { title: "Soru Çözüm Stratejileri", type: "Strateji", date: "6 May 2025", status: "Taslak" },
+    { title: "Okuma Parçası 1A", type: "Okuma", date: "5 May 2025", status: "Yayında" },
+    { title: "Dinleme Metni 1A", type: "Dinleme", date: "4 May 2025", status: "Yayında" }
+  ],
+  quizzes: [
+    { title: "Unit 1A - Kelime Quiz", category: "Kelime", questions: "20 soru", difficulty: "Kolay", date: "8 May 2025", status: "Yayında" },
+    { title: "Present Perfect Tense Quiz", category: "Dilbilgisi", questions: "15 soru", difficulty: "Orta", date: "7 May 2025", status: "Yayında" },
+    { title: "Çevre ve Kirlilik Quiz", category: "Okuma", questions: "25 soru", difficulty: "Orta", date: "6 May 2025", status: "Yayında" },
+    { title: "İş Hayatı Kelimeleri Quiz", category: "Kelime", questions: "20 soru", difficulty: "Zor", date: "5 May 2025", status: "Taslak" },
+    { title: "Sıfatlar ve Zarflar Quiz", category: "Dilbilgisi", questions: "18 soru", difficulty: "Kolay", date: "4 May 2025", status: "Yayında" }
+  ],
+  exams: [
+    { title: "1A Genel Tekrar Sınavı", desc: "1A ünitesi genel tekrar sınavı", type: "Genel", duration: "90 dk", date: "8 May 2025 18:00", participants: 128, status: "Yayınlandı" },
+    { title: "Unit 1A Vocabulary Test", desc: "Kelime odaklı mini ölçme", type: "Kelime", duration: "30 dk", date: "10 May 2025 14:00", participants: 96, status: "Yayınlandı" },
+    { title: "Present Perfect Test", desc: "Konu performansı ölçümü", type: "Konu", duration: "45 dk", date: "12 May 2025 16:00", participants: 104, status: "Tamamlandı" },
+    { title: "Okuma Comprehension 1A", desc: "Okuma becerisi sınavı", type: "Okuma", duration: "40 dk", date: "15 May 2025 17:00", participants: 87, status: "Planlandı" },
+    { title: "Dinleme Testi 1A", desc: "Dinleme becerisi sınavı", type: "Dinleme", duration: "35 dk", date: "18 May 2025 15:00", participants: 72, status: "Planlandı" },
+    { title: "Grammar Review 1A", desc: "Dilbilgisi tekrar sınavı", type: "Dilbilgisi", duration: "50 dk", date: "20 May 2025 18:00", participants: 65, status: "Taslak" }
+  ],
+  flashcards: [
+    { title: "Present Perfect Kelimeleri", category: "Kelime", deck: "İngilizce - Temel", difficulty: "Orta", date: "8 May 2025", status: "Yayında" },
+    { title: "Sıfatlar ve Zarflar", category: "Dilbilgisi", deck: "İngilizce - Dilbilgisi", difficulty: "Orta", date: "6 May 2025", status: "Yayında" },
+    { title: "İngilizce Fiiller", category: "Kelime", deck: "İngilizce - Fiiller", difficulty: "Zor", date: "5 May 2025", status: "Yayında" },
+    { title: "Mimari Terimler", category: "Genel", deck: "Mimarlık - Terimler", difficulty: "Zor", date: "3 May 2025", status: "Taslak" },
+    { title: "Günlük Konuşma Kalıpları", category: "Konuşma", deck: "İngilizce - Konuşma", difficulty: "Kolay", date: "1 May 2025", status: "Yayında" },
+    { title: "Okuma Anlama Kelimeleri", category: "Okuma", deck: "İngilizce - Okuma", difficulty: "Orta", date: "30 Nis 2025", status: "Yayında" },
+    { title: "İleri Seviye Kelimeler", category: "Kelime", deck: "İngilizce - İleri", difficulty: "Zor", date: "28 Nis 2025", status: "Arşivlendi" },
+    { title: "Akademik Kelimeler", category: "Kelime", deck: "İngilizce - Akademik", difficulty: "Zor", date: "25 Nis 2025", status: "Taslak" }
+  ],
+  popularContents: [
+    { title: "Present Perfect Tense", views: "2.481" },
+    { title: "Unit 1A Kelime Listesi", views: "2.218" },
+    { title: "Okuma Parçası 1A", views: "1.842" },
+    { title: "Grammar Review 1A", views: "1.637" },
+    { title: "Dinleme Metni 1A", views: "1.204" }
+  ],
+  units: ["Unit 1A", "Unit 1B", "Unit 2A", "Unit 2B", "Unit 3A", "Unit 3B"],
+  activeDecks: [
+    { name: "İngilizce - Temel", cards: "56 kart", pct: 92 },
+    { name: "İngilizce - Kelime", cards: "48 kart", pct: 88 },
+    { name: "İngilizce - Dilbilgisi", cards: "36 kart", pct: 75 },
+    { name: "İngilizce - Fiiller", cards: "28 kart", pct: 68 },
+    { name: "İngilizce - Konuşma", cards: "24 kart", pct: 65 }
+  ],
+  studySeries: [
+    { title: "Unit 1A Başlangıç Serisi", desc: "Kelime, grammar, quiz ve mini sınav akışı.", pct: 86 },
+    { title: "Grammar Yoğun Tekrar", desc: "Zayıf konular için 7 günlük tekrar planı.", pct: 72 },
+    { title: "Okuma Becerisi Kampı", desc: "Paragraf, soru kökü ve strateji çalışmaları.", pct: 64 },
+    { title: "Sınav Öncesi Hızlı Seri", desc: "Son hafta kritik konu ve deneme planı.", pct: 91 },
+    { title: "Kelime Ezber Rotası", desc: "Flashcard ve quiz destekli günlük liste.", pct: 78 },
+    { title: "Dinleme Mini Planı", desc: "Kısa metinler, boşluk ve tekrar döngüsü.", pct: 58 }
+  ],
+  fillgaps: [
+    { title: "Present Perfect Boşlukları", desc: "For/since ve yapı pratiği.", pct: 83 },
+    { title: "Dependent Prepositions", desc: "Sık kullanılan edat kalıpları.", pct: 74 },
+    { title: "Object Pronouns Practice", desc: "Cümle içinde doğru zamir seçimi.", pct: 88 },
+    { title: "Reading Vocabulary Gaps", desc: "Okuma parçalarından kelime pratiği.", pct: 69 },
+    { title: "Adjectives & Adverbs", desc: "Karşılaştırma ve zarf kullanımı.", pct: 81 },
+    { title: "Listening Transcript Gaps", desc: "Dinleme metni boşluk tamamlama.", pct: 63 }
+  ],
+  notifications: [
+    { icon: "!", title: "Yeni quiz paketi yayında", desc: "Unit 1A kelime quizleri kullanıcılara duyuruldu.", status: "Yayında" },
+    { icon: "✦", title: "Haftalık hedef hatırlatması", desc: "Streak devamı için motivasyon bildirimi hazır.", status: "Planlandı" },
+    { icon: "◎", title: "Sınav sonucu bildirimi", desc: "Sınav bitince başarı oranı bildirimi gönderilir.", status: "Taslak" }
+  ],
+  logs: [
+    { icon: "✓", title: "Admin giriş yaptı", desc: "Demo oturum açıldı.", status: "Başarılı" },
+    { icon: "▣", title: "İçerik yönetimi görüntülendi", desc: "Unit 1A içerikleri listelendi.", status: "Bilgi" },
+    { icon: "?", title: "Quiz modalı hazırlandı", desc: "Yeni quiz demo formu açıldı.", status: "Bilgi" },
+    { icon: "☑", title: "Sınav listesi render edildi", desc: "6 sınav demo tablosuna işlendi.", status: "Başarılı" }
+  ]
+};
 
-function showToast(message, type = "info") {
-  const host = $("#toastHost");
-  if (!host) return;
-  const node = document.createElement("div");
-  node.className = `toast toast-${type}`;
-  node.textContent = message;
-  host.appendChild(node);
-  setTimeout(() => node.classList.add("toast-out"), 2400);
-  setTimeout(() => node.remove(), 2900);
-}
+const realDataState = {
+  loaded: false,
+  loadingPromise: null,
+  source: "Demo fallback"
+};
 
-function markUnsaved() {
-  state.unsaved = true;
-  setStatus("Kaydedilmemiş değişiklik var", "warning");
-}
-
-function safe(value = "") {
-  return String(value ?? "").replace(/[&<>'"]/g, (char) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;"
-  })[char]);
+function clone(value) {
+  return JSON.parse(JSON.stringify(value || null));
 }
 
 function toDate(value) {
   if (!value) return null;
   if (typeof value.toDate === "function") return value.toDate();
-  if (typeof value === "string") return new Date(value);
+  if (typeof value === "string") {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  if (typeof value === "number") return new Date(value);
   if (value.seconds) return new Date(value.seconds * 1000);
   return null;
 }
 
-function formatDate(value) {
+function formatDate(value, fallback = "-") {
   const date = toDate(value);
-  if (!date || Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString("tr-TR", { dateStyle: "short", timeStyle: "short" });
+  if (!date) return fallback;
+  return date.toLocaleString("tr-TR", { dateStyle: "medium", timeStyle: "short" });
 }
 
-function formatRelative(value) {
+function formatDateOnly(value, fallback = "-") {
   const date = toDate(value);
-  if (!date || Number.isNaN(date.getTime())) return "";
-  const diff = Date.now() - date.getTime();
-  const minutes = Math.round(diff / 60000);
-  if (minutes < 1) return "şimdi";
-  if (minutes < 60) return `${minutes} dk önce`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours} sa önce`;
-  const days = Math.round(hours / 24);
-  return `${days} gün önce`;
+  if (!date) return fallback;
+  return date.toLocaleDateString("tr-TR", { dateStyle: "medium" });
 }
 
-function todayKey(date = new Date()) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+function normalizeUnit(unit) {
+  if (!unit) return "Unit";
+  const text = String(unit);
+  return text.toLocaleLowerCase("tr-TR").startsWith("unit") ? text : `Unit ${text}`;
 }
 
-function getVisitDateKey(visit) {
-  const date = toDate(visit.createdAt) || toDate(visit.clientCreatedAt);
-  return date ? todayKey(date) : "";
+function normalizeStatus(status) {
+  const text = String(status || "").toLocaleLowerCase("tr-TR");
+  if (text.includes("publish") || text.includes("yay")) return "Yayında";
+  if (text.includes("draft") || text.includes("taslak")) return "Taslak";
+  if (text.includes("archive") || text.includes("arşiv")) return "Arşivlendi";
+  if (text.includes("plan")) return "Planlandı";
+  if (text.includes("complete") || text.includes("tamam")) return "Tamamlandı";
+  return status ? String(status) : "Yayında";
 }
 
-function activateTab(tabId) {
-  $$(".tab-btn").forEach((btn) => btn.classList.toggle("active", btn.dataset.tab === tabId));
-  $$(".tab-panel").forEach((panel) => panel.classList.toggle("active", panel.id === `tab-${tabId}`));
-  const activeBtn = $(`.tab-btn[data-tab="${tabId}"]`);
-  $("#panelTitle").textContent = activeBtn ? activeBtn.textContent.trim() : "Panel";
-  closeMobileSidebar();
+function normalizeCategory(category) {
+  const text = String(category || "").toLocaleLowerCase("tr-TR");
+  if (text.includes("vocab") || text.includes("word")) return "Kelime";
+  if (text.includes("grammar")) return "Dilbilgisi";
+  if (text.includes("reading")) return "Okuma";
+  if (text.includes("listening")) return "Dinleme";
+  if (text.includes("speaking")) return "Konuşma";
+  if (text.includes("strategy")) return "Strateji";
+  return category || "Genel";
 }
 
-function openMobileSidebar() {
-  if (window.innerWidth > 900) return;
-  $("#adminSidebar")?.classList.add("is-open");
-  const scrim = $("#sidebarScrim");
-  if (scrim) scrim.hidden = false;
-  document.body.classList.add("no-scroll");
+function difficultyFromLevel(level) {
+  const text = String(level || "").toLocaleLowerCase("tr-TR");
+  if (text.includes("starter") || text.includes("easy") || text.includes("beginner")) return "Kolay";
+  if (text.includes("pre") || text.includes("inter") || text.includes("medium") || text.includes("elementary")) return "Orta";
+  if (text.includes("advanced") || text.includes("hard")) return "Zor";
+  return "Orta";
 }
 
-function closeMobileSidebar() {
-  $("#adminSidebar")?.classList.remove("is-open");
-  const scrim = $("#sidebarScrim");
-  if (scrim) scrim.hidden = true;
-  document.body.classList.remove("no-scroll");
+function getQuestions(item) {
+  if (Array.isArray(item?.questions)) return item.questions;
+  if (Array.isArray(item?.quiz)) return item.quiz;
+  return [];
 }
 
-async function loadAdminData() {
-  setStatus("Veriler yükleniyor…", "warning");
-  try {
-    const [generalSnap, dashboardSnap, navSnap, pagesSnap, quizzesSnap, visitsSnap] = await Promise.all([
-      getDoc(doc(db, "system", "general")),
-      getDoc(doc(db, "system", "dashboard")),
-      getDoc(doc(db, "system", "navigation")),
-      getDocs(collection(db, "pages")),
-      getDocs(collection(db, "quizzes")),
-      getDocs(query(collection(db, "user_visits"), orderBy("createdAt", "desc"), limit(250)))
-    ]);
-
-    state.general = generalSnap.exists() ? generalSnap.data() : {};
-    state.dashboard = dashboardSnap.exists() ? dashboardSnap.data() : { stats: [], cards: [] };
-    state.nav = navSnap.exists() ? (navSnap.data().items || []) : [];
-    state.pages = [];
-    pagesSnap.forEach((snap) => state.pages.push({ id: snap.id, ...snap.data() }));
-    state.pages.sort((a, b) => (a.order || 0) - (b.order || 0));
-    state.quizzes = {};
-    quizzesSnap.forEach((snap) => { state.quizzes[snap.id] = snap.data().questions || []; });
-    state.visits = [];
-    visitsSnap.forEach((snap) => state.visits.push({ firestoreId: snap.id, ...snap.data() }));
-
-    state.deletedPageIds.clear();
-    state.deletedQuizIds.clear();
-    state.pendingRenames = {};
-    state.unsaved = false;
-    state.activePageIndex = null;
-
-    renderAll();
-    setStatus("Veriler yüklendi", "success");
-  } catch (error) {
-    console.error(error);
-    setStatus("Veri yükleme hatası", "error");
-    showToast("Veri yüklenemedi. Konsolu kontrol et.", "error");
-  }
+function countTopicBlocks(topic) {
+  if (Array.isArray(topic?.blocks)) return topic.blocks.length;
+  if (topic?.summaryHtml) return Math.max(1, String(topic.summaryHtml).split("<div").length - 1);
+  return 0;
 }
 
-function renderAll() {
-  populateSettings();
-  renderOverview();
-  renderVisitTable();
-  renderPagesList();
-  renderEmptyEditor();
-  renderDashboardEditor();
+function extractFlashcardsFromTopics(topics) {
+  const rows = [];
+  topics.forEach((topic) => {
+    (topic.blocks || []).forEach((block) => {
+      if (block?.type !== "flashcards") return;
+      const cards = block.data?.cards || [];
+      cards.forEach((card, index) => {
+        rows.push({
+          title: card.front || `${topic.title} Kart ${index + 1}`,
+          category: normalizeCategory(topic.category),
+          deck: topic.title || "Genel Deste",
+          difficulty: difficultyFromLevel(topic.level || topic.difficulty),
+          date: formatDateOnly(topic.updatedAt || topic.createdAt, "Kaynak seed"),
+          status: normalizeStatus(topic.status || "published")
+        });
+      });
+    });
+  });
+  return rows;
 }
 
-function renderEmptyEditor() {
-  $("#emptyEditor").hidden = state.activePageIndex !== null;
-  $("#pageEditor").hidden = state.activePageIndex === null;
-}
-
-function populateSettings() {
-  const g = state.general || {};
-  $("#generalSiteTitle").value = g.siteTitle || "";
-  $("#generalSubtitle").value = g.siteSubtitle || "";
-  $("#generalBadge").value = g.topbarBadge || "";
-  $("#generalFooter").value = g.footerText || "";
-  $("#generalHeroTitle").value = g.heroTitle || "";
-  $("#generalHeroDesc").value = g.heroDesc || "";
-  const t = g.themeTokens || {};
-  $("#themeNavy").value = t.navy || "#1a2850";
-  $("#themePink").value = t.pink || "#d4669c";
-  $("#themePinkBright").value = t["pink-bright"] || "#e879a0";
-  $("#themeBg").value = t.bg || "#f6f4fb";
-}
-
-function renderOverview() {
-  const visits = state.visits || [];
-  const today = todayKey();
-  const todayVisits = visits.filter((v) => getVisitDateKey(v) === today).length;
-  const mobileCount = visits.filter((v) => ["Mobil", "Tablet"].includes(v.deviceType)).length;
-  const rate = visits.length ? Math.round((mobileCount / visits.length) * 100) : 0;
-  const deviceCounts = countBy(visits, (v) => v.deviceModel || v.os || "Bilinmeyen");
-  const topDevice = Object.entries(deviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "-";
-
-  $("#metricTotalVisits").textContent = visits.length;
-  $("#metricTodayVisits").textContent = todayVisits;
-  $("#metricMobileRate").textContent = `${rate}%`;
-  $("#metricTopDevice").textContent = topDevice;
-
-  $("#latestVisits").innerHTML = visits.slice(0, 6).map((v) => `
-    <div class="latest-item">
-      <div class="latest-item-main">
-        <strong>${safe(v.deviceModel || v.os || "Bilinmeyen cihaz")}</strong>
-        <span>${safe(v.os || "-")} • ${safe(v.browser || "-")} • ${safe(v.deviceType || "-")}</span>
-      </div>
-      <div class="latest-item-meta">
-        <span>${safe(formatDate(v.createdAt || v.clientCreatedAt))}</span>
-        <small>${safe(formatRelative(v.createdAt || v.clientCreatedAt))}</small>
-      </div>
-    </div>
-  `).join("") || `<div class="latest-item empty"><span>Henüz giriş kaydı yok. Site açıldığında otomatik düşer.</span></div>`;
-
-  const typeCounts = countBy(visits, (v) => v.deviceType || "Bilinmeyen");
-  const total = visits.length || 1;
-  $("#deviceBreakdown").innerHTML = Object.entries(typeCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([type, count]) => {
-      const pct = Math.round((count / total) * 100);
-      return `<div class="breakdown-item">
-        <div><strong>${safe(type)}</strong> <span>${count} kayıt • ${pct}%</span></div>
-        <div class="breakdown-bar"><i style="width:${pct}%"></i></div>
-      </div>`;
-    }).join("") || `<div class="breakdown-item empty"><span>Veri bekleniyor.</span></div>`;
+function summarizeDecks(flashcards) {
+  const groups = new Map();
+  flashcards.forEach((card) => {
+    const current = groups.get(card.deck) || { name: card.deck, count: 0 };
+    current.count += 1;
+    groups.set(card.deck, current);
+  });
+  const max = Math.max(1, ...Array.from(groups.values()).map((item) => item.count));
+  return Array.from(groups.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+    .map((item) => ({ name: item.name, cards: `${item.count} kart`, pct: Math.max(12, Math.round((item.count / max) * 100)) }));
 }
 
 function countBy(list, getter) {
@@ -249,657 +231,908 @@ function countBy(list, getter) {
   }, {});
 }
 
-function getAccuracyLabel(visit) {
-  const value = visit.modelAccuracy || "";
-  if (value === "browser-provided" || value === "automatic-exact-or-browser-provided") return "Tarayıcı verdi";
-  if (value === "estimated-screen-group" || value === "estimated") return "Ekran/DPR tahmini";
-  if (value === "user-agent-estimated") return "User-Agent tahmini";
-  if (value === "automatic") return "Otomatik";
-  if (value === "confirmed-by-user") return "Kullanıcı seçmiş";
-  return value || "Otomatik";
+function distributionRows(counts, palette) {
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([label, value], index) => [label, String(value), palette[index % palette.length]]);
 }
 
-function getAccuracyClass(visit) {
-  const value = visit.modelAccuracy || "";
-  if (value === "browser-provided" || value === "automatic-exact-or-browser-provided" || value === "confirmed-by-user") return "confirmed";
-  if (value === "estimated-screen-group" || value === "estimated" || value === "user-agent-estimated") return "estimated";
-  return "auto";
-}
-
-function getFilteredVisits() {
-  const search = ($("#visitSearch")?.value || "").toLowerCase().trim();
-  const type = $("#visitTypeFilter")?.value || "all";
-  return (state.visits || []).filter((visit) => {
-    const blob = [
-      visit.deviceModel, visit.confirmedModel, visit.automaticDeviceModel,
-      visit.os, visit.browser, visit.deviceType, visit.modelAccuracy,
-      visit.pagePath, visit.userAgent, visit.visitorId, visit.sessionId
-    ].join(" ").toLowerCase();
-    const matchesSearch = !search || blob.includes(search);
-    const matchesType = type === "all" || visit.deviceType === type;
-    return matchesSearch && matchesType;
+function buildUsersFromVisits(visits) {
+  return visits.slice(0, 40).map((visit, index) => {
+    const date = toDate(visit.createdAt || visit.clientCreatedAt);
+    const isActive = date ? Date.now() - date.getTime() < 1000 * 60 * 60 * 24 * 14 : index < 5;
+    const visitor = visit.deviceModel || visit.automaticDeviceModel || visit.os || `Ziyaretçi ${index + 1}`;
+    return {
+      name: visitor,
+      email: visit.visitorId ? `${String(visit.visitorId).slice(0, 10)}@visitor.local` : "ziyaretci@local",
+      role: "Öğrenci",
+      date: formatDate(visit.createdAt || visit.clientCreatedAt, "-"),
+      status: isActive ? "Aktif" : "Pasif"
+    };
   });
 }
 
-function renderVisitTable() {
-  const body = $("#visitTableBody");
-  if (!body) return;
-  const visits = getFilteredVisits();
-  state.filteredVisits = visits;
-
-  const meta = $("#visitsMeta");
-  if (meta) {
-    meta.textContent = `${visits.length} kayıt gösteriliyor (toplam ${state.visits.length})`;
-  }
-
-  body.innerHTML = visits.map((v, index) => {
-    const screen = v.screen ? `${v.screen.width || "?"}×${v.screen.height || "?"} <small>DPR ${v.screen.dpr || 1}</small>` : "-";
-    const autoModel = v.automaticDeviceModel && v.automaticDeviceModel !== v.deviceModel
-      ? `<small>Otomatik: ${safe(v.automaticDeviceModel)}</small>`
-      : `<small>Otomatik analiz</small>`;
-    return `
-    <tr>
-      <td data-label="Tarih">${safe(formatDate(v.createdAt || v.clientCreatedAt))}<small>${safe(formatRelative(v.createdAt || v.clientCreatedAt))}</small></td>
-      <td data-label="Cihaz"><strong>${safe(v.deviceModel || "Bilinmeyen")}</strong>${autoModel}</td>
-      <td data-label="Doğruluk"><span class="accuracy-pill ${getAccuracyClass(v)}">${safe(getAccuracyLabel(v))}</span></td>
-      <td data-label="Tür"><span class="table-pill">${safe(v.deviceType || "-")}</span></td>
-      <td data-label="OS">${safe(v.os || "-")}</td>
-      <td data-label="Tarayıcı">${safe(v.browser || "-")}</td>
-      <td data-label="Ekran">${screen}</td>
-      <td data-label="Sayfa"><span class="path-cell">${safe(v.pagePath || "-")}</span></td>
-      <td data-label="Detay"><button class="detail-link" data-visit-index="${index}" type="button">Detayı Aç</button></td>
-    </tr>
-  `;
-  }).join("") || `<tr><td colspan="9" class="empty-row">Kayıt bulunamadı. Filtre temizle veya site açılana kadar bekle.</td></tr>`;
-}
-
-function renderPagesList() {
-  const list = $("#pagesList");
-  if (!list) return;
-  list.innerHTML = state.pages.map((page, index) => `
-    <div class="page-item ${index === state.activePageIndex ? "active" : ""}" data-page-index="${index}">
-      <button class="page-item-main" data-page-index="${index}" type="button">
-        <strong>${safe(page.icon || "📄")} ${safe(page.title || "Başlıksız")}</strong>
-        <small>${safe(page.id || "-")} ${page.unitBadge ? `• ${safe(page.unitBadge)}` : ""}</small>
-      </button>
-      <div class="page-item-tools">
-        <button class="icon-btn" data-page-move="up" data-page-index="${index}" type="button" aria-label="Yukarı taşı" title="Yukarı taşı">↑</button>
-        <button class="icon-btn" data-page-move="down" data-page-index="${index}" type="button" aria-label="Aşağı taşı" title="Aşağı taşı">↓</button>
-      </div>
-    </div>
-  `).join("") || `<div class="page-item empty"><span><strong>Sayfa yok</strong><small>+ Yeni butonu ile ilk konuyu ekle.</small></span></div>`;
-}
-
-function openPageEditor(index) {
-  saveEditorToState();
-  state.activePageIndex = index;
-  renderPagesList();
-  const page = state.pages[index];
-  if (!page) {
-    renderEmptyEditor();
-    return;
-  }
-  page.blocks = page.blocks || [];
-  if (!state.quizzes[page.id]) state.quizzes[page.id] = page.quiz || [];
-  $("#emptyEditor").hidden = true;
-  $("#pageEditor").hidden = false;
-  $("#pageIdInput").value = page.id || "";
-  $("#pageTitleInput").value = page.title || "";
-  $("#pageIconInput").value = page.icon || "";
-  $("#pageBadgeInput").value = page.unitBadge || page.unit || "";
-  $("#pageDescInput").value = page.desc || page.subtitle || "";
-  renderBlocks(page.blocks);
-  renderQuiz(state.quizzes[page.id]);
-}
-
-function renderBlocks(blocks = []) {
-  $("#blocksContainer").innerHTML = blocks.map((block, index) => {
-    const typeOptions = BLOCK_TYPES.map((bt) =>
-      `<option value="${bt.value}" ${block.type === bt.value ? "selected" : ""}>${bt.label}</option>`
-    ).join("");
-    return `
-    <div class="block-item editor-block" data-block-index="${index}">
-      <div class="block-head">
-        <span class="block-index">#${index + 1}</span>
-        <label class="block-type-label">
-          <span>Blok türü</span>
-          <select class="block-type">${typeOptions}</select>
-        </label>
-        <div class="block-tools">
-          <button class="icon-btn" data-block-move="up" data-block-index="${index}" type="button" aria-label="Yukarı taşı" title="Yukarı">↑</button>
-          <button class="icon-btn" data-block-move="down" data-block-index="${index}" type="button" aria-label="Aşağı taşı" title="Aşağı">↓</button>
-          <button class="block-remove" data-remove-block="${index}" type="button">Sil</button>
-        </div>
-      </div>
-      <label class="block-content-label">
-        <span>İçerik</span>
-        <textarea class="block-content" rows="4" placeholder="Bu bloğun metni veya HTML içeriği">${safe(block.content || "")}</textarea>
-      </label>
-    </div>
-  `;
-  }).join("") || `<div class="block-item empty"><span>Henüz blok yok. <strong>+ Blok</strong> ile ekle.</span></div>`;
-}
-
-function renderQuiz(questions = []) {
-  $("#quizContainer").innerHTML = questions.map((q, index) => {
-    const opts = q.options || [q.a || "", q.b || "", q.c || ""];
-    const correct = typeof q.answer === "number"
-      ? q.answer
-      : (q.correct === "c" ? 2 : q.correct === "b" ? 1 : 0);
-    return `
-      <div class="block-item editor-quiz" data-quiz-index="${index}">
-        <div class="block-head">
-          <span class="block-index">Soru ${index + 1}</span>
-          <label class="block-type-label">
-            <span>Doğru cevap</span>
-            <select class="quiz-answer">
-              <option value="0" ${correct === 0 ? "selected" : ""}>A doğru</option>
-              <option value="1" ${correct === 1 ? "selected" : ""}>B doğru</option>
-              <option value="2" ${correct === 2 ? "selected" : ""}>C doğru</option>
-            </select>
-          </label>
-          <div class="block-tools">
-            <button class="icon-btn" data-quiz-move="up" data-quiz-index="${index}" type="button" aria-label="Yukarı taşı" title="Yukarı">↑</button>
-            <button class="icon-btn" data-quiz-move="down" data-quiz-index="${index}" type="button" aria-label="Aşağı taşı" title="Aşağı">↓</button>
-            <button class="block-remove" data-remove-quiz="${index}" type="button">Sil</button>
-          </div>
-        </div>
-        <div class="quiz-grid">
-          <label class="form-field full">Soru
-            <input class="quiz-question" type="text" value="${safe(q.question || "")}" placeholder="Soru metni">
-          </label>
-          <label class="form-field">A şıkkı
-            <input class="quiz-opt-a" type="text" value="${safe(opts[0] || "")}" placeholder="A">
-          </label>
-          <label class="form-field">B şıkkı
-            <input class="quiz-opt-b" type="text" value="${safe(opts[1] || "")}" placeholder="B">
-          </label>
-          <label class="form-field">C şıkkı (opsiyonel)
-            <input class="quiz-opt-c" type="text" value="${safe(opts[2] || "")}" placeholder="C — boş bırakılabilir">
-          </label>
-          <label class="form-field full">Açıklama
-            <input class="quiz-explanation" type="text" value="${safe(q.explanation || "")}" placeholder="Doğru cevap sonrası gösterilecek açıklama">
-          </label>
-        </div>
-      </div>
-    `;
-  }).join("") || `<div class="block-item empty"><span>Henüz soru yok. <strong>+ Soru</strong> ile ekle.</span></div>`;
-}
-
-function saveEditorToState() {
-  if (state.activePageIndex === null || !state.pages[state.activePageIndex] || $("#pageEditor")?.hidden) return;
-  const page = state.pages[state.activePageIndex];
-  const oldId = page.id;
-  const newIdRaw = $("#pageIdInput").value.trim();
-  const newId = newIdRaw || oldId;
-
-  if (newId !== oldId) {
-    if (!ID_PATTERN.test(newId)) {
-      showToast(`Geçersiz sayfa ID: "${newId}". Sadece harf/rakam/-/_ kullan.`, "error");
-      $("#pageIdInput").value = oldId;
-    } else if (state.pages.some((p, i) => i !== state.activePageIndex && p.id === newId)) {
-      showToast(`"${newId}" ID'si zaten başka bir sayfada kullanılıyor.`, "error");
-      $("#pageIdInput").value = oldId;
-    } else {
-      state.pendingRenames[oldId] = newId;
-      page.id = newId;
-      if (state.quizzes[oldId]) {
-        state.quizzes[newId] = state.quizzes[oldId];
-        delete state.quizzes[oldId];
-      }
-    }
-  }
-
-  page.title = $("#pageTitleInput").value.trim();
-  page.icon = $("#pageIconInput").value.trim();
-  page.unitBadge = $("#pageBadgeInput").value.trim();
-  page.desc = $("#pageDescInput").value.trim();
-  page.order = state.activePageIndex;
-
-  page.blocks = $$("#blocksContainer .editor-block").map((el) => ({
-    type: el.querySelector(".block-type")?.value || "paragraph",
-    content: el.querySelector(".block-content")?.value || ""
-  }));
-
-  state.quizzes[page.id] = $$("#quizContainer .editor-quiz").map((el) => ({
-    question: el.querySelector(".quiz-question")?.value || "",
-    options: [
-      el.querySelector(".quiz-opt-a")?.value || "",
-      el.querySelector(".quiz-opt-b")?.value || "",
-      el.querySelector(".quiz-opt-c")?.value || ""
-    ].filter(Boolean),
-    answer: Number(el.querySelector(".quiz-answer")?.value || 0),
-    explanation: el.querySelector(".quiz-explanation")?.value || ""
-  }));
-}
-
-function renderDashboardEditor() {
-  const stats = state.dashboard.stats || [];
-  $("#statsContainer").innerHTML = stats.map((stat, index) => `
-    <div class="block-item editor-block" data-stat-index="${index}">
-      <div class="block-head">
-        <span class="block-index">İstatistik ${index + 1}</span>
-        <div class="block-tools">
-          <button class="block-remove" data-remove-stat="${index}" type="button">Sil</button>
-        </div>
-      </div>
-      <div class="quiz-grid">
-        <label class="form-field">Değer
-          <input class="stat-value" value="${safe(stat.value || "0")}" placeholder="örn: 120+">
-        </label>
-        <label class="form-field">Etiket
-          <input class="stat-label" value="${safe(stat.label || "Etiket")}" placeholder="örn: Aktif Öğrenci">
-        </label>
-      </div>
-    </div>
-  `).join("") || `<div class="block-item empty"><span>Henüz istatistik yok. <strong>+ İstatistik</strong> ekle.</span></div>`;
-
-  const cards = state.dashboard.cards || [];
-  $("#dashCardsContainer").innerHTML = cards.map((card, index) => `
-    <div class="block-item editor-block" data-card-index="${index}">
-      <div class="block-head">
-        <span class="block-index">Kart ${index + 1}</span>
-        <div class="block-tools">
-          <button class="block-remove" data-remove-card="${index}" type="button">Sil</button>
-        </div>
-      </div>
-      <div class="quiz-grid">
-        <label class="form-field">Bağlı pageId
-          <input class="dash-page" value="${safe(card.pageId || "")}" placeholder="örn: unit1a">
-        </label>
-        <label class="form-field">İkon
-          <input class="dash-icon" value="${safe(card.icon || "✨")}" placeholder="✨" maxlength="4">
-        </label>
-        <label class="form-field full">Başlık
-          <input class="dash-title" value="${safe(card.title || "Başlık")}" placeholder="Kart başlığı">
-        </label>
-        <label class="form-field full">Açıklama
-          <input class="dash-desc" value="${safe(card.desc || "")}" placeholder="Kart altındaki kısa açıklama">
-        </label>
-      </div>
-    </div>
-  `).join("") || `<div class="block-item empty"><span>Henüz yönlendirme kartı yok.</span></div>`;
-}
-
-function saveDashboardEditorToState() {
-  state.dashboard.stats = $$("#statsContainer [data-stat-index]").map((el) => ({
-    value: el.querySelector(".stat-value")?.value || "0",
-    label: el.querySelector(".stat-label")?.value || "Etiket"
-  }));
-  state.dashboard.cards = $$("#dashCardsContainer [data-card-index]").map((el) => ({
-    pageId: el.querySelector(".dash-page")?.value || "",
-    icon: el.querySelector(".dash-icon")?.value || "✨",
-    title: el.querySelector(".dash-title")?.value || "Başlık",
-    desc: el.querySelector(".dash-desc")?.value || ""
-  }));
-}
-
-async function saveAll() {
-  setStatus("Kaydediliyor…", "warning");
-  saveEditorToState();
-  saveDashboardEditorToState();
-
-  state.general.siteTitle = $("#generalSiteTitle").value;
-  state.general.siteSubtitle = $("#generalSubtitle").value;
-  state.general.topbarBadge = $("#generalBadge").value;
-  state.general.footerText = $("#generalFooter").value;
-  state.general.heroTitle = $("#generalHeroTitle").value;
-  state.general.heroDesc = $("#generalHeroDesc").value;
-  state.general.themeTokens = {
-    navy: $("#themeNavy").value,
-    pink: $("#themePink").value,
-    "pink-bright": $("#themePinkBright").value,
-    bg: $("#themeBg").value
+function progressCounts(progress, topics, quizzes, exams) {
+  const studyCompleted = progress?.studyCompleted || {};
+  const quizAttempts = progress?.quizAttempts || {};
+  const examAttempts = Array.isArray(progress?.examAttempts) ? progress.examAttempts : [];
+  const memoryStats = progress?.memoryStats || {};
+  const studyDone = Object.values(studyCompleted).filter(Boolean).length;
+  const quizDone = Object.keys(quizAttempts).length;
+  const bestExam = examAttempts.reduce((max, item) => Math.max(max, Number(item.score || item.percent || 0)), 0);
+  const avgQuiz = Object.values(quizAttempts).reduce((sum, item) => sum + Number(item.bestScore || item.lastScore || 0), 0);
+  return {
+    studyDone,
+    quizDone,
+    bestExam,
+    avgQuiz: quizDone ? Math.round(avgQuiz / quizDone) : 0,
+    examAttempts: examAttempts.length,
+    memoryKnown: Object.values(memoryStats).filter((item) => Number(item?.correct || 0) > 0).length,
+    studyRate: topics.length ? Math.round((studyDone / topics.length) * 100) : 0,
+    quizRate: quizzes.length ? Math.round((quizDone / quizzes.length) * 100) : 0,
+    examRate: exams.length ? Math.round((examAttempts.length / exams.length) * 100) : 0
   };
-  state.general.updatedAt = serverTimestamp();
-  state.nav = state.pages.map((page, index) => ({
-    pageId: page.id,
-    title: page.title,
-    icon: page.icon,
-    visible: true,
-    order: index
-  }));
+}
 
+function buildAdminData({ topics, quizzes, exams, visits = [], progress = null, fillgaps = [], source = "Yerel seed" }) {
+  const safeTopics = (topics?.length ? topics : clone(DEFAULT_TOPICS)).sort((a, b) => (a.order || 0) - (b.order || 0));
+  const safeQuizzes = (quizzes?.length ? quizzes : clone(DEFAULT_QUIZZES)).sort((a, b) => (a.order || 0) - (b.order || 0));
+  const safeExams = (exams?.length ? exams : clone(DEFAULT_EXAMS)).sort((a, b) => (a.order || 0) - (b.order || 0));
+  const counts = progressCounts(progress, safeTopics, safeQuizzes, safeExams);
+  const flashcards = extractFlashcardsFromTopics(safeTopics);
+  const users = buildUsersFromVisits(visits);
+  const topicQuestionCount = safeTopics.reduce((sum, topic) => sum + getQuestions(topic).length, 0);
+  const quizQuestionCount = safeQuizzes.reduce((sum, quiz) => sum + getQuestions(quiz).length, 0);
+  const totalQuestions = topicQuestionCount + quizQuestionCount;
+  const unitCounts = countBy(safeTopics, (topic) => normalizeUnit(topic.unit || topic.unitBadge));
+  const categoryCounts = countBy(safeTopics, (topic) => normalizeCategory(topic.category));
+  const quizCategoryCounts = countBy(safeQuizzes, (quiz) => normalizeCategory(quiz.category || safeTopics.find((topic) => topic.id === quiz.topicId)?.category));
+  const examStatusCounts = countBy(safeExams, (exam) => normalizeStatus(exam.status || "published"));
+  const cardCategoryCounts = countBy(flashcards, (card) => card.category);
+  const activeUsers = users.filter((user) => user.status === "Aktif").length;
+  const newThisMonth = visits.filter((visit) => {
+    const date = toDate(visit.createdAt || visit.clientCreatedAt);
+    const now = new Date();
+    return date && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  }).length;
+
+  return {
+    meta: { source, loadedAt: new Date().toISOString() },
+    raw: { topics: safeTopics, quizzes: safeQuizzes, exams: safeExams, visits, progress, fillgaps },
+    users,
+    content: safeTopics.map((topic) => ({
+      title: topic.title || topic.name || topic.id,
+      type: normalizeCategory(topic.category),
+      date: formatDateOnly(topic.updatedAt || topic.createdAt, "Kaynak seed"),
+      status: normalizeStatus(topic.status || "published"),
+      unit: normalizeUnit(topic.unit || topic.unitBadge),
+      blocks: countTopicBlocks(topic)
+    })),
+    quizzes: safeQuizzes.map((quiz) => ({
+      title: quiz.title || quiz.name || quiz.id,
+      category: normalizeCategory(quiz.category || safeTopics.find((topic) => topic.id === quiz.topicId)?.category),
+      questions: `${getQuestions(quiz).length} soru`,
+      difficulty: difficultyFromLevel(quiz.level || quiz.difficulty || safeTopics.find((topic) => topic.id === quiz.topicId)?.level),
+      date: formatDateOnly(quiz.updatedAt || quiz.createdAt, "Kaynak seed"),
+      status: normalizeStatus(quiz.status || "published")
+    })),
+    exams: safeExams.map((exam) => ({
+      title: exam.title || exam.name || exam.id,
+      desc: exam.description || `${exam.questionCount || getQuestions(exam).length || 0} soruluk gerçek sınav kaydı`,
+      type: exam.type === "mini" ? "Mini" : exam.type === "mid" ? "Orta" : exam.type === "full" ? "Genel" : (exam.type || "Genel"),
+      duration: `${exam.durationMinutes || exam.duration || 0} dk`,
+      date: formatDate(exam.publishedAt || exam.updatedAt || exam.createdAt, "Plan yok"),
+      participants: visits.length,
+      status: normalizeStatus(exam.status || "published")
+    })),
+    flashcards,
+    popularContents: safeTopics.slice(0, 5).map((topic) => ({
+      title: topic.title || topic.id,
+      views: `${visits.filter((visit) => String(visit.pagePath || "").includes(topic.slug || topic.id)).length} görüntüleme`
+    })),
+    units: Object.keys(unitCounts),
+    activeDecks: summarizeDecks(flashcards),
+    studySeries: Object.entries(unitCounts).map(([unit, count]) => ({
+      title: `${unit} Çalışma Serisi`,
+      desc: `${count} gerçek konu, quiz ve tekrar akışı.`,
+      pct: counts.studyRate || Math.min(100, Math.max(18, count * 12))
+    })),
+    fillgaps: (fillgaps || []).map((item) => ({
+      title: item.title || item.name || item.id || "Boşluk doldurma",
+      desc: item.description || `${(item.items || item.questions || []).length} gerçek boşluk`,
+      pct: Number(item.completionRate || item.pct || 0) || 0
+    })),
+    notifications: [
+      { icon: "✓", title: "Gerçek veri kaynağı bağlandı", desc: `${source} üzerinden admin verileri üretildi.`, status: "Başarılı" },
+      { icon: "▣", title: "İçerik sayımı güncellendi", desc: `${safeTopics.length} konu, ${safeQuizzes.length} quiz, ${safeExams.length} sınav okundu.`, status: "Bilgi" },
+      { icon: "◎", title: "Ziyaret kayıtları işlendi", desc: `${visits.length} gerçek ziyaret kaydı kullanıcı paneline aktarıldı.`, status: visits.length ? "Yayında" : "Taslak" }
+    ],
+    logs: [
+      { icon: "↻", title: "Veri senkronizasyonu", desc: `${source} okundu.`, status: "Başarılı" },
+      { icon: "◎", title: "Kullanıcılar eşlendi", desc: `${users.length} ziyaretçi kaydı tabloya dönüştürüldü.`, status: "Bilgi" },
+      { icon: "▤", title: "Flashcard çıkarımı", desc: `${flashcards.length} kart topic bloklarından üretildi.`, status: "Bilgi" },
+      { icon: "?", title: "Soru havuzu sayıldı", desc: `${totalQuestions} soru gerçek quiz/topic yapısından hesaplandı.`, status: "Başarılı" }
+    ],
+    overviewStats: [
+      { icon: "◎", value: String(users.length), label: "Toplam Kullanıcı", growth: visits.length ? "user_visits" : "Kayıt yok" },
+      { icon: "▣", value: String(safeTopics.length), label: "Toplam İçerik", growth: source },
+      { icon: "?", value: String(safeQuizzes.length), label: "Toplam Quiz", growth: `${totalQuestions} soru` },
+      { icon: "☑", value: String(safeExams.length), label: "Toplam Sınav", growth: `${counts.examAttempts} deneme` },
+      { icon: "▤", value: String(flashcards.length), label: "Ezber Kartı", growth: "Topic bloklarından" }
+    ],
+    userStats: [
+      { icon: "◎", value: String(users.length), label: "Toplam Kullanıcı", growth: "Ziyaret kayıtları" },
+      { icon: "✓", value: String(activeUsers), label: "Aktif Kullanıcı", growth: "Son 14 gün" },
+      { icon: "+", value: String(newThisMonth), label: "Yeni Bu Ay", growth: "user_visits" },
+      { icon: "–", value: String(Math.max(0, users.length - activeUsers)), label: "Pasif Kullanıcı", growth: "Tahmini" }
+    ],
+    contentStats: [
+      { icon: "▣", value: String(safeTopics.length), label: "Toplam İçerik", growth: `${Object.keys(unitCounts).length} ünite` },
+      { icon: "U", value: String(Object.keys(unitCounts).length), label: "Ünite", growth: "Gerçek konu" },
+      { icon: "K", value: String(safeTopics.length), label: "Konu", growth: `${safeTopics.reduce((sum, topic) => sum + countTopicBlocks(topic), 0)} blok` },
+      { icon: "R", value: String(safeTopics.reduce((sum, topic) => sum + (topic.sourceRefs?.length || 0), 0)), label: "Kaynak", growth: "sourceRefs" }
+    ],
+    quizStats: [
+      { icon: "?", value: String(safeQuizzes.length), label: "Toplam Quiz", growth: source },
+      { icon: "Q", value: String(quizQuestionCount), label: "Toplam Soru", growth: "Quiz soruları" },
+      { icon: "↗", value: `${Object.keys(quizCategoryCounts).length}`, label: "Kategori", growth: "Gerçek dağılım" },
+      { icon: "%", value: `${counts.avgQuiz}%`, label: "Ortalama Başarı", growth: progress ? "progress/ravza" : "Veri yok" }
+    ],
+    examStats: [
+      { icon: "☑", value: String(safeExams.length), label: "Toplam Sınav", growth: source },
+      { icon: "✎", value: String(counts.examAttempts), label: "Yapılan Sınav", growth: "progress/ravza" },
+      { icon: "✓", value: String(examStatusCounts.Tamamlandı || 0), label: "Tamamlanan", growth: "Sınav durumu" },
+      { icon: "%", value: `${counts.bestExam}%`, label: "En İyi Puan", growth: "Gerçek deneme" }
+    ],
+    flashcardStats: [
+      { icon: "▤", value: String(flashcards.length), label: "Toplam Kart", growth: "Topic blokları" },
+      { icon: "◇", value: String(new Set(flashcards.map((card) => card.deck)).size), label: "Toplam Deste", growth: "Gerçek deste" },
+      { icon: "✓", value: String(flashcards.filter((card) => card.status === "Yayında").length), label: "Aktif Kart", growth: "Yayında" },
+      { icon: "%", value: `${counts.memoryKnown}%`, label: "Bilinen Kart", growth: progress ? "memoryStats" : "Veri yok" }
+    ],
+    reportStats: [
+      { icon: "↗", value: String(visits.length), label: "Toplam Giriş", growth: "user_visits" },
+      { icon: "%", value: `${counts.avgQuiz || counts.bestExam}%`, label: "Ortalama Başarı", growth: progress ? "progress" : "Veri yok" },
+      { icon: "◷", value: `${safeTopics.reduce((sum, topic) => sum + Number(topic.estimatedMinutes || topic.time || 0), 0)} dk`, label: "Toplam Çalışma Süresi", growth: "Tahmini içerik" },
+      { icon: "?", value: String(counts.quizDone), label: "Tamamlanan Quiz", growth: "progress/ravza" }
+    ],
+    contentDistribution: distributionRows(categoryCounts, ["#ff4f93", "#9d5cff", "#f59e0b", "#38bdf8", "#27d39b"]),
+    examDistribution: distributionRows(examStatusCounts, ["#27d39b", "#38bdf8", "#f59e0b", "#8d7a85"]),
+    cardDistribution: distributionRows(cardCategoryCounts, ["#ff4f93", "#9d5cff", "#f59e0b", "#38bdf8", "#27d39b"]),
+    successLegend: [
+      ["Çalışma", `${counts.studyRate}%`, "#27d39b"],
+      ["Quiz", `${counts.quizRate}%`, "#ff4f93"],
+      ["Sınav", `${counts.examRate}%`, "#f59e0b"],
+      ["Ezber", `${counts.memoryKnown}%`, "#38bdf8"]
+    ],
+    topicBars: Object.entries(categoryCounts).slice(0, 5).map(([label, value]) => [label, Math.min(100, Math.max(18, value * 12))]),
+    streakBars: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((day, index) => [day, progress?.studyStreak?.week?.[index] ? 92 : Math.max(18, 42 + index * 6)]),
+    topQuizList: safeQuizzes.slice(0, 5).map((quiz) => ({ title: quiz.title || quiz.id, views: `${getQuestions(quiz).length} soru` })),
+    upcomingExams: safeExams.slice(0, 3).map((exam, index) => [exam.title || exam.id, exam.publishedAt ? formatDate(exam.publishedAt) : `${index + 1} kayıt`])
+  };
+}
+
+async function getCollectionData(name, options = {}) {
   try {
-    const batch = writeBatch(db);
-    batch.set(doc(db, "system", "general"), state.general, { merge: true });
-    batch.set(doc(db, "system", "dashboard"), state.dashboard, { merge: true });
-    batch.set(doc(db, "system", "navigation"), { items: state.nav, updatedAt: serverTimestamp() }, { merge: true });
-
-    state.pages.forEach((page, index) => {
-      batch.set(doc(db, "pages", page.id), { ...page, order: index, updatedAt: serverTimestamp() }, { merge: true });
-    });
-
-    Object.keys(state.quizzes).forEach((id) => {
-      batch.set(doc(db, "quizzes", id), { questions: state.quizzes[id], updatedAt: serverTimestamp() }, { merge: true });
-    });
-
-    Object.entries(state.pendingRenames).forEach(([oldId, newId]) => {
-      if (oldId && oldId !== newId) {
-        batch.delete(doc(db, "pages", oldId));
-        batch.delete(doc(db, "quizzes", oldId));
-      }
-    });
-
-    state.deletedPageIds.forEach((id) => {
-      batch.delete(doc(db, "pages", id));
-    });
-    state.deletedQuizIds.forEach((id) => {
-      batch.delete(doc(db, "quizzes", id));
-    });
-
-    await batch.commit();
-
-    state.deletedPageIds.clear();
-    state.deletedQuizIds.clear();
-    state.pendingRenames = {};
-    state.unsaved = false;
-
-    setStatus("Kaydedildi", "success");
-    showToast("Tüm değişiklikler kaydedildi.", "success");
+    const ref = options.orderBy
+      ? query(collection(db, name), orderBy(options.orderBy, options.direction || "desc"), limit(options.limit || 250))
+      : query(collection(db, name), limit(options.limit || 250));
+    const snap = await getDocs(ref);
+    return snap.docs.map((item) => ({ id: item.id, ...item.data() }));
   } catch (error) {
+    console.warn(`Admin veri kaynağı okunamadı: ${name}`, error);
+    return [];
+  }
+}
+
+async function getDocumentData(collectionName, docId) {
+  try {
+    const snap = await getDoc(doc(db, collectionName, docId));
+    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+  } catch (error) {
+    console.warn(`Admin belge kaynağı okunamadı: ${collectionName}/${docId}`, error);
+    return null;
+  }
+}
+
+async function loadRealAdminData({ notify = false } = {}) {
+  if (realDataState.loaded) {
+    if (notify) showToast(`Gerçek veriler hazır: ${realDataState.source}`, "success");
+    return Promise.resolve();
+  }
+  if (realDataState.loadingPromise) return realDataState.loadingPromise;
+  realDataState.loadingPromise = (async () => {
+    const localData = buildAdminData({
+      topics: clone(DEFAULT_TOPICS),
+      quizzes: clone(DEFAULT_QUIZZES),
+      exams: clone(DEFAULT_EXAMS),
+      source: "content-defaults.js"
+    });
+    Object.assign(data, localData);
+    renderAll();
+
+    const [
+      publishedTopics,
+      draftTopics,
+      legacyPages,
+      publishedQuizzes,
+      draftQuizzes,
+      legacyQuizzes,
+      publishedExams,
+      draftExams,
+      visits,
+      progress,
+      fillGapA,
+      fillGapB
+    ] = await Promise.all([
+      getCollectionData("portal_topics_published"),
+      getCollectionData("portal_topics_draft"),
+      getCollectionData("pages"),
+      getCollectionData("portal_quizzes_published"),
+      getCollectionData("portal_quizzes_draft"),
+      getCollectionData("quizzes"),
+      getCollectionData("portal_exams_published"),
+      getCollectionData("portal_exams_draft"),
+      getCollectionData("user_visits", { orderBy: "createdAt", direction: "desc", limit: 250 }),
+      getDocumentData("progress", "ravza"),
+      getCollectionData("fill_gap_exercises"),
+      getCollectionData("fillgaps")
+    ]);
+
+    const topics = publishedTopics.length ? publishedTopics : (draftTopics.length ? draftTopics : (legacyPages.length ? legacyPages : clone(DEFAULT_TOPICS)));
+    const quizzes = publishedQuizzes.length ? publishedQuizzes : (draftQuizzes.length ? draftQuizzes : (legacyQuizzes.length ? legacyQuizzes : clone(DEFAULT_QUIZZES)));
+    const exams = publishedExams.length ? publishedExams : (draftExams.length ? draftExams : clone(DEFAULT_EXAMS));
+    const fillgaps = fillGapA.length ? fillGapA : fillGapB;
+    const source = publishedTopics.length || publishedQuizzes.length || publishedExams.length
+      ? "Firestore published"
+      : draftTopics.length || draftQuizzes.length || draftExams.length
+        ? "Firestore draft"
+        : legacyPages.length || legacyQuizzes.length || visits.length || progress
+          ? "Firestore legacy/progress"
+          : "content-defaults.js";
+
+    Object.assign(data, buildAdminData({ topics, quizzes, exams, visits, progress, fillgaps, source }));
+    realDataState.loaded = true;
+    realDataState.source = source;
+    renderAll();
+    if (notify) showToast(`Gerçek veriler eşlendi: ${source}`, "success");
+  })().catch((error) => {
     console.error(error);
-    setStatus("Kayıt hatası", "error");
-    showToast(`Kayıt başarısız: ${error.message || error}`, "error");
-  }
+    showToast("Gerçek veri okunamadı; yerel seed ile devam ediliyor.", "error");
+  }).finally(() => {
+    realDataState.loadingPromise = null;
+  });
+  return realDataState.loadingPromise;
 }
 
-function exportVisitsCsv() {
-  const rows = getFilteredVisits();
-  if (!rows.length) {
-    showToast("Dışa aktarılacak kayıt yok.", "info");
-    return;
-  }
-  const headers = ["Tarih", "Cihaz Modeli", "Otomatik Model", "Doğruluk", "Tür", "OS", "Tarayıcı", "Ekran (WxH)", "DPR", "Sayfa", "Visitor ID", "Session ID", "User Agent"];
-  const csvRows = [headers, ...rows.map((v) => [
-    formatDate(v.createdAt || v.clientCreatedAt),
-    v.deviceModel || "",
-    v.automaticDeviceModel || "",
-    getAccuracyLabel(v),
-    v.deviceType || "",
-    v.os || "",
-    v.browser || "",
-    v.screen ? `${v.screen.width || ""}x${v.screen.height || ""}` : "",
-    v.screen?.dpr || "",
-    v.pagePath || "",
-    v.visitorId || "",
-    v.sessionId || "",
-    v.userAgent || ""
-  ])];
-  const csv = csvRows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
-  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `kullanici-girisleri-${todayKey()}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`${rows.length} kayıt CSV olarak indirildi.`, "success");
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
 }
 
-function showVisitDetail(visit) {
-  if (!visit) return;
-  const fields = [
-    ["Tarih", formatDate(visit.createdAt || visit.clientCreatedAt)],
-    ["Göreceli", formatRelative(visit.createdAt || visit.clientCreatedAt)],
-    ["Cihaz Modeli", visit.deviceModel || "-"],
-    ["Otomatik Tahmin", visit.automaticDeviceModel || "-"],
-    ["Kullanıcı Onayı", visit.confirmedModel || "-"],
-    ["Doğruluk", getAccuracyLabel(visit)],
-    ["Tür", visit.deviceType || "-"],
-    ["İşletim Sistemi", visit.os || "-"],
-    ["Tarayıcı", visit.browser || "-"],
-    ["Ekran Genişlik", visit.screen?.width || "-"],
-    ["Ekran Yükseklik", visit.screen?.height || "-"],
-    ["DPR", visit.screen?.dpr || "-"],
-    ["Sayfa Yolu", visit.pagePath || "-"],
-    ["Visitor ID", visit.visitorId || "-"],
-    ["Session ID", visit.sessionId || "-"],
-    ["User Agent", visit.userAgent || "-"],
-    ["Firestore ID", visit.firestoreId || "-"]
+function includesText(value, query) {
+  return String(value ?? "").toLocaleLowerCase("tr-TR").includes(query.toLocaleLowerCase("tr-TR"));
+}
+
+function getInitials(name) {
+  return String(name || "A")
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toLocaleUpperCase("tr-TR");
+}
+
+function badgeClass(value) {
+  const text = String(value || "").toLocaleLowerCase("tr-TR");
+  if (["yayında", "aktif", "tamamlandı", "yayınlandı", "başarılı", "kolay"].some((item) => text.includes(item))) return "green";
+  if (["planlandı", "orta", "bilgi"].some((item) => text.includes(item))) return "orange";
+  if (["taslak", "pasif", "arşivlendi"].some((item) => text.includes(item))) return "gray";
+  if (["zor", "sil"].some((item) => text.includes(item))) return "red";
+  if (["dilbilgisi", "genel", "konu"].some((item) => text.includes(item))) return "purple";
+  if (["kelime", "konuşma"].some((item) => text.includes(item))) return "pink";
+  if (["okuma"].some((item) => text.includes(item))) return "orange";
+  if (["dinleme"].some((item) => text.includes(item))) return "blue";
+  return "purple";
+}
+
+function badge(value) {
+  return `<span class="badge ${badgeClass(value)}">${escapeHtml(value)}</span>`;
+}
+
+function actions(label) {
+  return `
+    <div class="row-actions">
+      <button class="icon-action" type="button" data-demo-action="${escapeHtml(label)} görüntülendi" title="Görüntüle" aria-label="Görüntüle">⌕</button>
+      <button class="icon-action" type="button" data-demo-action="${escapeHtml(label)} düzenleme demo modu açıldı" title="Düzenle" aria-label="Düzenle">✎</button>
+      <button class="icon-action delete" type="button" data-delete="${escapeHtml(label)}" title="Sil" aria-label="Sil">×</button>
+    </div>
+  `;
+}
+
+function renderStats(selector, stats) {
+  const target = $(selector);
+  if (!target) return;
+  target.innerHTML = stats.map((stat) => `
+    <article class="stat-card">
+      <span class="stat-icon">${escapeHtml(stat.icon)}</span>
+      <div>
+        <strong>${escapeHtml(stat.value)}</strong>
+        <small>${escapeHtml(stat.label)}</small>
+      </div>
+      <em>${escapeHtml(stat.growth)}</em>
+      <i class="spark" aria-hidden="true"></i>
+    </article>
+  `).join("");
+}
+
+function renderOverview() {
+  renderStats("#overviewStats", data.overviewStats);
+  $("#recentUsers").innerHTML = data.users.slice(0, 5).map((user) => `
+    <div class="compact-item">
+      <span class="compact-avatar">${escapeHtml(getInitials(user.name))}</span>
+      <span><strong>${escapeHtml(user.name)}</strong><small>${escapeHtml(user.email)} · ${escapeHtml(user.date)}</small></span>
+      <i class="status-dot ${user.status === "Pasif" ? "passive" : ""}"></i>
+    </div>
+  `).join("") || `<div class="empty-state">Henüz gerçek kullanıcı/ziyaret kaydı yok.</div>`;
+
+  renderLegend("#contentDistribution", data.contentDistribution || []);
+  renderRankList("#popularContents", data.popularContents || []);
+  const summary = data.systemSummary || [
+    ["Toplam Giriş", data.reportStats?.[0]?.value || "0"],
+    ["Ortalama Başarı Oranı", data.reportStats?.[1]?.value || "0%"],
+    ["Toplam Çalışma Süresi", data.reportStats?.[2]?.value || "0 dk"],
+    ["Aktif Kullanıcı", data.userStats?.[1]?.value || "0"]
   ];
-  $("#visitDetailFields").innerHTML = fields.map(([label, value]) => `
-    <div class="detail-field">
-      <span class="detail-label">${safe(label)}</span>
-      <span class="detail-value">${safe(value)}</span>
+  $("#systemSummary").innerHTML = summary.map(([label, value]) => `<div class="summary-item"><span>${label}</span><strong>${value}</strong></div>`).join("");
+}
+
+function renderLegend(selector, rows) {
+  const target = $(selector);
+  if (!target) return;
+  target.innerHTML = rows.map(([label, value, color]) => `
+    <div class="legend-item" style="--legend-color:${color}">
+      <i class="legend-color"></i>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
     </div>
   `).join("");
-  $("#visitDetailPre").textContent = JSON.stringify(visit, null, 2);
-  const dialog = $("#visitDetailDialog");
-  if (typeof dialog.showModal === "function") dialog.showModal();
-  else dialog.setAttribute("open", "");
 }
 
-function closeVisitDialog() {
-  const dialog = $("#visitDetailDialog");
-  if (typeof dialog.close === "function") dialog.close();
-  else dialog.removeAttribute("open");
+function renderRankList(selector, rows) {
+  const target = $(selector);
+  if (!target) return;
+  target.innerHTML = rows.map((item, index) => `
+    <div class="rank-item">
+      <span class="rank-number">${index + 1}</span>
+      <span><strong>${escapeHtml(item.title)}</strong><small>Popüler içerik</small></span>
+      <span class="eye-count">⌕ ${escapeHtml(item.views)}</span>
+    </div>
+  `).join("");
 }
 
-function moveItem(arr, fromIndex, direction) {
-  const toIndex = fromIndex + direction;
-  if (toIndex < 0 || toIndex >= arr.length) return false;
-  const [item] = arr.splice(fromIndex, 1);
-  arr.splice(toIndex, 0, item);
-  return true;
+function renderUsers() {
+  const query = $("#userSearch")?.value.trim() || "";
+  const role = $("#userRoleFilter")?.value || "";
+  const status = $("#userStatusFilter")?.value || "";
+  const rows = data.users.filter((user) => {
+    const matchesSearch = !query || includesText(`${user.name} ${user.email}`, query);
+    const matchesRole = !role || user.role === role;
+    const matchesStatus = !status || user.status === status;
+    return matchesSearch && matchesRole && matchesStatus;
+  });
+
+  renderStats("#userStats", data.userStats || []);
+
+  $("#usersTable").innerHTML = rows.map((user) => `
+    <tr>
+      <td><div class="table-user"><span class="table-avatar">${escapeHtml(getInitials(user.name))}</span><strong>${escapeHtml(user.name)}</strong></div></td>
+      <td>${escapeHtml(user.email)}</td>
+      <td>${badge(user.role)}</td>
+      <td>${escapeHtml(user.date)}</td>
+      <td>${badge(user.status)}</td>
+      <td>${actions(user.name)}</td>
+    </tr>
+  `).join("") || emptyRow(6);
+}
+
+function renderContent() {
+  renderStats("#contentStats", data.contentStats || []);
+
+  $("#unitList").innerHTML = (data.units || []).map((unit, index) => `
+    <button class="unit-item ${index === 0 ? "active" : ""}" type="button" data-demo-action="${unit} seçildi">
+      <strong>${escapeHtml(unit)}</strong><span>${index === 0 ? "Aktif" : "Seç"}</span>
+    </button>
+  `).join("") || `<div class="empty-state">Gerçek ünite kaydı bulunamadı.</div>`;
+
+  $("#contentTable").innerHTML = (data.content || []).map((item) => `
+    <tr>
+      <td><div class="table-title"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.unit || "")}${item.blocks ? ` · ${item.blocks} blok` : ""}</small></div></td>
+      <td>${badge(item.type)}</td>
+      <td>${escapeHtml(item.date)}</td>
+      <td>${badge(item.status)}</td>
+      <td>${actions(item.title)}</td>
+    </tr>
+  `).join("") || emptyRow(5);
+}
+
+function renderQuiz() {
+  const query = $("#quizSearch")?.value.trim() || "";
+  const category = $("#quizCategoryFilter")?.value || "";
+  const difficulty = $("#quizDifficultyFilter")?.value || "";
+  const status = $("#quizStatusFilter")?.value || "";
+  const rows = data.quizzes.filter((quiz) => {
+    return (!query || includesText(quiz.title, query))
+      && (!category || quiz.category === category)
+      && (!difficulty || quiz.difficulty === difficulty)
+      && (!status || quiz.status === status);
+  });
+
+  renderStats("#quizStats", data.quizStats || []);
+
+  $("#quizTable").innerHTML = rows.map((quiz) => `
+    <tr>
+      <td><strong>${escapeHtml(quiz.title)}</strong></td>
+      <td>${badge(quiz.category)}</td>
+      <td>${escapeHtml(quiz.questions)}</td>
+      <td>${badge(quiz.difficulty)}</td>
+      <td>${escapeHtml(quiz.date)}</td>
+      <td>${badge(quiz.status)}</td>
+      <td>${actions(quiz.title)}</td>
+    </tr>
+  `).join("") || emptyRow(7);
+}
+
+function renderExams() {
+  const query = $("#examSearch")?.value.trim() || "";
+  const type = $("#examTypeFilter")?.value || "";
+  const status = $("#examStatusFilter")?.value || "";
+  const rows = data.exams.filter((exam) => {
+    return (!query || includesText(`${exam.title} ${exam.desc}`, query))
+      && (!type || exam.type === type)
+      && (!status || exam.status === status);
+  });
+
+  renderStats("#examStats", data.examStats || []);
+
+  $("#examTable").innerHTML = rows.map((exam) => `
+    <tr>
+      <td><div class="table-title"><strong>${escapeHtml(exam.title)}</strong><small>${escapeHtml(exam.desc)}</small></div></td>
+      <td>${badge(exam.type)}</td>
+      <td>${escapeHtml(exam.duration)}</td>
+      <td>${escapeHtml(exam.date)}</td>
+      <td>${escapeHtml(exam.participants)}</td>
+      <td>${badge(exam.status)}</td>
+      <td>${actions(exam.title)}</td>
+    </tr>
+  `).join("") || emptyRow(7);
+
+  $("#upcomingExams").innerHTML = (data.upcomingExams || []).map(([title, remaining]) => `
+    <div class="compact-item">
+      <span class="compact-avatar">☑</span>
+      <span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(remaining)}</small></span>
+      <i class="status-dot"></i>
+    </div>
+  `).join("") || `<div class="empty-state">Yaklaşan gerçek sınav kaydı yok.</div>`;
+
+  renderLegend("#examDistribution", data.examDistribution || []);
+}
+
+function renderFlashcards() {
+  const query = $("#cardSearch")?.value.trim() || "";
+  const category = $("#cardCategoryFilter")?.value || "";
+  const difficulty = $("#cardDifficultyFilter")?.value || "";
+  const status = $("#cardStatusFilter")?.value || "";
+  const rows = data.flashcards.filter((card) => {
+    return (!query || includesText(card.title, query))
+      && (!category || card.category === category)
+      && (!difficulty || card.difficulty === difficulty)
+      && (!status || card.status === status);
+  });
+
+  renderStats("#flashcardStats", data.flashcardStats || []);
+
+  $("#flashcardTable").innerHTML = rows.map((card) => `
+    <tr>
+      <td><strong>${escapeHtml(card.title)}</strong></td>
+      <td>${badge(card.category)}</td>
+      <td>${escapeHtml(card.deck)}</td>
+      <td>${badge(card.difficulty)}</td>
+      <td>${escapeHtml(card.date)}</td>
+      <td>${badge(card.status)}</td>
+      <td>${actions(card.title)}</td>
+    </tr>
+  `).join("") || emptyRow(7);
+
+  $("#activeDecks").innerHTML = (data.activeDecks || []).map((deck) => `
+    <div class="deck-item">
+      <div class="deck-row"><strong>${escapeHtml(deck.name)}</strong><small>${escapeHtml(deck.cards)} / %${deck.pct}</small></div>
+      <div class="deck-progress"><i style="width:${deck.pct}%"></i></div>
+    </div>
+  `).join("") || `<div class="empty-state">Gerçek flashcard destesi bulunamadı.</div>`;
+
+  renderLegend("#cardDistribution", data.cardDistribution || []);
+}
+
+function renderReports() {
+  renderStats("#reportStats", data.reportStats || []);
+  renderLegend("#successLegend", data.successLegend || []);
+
+  $("#topicBars").innerHTML = (data.topicBars || []).map(([label, pct]) => `
+    <div class="bar-item">
+      <div class="bar-meta"><span>${escapeHtml(label)}</span><strong>%${pct}</strong></div>
+      <div class="bar-track"><i style="width:${pct}%"></i></div>
+    </div>
+  `).join("") || `<div class="empty-state">Konu performansı için gerçek kayıt yok.</div>`;
+
+  $("#streakBars").innerHTML = (data.streakBars || []).map(([day, pct]) => `<div class="streak-day"><i style="height:${pct}%"></i><span>${escapeHtml(day)}</span></div>`).join("");
+  renderRankList("#topQuizList", data.topQuizList || []);
+}
+
+function renderCards(selector, rows) {
+  const target = $(selector);
+  if (!target) return;
+  target.innerHTML = (rows || []).map((item) => `
+    <article class="series-card">
+      <h3>${escapeHtml(item.title)}</h3>
+      <p>${escapeHtml(item.desc)}</p>
+      <div class="progress-block">
+        <div><span>İlerleme</span><strong>%${item.pct}</strong></div>
+        <i><b style="width:${item.pct}%"></b></i>
+      </div>
+    </article>
+  `).join("") || `<div class="empty-state">Bu bölüm için gerçek kayıt bulunamadı.</div>`;
+}
+
+function renderNotifications() {
+  $("#notificationList").innerHTML = data.notifications.map((item) => `
+    <div class="notification-item">
+      <span class="notification-icon">${escapeHtml(item.icon)}</span>
+      <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.desc)}</small></span>
+      ${badge(item.status)}
+    </div>
+  `).join("");
+}
+
+function renderLogs() {
+  $("#activityLogs").innerHTML = data.logs.map((item) => `
+    <div class="log-item">
+      <span class="log-icon">${escapeHtml(item.icon)}</span>
+      <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.desc)}</small></span>
+      ${badge(item.status)}
+    </div>
+  `).join("");
+}
+
+function emptyRow(columns) {
+  return `<tr><td colspan="${columns}" class="empty-state">Sonuç bulunamadı.</td></tr>`;
+}
+
+function openMobileMenu() {
+  $("#adminApp")?.classList.add("sidebar-open");
+  $("#mobileMenuButton")?.setAttribute("aria-expanded", "true");
+  document.body.classList.add("admin-no-scroll");
+}
+
+function closeMobileMenu() {
+  $("#adminApp")?.classList.remove("sidebar-open");
+  $("#mobileMenuButton")?.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("admin-no-scroll");
+}
+
+function activatePage(pageId, pushHash = true) {
+  $$(".admin-nav-item").forEach((button) => button.classList.toggle("active", button.dataset.page === pageId));
+  $$(".admin-section").forEach((section) => section.classList.toggle("active", section.dataset.page === pageId));
+  closeMobileMenu();
+  $("#globalSearch").value = "";
+  clearGlobalSearch();
+  if (pushHash) history.replaceState(null, "", `#${pageId}`);
+}
+
+function applyGlobalSearch() {
+  const query = $("#globalSearch")?.value.trim() || "";
+  const active = $(".admin-section.active");
+  if (!active) return;
+  const candidates = $$("tbody tr, .rank-item, .compact-item, .summary-item, .series-card, .theme-card, .notification-item, .log-item, .deck-item, .legend-item", active);
+  candidates.forEach((node) => {
+    const visible = !query || includesText(node.textContent, query);
+    node.classList.toggle("is-hidden-by-search", !visible);
+  });
+}
+
+function clearGlobalSearch() {
+  $$(".is-hidden-by-search").forEach((node) => node.classList.remove("is-hidden-by-search"));
+}
+
+const modalConfig = {
+  user: {
+    kicker: "Kullanıcı",
+    title: "Yeni Kullanıcı",
+    fields: [
+      ["Ad Soyad", "text", "Ravza Y."],
+      ["E-posta", "email", "ravza@example.com"],
+      ["Rol", "select", "Öğrenci", ["Öğrenci", "Yönetici"]],
+      ["Durum", "select", "Aktif", ["Aktif", "Pasif"]]
+    ]
+  },
+  quiz: {
+    kicker: "Quiz",
+    title: "Yeni Quiz",
+    fields: [
+      ["Quiz Başlığı", "text", "Unit 1A - Kelime Quiz"],
+      ["Kategori", "select", "Kelime", ["Kelime", "Dilbilgisi", "Okuma"]],
+      ["Zorluk", "select", "Orta", ["Kolay", "Orta", "Zor"]],
+      ["Soru Sayısı", "number", "20"]
+    ]
+  },
+  exam: {
+    kicker: "Sınav",
+    title: "Yeni Sınav",
+    fields: [
+      ["Sınav Adı", "text", "1A Genel Tekrar Sınavı"],
+      ["Tür", "select", "Genel", ["Genel", "Kelime", "Konu", "Okuma", "Dinleme", "Dilbilgisi"]],
+      ["Süre", "text", "90 dk"],
+      ["Tarih", "datetime-local", ""]
+    ]
+  },
+  card: {
+    kicker: "Ezber Kartı",
+    title: "Yeni Kart",
+    fields: [
+      ["Kart Başlığı", "text", "Present Perfect Kelimeleri"],
+      ["Kategori", "select", "Kelime", ["Kelime", "Dilbilgisi", "Genel", "Konuşma", "Okuma"]],
+      ["Deste", "text", "İngilizce - Temel"],
+      ["Zorluk", "select", "Orta", ["Kolay", "Orta", "Zor"]]
+    ]
+  },
+  content: {
+    kicker: "İçerik",
+    title: "Yeni İçerik",
+    fields: [
+      ["Konu Başlığı", "text", "Yeni Konu"],
+      ["Tür", "select", "Kelime", ["Kelime", "Dilbilgisi", "Strateji", "Okuma", "Dinleme"]],
+      ["Ünite", "select", "Unit 1A", data.units],
+      ["Durum", "select", "Yayında", ["Yayında", "Taslak"]]
+    ]
+  },
+  series: {
+    kicker: "Çalışma Serisi",
+    title: "Yeni Seri",
+    fields: [
+      ["Seri Adı", "text", "Yeni Çalışma Serisi"],
+      ["Hedef", "text", "7 günlük çalışma planı"],
+      ["Durum", "select", "Yayında", ["Yayında", "Taslak"]]
+    ]
+  },
+  fillgap: {
+    kicker: "Boşluk Doldurma",
+    title: "Yeni Alıştırma",
+    fields: [
+      ["Alıştırma Başlığı", "text", "Present Perfect Boşlukları"],
+      ["Kategori", "select", "Dilbilgisi", ["Kelime", "Dilbilgisi", "Okuma", "Dinleme"]],
+      ["Boşluk Sayısı", "number", "12"]
+    ]
+  },
+  notification: {
+    kicker: "Bildirim",
+    title: "Yeni Bildirim",
+    fields: [
+      ["Başlık", "text", "Yeni quiz yayında"],
+      ["Hedef", "select", "Tüm kullanıcılar", ["Tüm kullanıcılar", "Aktif kullanıcılar", "Pasif kullanıcılar"]],
+      ["Mesaj", "textarea", "Bugünkü çalışma hedefin hazır."]
+    ]
+  }
+};
+
+function openModal(type) {
+  const config = modalConfig[type] || modalConfig.content;
+  $("#modalKicker").textContent = config.kicker;
+  $("#modalTitle").textContent = config.title;
+  $("#modalForm").innerHTML = config.fields.map(([label, inputType, value, options]) => {
+    if (inputType === "select") {
+      return `
+        <label>
+          <span>${escapeHtml(label)}</span>
+          <select>
+            ${options.map((option) => `<option ${option === value ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}
+          </select>
+        </label>
+      `;
+    }
+    if (inputType === "textarea") {
+      return `<label class="full"><span>${escapeHtml(label)}</span><textarea rows="4">${escapeHtml(value)}</textarea></label>`;
+    }
+    return `<label><span>${escapeHtml(label)}</span><input type="${inputType}" value="${escapeHtml(value)}"></label>`;
+  }).join("") + `<button type="submit">Kaydet</button>`;
+  $("#modalBackdrop").hidden = false;
+  document.body.classList.add("admin-no-scroll");
+}
+
+function closeModal() {
+  $("#modalBackdrop").hidden = true;
+  document.body.classList.remove("admin-no-scroll");
+}
+
+function openConfirm(label) {
+  $("#confirmText").textContent = `"${label}" kaydını silmek istediğine emin misin?`;
+  $("#confirmDelete").dataset.deleteTarget = label;
+  $("#confirmBackdrop").hidden = false;
+  document.body.classList.add("admin-no-scroll");
+}
+
+function closeConfirm() {
+  $("#confirmBackdrop").hidden = true;
+  document.body.classList.remove("admin-no-scroll");
+}
+
+function showToast(message, type = "info") {
+  const host = $("#toastHost");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  host.appendChild(toast);
+  setTimeout(() => toast.classList.add("out"), 2500);
+  setTimeout(() => toast.remove(), 2850);
+}
+
+function renderAll() {
+  renderOverview();
+  renderUsers();
+  renderContent();
+  renderQuiz();
+  renderExams();
+  renderFlashcards();
+  renderReports();
+  renderCards("#studySeriesGrid", data.studySeries);
+  renderCards("#fillgapGrid", data.fillgaps);
+  renderNotifications();
+  renderLogs();
 }
 
 function bindEvents() {
-  $$(".tab-btn").forEach((btn) => btn.addEventListener("click", () => activateTab(btn.dataset.tab)));
-  $("#refreshBtn").addEventListener("click", () => {
-    if (state.unsaved && !confirm("Kaydedilmemiş değişiklikler kaybolacak. Yine de yenilensin mi?")) return;
-    loadAdminData();
+  $("#adminLoginForm")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = $("#adminPasswordInput");
+    const value = input.value.trim();
+    if (value !== ADMIN_PASSWORD) {
+      $("#loginMessage").textContent = "Şifre hatalı. Demo şifre: ravza2025";
+      $("#loginMessage").classList.add("is-error");
+      input.select();
+      return;
+    }
+    sessionStorage.setItem(SESSION_KEY, "1");
+    revealAdmin();
+    loadRealAdminData({ notify: true });
+    showToast("Admin paneline hoş geldin.", "success");
   });
-  $("#saveAllBtn").addEventListener("click", saveAll);
-  $("#visitSearch").addEventListener("input", renderVisitTable);
-  $("#visitTypeFilter").addEventListener("change", renderVisitTable);
-  $("#exportVisitsBtn").addEventListener("click", exportVisitsCsv);
-  $("#mobileMenuBtn").addEventListener("click", () => {
-    if ($("#adminSidebar").classList.contains("is-open")) closeMobileSidebar();
-    else openMobileSidebar();
-  });
-  $("#sidebarScrim").addEventListener("click", closeMobileSidebar);
 
-  $("#logoutBtn").addEventListener("click", () => {
-    if (state.unsaved && !confirm("Kaydedilmemiş değişiklikler var. Yine de çıkılsın mı?")) return;
-    clearAdminSession();
+  $("#adminLogoutBtn")?.addEventListener("click", () => {
+    sessionStorage.removeItem(SESSION_KEY);
     location.reload();
   });
 
+  $$(".admin-nav-item").forEach((button) => {
+    button.addEventListener("click", () => activatePage(button.dataset.page));
+  });
+
+  $("#mobileMenuButton")?.addEventListener("click", () => {
+    if ($("#adminApp").classList.contains("sidebar-open")) closeMobileMenu();
+    else openMobileMenu();
+  });
+  $("#adminBackdrop")?.addEventListener("click", closeMobileMenu);
+
+  $("#globalSearch")?.addEventListener("input", applyGlobalSearch);
+
+  ["userSearch", "userRoleFilter", "userStatusFilter"].forEach((id) => {
+    $(`#${id}`)?.addEventListener("input", renderUsers);
+    $(`#${id}`)?.addEventListener("change", renderUsers);
+  });
+  $("#userFilterButton")?.addEventListener("click", renderUsers);
+
+  ["quizSearch", "quizCategoryFilter", "quizDifficultyFilter", "quizStatusFilter"].forEach((id) => {
+    $(`#${id}`)?.addEventListener("input", renderQuiz);
+    $(`#${id}`)?.addEventListener("change", renderQuiz);
+  });
+
+  ["examSearch", "examTypeFilter", "examStatusFilter", "examDateFilter"].forEach((id) => {
+    $(`#${id}`)?.addEventListener("input", renderExams);
+    $(`#${id}`)?.addEventListener("change", renderExams);
+  });
+
+  ["cardSearch", "cardCategoryFilter", "cardDifficultyFilter", "cardStatusFilter"].forEach((id) => {
+    $(`#${id}`)?.addEventListener("input", renderFlashcards);
+    $(`#${id}`)?.addEventListener("change", renderFlashcards);
+  });
+
   document.addEventListener("click", (event) => {
-    const tabJump = event.target.closest("[data-tab-jump]");
-    if (tabJump) { activateTab(tabJump.dataset.tabJump); return; }
-
-    const pageMove = event.target.closest("[data-page-move]");
-    if (pageMove) {
-      saveEditorToState();
-      const idx = Number(pageMove.dataset.pageIndex);
-      const dir = pageMove.dataset.pageMove === "up" ? -1 : 1;
-      if (moveItem(state.pages, idx, dir)) {
-        if (state.activePageIndex === idx) state.activePageIndex = idx + dir;
-        else if (state.activePageIndex === idx + dir) state.activePageIndex = idx;
-        markUnsaved();
-        renderPagesList();
-      }
+    const modalButton = event.target.closest("[data-modal]");
+    if (modalButton) {
+      openModal(modalButton.dataset.modal);
       return;
     }
 
-    const pageBtn = event.target.closest(".page-item-main[data-page-index]");
-    if (pageBtn) { openPageEditor(Number(pageBtn.dataset.pageIndex)); return; }
-
-    const visitBtn = event.target.closest("[data-visit-index]");
-    if (visitBtn) {
-      const visit = state.filteredVisits[Number(visitBtn.dataset.visitIndex)];
-      showVisitDetail(visit);
+    const demoButton = event.target.closest("[data-demo-action]");
+    if (demoButton) {
+      showToast(demoButton.dataset.demoAction || "Demo işlem çalıştı.");
       return;
     }
 
-    const blockMove = event.target.closest("[data-block-move]");
-    if (blockMove) {
-      saveEditorToState();
-      const idx = Number(blockMove.dataset.blockIndex);
-      const dir = blockMove.dataset.blockMove === "up" ? -1 : 1;
-      if (moveItem(state.pages[state.activePageIndex].blocks, idx, dir)) {
-        markUnsaved();
-        renderBlocks(state.pages[state.activePageIndex].blocks);
-      }
-      return;
-    }
-
-    const removeBlock = event.target.closest("[data-remove-block]");
-    if (removeBlock) {
-      saveEditorToState();
-      state.pages[state.activePageIndex].blocks.splice(Number(removeBlock.dataset.removeBlock), 1);
-      markUnsaved();
-      renderBlocks(state.pages[state.activePageIndex].blocks);
-      return;
-    }
-
-    const quizMove = event.target.closest("[data-quiz-move]");
-    if (quizMove) {
-      saveEditorToState();
-      const id = state.pages[state.activePageIndex].id;
-      const idx = Number(quizMove.dataset.quizIndex);
-      const dir = quizMove.dataset.quizMove === "up" ? -1 : 1;
-      if (moveItem(state.quizzes[id], idx, dir)) {
-        markUnsaved();
-        renderQuiz(state.quizzes[id]);
-      }
-      return;
-    }
-
-    const removeQuiz = event.target.closest("[data-remove-quiz]");
-    if (removeQuiz) {
-      saveEditorToState();
-      const id = state.pages[state.activePageIndex].id;
-      state.quizzes[id].splice(Number(removeQuiz.dataset.removeQuiz), 1);
-      markUnsaved();
-      renderQuiz(state.quizzes[id]);
-      return;
-    }
-
-    const removeStat = event.target.closest("[data-remove-stat]");
-    if (removeStat) {
-      saveDashboardEditorToState();
-      state.dashboard.stats.splice(Number(removeStat.dataset.removeStat), 1);
-      markUnsaved();
-      renderDashboardEditor();
-      return;
-    }
-
-    const removeCard = event.target.closest("[data-remove-card]");
-    if (removeCard) {
-      saveDashboardEditorToState();
-      state.dashboard.cards.splice(Number(removeCard.dataset.removeCard), 1);
-      markUnsaved();
-      renderDashboardEditor();
-      return;
+    const deleteButton = event.target.closest("[data-delete]");
+    if (deleteButton) {
+      openConfirm(deleteButton.dataset.delete);
     }
   });
 
-  document.addEventListener("input", (event) => {
-    if (event.target.closest(".admin-card, .admin-dialog")) markUnsaved();
+  $("#modalClose")?.addEventListener("click", closeModal);
+  $("#modalBackdrop")?.addEventListener("click", (event) => {
+    if (event.target.id === "modalBackdrop") closeModal();
   });
-
-  $("#closeVisitDialog").addEventListener("click", closeVisitDialog);
-  $("#visitDetailDialog").addEventListener("click", (event) => {
-    const rect = event.target.getBoundingClientRect();
-    const inside =
-      rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
-      rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
-    if (!inside) closeVisitDialog();
-  });
-
-  $("#addPageBtn").addEventListener("click", () => {
-    saveEditorToState();
-    const id = `konu_${Date.now()}`;
-    state.pages.push({
-      id,
-      title: "Yeni Konu",
-      icon: "📄",
-      unitBadge: "NEW",
-      desc: "",
-      order: state.pages.length,
-      blocks: []
-    });
-    state.quizzes[id] = [];
-    markUnsaved();
-    openPageEditor(state.pages.length - 1);
-  });
-
-  $("#deletePageBtn").addEventListener("click", () => {
-    if (state.activePageIndex === null) return;
-    const page = state.pages[state.activePageIndex];
-    if (!confirm(`"${page.title || page.id}" sayfasını silmek istediğine emin misin? Kaydet bastığında Firestore'dan da kaldırılır.`)) return;
-    state.deletedPageIds.add(page.id);
-    state.deletedQuizIds.add(page.id);
-    Object.entries(state.pendingRenames).forEach(([oldId, newId]) => {
-      if (newId === page.id) state.deletedPageIds.add(oldId);
-    });
-    state.pages.splice(state.activePageIndex, 1);
-    delete state.quizzes[page.id];
-    state.activePageIndex = null;
-    markUnsaved();
-    renderPagesList();
-    renderEmptyEditor();
-    showToast(`"${page.title || page.id}" silinmek üzere işaretlendi. Kaydet'e bas.`, "info");
-  });
-
-  $("#addBlockBtn").addEventListener("click", () => {
-    if (state.activePageIndex === null) return;
-    saveEditorToState();
-    state.pages[state.activePageIndex].blocks.push({ type: "paragraph", content: "Yeni içerik…" });
-    markUnsaved();
-    renderBlocks(state.pages[state.activePageIndex].blocks);
-  });
-
-  $("#addQuizBtn").addEventListener("click", () => {
-    if (state.activePageIndex === null) return;
-    saveEditorToState();
-    const id = state.pages[state.activePageIndex].id;
-    if (!state.quizzes[id]) state.quizzes[id] = [];
-    state.quizzes[id].push({
-      question: "Yeni soru?",
-      options: ["A şıkkı", "B şıkkı", ""],
-      answer: 0,
-      explanation: ""
-    });
-    markUnsaved();
-    renderQuiz(state.quizzes[id]);
-  });
-
-  $("#addStatBtn").addEventListener("click", () => {
-    saveDashboardEditorToState();
-    if (!state.dashboard.stats) state.dashboard.stats = [];
-    state.dashboard.stats.push({ value: "0", label: "Yeni istatistik" });
-    markUnsaved();
-    renderDashboardEditor();
-  });
-
-  $("#addDashCardBtn").addEventListener("click", () => {
-    saveDashboardEditorToState();
-    if (!state.dashboard.cards) state.dashboard.cards = [];
-    state.dashboard.cards.push({ pageId: "", icon: "✨", title: "Yeni Kart", desc: "" });
-    markUnsaved();
-    renderDashboardEditor();
-  });
-
-  window.addEventListener("beforeunload", (event) => {
-    if (!state.unsaved) return;
+  $("#modalForm")?.addEventListener("submit", (event) => {
     event.preventDefault();
-    event.returnValue = "";
+    closeModal();
+    showToast("Demo mod: Değişiklik kaydedildi.", "success");
+  });
+
+  $("#confirmCancel")?.addEventListener("click", closeConfirm);
+  $("#confirmBackdrop")?.addEventListener("click", (event) => {
+    if (event.target.id === "confirmBackdrop") closeConfirm();
+  });
+  $("#confirmDelete")?.addEventListener("click", () => {
+    closeConfirm();
+    showToast("Demo mod: Kayıt silindi.", "success");
+  });
+
+  $("#settingsForm")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    showToast("Demo mod: Değişiklik kaydedildi.", "success");
+  });
+
+  $$(".range-tabs button").forEach((button) => {
+    button.addEventListener("click", () => {
+      $$(".range-tabs button").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      showToast(`${button.textContent.trim()} filtresi uygulandı.`);
+    });
   });
 
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 900) closeMobileSidebar();
+    if (window.innerWidth > 1024) closeMobileMenu();
   });
 }
 
-async function bootstrap() {
-  const ok = await ensureAdminAccess({ db });
-  if (!ok) return;
-  bindEvents();
-  await loadAdminData();
+function revealAdmin() {
+  $("#adminLogin")?.classList.add("hidden");
+  $("#adminApp").hidden = false;
+  document.body.classList.remove("admin-locked");
+  const pageFromHash = location.hash.replace("#", "");
+  const firstPage = pageFromHash && $(`.admin-section[data-page="${pageFromHash}"]`) ? pageFromHash : "overview";
+  activatePage(firstPage, false);
 }
 
-bootstrap();
+async function init() {
+  Object.assign(data, buildAdminData({
+    topics: clone(DEFAULT_TOPICS),
+    quizzes: clone(DEFAULT_QUIZZES),
+    exams: clone(DEFAULT_EXAMS),
+    source: "content-defaults.js"
+  }));
+  renderAll();
+  bindEvents();
+  const hasSession = sessionStorage.getItem(SESSION_KEY) === "1";
+  if (hasSession) {
+    revealAdmin();
+  }
+  await loadRealAdminData({ notify: hasSession });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
