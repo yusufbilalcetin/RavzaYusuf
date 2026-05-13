@@ -14435,7 +14435,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
    - Tüm canlı oda durumu Firestore'da: kahootRooms/{roomId} (+ players, answers subcoll).
    - QR ile başka cihazlardan katılım: ?page=kahoot&room=ROOM_ID&role=player
    - Public URL <meta name="kahoot-public-url" content="..."> ile zorlanabilir.
-   - QRCode CDN yüklenemese sistem patlamaz; fallback alanı linki gösterir.
+   - QRCode CDN yüklenemese sistem yerel canvas QR üretir; son çare link fallback'i gösterir.
    - Mevcut tek-kişilik kahoot akışı (ravzaKahootModule) korunur.
    - Firestore security rules için NOTLAR aşağıda mevcuttur.
    ========================================================= */
@@ -14455,6 +14455,11 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
   */
 
   const QR_CDN = "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js";
+  const QR_CDN_FALLBACKS = [
+    QR_CDN,
+    "https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.4/qrcode.min.js"
+  ];
   const ROOM_COLLECTION = "kahootRooms";
   const DEFAULT_QUESTION_TIME = 20;
   const DEFAULT_QUESTION_COUNT = 10;
@@ -14564,23 +14569,244 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
 
   /* ---------- QR rendering with bulletproof fallback ---------- */
   let qrLoadingPromise = null;
-  function ensureQrLibrary() {
-    if (window.QRCode) return Promise.resolve(true);
-    if (qrLoadingPromise) return qrLoadingPromise;
-    qrLoadingPromise = new Promise((resolve) => {
-      const s = document.createElement("script");
-      s.src = QR_CDN;
-      s.async = true;
-      s.onload = () => resolve(true);
-      s.onerror = () => resolve(false);
-      document.head.appendChild(s);
+
+  function loadQrScriptOnce(src) {
+    return new Promise((resolve) => {
+      const existing = Array.from(document.scripts).find((script) => script.src === src);
+      if (existing?.dataset.loaded === "true") {
+        resolve(true);
+        return;
+      }
+      if (existing && window.QRCode?.toCanvas) {
+        existing.dataset.loaded = "true";
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.onload = () => {
+        script.dataset.loaded = "true";
+        resolve(true);
+      };
+      script.onerror = () => resolve(false);
+      document.head.appendChild(script);
     });
+  }
+
+  function ensureQrLibrary() {
+    if (window.QRCode?.toCanvas) return Promise.resolve(true);
+    if (qrLoadingPromise) return qrLoadingPromise;
+    qrLoadingPromise = (async () => {
+      for (const src of QR_CDN_FALLBACKS) {
+        const loaded = await loadQrScriptOnce(src);
+        if (loaded && window.QRCode?.toCanvas) return true;
+      }
+      return false;
+    })();
     return qrLoadingPromise;
+  }
+
+  const LOCAL_QR_VERSION = 5;
+  const LOCAL_QR_SIZE = 17 + LOCAL_QR_VERSION * 4;
+  const LOCAL_QR_DATA_CODEWORDS = 108;
+  const LOCAL_QR_ECC_CODEWORDS = 26;
+  const LOCAL_QR_TOTAL_CODEWORDS = LOCAL_QR_DATA_CODEWORDS + LOCAL_QR_ECC_CODEWORDS;
+  const QR_GF_EXP = (() => {
+    const exp = new Array(512);
+    let value = 1;
+    for (let i = 0; i < 255; i++) {
+      exp[i] = value;
+      value <<= 1;
+      if (value & 0x100) value ^= 0x11d;
+    }
+    for (let i = 255; i < exp.length; i++) exp[i] = exp[i - 255];
+    return exp;
+  })();
+  const QR_GF_LOG = (() => {
+    const log = new Array(256).fill(0);
+    for (let i = 0; i < 255; i++) log[QR_GF_EXP[i]] = i;
+    return log;
+  })();
+
+  function qrGfMultiply(a, b) {
+    if (!a || !b) return 0;
+    return QR_GF_EXP[QR_GF_LOG[a] + QR_GF_LOG[b]];
+  }
+
+  function qrGeneratorPolynomial(degree) {
+    let poly = [1];
+    for (let i = 0; i < degree; i++) {
+      const next = new Array(poly.length + 1).fill(0);
+      for (let j = 0; j < poly.length; j++) {
+        next[j] ^= poly[j];
+        next[j + 1] ^= qrGfMultiply(poly[j], QR_GF_EXP[i]);
+      }
+      poly = next;
+    }
+    return poly.slice(1);
+  }
+
+  function qrReedSolomonRemainder(data, degree) {
+    const generator = qrGeneratorPolynomial(degree);
+    const result = new Array(degree).fill(0);
+    data.forEach((byte) => {
+      const factor = byte ^ result.shift();
+      result.push(0);
+      for (let i = 0; i < degree; i++) {
+        result[i] ^= qrGfMultiply(generator[i], factor);
+      }
+    });
+    return result;
+  }
+
+  function getQrUtf8Bytes(value) {
+    if (window.TextEncoder) return Array.from(new TextEncoder().encode(value));
+    return Array.from(unescape(encodeURIComponent(value))).map((ch) => ch.charCodeAt(0));
+  }
+
+  function buildQrDataCodewords(value) {
+    const bytes = getQrUtf8Bytes(value);
+    const bits = [];
+    const pushBits = (num, length) => {
+      for (let i = length - 1; i >= 0; i--) bits.push((num >>> i) & 1);
+    };
+    pushBits(0x4, 4);
+    pushBits(bytes.length, 8);
+    bytes.forEach((byte) => pushBits(byte, 8));
+    const maxBits = LOCAL_QR_DATA_CODEWORDS * 8;
+    if (bits.length > maxBits) return null;
+    for (let i = 0, count = Math.min(4, maxBits - bits.length); i < count; i++) bits.push(0);
+    while (bits.length % 8) bits.push(0);
+    const codewords = [];
+    for (let i = 0; i < bits.length; i += 8) {
+      codewords.push(bits.slice(i, i + 8).reduce((acc, bit) => (acc << 1) | bit, 0));
+    }
+    for (let pad = 0xec; codewords.length < LOCAL_QR_DATA_CODEWORDS; pad = pad === 0xec ? 0x11 : 0xec) {
+      codewords.push(pad);
+    }
+    return codewords;
+  }
+
+  function qrFormatBits(mask) {
+    const errorLevelLow = 1;
+    const data = (errorLevelLow << 3) | mask;
+    let rem = data;
+    for (let i = 0; i < 10; i++) {
+      rem = (rem << 1) ^ (((rem >>> 9) & 1) ? 0x537 : 0);
+    }
+    return ((data << 10) | rem) ^ 0x5412;
+  }
+
+  function createLocalQrMatrix(value) {
+    const dataCodewords = buildQrDataCodewords(value);
+    if (!dataCodewords) return null;
+    const size = LOCAL_QR_SIZE;
+    const modules = Array.from({ length: size }, () => Array(size).fill(false));
+    const reserved = Array.from({ length: size }, () => Array(size).fill(false));
+    const setFunction = (row, col, dark) => {
+      if (row < 0 || row >= size || col < 0 || col >= size) return;
+      modules[row][col] = !!dark;
+      reserved[row][col] = true;
+    };
+    const drawFinder = (row, col) => {
+      for (let r = -1; r <= 7; r++) {
+        for (let c = -1; c <= 7; c++) {
+          const rr = row + r;
+          const cc = col + c;
+          const inFinder = r >= 0 && r <= 6 && c >= 0 && c <= 6;
+          const edge = r === 0 || r === 6 || c === 0 || c === 6;
+          const center = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+          setFunction(rr, cc, inFinder && (edge || center));
+        }
+      }
+    };
+    const drawAlignment = (centerRow, centerCol) => {
+      for (let r = -2; r <= 2; r++) {
+        for (let c = -2; c <= 2; c++) {
+          const dist = Math.max(Math.abs(r), Math.abs(c));
+          setFunction(centerRow + r, centerCol + c, dist === 2 || dist === 0);
+        }
+      }
+    };
+
+    drawFinder(0, 0);
+    drawFinder(0, size - 7);
+    drawFinder(size - 7, 0);
+    for (let i = 8; i < size - 8; i++) {
+      setFunction(6, i, i % 2 === 0);
+      setFunction(i, 6, i % 2 === 0);
+    }
+    drawAlignment(30, 30);
+
+    const format = qrFormatBits(0);
+    const getBit = (num, index) => ((num >>> index) & 1) !== 0;
+    for (let i = 0; i <= 5; i++) setFunction(i, 8, getBit(format, i));
+    setFunction(7, 8, getBit(format, 6));
+    setFunction(8, 8, getBit(format, 7));
+    setFunction(8, 7, getBit(format, 8));
+    for (let i = 9; i < 15; i++) setFunction(8, 14 - i, getBit(format, i));
+    for (let i = 0; i < 8; i++) setFunction(8, size - 1 - i, getBit(format, i));
+    for (let i = 8; i < 15; i++) setFunction(size - 15 + i, 8, getBit(format, i));
+    setFunction(size - 8, 8, true);
+
+    const ecc = qrReedSolomonRemainder(dataCodewords, LOCAL_QR_ECC_CODEWORDS);
+    const allCodewords = dataCodewords.concat(ecc);
+    if (allCodewords.length !== LOCAL_QR_TOTAL_CODEWORDS) return null;
+    const dataBits = [];
+    allCodewords.forEach((byte) => {
+      for (let i = 7; i >= 0; i--) dataBits.push((byte >>> i) & 1);
+    });
+
+    let bitIndex = 0;
+    let upward = true;
+    for (let col = size - 1; col >= 1; col -= 2) {
+      if (col === 6) col--;
+      for (let i = 0; i < size; i++) {
+        const row = upward ? size - 1 - i : i;
+        for (let j = 0; j < 2; j++) {
+          const cc = col - j;
+          if (reserved[row][cc]) continue;
+          const bit = bitIndex < dataBits.length ? dataBits[bitIndex++] : 0;
+          const masked = bit ^ (((row + cc) % 2 === 0) ? 1 : 0);
+          modules[row][cc] = !!masked;
+        }
+      }
+      upward = !upward;
+    }
+    return modules;
+  }
+
+  function drawKahootQrLocally(canvas, value) {
+    try {
+      const matrix = createLocalQrMatrix(value);
+      if (!canvas || !matrix) return false;
+      const width = 260;
+      const ctx = canvas.getContext("2d");
+      const size = matrix.length;
+      const scale = Math.max(1, Math.floor(width / (size + 8)));
+      const offset = Math.floor((width - size * scale) / 2);
+      canvas.width = width;
+      canvas.height = width;
+      ctx.imageSmoothingEnabled = false;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, width);
+      ctx.fillStyle = "#1a1330";
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (matrix[row][col]) ctx.fillRect(offset + col * scale, offset + row * scale, scale, scale);
+        }
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   async function renderKahootQRCode(canvas, joinUrl) {
     const fallbackBox = document.getElementById("kahootQrFallback");
-    function showFallback(message) {
+
+    function showLinkFallback(message) {
       if (!fallbackBox) return;
       fallbackBox.hidden = false;
       fallbackBox.innerHTML = `
@@ -14589,12 +14815,34 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
         <a href="${esc(joinUrl)}" target="_blank" rel="noopener">${esc(joinUrl)}</a>
       `;
     }
+
+    function showImageFallback(message) {
+      if (!fallbackBox) return;
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=12&format=svg&data=${encodeURIComponent(joinUrl)}`;
+      fallbackBox.hidden = false;
+      fallbackBox.innerHTML = `
+        <img class="kahoot-qr-fallback-img" src="${esc(qrImageUrl)}" width="260" height="260" alt="Kahoot oda QR kodu">
+        <span>${esc(message)}</span>
+        <a href="${esc(joinUrl)}" target="_blank" rel="noopener">${esc(joinUrl)}</a>
+      `;
+      const image = fallbackBox.querySelector("img");
+      image?.addEventListener("error", () => showLinkFallback("QR kod görseli yüklenemedi."));
+    }
+
+    function showLocalCanvas() {
+      if (!canvas || !drawKahootQrLocally(canvas, joinUrl)) return false;
+      canvas.style.display = "";
+      if (fallbackBox) fallbackBox.hidden = true;
+      return true;
+    }
+
     try {
       if (!canvas) return;
       const ok = await ensureQrLibrary();
       if (!ok || !window.QRCode || typeof window.QRCode.toCanvas !== "function") {
-        showFallback("QR kod kütüphanesi yüklenemedi.");
+        if (showLocalCanvas()) return;
         canvas.style.display = "none";
+        showImageFallback("QR kod otomatik oluşturuldu.");
         return;
       }
       canvas.style.display = "";
@@ -14607,8 +14855,9 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
       if (fallbackBox) fallbackBox.hidden = true;
     } catch (err) {
       console.error("[Kahoot] QR oluşturulamadı:", err);
-      showFallback("QR kod oluşturulamadı.");
+      if (showLocalCanvas()) return;
       if (canvas) canvas.style.display = "none";
+      showImageFallback("QR kod otomatik oluşturuldu.");
     }
   }
 
@@ -15150,11 +15399,35 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
           </div>
 
           <div class="kahoot-host-qr-card">
-            <div class="kahoot-qr-frame">
-              <canvas id="kahootQrCanvas" width="260" height="260" aria-label="Kahoot oda QR kodu"></canvas>
-              <div id="kahootQrFallback" class="kahoot-qr-fallback" hidden></div>
+            <div class="kahoot-qr-stage">
+              <div class="kahoot-qr-top-badge">
+                <span>OYUNA KATIL!</span>
+                <span class="kahoot-qr-bolt" aria-hidden="true">⚡</span>
+              </div>
+
+              <span class="kahoot-qr-sparkle s1" aria-hidden="true">✦</span>
+              <span class="kahoot-qr-sparkle s2" aria-hidden="true">✧</span>
+              <span class="kahoot-qr-sparkle s3" aria-hidden="true">✦</span>
+              <span class="kahoot-qr-sparkle s4" aria-hidden="true">✧</span>
+              <span class="kahoot-qr-confetti c1" aria-hidden="true"></span>
+              <span class="kahoot-qr-confetti c2" aria-hidden="true"></span>
+              <span class="kahoot-qr-confetti c3" aria-hidden="true"></span>
+              <span class="kahoot-qr-confetti c4" aria-hidden="true"></span>
+
+              <div class="kahoot-qr-panel">
+                <canvas id="kahootQrCanvas" width="260" height="260" aria-label="Kahoot oda QR kodu"></canvas>
+                <div id="kahootQrFallback" class="kahoot-qr-fallback" hidden></div>
+                <div class="kahoot-qr-logo-badge" aria-hidden="true">
+                  <span class="kahoot-qr-logo-text">K!</span>
+                  <span class="kahoot-qr-logo-confetti lc1"></span>
+                  <span class="kahoot-qr-logo-confetti lc2"></span>
+                  <span class="kahoot-qr-logo-confetti lc3"></span>
+                </div>
+              </div>
+
+              <p class="kahoot-qr-helper">📱 Telefonunla okut ve oyuna katıl</p>
+              <p class="kahoot-qr-link">${esc(joinUrl)}</p>
             </div>
-            <small class="kahoot-qr-caption">${esc(joinUrl)}</small>
           </div>
         </div>
 

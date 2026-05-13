@@ -10076,8 +10076,7 @@ body.rlz5-page-active .page.ravzalingo-page.active::after {
   box-shadow:0 22px 70px rgba(15,23,42,.14);
 }
 
-body.dark .kahoot-hero-card,
-body[data-theme-style] .kahoot-hero-card{
+body.dark .kahoot-hero-card{
   background:
     radial-gradient(circle at 18% 22%,rgba(236,72,153,.22),transparent 34%),
     radial-gradient(circle at 78% 42%,rgba(124,58,237,.38),transparent 34%),
@@ -10139,12 +10138,12 @@ body[data-theme-style] .kahoot-hero-card{
 body.dark .kahoot-hero-copy h1,
 body.dark .kahoot-hero-copy p,
 body.dark .kahoot-hero-copy h2,
-body[data-theme-style] .kahoot-hero-copy h1,
-body[data-theme-style] .kahoot-hero-copy p{
+body.dark[data-theme-style] .kahoot-hero-copy h1,
+body.dark[data-theme-style] .kahoot-hero-copy p{
   color:#f8eafd;
 }
 body.dark .kahoot-hero-copy h2,
-body[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
+body.dark[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
 
 .kahoot-hero-actions{display:flex;gap:12px;flex-wrap:wrap}
 .kahoot-primary-btn,
@@ -10307,8 +10306,7 @@ body[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
   overflow:hidden;
   margin:0 0 18px;
 }
-body.dark .kahoot-room-launch-card,
-body[data-theme-style] .kahoot-room-launch-card{
+body.dark .kahoot-room-launch-card{
   background:
     radial-gradient(circle at 14% 18%,rgba(236,72,153,.20),transparent 40%),
     radial-gradient(circle at 88% 80%,rgba(34,197,94,.18),transparent 38%),
@@ -10335,7 +10333,7 @@ body[data-theme-style] .kahoot-room-launch-card{
   color:var(--text);margin:0 0 10px;letter-spacing:-.02em;
 }
 body.dark .kahoot-room-launch-copy h2,
-body[data-theme-style] .kahoot-room-launch-copy h2{color:#f8eafd}
+body.dark[data-theme-style] .kahoot-room-launch-copy h2{color:#f8eafd}
 .kahoot-room-launch-copy p{
   color:var(--text-light);line-height:1.7;font-size:15px;margin:0 0 18px;max-width:640px;
 }
@@ -10442,7 +10440,7 @@ body.dark .kahoot-room-history li strong{color:#f8eafd}
   letter-spacing:-.02em;
 }
 body.dark .kahoot-host-info-card h2,
-body[data-theme-style] .kahoot-host-info-card h2{color:#f8eafd}
+body.dark[data-theme-style] .kahoot-host-info-card h2{color:#f8eafd}
 .kahoot-host-info-card p{color:var(--text-light);line-height:1.6;margin-bottom:14px}
 
 .kahoot-pin-block{
@@ -10456,14 +10454,14 @@ body[data-theme-style] .kahoot-host-info-card h2{color:#f8eafd}
   color:#7c3aed;text-transform:uppercase;margin-bottom:4px;
 }
 body.dark .kahoot-pin-block small,
-body[data-theme-style] .kahoot-pin-block small{color:#c4b5fd}
+body.dark[data-theme-style] .kahoot-pin-block small{color:#c4b5fd}
 .kahoot-pin-value{
   font-family:'Playfair Display',serif;
   font-size:clamp(34px,5vw,52px);
   letter-spacing:.18em;line-height:1;color:var(--text);font-weight:900;
 }
 body.dark .kahoot-pin-value,
-body[data-theme-style] .kahoot-pin-value{color:#fff}
+body.dark[data-theme-style] .kahoot-pin-value{color:#fff}
 .kahoot-room-code{margin-top:6px;font-size:13px;color:var(--text-light)}
 .kahoot-room-code strong{color:var(--text);letter-spacing:.05em}
 body.dark .kahoot-room-code strong{color:#fff}
@@ -10535,6 +10533,15 @@ body.dark .kahoot-qr-fallback strong{color:#f8eafd}
   word-break:break-all;font-size:12.5px;
 }
 body.dark .kahoot-qr-fallback a{color:#c4b5fd}
+.kahoot-qr-fallback-img{
+  display:block;
+  width:100%;
+  max-width:240px;
+  height:auto;
+  margin:0 auto 6px;
+  border-radius:10px;
+  background:#fff;
+}
 
 /* Localhost / public URL eksik uyarısı */
 .kahoot-localhost-warning{
@@ -10554,7 +10561,7 @@ body.dark .kahoot-qr-fallback a{color:#c4b5fd}
   margin-top:14px;padding:10px 14px;font-size:12.5px;border-radius:14px;
 }
 body.dark .kahoot-localhost-warning,
-body[data-theme-style] .kahoot-localhost-warning{
+body.dark[data-theme-style] .kahoot-localhost-warning{
   background:linear-gradient(135deg,rgba(245,158,11,.20),rgba(245,158,11,.08));
   color:#fcd34d;border-color:rgba(245,158,11,.34);
 }
@@ -10576,7 +10583,7 @@ body.dark .kahoot-localhost-warning code{background:rgba(255,255,255,.10);color:
 }
 .kahoot-host-players-head h3{margin:0;color:var(--text);font-size:18px}
 body.dark .kahoot-host-players-head h3,
-body[data-theme-style] .kahoot-host-players-head h3{color:#f8eafd}
+body.dark[data-theme-style] .kahoot-host-players-head h3{color:#f8eafd}
 .kahoot-host-players-count{
   display:inline-grid;place-items:center;min-width:34px;
   padding:4px 10px;border-radius:999px;
@@ -10654,7 +10661,7 @@ body.dark .kahoot-player-chip strong{color:#fff}
 }
 .kahoot-timer-pill.big{padding:10px 18px;font-size:15px}
 body.dark .kahoot-timer-pill,
-body[data-theme-style] .kahoot-timer-pill{color:#c4b5fd;background:rgba(124,58,237,.22)}
+body.dark[data-theme-style] .kahoot-timer-pill{color:#c4b5fd;background:rgba(124,58,237,.22)}
 
 .kahoot-host-q h2{font-size:clamp(20px,2.5vw,30px);line-height:1.32}
 
@@ -10713,7 +10720,7 @@ body.dark .kahoot-lb-row strong{color:#f8eafd}
   font-family:'Playfair Display',serif;font-size:32px;margin:8px 0;color:var(--text);
 }
 body.dark .kahoot-host-final h2,
-body[data-theme-style] .kahoot-host-final h2{color:#f8eafd}
+body.dark[data-theme-style] .kahoot-host-final h2{color:#f8eafd}
 .kahoot-host-final p{color:var(--text-light);margin-bottom:16px}
 .kahoot-podium{
   display:flex;justify-content:center;align-items:flex-end;gap:14px;margin:18px 0;
@@ -10764,7 +10771,7 @@ body.dark .kahoot-podium-spot strong{color:#f8eafd}
   font-family:'Playfair Display',serif;font-size:28px;margin:8px 0 4px;color:var(--text);
 }
 body.dark .kahoot-player-card h2,
-body[data-theme-style] .kahoot-player-card h2{color:#f8eafd}
+body.dark[data-theme-style] .kahoot-player-card h2{color:#f8eafd}
 .kahoot-player-card p{color:var(--text-light);line-height:1.65}
 .kahoot-player-card p strong{color:var(--text);letter-spacing:.05em}
 body.dark .kahoot-player-card p strong{color:#fff}
@@ -10833,7 +10840,7 @@ body.dark .kahoot-player-error{color:#fca5a5}
   border:1px solid color-mix(in srgb,#7c3aed 22%,var(--card-border));
 }
 body.dark .kahoot-player-qtext,
-body[data-theme-style] .kahoot-player-qtext{color:#f8eafd}
+body.dark[data-theme-style] .kahoot-player-qtext{color:#f8eafd}
 
 .kahoot-player-answer-grid{
   display:grid;grid-template-columns:1fr 1fr;gap:12px;
@@ -10937,5 +10944,353 @@ body.dark .kahoot-player-score-pill{color:#c4b5fd}
 }
 @media (hover:none){
   .kahoot-answer:hover{transform:none;filter:none}
+}
+
+/* =========================================================
+   QR PREMIUM DESIGN — Kahoot canlı oda davet kartı
+   - Sadece QR alanının görsel tasarımı; QR canvas/id/render mantığı korunur.
+   - Mevcut .kahoot-host-qr-card / .kahoot-qr-frame stilleri override edilir.
+   - Dark + tüm tema varyantlarıyla uyumlu, QR okunabilirliği bozulmaz.
+   ========================================================= */
+
+/* Neon QR poster: referans görseldeki koyu, parlayan davet kartı */
+.kahoot-host-qr-card {
+  position: relative;
+  min-height: 470px;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(236,72,153,.24), transparent 34%),
+    radial-gradient(circle at 14% 22%, rgba(56,189,248,.14), transparent 28%),
+    radial-gradient(circle at 88% 72%, rgba(124,44,255,.25), transparent 32%),
+    linear-gradient(145deg, #111827 0%, #17182d 48%, #101522 100%) !important;
+  border: 1px solid rgba(148,163,184,.18) !important;
+  border-radius: 34px !important;
+  box-shadow:
+    0 30px 86px rgba(15,23,42,.28),
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 0 0 1px rgba(255,255,255,.04) !important;
+  padding: 34px 18px 38px !important;
+  overflow: visible !important;
+  align-items: stretch !important;
+  isolation: isolate;
+}
+.kahoot-host-qr-card::before,
+.kahoot-host-qr-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+}
+.kahoot-host-qr-card::before{
+  background:
+    radial-gradient(circle at 50% 44%, rgba(255,255,255,.16), transparent 26%),
+    radial-gradient(circle at 50% 50%, rgba(168,85,247,.30), transparent 42%);
+  filter:blur(6px);
+  opacity:.75;
+  z-index:0;
+}
+.kahoot-host-qr-card::after{
+  background:
+    linear-gradient(18deg, transparent 23%, rgba(124,44,255,.26) 24%, transparent 26%),
+    linear-gradient(158deg, transparent 25%, rgba(236,72,153,.20) 26%, transparent 28%),
+    radial-gradient(circle, rgba(255,255,255,.32) 1px, transparent 2px);
+  background-size:100% 100%,100% 100%,42px 42px;
+  opacity:.22;
+  z-index:0;
+}
+body.dark .kahoot-host-qr-card {
+  box-shadow:
+    0 32px 90px rgba(0,0,0,.46),
+    0 0 44px rgba(124,44,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 0 0 1px rgba(255,255,255,.05) !important;
+}
+
+/* Stage — dış kompozisyon */
+.kahoot-qr-stage {
+  position: relative;
+  width: 100%;
+  max-width: 410px;
+  margin: 0 auto;
+  padding: 28px 18px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  isolation: isolate;
+  z-index: 1;
+}
+
+/* Üst gradient pill */
+.kahoot-qr-top-badge {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border-radius: 18px;
+  clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+  background:
+    linear-gradient(135deg, #7c2cff 0%, #ec4899 55%, #38bdf8 115%);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow:
+    0 14px 32px rgba(124, 44, 255, 0.45),
+    0 0 0 3px rgba(255, 255, 255, 0.08) inset,
+    0 0 24px rgba(236, 72, 153, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+}
+.kahoot-qr-bolt {
+  font-size: 14px;
+  filter: drop-shadow(0 0 8px #ffd54a);
+  animation: kahootBoltPulse 1.6s ease-in-out infinite;
+}
+@keyframes kahootBoltPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.22) rotate(-8deg); }
+}
+
+/* Dekoratif sparkle yıldızları */
+.kahoot-qr-sparkle {
+  position: absolute;
+  font-size: 16px;
+  color: #c4b5fd;
+  pointer-events: none;
+  text-shadow:
+    0 0 10px rgba(196, 181, 253, 0.95),
+    0 0 22px rgba(124, 44, 255, 0.55);
+  z-index: 2;
+  animation: kahootSparkle 3.2s ease-in-out infinite;
+}
+.kahoot-qr-sparkle.s1 { top: 38px; left: -4px; }
+.kahoot-qr-sparkle.s2 { top: 22px; right: 4px; color: #f9a8d4; animation-delay: .7s; font-size: 14px; }
+.kahoot-qr-sparkle.s3 { bottom: 130px; left: -2px; color: #7dd3fc; animation-delay: 1.4s; font-size: 18px; }
+.kahoot-qr-sparkle.s4 { bottom: 90px; right: -2px; color: #fda4af; animation-delay: 2.0s; font-size: 14px; }
+@keyframes kahootSparkle {
+  0%, 100% { transform: scale(.55) rotate(0deg); opacity: .35; }
+  50% { transform: scale(1.15) rotate(180deg); opacity: 1; }
+}
+
+/* Konfeti şeritleri (panel etrafında, QR'a değmez) */
+.kahoot-qr-confetti {
+  position: absolute;
+  width: 12px;
+  height: 5px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.85;
+}
+.kahoot-qr-confetti.c1 { top: 70px; left: 6px; background: #ec4899; transform: rotate(28deg); }
+.kahoot-qr-confetti.c2 { top: 56px; right: 10px; background: #38bdf8; transform: rotate(-24deg); }
+.kahoot-qr-confetti.c3 { bottom: 110px; left: 4px; background: #fbbf24; transform: rotate(-12deg); }
+.kahoot-qr-confetti.c4 { bottom: 130px; right: 8px; background: #a3e635; transform: rotate(40deg); }
+
+/* Beyaz QR paneli — premium glow */
+.kahoot-qr-panel {
+  position: relative;
+  width: 100%;
+  max-width: 354px;
+  padding: 48px 38px 62px;
+  margin: 22px auto 0;
+  background: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 36px;
+  box-shadow:
+    0 0 0 5px rgba(124,44,255,.28),
+    0 0 54px rgba(168, 85, 247, 0.48),
+    0 0 92px rgba(236, 72, 153, 0.24),
+    0 28px 70px rgba(15, 23, 42, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform .25s ease, box-shadow .25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+.kahoot-qr-panel:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 5px rgba(124,44,255,.34),
+    0 0 60px rgba(168, 85, 247, 0.55),
+    0 0 100px rgba(236, 72, 153, 0.28),
+    0 30px 70px rgba(15, 23, 42, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* QR canvas — okunabilirlik birinci öncelik */
+.kahoot-qr-panel canvas {
+  display: block;
+  width: 100% !important;
+  max-width: 260px;
+  height: auto !important;
+  margin: 0 auto;
+  border-radius: 6px;
+  background: #ffffff;
+}
+.kahoot-qr-fallback[hidden],
+.kahoot-qr-panel .kahoot-qr-fallback[hidden] {
+  display: none !important;
+}
+
+/* Fallback alanı (CDN yüklenmezse linki gösterir) */
+.kahoot-qr-panel .kahoot-qr-fallback {
+  width: 100%;
+  background: #f8fafc;
+  color: #0f172a;
+}
+.kahoot-qr-panel .kahoot-qr-fallback strong { color: #0f172a; }
+.kahoot-qr-panel .kahoot-qr-fallback span { color: #475569; }
+.kahoot-qr-panel .kahoot-qr-fallback a { color: #7c2cff; }
+
+/* Alt orta logo rozeti — K! */
+.kahoot-qr-logo-badge {
+  position: absolute;
+  bottom: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.45), transparent 38%),
+    conic-gradient(from 220deg, #7c2cff, #ec4899, #38bdf8, #a855f7, #7c2cff);
+  color: #ffffff;
+  border: 5px solid #ffffff;
+  box-shadow:
+    0 0 0 2px rgba(168, 85, 247, 0.62),
+    0 0 36px rgba(236, 72, 153, 0.70),
+    0 14px 28px rgba(0, 0, 0, 0.34);
+  animation: kahootLogoGlow 2.6s ease-in-out infinite;
+}
+.kahoot-qr-logo-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 30px;
+  font-weight: 1000;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.kahoot-qr-logo-confetti {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: .92;
+}
+.kahoot-qr-logo-confetti.lc1 { top: 8px; right: 6px; background: #fde68a; }
+.kahoot-qr-logo-confetti.lc2 { bottom: 10px; left: 8px; background: #67e8f9; }
+.kahoot-qr-logo-confetti.lc3 { top: 50%; right: -2px; background: #fda4af; width: 5px; height: 5px; }
+
+@keyframes kahootLogoGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px rgba(168, 85, 247, 0.55),
+      0 0 28px rgba(236, 72, 153, 0.55),
+      0 14px 28px rgba(0, 0, 0, 0.32);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(168, 85, 247, 0.85),
+      0 0 56px rgba(236, 72, 153, 0.85),
+      0 14px 28px rgba(0, 0, 0, 0.32);
+  }
+}
+
+/* Helper + link */
+.kahoot-qr-helper {
+  margin: 56px 0 8px;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #dbe4ff;
+  letter-spacing: -.01em;
+  text-shadow: 0 0 20px rgba(124,44,255,.28);
+}
+body.dark .kahoot-qr-helper,
+body.dark[data-theme-style] .kahoot-qr-helper {
+  color: #e9d5ff;
+}
+.kahoot-qr-link {
+  margin: 0;
+  padding: 0 6px;
+  max-width: 100%;
+  word-break: break-all;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.55;
+  background:
+    linear-gradient(135deg, #c4b5fd 0%, #f9a8d4 55%, #7dd3fc 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: 0 0 18px rgba(196, 181, 253, 0.25);
+}
+/* Açık temada link okunabilirliği */
+body:not(.dark) .kahoot-qr-link {
+  background: linear-gradient(135deg, #7c2cff 0%, #ec4899 55%, #2563eb 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 18px rgba(124,44,255,.18);
+}
+
+/* Eski .kahoot-qr-caption hala başka yerde varsa gizle */
+.kahoot-host-qr-card .kahoot-qr-caption { display: none !important; }
+
+/* Mobile */
+@media (max-width: 760px) {
+  .kahoot-host-qr-card { min-height: 430px; padding: 24px 8px 34px !important; border-radius: 28px !important; }
+  .kahoot-qr-stage { padding: 28px 8px 0; max-width: 100%; }
+  .kahoot-qr-panel { padding: 32px 22px 44px; border-radius: 28px; max-width: 320px; }
+  .kahoot-qr-panel canvas { max-width: 230px; }
+  .kahoot-qr-top-badge { padding: 9px 18px; font-size: 11.5px; letter-spacing: 0.10em; }
+  .kahoot-qr-helper { margin-top: 50px; font-size: 13px; }
+  .kahoot-qr-link { font-size: 11.5px; }
+}
+
+@media (max-width: 480px) {
+  .kahoot-qr-logo-badge {
+    width: 64px;
+    height: 64px;
+    border-width: 4px;
+    bottom: -30px;
+  }
+  .kahoot-qr-logo-text { font-size: 25px; }
+  .kahoot-qr-panel { padding: 30px 18px 38px; }
+  .kahoot-qr-panel canvas { max-width: 200px; }
+  .kahoot-qr-confetti.c4,
+  .kahoot-qr-sparkle.s2,
+  .kahoot-qr-sparkle.s4 { display: none; }
+  .kahoot-qr-top-badge { font-size: 10.5px; padding: 8px 16px; }
+}
+
+@media (max-width: 360px) {
+  .kahoot-qr-panel canvas { max-width: 180px; }
+  .kahoot-qr-panel { padding: 26px 14px 34px; }
+}
+
+/* Reduced motion: animasyonları kapat */
+@media (prefers-reduced-motion: reduce) {
+  .kahoot-qr-bolt,
+  .kahoot-qr-logo-badge,
+  .kahoot-qr-sparkle { animation: none !important; }
+}
+
+/* Touch: hover'sız cihazlarda panel kaymasın */
+@media (hover: none) {
+  .kahoot-qr-panel:hover { transform: none; }
 }
 
