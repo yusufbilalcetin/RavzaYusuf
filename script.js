@@ -14811,20 +14811,36 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
       return;
     }
     const roomRef = doc(db, ROOM_COLLECTION, state.roomId);
+    const now = Date.now();
+
+    // Optimistic UI: ekranı HEMEN countdown'a çevir, server confirm beklenmesin
+    if (state.roomData) {
+      state.roomData = { ...state.roomData, status: "countdown", currentQuestionIndex: 0, countdownStartedAt: now };
+      state.lastRenderSig = null;
+      renderForCurrentMode();
+    }
+
     try {
       await updateDoc(roomRef, {
         status: "countdown",
         currentQuestionIndex: 0,
-        countdownStartedAt: Date.now(),
-        updatedAt: serverTimestamp()
+        countdownStartedAt: now,
+        updatedAt: Date.now()
       });
       setTimeout(async () => {
+        const startedAt = Date.now();
+        // Optimistic UI: host kendi ekranında hemen soru ekranına geçsin
+        if (state.roomData) {
+          state.roomData = { ...state.roomData, status: "playing", currentQuestionIndex: 0, questionStartedAt: startedAt };
+          state.lastRenderSig = null;
+          renderForCurrentMode();
+        }
         try {
           await updateDoc(roomRef, {
             status: "playing",
             currentQuestionIndex: 0,
-            questionStartedAt: Date.now(),
-            updatedAt: serverTimestamp()
+            questionStartedAt: startedAt,
+            updatedAt: Date.now()
           });
         } catch (e) {
           console.error("[Kahoot] start game (phase 2) error:", e);
@@ -14841,22 +14857,33 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
     const nextIndex = Number(state.roomData.currentQuestionIndex || 0) + 1;
     const total = (state.roomData.questions || []).length;
     const roomRef = doc(db, ROOM_COLLECTION, state.roomId);
+    const now = Date.now();
     try {
       if (nextIndex >= total) {
+        // Optimistic: hemen final ekranına geç
+        state.roomData = { ...state.roomData, status: "finished", finishedAt: now };
+        state.lastRenderSig = null;
+        renderForCurrentMode();
+
         await updateDoc(roomRef, {
           status: "finished",
-          finishedAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
+          finishedAt: now,
+          updatedAt: Date.now()
         });
         return;
       }
+      // Optimistic: hemen yeni soruya geç
+      state.roomData = { ...state.roomData, currentQuestionIndex: nextIndex, status: "playing", questionStartedAt: now };
+      state.lastRenderSig = null;
+      state.answeredForIndex = -1;
+      renderForCurrentMode();
+
       await updateDoc(roomRef, {
         currentQuestionIndex: nextIndex,
         status: "playing",
-        questionStartedAt: Date.now(),
-        updatedAt: serverTimestamp()
+        questionStartedAt: now,
+        updatedAt: Date.now()
       });
-      state.answeredForIndex = -1;
     } catch (e) {
       console.error("[Kahoot] advance error:", e);
     }
@@ -14926,23 +14953,33 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
       if (data.status === "finished") return { ok: false, error: "Bu oda kapanmış. Host'tan yeni oda iste." };
 
       const playerId = getOrCreatePlayerId();
-      await setDoc(doc(db, ROOM_COLLECTION, roomId, "players", playerId), {
-        playerId,
-        name,
-        score: 0,
-        correctCount: 0,
-        wrongCount: 0,
-        joinedAt: serverTimestamp(),
-        lastSeenAt: serverTimestamp()
-      }, { merge: true });
 
+      // Optimistic: lokal state'i HEMEN güncelle, ekranı bekleme moduna al, sonra Firestore'a yaz
       savePlayerProfile({ id: playerId, name, roomId });
       state.mode = "player";
       state.roomId = roomId;
       state.playerId = playerId;
       state.answeredForIndex = -1;
+      state.roomData = data;
+      state.playerData = { playerId, name, score: 0, correctCount: 0, wrongCount: 0 };
+      state.playersData = [state.playerData, ...(state.playersData || []).filter((p) => p.playerId !== playerId)];
       state.lastRenderSig = null;
       subscribePlayerRoom(roomId, playerId);
+      renderForCurrentMode();
+
+      // Arka planda Firestore write (await ETME — fire-and-forget gibi davran)
+      setDoc(doc(db, ROOM_COLLECTION, roomId, "players", playerId), {
+        playerId,
+        name,
+        score: 0,
+        correctCount: 0,
+        wrongCount: 0,
+        joinedAt: Date.now(),
+        lastSeenAt: Date.now()
+      }, { merge: true }).catch((e) => {
+        console.error("[Kahoot] player write error:", e);
+      });
+
       return { ok: true, playerId };
     } catch (e) {
       console.error("[Kahoot] join error:", e);
@@ -14975,26 +15012,40 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
     const score = calculateKahootScore(isCorrect, msUsed, room.questionDuration);
     const answerId = `${playerId}_${idx}`;
 
+    // Optimistic: feedback ekranını HEMEN göster, server confirm beklenmesin
+    const optimisticAnswer = { playerId, questionIndex: idx, selectedIndex: optionIndex, isCorrect, score };
+    state.answersData = [...(state.answersData || []).filter((a) => !(a.playerId === playerId && a.questionIndex === idx)), optimisticAnswer];
+    if (state.playerData) {
+      state.playerData = {
+        ...state.playerData,
+        score: (state.playerData.score || 0) + score,
+        correctCount: (state.playerData.correctCount || 0) + (isCorrect ? 1 : 0),
+        wrongCount: (state.playerData.wrongCount || 0) + (isCorrect ? 0 : 1)
+      };
+    }
+    state.lastRenderSig = null;
+    renderForCurrentMode();
+
+    // Arka planda Firestore write
     try {
-      await setDoc(doc(db, ROOM_COLLECTION, roomId, "answers", answerId), {
+      setDoc(doc(db, ROOM_COLLECTION, roomId, "answers", answerId), {
         playerId,
         questionIndex: idx,
         selectedIndex: optionIndex,
         isCorrect,
         score,
-        answeredAt: serverTimestamp()
-      });
-      await updateDoc(doc(db, ROOM_COLLECTION, roomId, "players", playerId), {
+        answeredAt: Date.now()
+      }).catch((e) => console.error("[Kahoot] answer write error:", e));
+
+      updateDoc(doc(db, ROOM_COLLECTION, roomId, "players", playerId), {
         score: increment(score),
         correctCount: increment(isCorrect ? 1 : 0),
         wrongCount: increment(isCorrect ? 0 : 1),
-        lastSeenAt: serverTimestamp()
-      });
+        lastSeenAt: Date.now()
+      }).catch((e) => console.error("[Kahoot] player score write error:", e));
     } catch (e) {
       console.error("[Kahoot] submit answer error:", e);
-      state.answeredForIndex = -1;
     }
-    renderForCurrentMode();
   }
 
   /* ---------- Render gate / Signature ---------- */
@@ -15027,11 +15078,11 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
 
   function startTimerTick() {
     stopTimerTick();
+    // 500ms → 120ms: timer/countdown anında güncellenir, signature check sayesinde gereksiz redraw yok
     state.tickId = setInterval(() => {
       if (!state.mode) return;
-      // Signature içine elapsed/countdown saniyesi gömülü; sadece değiştikçe yeniden çizilir.
       renderForCurrentMode();
-    }, 500);
+    }, 120);
   }
   function stopTimerTick() {
     if (state.tickId) { clearInterval(state.tickId); state.tickId = null; }
