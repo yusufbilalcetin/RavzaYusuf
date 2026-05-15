@@ -4410,17 +4410,11 @@ function renderStudyHub(filterText = "") {
         <article class="topic-card">
           <div class="topic-card-top">
             <span class="unit-badge">${safeText(topic.unit)}</span>
-            <span class="status-chip ${done ? "done" : "waiting"}">${done ? "Tamamlandı" : "Bekliyor"}</span>
           </div>
           <div>
             <h3 class="topic-title">${safeText(topic.title)}</h3>
             <p>${safeText(topic.subtitle)}</p>
           </div>
-          <div class="topic-meta">
-            <span class="difficulty-chip ${topic.difficulty}">${difficultyLabel}</span>
-            <span class="status-chip ready">${topic.time} dk</span>
-          </div>
-          <p class="helper-line">Bu bölüm yalnızca konu çalışmak için tasarlandı. Quiz kısmı ayrı sayfadadır.</p>
           <div class="topic-actions">
             <button class="primary-btn" onclick="openStudyTopic('${topic.id}')">Konuya Git</button>
             <button class="mark-btn ${done ? "done" : ""}" onclick="toggleStudyDone('${topic.id}')">${done ? "☑️ Tamamlandı" : "✅ Çalışmayı Bitirdim"}</button>
