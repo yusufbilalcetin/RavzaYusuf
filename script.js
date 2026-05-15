@@ -14033,16 +14033,28 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       /* --- "KALDIĞIM ETKİNLİĞE GİT" BUTONU --- */
-      .rlz5-goto-activity{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:0;background:linear-gradient(135deg,#7ee000,#58cc02);color:#fff;font-size:24px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 12px 28px rgba(40,120,0,.4);z-index:150;display:none;align-items:center;justify-content:center;padding:0;touch-action:manipulation;transition:transform .18s ease}
+      body.rlz5-page-active .scroll-top-btn,
+      body.rlz5-page-active .rlz5-goto-activity{
+        right:calc(18px + env(safe-area-inset-right,0px))!important;
+        width:48px;
+        height:48px;
+      }
+      .rlz5-goto-activity{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:48px;height:48px;border-radius:50%;border:0;background:linear-gradient(135deg,#7ee000,#58cc02);color:#fff;font-size:24px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 12px 28px rgba(40,120,0,.4);z-index:150;display:none;align-items:center;justify-content:center;padding:0;touch-action:manipulation;transition:transform .18s ease}
       .rlz5-goto-activity:hover{transform:translateY(-3px) scale(1.04)}
       /* Aşağı butonu yalnızca kaldığın etkinlik ekranda görünmüyorken (aşağıdayken) çıkar; ona gelince gizlenir */
       body.rlz5-page-active.rlz5-show-goto .rlz5-goto-activity{display:flex}
-      body.rlz5-page-active.rlz5-show-goto .scroll-top-btn{bottom:78px}
+      body.rlz5-page-active.rlz5-show-goto .scroll-top-btn{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
       /* Etkinliğin altına inince: yukarı butonu yeşile döner ve etkinliğe götürür */
       .scroll-top-btn.rlz5-up-green{background:linear-gradient(135deg,#7ee000,#58cc02)!important;box-shadow:0 12px 28px rgba(40,120,0,.42)}
       .scroll-top-btn.rlz5-up-green:hover{box-shadow:0 16px 32px rgba(40,120,0,.5)}
       @media(max-width:480px){
-        .rlz5-goto-activity{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:44px;height:44px;font-size:21px}
+        body.rlz5-page-active .scroll-top-btn,
+        body.rlz5-page-active .rlz5-goto-activity{
+          right:calc(14px + env(safe-area-inset-right,0px))!important;
+          width:44px;
+          height:44px;
+        }
+        .rlz5-goto-activity{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));width:44px;height:44px;font-size:21px}
         body.rlz5-page-active.rlz5-show-goto .scroll-top-btn{bottom:calc(70px + env(safe-area-inset-bottom,0px))}
       }
 
