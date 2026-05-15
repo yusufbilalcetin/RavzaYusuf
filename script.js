@@ -4166,6 +4166,9 @@ function closeMobileMenu() {
 }
 
 function navigate(pageId) {
+  const isLeavingMemoryHub = pageId !== "memoryhub" && document.getElementById("memoryhub")?.classList.contains("active");
+  if (isLeavingMemoryHub && typeof stopMemorySpeech === "function") stopMemorySpeech();
+
   const isRavzaLingoPage = pageId === "ravzalingo";
   document.documentElement.classList.toggle("is-ravzalingo-page", isRavzaLingoPage);
   document.body.classList.toggle("is-ravzalingo-page", isRavzaLingoPage);
@@ -4698,6 +4701,7 @@ function setMemoryHubSection(section) {
 function renderMemorizationHub(filterText = "") {
   const grid = document.getElementById("memoryHubGrid");
   if (!grid) return;
+  stopMemorySpeech();
 
   const q = filterText.trim().toLowerCase();
   const filtered = MEMORIZATION_CARDS.filter((card) =>
@@ -4734,12 +4738,62 @@ function renderMemorizationHub(filterText = "") {
       </button>
     `)
     .join("");
+
+  attachMemorySpeakButtons(grid, filtered);
+}
+
+function updateMemorySpeakButtonState(cardEl) {
+  const button = cardEl?.querySelector(".memory-speak-btn");
+  if (!button) return;
+  const isBackVisible = cardEl.classList.contains("flipped");
+  button.dataset.speakText = isBackVisible ? button.dataset.speakBack : button.dataset.speakFront;
+  button.dataset.speakLang = isBackVisible ? "tr" : "en";
+  button.classList.toggle("is-back-side", isBackVisible);
+  button.setAttribute(
+    "aria-label",
+    isBackVisible ? "Türkçe anlamı sesli oku" : "İngilizce kelimeyi sesli oku"
+  );
+}
+
+function createMemorySpeakButton(card) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "memory-speak-btn";
+  button.dataset.speakFront = card.front || "";
+  button.dataset.speakBack = card.back || "";
+  button.dataset.speakText = card.front || "";
+  button.dataset.speakLang = "en";
+  button.setAttribute("aria-label", "İngilizce kelimeyi sesli oku");
+  button.textContent = "🔊";
+  button.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") event.stopPropagation();
+  });
+  button.addEventListener("click", (event) => {
+    updateMemorySpeakButtonState(button.closest(".memory-card"));
+    speakMemoryCardText(event, button.dataset.speakText, button.dataset.speakLang);
+  });
+  return button;
+}
+
+function attachMemorySpeakButtons(grid, cards) {
+  const cardsById = new Map(cards.map((card) => [String(card.id), card]));
+  grid.querySelectorAll(".memory-card[data-card-id]").forEach((cardEl) => {
+    const card = cardsById.get(cardEl.getAttribute("data-card-id"));
+    if (!card) return;
+
+    if (!cardEl.querySelector(".memory-speak-btn")) {
+      cardEl.appendChild(createMemorySpeakButton(card));
+    }
+    updateMemorySpeakButtonState(cardEl);
+  });
 }
 
 function toggleMemoryCard(cardId) {
   const card = document.querySelector(`[data-card-id="${cardId}"]`);
   if (!card) return;
+  stopMemorySpeech();
   card.classList.toggle("flipped");
+  updateMemorySpeakButtonState(card);
 }
 
 function handleMemoryCardKey(event, cardId) {
@@ -4747,6 +4801,67 @@ function handleMemoryCardKey(event, cardId) {
     event.preventDefault();
     toggleMemoryCard(cardId);
   }
+}
+
+function getSpeechVoice(langType) {
+  if (!window.speechSynthesis) return null;
+  const voices = speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  if (langType === "en") {
+    return (
+      voices.find((v) => v.lang === "en-US") ||
+      voices.find((v) => v.lang === "en-GB") ||
+      voices.find((v) => v.lang.startsWith("en")) ||
+      null
+    );
+  }
+  if (langType === "tr") {
+    return (
+      voices.find((v) => v.lang === "tr-TR") ||
+      voices.find((v) => v.lang.startsWith("tr")) ||
+      null
+    );
+  }
+  return null;
+}
+
+function speakMemoryCardText(event, text, langType) {
+  event.preventDefault();
+  event.stopPropagation();
+  if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== "function") {
+    console.warn("Web Speech API bu tarayıcıda desteklenmiyor.");
+    return;
+  }
+  const spokenText = String(text || "").trim();
+  if (!spokenText) return;
+  stopMemorySpeech();
+  const utterance = new SpeechSynthesisUtterance(spokenText);
+  utterance.lang = langType === "tr" ? "tr-TR" : "en-US";
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+  const voice = getSpeechVoice(langType);
+  if (voice) utterance.voice = voice;
+  const btn = event.target.closest(".memory-speak-btn") || event.currentTarget;
+  if (btn) btn.classList.add("speaking");
+  utterance.onend = () => { if (btn) btn.classList.remove("speaking"); };
+  utterance.onerror = () => { if (btn) btn.classList.remove("speaking"); };
+  speechSynthesis.speak(utterance);
+}
+
+function stopMemorySpeech() {
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  document.querySelectorAll(".memory-speak-btn.speaking").forEach((btn) => {
+    btn.classList.remove("speaking");
+  });
+}
+
+if (typeof window !== "undefined" && !window.__MEMORY_SPEECH_STOP_HOOKED__) {
+  window.__MEMORY_SPEECH_STOP_HOOKED__ = true;
+  window.addEventListener("pagehide", stopMemorySpeech);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopMemorySpeech();
+  });
 }
 
 function shuffleArray(items) {
@@ -5307,6 +5422,8 @@ window.renderMemorizationHub = renderMemorizationHub;
 window.setMemoryHubSection = setMemoryHubSection;
 window.toggleMemoryCard = toggleMemoryCard;
 window.handleMemoryCardKey = handleMemoryCardKey;
+window.speakMemoryCardText = speakMemoryCardText;
+window.stopMemorySpeech = stopMemorySpeech;
 window.setMemoryPracticeMode = setMemoryPracticeMode;
 window.submitMemoryPracticeAnswer = submitMemoryPracticeAnswer;
 window.nextMemoryPracticeQuestion = nextMemoryPracticeQuestion;
@@ -7439,6 +7556,7 @@ document.addEventListener("keydown", (event) => {
 
   function setMemoryTab(tab) {
     if (!TAB_TO_SECTION[tab]) return;
+    if (typeof window.stopMemorySpeech === "function") window.stopMemorySpeech();
     currentMemoryTab = tab;
 
     // Tüm panelleri kesin gizle: hem 'hidden' attribute hem 'is-hidden' class hem inline style
