@@ -162,131 +162,150 @@
 
     <div class="content-wrapper">
       <section id="dashboard" class="page active">
-        <div class="hero">
-          <h1>Çalışma, quiz ve sınav artık ayrı alanlarda 💙</h1>
-          <p>Bu sürümde konuları önce düzenli şekilde çalışabilir, sonra her konu için ayrı quiz çözebilir ve en sonda karışık deneme sınavına girebilirsin. Daha planlı ve daha rahat bir akış oluşturuldu.</p>
-          <div class="hero-hearts">♡  ♡  ♡  ♡  ♡</div>
+
+        <!-- Hızlı Erişim sol paneli -->
+        <div class="dash-quick-access quick-access-panel">
+          <div class="quick-access-title">
+            <span class="dqa-star">★</span>
+            <strong>Hızlı Erişim</strong>
+          </div>
+          <button class="quick-access-item" onclick="navigate('dashboard')"><span><span class="quick-access-icon">🏠</span> Ana Sayfa</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('ravzalingo')"><span><span class="quick-access-icon">🟢</span> RavzaLingo</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('kahoot')"><span><span class="quick-access-icon" style="background:rgba(100,50,200,.26);color:#b89aff;border-radius:6px;padding:1px 4px;font-weight:700;font-size:12px;">K!</span> Kahoot</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('studyhub')"><span><span class="quick-access-icon">📚</span> Çalışma Merkezi</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('memoryhub')"><span><span class="quick-access-icon">🧠</span> Ezber Merkezi</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('fillgaphub')"><span><span class="quick-access-icon">🧩</span> Boşluk Doldurma</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('quizhub')"><span><span class="quick-access-icon">📝</span> Quiz Merkezi</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('examcenter')"><span><span class="quick-access-icon">🎯</span> Sınav Merkezi</span><b class="quick-access-arrow">›</b></button>
+          <button class="quick-access-item" onclick="navigate('recap')"><span><span class="quick-access-icon">⚡</span> Hızlı Tekrar</span><b class="quick-access-arrow">›</b></button>
         </div>
 
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-num" id="stat-study-complete">0/20</div>
-            <div class="stat-label">Tamamlanan Çalışma</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-quiz-complete">0/20</div>
-            <div class="stat-label">Tamamlanan Quiz</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-best-exam">0%</div>
-            <div class="stat-label">En İyi Sınav Sonucu</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num" id="stat-question-bank">0</div>
-            <div class="stat-label">Toplam Soru Havuzu</div>
-          </div>
-        </div>
+        <!-- Sağ içerik alanı -->
+        <div class="dash-right">
 
-
-
-        <!-- Duolingo tarzı sade streak modülü -->
-        <div class="streak-module" id="streakModule">
-          <div class="streak-main-card">
-            <div class="streak-fire-wrap" aria-hidden="true">
-              <span class="streak-fire" id="streakFireIcon">🔥</span>
+          <div class="stats-row">
+            <div class="stat-card">
+              <span class="stat-icon-wrap pink">📚</span>
+              <div class="stat-num" id="stat-study-complete">0/20</div>
+              <div class="stat-label">Tamamlanan Çalışma</div>
             </div>
-
-            <div class="streak-main-info">
-              <span class="unit-badge streak-badge">STREAK</span>
-              <h3><span id="streakCurrent">0</span> Günlük Seri</h3>
-              <p id="streakMessage">Bugün çalışmaya başla, serin başlasın.</p>
+            <div class="stat-card">
+              <span class="stat-icon-wrap gold">🏆</span>
+              <div class="stat-num" id="stat-quiz-complete">0/20</div>
+              <div class="stat-label">Tamamlanan Quiz</div>
             </div>
-
-            <div class="streak-status-pill" id="streakStatusPill">Bugün bekliyor</div>
-          </div>
-
-          <div class="streak-week-card">
-            <div class="streak-week-head">
-              <strong>Haftalık Takip</strong>
-              <span id="streakBestLabel">En iyi seri: 0 gün</span>
+            <div class="stat-card">
+              <span class="stat-icon-wrap purple">🎯</span>
+              <div class="stat-num" id="stat-best-exam">0%</div>
+              <div class="stat-label">En İyi Sınav Sonucu</div>
             </div>
-
-            <div class="streak-days" id="streakDays" aria-label="Haftalık streak takibi">
-              <span data-day="0">Pzt</span>
-              <span data-day="1">Sal</span>
-              <span data-day="2">Çar</span>
-              <span data-day="3">Per</span>
-              <span data-day="4">Cum</span>
-              <span data-day="5">Cmt</span>
-              <span data-day="6">Paz</span>
+            <div class="stat-card">
+              <span class="stat-icon-wrap fire">📝</span>
+              <div class="stat-num" id="stat-question-bank">0</div>
+              <div class="stat-label">Toplam Soru Havuzu</div>
             </div>
           </div>
-        </div>
 
-        <div class="progress-shell">
-          <div class="progress-card">
-            <div class="progress-card-head">
-              <h3>Çalışma ilerlemesi</h3>
-              <span id="study-progress-label">0%</span>
+          <div class="dashboard-visual-stage" aria-hidden="true"></div>
+
+          <div class="hero">
+            <h1>Çalışma, quiz ve sınav artık ayrı alanlarda 💙</h1>
+            <p>Bu sürümde konuları önce düzenli şekilde çalışabilir, sonra her konu için ayrı quiz çözebilir ve en sonda karışık deneme sınavına girebilirsin.</p>
+            <div class="hero-hearts">♡  ♡  ♡  ♡  ♡</div>
+          </div>
+
+          <!-- Duolingo tarzı sade streak modülü -->
+          <div class="streak-module" id="streakModule">
+            <div class="streak-main-card">
+              <div class="streak-fire-wrap" aria-hidden="true">
+                <span class="streak-fire" id="streakFireIcon">🔥</span>
+              </div>
+              <div class="streak-main-info">
+                <span class="unit-badge streak-badge">STREAK</span>
+                <h3><span id="streakCurrent">0</span> Günlük Seri</h3>
+                <p id="streakMessage">Bugün çalışmaya başla, serin başlasın.</p>
+              </div>
+              <div class="streak-status-pill" id="streakStatusPill">Bugün bekliyor</div>
             </div>
-            <div class="progress-bar-bg"><div class="progress-fill" id="study-progress-fill"></div></div>
-            <p class="progress-text" id="study-progress-text">0 / 20 çalışma tamamlandı</p>
-          </div>
-          <div class="progress-card">
-            <div class="progress-card-head">
-              <h3>Quiz ilerlemesi</h3>
-              <span id="quiz-progress-label">0%</span>
+            <div class="streak-week-card">
+              <div class="streak-week-head">
+                <strong>Haftalık Takip</strong>
+                <span id="streakBestLabel">En iyi seri: 0 gün</span>
+              </div>
+              <div class="streak-days" id="streakDays" aria-label="Haftalık streak takibi">
+                <span data-day="0">Pzt</span>
+                <span data-day="1">Sal</span>
+                <span data-day="2">Çar</span>
+                <span data-day="3">Per</span>
+                <span data-day="4">Cum</span>
+                <span data-day="5">Cmt</span>
+                <span data-day="6">Paz</span>
+              </div>
             </div>
-            <div class="progress-bar-bg alt"><div class="progress-fill alt" id="quiz-progress-fill"></div></div>
-            <p class="progress-text" id="quiz-progress-text">0 / 20 quiz tamamlandı</p>
-          </div>
-        </div>
-
-        <div class="panel-grid">
-          <div class="feature-panel">
-            <div class="panel-badge">1. ADIM</div>
-            <h3>Çalışma Merkezi</h3>
-            <p>Konu anlatımları burada. Her konuda özet, kritik kurallar, mini notlar ve çalışma tamamlama butonu var.</p>
-            <button class="primary-btn" onclick="navigate('studyhub')">Çalışmaya Git</button>
           </div>
 
-          <div class="feature-panel">
-            <div class="panel-badge quiz">2. ADIM</div>
-            <h3>Ezber Merkezi</h3>
-            <p>İngilizce kelimeyi kartın ön yüzünde gör, karta tıklayınca arka yüzde Türkçesini aç. Hızlı tekrar için ideal.</p>
-            <button class="primary-btn soft" onclick="navigate('memoryhub')">Kartlara Git</button>
+          <div class="progress-shell">
+            <div class="progress-card">
+              <div class="progress-card-head">
+                <h3>Çalışma ilerlemesi</h3>
+                <span id="study-progress-label">0%</span>
+              </div>
+              <div class="progress-bar-bg"><div class="progress-fill" id="study-progress-fill"></div></div>
+              <p class="progress-text" id="study-progress-text">0 / 20 çalışma tamamlandı</p>
+            </div>
+            <div class="progress-card">
+              <div class="progress-card-head">
+                <h3>Quiz ilerlemesi</h3>
+                <span id="quiz-progress-label">0%</span>
+              </div>
+              <div class="progress-bar-bg alt"><div class="progress-fill alt" id="quiz-progress-fill"></div></div>
+              <p class="progress-text" id="quiz-progress-text">0 / 20 quiz tamamlandı</p>
+            </div>
           </div>
 
-          <div class="feature-panel">
-            <div class="panel-badge quiz">3. ADIM</div>
-            <h3>Quiz Merkezi</h3>
-            <p>Konu çalıştıktan sonra sadece quiz odaklı ayrı sayfaya geçebilirsin. Böylece not ve soru birbirine karışmaz.</p>
-            <button class="primary-btn soft" onclick="navigate('quizhub')">Quizlere Git</button>
+          <div class="panel-grid">
+            <div class="feature-panel">
+              <div class="panel-badge">1. ADIM</div>
+              <h3>Çalışma Merkezi</h3>
+              <p>Konu anlatımları burada. Her konuda özet, kritik kurallar, mini notlar ve çalışma tamamlama butonu var.</p>
+              <button class="primary-btn" onclick="navigate('studyhub')">Çalışmaya Git</button>
+            </div>
+            <div class="feature-panel">
+              <div class="panel-badge quiz">2. ADIM</div>
+              <h3>Ezber Merkezi</h3>
+              <p>İngilizce kelimeyi kartın ön yüzünde gör, karta tıklayınca arka yüzde Türkçesini aç. Hızlı tekrar için ideal.</p>
+              <button class="primary-btn soft" onclick="navigate('memoryhub')">Kartlara Git</button>
+            </div>
+            <div class="feature-panel">
+              <div class="panel-badge quiz">3. ADIM</div>
+              <h3>Quiz Merkezi</h3>
+              <p>Konu çalıştıktan sonra sadece quiz odaklı ayrı sayfaya geçebilirsin. Böylece not ve soru birbirine karışmaz.</p>
+              <button class="primary-btn soft" onclick="navigate('quizhub')">Quizlere Git</button>
+            </div>
+            <div class="feature-panel">
+              <div class="panel-badge exam">4. ADIM</div>
+              <h3>Sınav Merkezi</h3>
+              <p>Karışık soru havuzundan mini, orta veya tam deneme başlat. Süre, skor ve cevap inceleme ekranı var.</p>
+              <button class="primary-btn dark" onclick="navigate('examcenter')">Sınava Başla</button>
+            </div>
           </div>
 
-          <div class="feature-panel">
-            <div class="panel-badge exam">4. ADIM</div>
-            <h3>Sınav Merkezi</h3>
-            <p>Karışık soru havuzundan mini, orta veya tam deneme başlat. Süre, skor ve cevap inceleme ekranı var.</p>
-            <button class="primary-btn dark" onclick="navigate('examcenter')">Sınava Başla</button>
-          </div>
-        </div>
-
-        <div class="dashboard-grid">
-          <div class="dashboard-card">
-            <h3>Bugünkü önerilen akış</h3>
-            <ol class="dashboard-steps">
-              <li>Önce 2 konu çalış</li>
-              <li>Sonra o 2 konunun quizini çöz</li>
-              <li>Günün sonunda mini deneme yap</li>
-            </ol>
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <h3>Bugünkü önerilen akış</h3>
+              <ol class="dashboard-steps">
+                <li>Önce 2 konu çalış</li>
+                <li>Sonra o 2 konunun quizini çöz</li>
+                <li>Günün sonunda mini deneme yap</li>
+              </ol>
+            </div>
+            <div class="dashboard-card">
+              <h3>Son sınav özeti</h3>
+              <div id="latest-exam-box" class="empty-mini">Henüz bir sınav sonucu yok.</div>
+            </div>
           </div>
 
-          <div class="dashboard-card">
-            <h3>Son sınav özeti</h3>
-            <div id="latest-exam-box" class="empty-mini">Henüz bir sınav sonucu yok.</div>
-          </div>
-        </div>
+        </div><!-- /dash-right -->
       </section>
 
       <section id="studyhub" class="page">
