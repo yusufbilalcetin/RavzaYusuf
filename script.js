@@ -13067,6 +13067,235 @@ document.addEventListener("DOMContentLoaded", () => {
       .rlz5-modal-foot .rlz5-btn-primary:hover{
         filter:brightness(1.03);
       }
+      .rlz5-progress-modal .rlz5-modal-body{
+        background:
+          radial-gradient(circle at 12% 4%,rgba(126,224,0,.10),transparent 28%),
+          radial-gradient(circle at 96% 10%,rgba(255,208,0,.12),transparent 24%);
+      }
+      .rlz5-progress-hero{
+        display:grid;
+        grid-template-columns:180px 1fr;
+        gap:22px;
+        align-items:center;
+        margin-bottom:24px;
+        padding:22px;
+        border-radius:28px;
+        background:linear-gradient(135deg,#f5ffe9,#fff8d9);
+        border:2px solid #c9efb8;
+        box-shadow:0 16px 34px rgba(88,204,2,.10);
+      }
+      .rlz5-progress-ring{
+        --pct:0;
+        width:156px;
+        aspect-ratio:1;
+        border-radius:50%;
+        display:grid;
+        place-items:center;
+        position:relative;
+        background:conic-gradient(#58cc02 calc(var(--pct) * 1%), #e7e7df 0);
+        box-shadow:0 8px 0 #b7eaa0,0 18px 34px rgba(88,204,2,.16),inset 0 1px 0 rgba(255,255,255,.9);
+      }
+      .rlz5-progress-ring::after{
+        content:"";
+        position:absolute;
+        inset:15px;
+        border-radius:50%;
+        background:#fffefa;
+        box-shadow:inset 0 3px 12px rgba(20,24,32,.08);
+      }
+      .rlz5-progress-ring span{
+        position:relative;
+        z-index:1;
+        display:grid;
+        gap:2px;
+        text-align:center;
+      }
+      .rlz5-progress-ring strong{
+        color:#2f7d00;
+        font-size:36px;
+        line-height:1;
+        font-weight:950;
+      }
+      .rlz5-progress-ring small{
+        color:#777a81;
+        font-size:12px;
+        font-weight:950;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+      }
+      .rlz5-progress-summary{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:12px;
+      }
+      .rlz5-progress-summary div{
+        min-height:76px;
+        display:grid;
+        align-content:center;
+        gap:4px;
+        padding:14px 16px;
+        border-radius:20px;
+        background:rgba(255,255,255,.82);
+        border:2px solid rgba(255,255,255,.82);
+        box-shadow:0 3px 0 rgba(183,234,160,.72);
+      }
+      .rlz5-progress-summary b{
+        color:#2b2d33;
+        font-size:clamp(18px,2vw,25px);
+        line-height:1.1;
+        font-weight:950;
+      }
+      .rlz5-progress-summary small{
+        color:#777a81;
+        font-size:13px;
+        font-weight:900;
+      }
+      .rlz5-progress-chart{
+        display:grid;
+        gap:18px;
+      }
+      .rlz5-progress-section{
+        padding:18px;
+        border-radius:28px;
+        background:rgba(255,255,255,.84);
+        border:2px solid #e6e6df;
+        box-shadow:0 4px 0 #e3e3dc,0 14px 28px rgba(20,24,32,.055);
+      }
+      .rlz5-progress-section-head{
+        display:flex;
+        align-items:end;
+        justify-content:space-between;
+        gap:14px;
+        margin-bottom:12px;
+      }
+      .rlz5-progress-section-head div{
+        display:grid;
+        gap:3px;
+        min-width:0;
+      }
+      .rlz5-progress-section-head span{
+        color:#58cc02;
+        font-size:13px;
+        font-weight:950;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+      }
+      .rlz5-progress-section-head strong{
+        color:#2b2d33;
+        font-size:24px;
+        line-height:1.1;
+        font-weight:950;
+      }
+      .rlz5-progress-section-head b{
+        color:#2f7d00;
+        font-size:24px;
+        line-height:1;
+        font-weight:950;
+      }
+      .rlz5-progress-section-bar,
+      .rlz5-progress-track{
+        display:block;
+        overflow:hidden;
+        border-radius:999px;
+        background:#e7e7df;
+      }
+      .rlz5-progress-section-bar{
+        height:14px;
+        margin-bottom:14px;
+      }
+      .rlz5-progress-section-bar span{
+        display:block;
+        width:calc(var(--section-pct) * 1%);
+        height:100%;
+        border-radius:inherit;
+        background:linear-gradient(90deg,#7ee000,#58cc02);
+      }
+      .rlz5-progress-units{
+        display:grid;
+        gap:10px;
+      }
+      .rlz5-progress-unit{
+        width:100%;
+        display:grid;
+        gap:10px;
+        padding:14px;
+        border:2px solid #ecece7;
+        border-radius:22px;
+        background:#fffefa;
+        color:#2b2d33;
+        text-align:left;
+        cursor:pointer;
+        transition:transform .14s ease,border-color .14s ease,background .14s ease;
+      }
+      .rlz5-progress-unit:hover{
+        transform:translateY(-1px);
+        background:#fbfff7;
+        border-color:#bcefa4;
+      }
+      .rlz5-progress-unit.is-locked{
+        opacity:.78;
+      }
+      .rlz5-progress-unit-head{
+        display:grid;
+        grid-template-columns:48px 1fr auto;
+        gap:12px;
+        align-items:center;
+      }
+      .rlz5-progress-unit-icon{
+        width:48px;
+        height:48px;
+        display:grid;
+        place-items:center;
+        border-radius:16px;
+        background:linear-gradient(180deg,#f2ffe9,#e2ffd5);
+        border:1px solid #daf4cb;
+        font-size:24px;
+      }
+      .rlz5-progress-unit-copy{
+        display:grid;
+        gap:3px;
+        min-width:0;
+      }
+      .rlz5-progress-unit-copy strong{
+        overflow:hidden;
+        color:#2b2d33;
+        font-size:18px;
+        line-height:1.15;
+        font-weight:950;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+      }
+      .rlz5-progress-unit-copy small{
+        color:#777a81;
+        font-size:13px;
+        font-weight:850;
+      }
+      .rlz5-progress-unit-head b{
+        color:#2f7d00;
+        font-size:18px;
+        font-weight:950;
+      }
+      .rlz5-progress-track{
+        height:10px;
+      }
+      .rlz5-progress-fill{
+        display:block;
+        height:100%;
+        border-radius:inherit;
+        background:linear-gradient(90deg,#7ee000,#58cc02);
+        box-shadow:0 0 14px rgba(88,204,2,.22);
+      }
+      .rlz5-progress-stars{
+        display:flex;
+        gap:3px;
+        color:#d7d7cf;
+        font-size:17px;
+        line-height:1;
+      }
+      .rlz5-progress-stars .is-on{
+        color:#ffd000;
+        text-shadow:0 1px 0 #b38300;
+      }
       @media(max-width:760px){
         .rlz5-modal-head{padding:18px 58px 16px 18px}
         .rlz5-modal-icon{width:58px;height:58px;border-radius:22px;font-size:27px}
@@ -13082,6 +13311,15 @@ document.addEventListener("DOMContentLoaded", () => {
         .rlz5-modal-summary .lesson-hero,
         .rlz5-modal-summary .mini-summary-card,
         .rlz5-modal-summary .visual-note{padding:18px;border-radius:22px}
+        .rlz5-progress-hero{grid-template-columns:1fr;padding:16px;justify-items:center;text-align:center}
+        .rlz5-progress-ring{width:136px}
+        .rlz5-progress-summary{width:100%;grid-template-columns:1fr}
+        .rlz5-progress-section{padding:14px;border-radius:22px}
+        .rlz5-progress-section-head strong{font-size:20px}
+        .rlz5-progress-unit-head{grid-template-columns:42px 1fr auto;gap:10px}
+        .rlz5-progress-unit-icon{width:42px;height:42px;border-radius:14px;font-size:21px}
+        .rlz5-progress-unit-copy strong{font-size:16px;white-space:normal}
+        .rlz5-progress-unit-copy small{font-size:12px}
         .rlz5-modal-foot{padding:14px 16px;grid-template-columns:1fr;display:grid}
       }
 
@@ -13351,6 +13589,448 @@ document.addEventListener("DOMContentLoaded", () => {
         color:#fff;
         box-shadow:0 6px 0 #2f7d00,0 16px 28px rgba(40,120,0,.24);
       }
+      body.dark .rlz5-progress-hero{
+        background:linear-gradient(135deg,rgba(88,204,2,.12),rgba(255,208,0,.07));
+        border-color:rgba(126,224,0,.24);
+        box-shadow:0 16px 34px rgba(0,0,0,.24);
+      }
+      body.dark .rlz5-progress-ring{
+        background:conic-gradient(#7ee000 calc(var(--pct) * 1%), #2c3e48 0);
+        box-shadow:0 8px 0 #244f13,0 18px 34px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.05);
+      }
+      body.dark .rlz5-progress-ring::after{
+        background:#101a20;
+        box-shadow:inset 0 3px 12px rgba(0,0,0,.34);
+      }
+      body.dark .rlz5-progress-ring strong,
+      body.dark .rlz5-progress-section-head b,
+      body.dark .rlz5-progress-unit-head b{
+        color:#7ee000;
+      }
+      body.dark .rlz5-progress-ring small,
+      body.dark .rlz5-progress-summary small,
+      body.dark .rlz5-progress-unit-copy small{
+        color:#9fb0bb;
+      }
+      body.dark .rlz5-progress-summary div,
+      body.dark .rlz5-progress-section,
+      body.dark .rlz5-progress-unit{
+        background:#1d2e36;
+        color:#f8fafc;
+        border-color:#2c3e48;
+        box-shadow:0 4px 0 #0e1a20,0 12px 26px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04);
+      }
+      body.dark .rlz5-progress-unit:hover{
+        background:#223845;
+        border-color:rgba(126,224,0,.34);
+      }
+      body.dark .rlz5-progress-summary b,
+      body.dark .rlz5-progress-section-head strong,
+      body.dark .rlz5-progress-unit-copy strong{
+        color:#f8fafc;
+      }
+      body.dark .rlz5-progress-unit-icon{
+        background:#243844;
+        color:#f8fafc;
+        border-color:#2c3e48;
+      }
+      body.dark .rlz5-progress-section-bar,
+      body.dark .rlz5-progress-track{
+        background:#2c3e48;
+      }
+      body.dark .rlz5-progress-stars{
+        color:#41535d;
+      }
+
+      /* RavzaLingo modal final düzen: daha ince başlık/alt bar ve çakışmayan konu satırları */
+      .rlz5-modal-units .rlz5-modal-head{
+        gap:14px;
+        min-height:92px;
+        padding:16px 58px 16px 22px;
+      }
+      .rlz5-modal-units .rlz5-modal-icon{
+        width:54px;
+        height:54px;
+        border-radius:18px;
+        font-size:25px;
+        box-shadow:0 5px 0 #2f7d00,0 12px 22px rgba(88,204,2,.16);
+      }
+      .rlz5-modal-units .rlz5-modal-head h2,
+      body.dark .rlz5-modal-units .rlz5-modal-head h2{
+        font-size:clamp(26px,3vw,34px);
+        line-height:1.05;
+        margin:0 0 2px;
+      }
+      .rlz5-modal-units .rlz5-modal-head p{
+        font-size:clamp(13px,1.35vw,16px);
+        line-height:1.25;
+        margin:0;
+      }
+      .rlz5-modal-units .rlz5-modal-close{
+        width:42px;
+        height:42px;
+        top:15px;
+        right:18px;
+        border-width:2px;
+        font-size:22px;
+        box-shadow:0 5px 14px rgba(0,0,0,.16);
+      }
+      .rlz5-modal-units .rlz5-modal-body{
+        padding:16px 22px;
+      }
+      .rlz5-modal-units .rlz5-modal-foot{
+        gap:12px;
+        align-items:center;
+        padding:12px 22px 14px;
+      }
+      .rlz5-modal-units .rlz5-uc-note{
+        min-width:0;
+        gap:10px;
+        font-size:13px;
+        line-height:1.35;
+      }
+      .rlz5-modal-units .rlz5-uc-noteico{
+        width:38px;
+        height:38px;
+        font-size:21px;
+      }
+      .rlz5-modal-units .rlz5-uc-foot .rlz5-uc-progbtn,
+      .rlz5-modal-units .rlz5-modal-foot .rlz5-btn-secondary,
+      .rlz5-modal-units .rlz5-modal-foot .rlz5-btn-primary{
+        min-height:44px;
+        border-radius:16px;
+        border-width:2px;
+        padding:8px 16px;
+        font-size:clamp(14px,1.35vw,17px);
+        box-shadow:0 3px 0 rgba(88,204,2,.42);
+      }
+      .rlz5-modal-units .rlz5-all-topic{
+        grid-template-columns:52px minmax(0,1fr) auto;
+        gap:14px;
+        min-height:76px;
+        padding:12px 16px;
+        border-radius:18px;
+      }
+      .rlz5-modal-units .rlz5-all-ico{
+        width:52px;
+        height:52px;
+        border-radius:15px;
+        font-size:24px;
+      }
+      .rlz5-modal-units .rlz5-all-copy{
+        min-width:0;
+        gap:4px;
+        align-self:center;
+      }
+      .rlz5-modal-units .rlz5-all-copy strong{
+        display:block;
+        overflow:visible;
+        color:inherit;
+        font-size:clamp(17px,1.75vw,21px);
+        line-height:1.14;
+        text-overflow:clip;
+        white-space:normal;
+        overflow-wrap:anywhere;
+      }
+      .rlz5-modal-units .rlz5-all-copy small{
+        display:block;
+        overflow:visible;
+        font-size:clamp(12px,1.22vw,15px);
+        line-height:1.28;
+        text-overflow:clip;
+        white-space:normal;
+        overflow-wrap:anywhere;
+      }
+      .rlz5-modal-units .rlz5-all-status{
+        min-height:34px;
+        padding:6px 12px;
+        font-size:13px;
+        border-width:2px;
+      }
+      .rlz5-modal-units .rlz5-all-title{
+        margin:8px 2px 8px;
+        font-size:clamp(15px,1.6vw,20px);
+        line-height:1.2;
+      }
+      @media(max-width:760px){
+        .rlz5-modal-units .rlz5-modal-head{
+          min-height:78px;
+          padding:13px 52px 13px 14px;
+          gap:10px;
+        }
+        .rlz5-modal-units .rlz5-modal-icon{
+          width:44px;
+          height:44px;
+          border-radius:15px;
+          font-size:21px;
+        }
+        .rlz5-modal-units .rlz5-modal-head h2,
+        body.dark .rlz5-modal-units .rlz5-modal-head h2{
+          font-size:26px;
+        }
+        .rlz5-modal-units .rlz5-modal-head p{
+          font-size:13px;
+        }
+        .rlz5-modal-units .rlz5-modal-close{
+          width:38px;
+          height:38px;
+          top:13px;
+          right:12px;
+          font-size:20px;
+        }
+        .rlz5-modal-units .rlz5-modal-body{
+          padding:12px;
+        }
+        .rlz5-modal-units .rlz5-all-topic{
+          grid-template-columns:44px minmax(0,1fr);
+          gap:10px;
+          min-height:72px;
+          padding:11px;
+          border-radius:16px;
+        }
+        .rlz5-modal-units .rlz5-all-ico{
+          width:44px;
+          height:44px;
+          border-radius:13px;
+          font-size:21px;
+        }
+        .rlz5-modal-units .rlz5-all-copy strong{
+          font-size:16px;
+          line-height:1.16;
+        }
+        .rlz5-modal-units .rlz5-all-copy small{
+          font-size:12px;
+        }
+        .rlz5-modal-units .rlz5-all-status{
+          grid-column:2;
+          justify-self:start;
+          min-height:28px;
+          padding:4px 10px;
+          font-size:12px;
+        }
+        .rlz5-modal-units .rlz5-modal-foot{
+          padding:11px 12px 12px;
+          gap:10px;
+        }
+        .rlz5-modal-units .rlz5-uc-note{
+          font-size:12px;
+        }
+        .rlz5-modal-units .rlz5-uc-noteico{
+          width:32px;
+          height:32px;
+          font-size:18px;
+        }
+        .rlz5-modal-units .rlz5-uc-foot .rlz5-uc-progbtn,
+        .rlz5-modal-units .rlz5-modal-foot .rlz5-btn-secondary,
+        .rlz5-modal-units .rlz5-modal-foot .rlz5-btn-primary{
+          min-height:40px;
+          width:100%;
+          font-size:14px;
+        }
+      }
+
+      /* Çalışma pop-up'ı: daha minimalist üst/alt alan ve düzenli içerik */
+      .rlz5-modal-study{
+        width:min(100%,1020px);
+      }
+      .rlz5-modal-study .rlz5-modal-head{
+        gap:14px;
+        min-height:92px;
+        padding:16px 58px 16px 22px;
+      }
+      .rlz5-modal-study .rlz5-modal-icon{
+        width:54px;
+        height:54px;
+        border-radius:18px;
+        font-size:25px;
+        box-shadow:0 5px 0 #c48f00,0 12px 22px rgba(255,184,0,.16);
+      }
+      .rlz5-modal-study .rlz5-modal-head h2,
+      body.dark .rlz5-modal-study .rlz5-modal-head h2{
+        font-size:clamp(26px,3.2vw,38px);
+        line-height:1.05;
+        margin:0 0 2px;
+      }
+      .rlz5-modal-study .rlz5-modal-head p{
+        font-size:clamp(13px,1.38vw,17px);
+        line-height:1.25;
+        margin:0;
+      }
+      .rlz5-modal-study .rlz5-modal-close{
+        width:42px;
+        height:42px;
+        top:15px;
+        right:18px;
+        border-width:2px;
+        font-size:22px;
+        box-shadow:0 5px 14px rgba(0,0,0,.16);
+      }
+      .rlz5-modal-study .rlz5-modal-body{
+        padding:18px 24px;
+      }
+      .rlz5-modal-study .rlz5-modal-keypoints{
+        grid-template-columns:58px minmax(0,1fr);
+        gap:0 18px;
+        padding:18px 20px;
+        border-radius:22px;
+        margin-bottom:14px;
+      }
+      .rlz5-modal-study .rlz5-modal-keypoints::before{
+        width:52px;
+        height:52px;
+        border-radius:16px;
+        font-size:24px;
+      }
+      .rlz5-modal-study .rlz5-modal-keypoints h3,
+      body.dark .rlz5-modal-study .rlz5-modal-keypoints h3{
+        font-size:clamp(21px,2.2vw,28px);
+        line-height:1.12;
+        margin:0 0 10px;
+      }
+      .rlz5-modal-study .rlz5-modal-keypoints ul{
+        gap:9px;
+      }
+      .rlz5-modal-study .rlz5-modal-keypoints li,
+      body.dark .rlz5-modal-study .rlz5-modal-keypoints li{
+        padding-left:32px;
+        font-size:clamp(14px,1.35vw,17px);
+        line-height:1.42;
+        overflow-wrap:anywhere;
+      }
+      .rlz5-modal-study .rlz5-modal-keypoints li::before{
+        width:22px;
+        height:22px;
+        font-size:14px;
+      }
+      .rlz5-modal-study .rlz5-modal-summary,
+      body.dark .rlz5-modal-study .rlz5-modal-summary{
+        font-size:clamp(13.5px,1.25vw,16px);
+        line-height:1.55;
+      }
+      .rlz5-modal-study .rlz5-modal-summary .content-card,
+      .rlz5-modal-study .rlz5-modal-summary .lesson-hero,
+      .rlz5-modal-study .rlz5-modal-summary .mini-summary-card,
+      .rlz5-modal-study .rlz5-modal-summary .visual-note{
+        padding:18px 20px;
+        border-radius:20px;
+        margin-bottom:12px;
+      }
+      .rlz5-modal-study .rlz5-modal-summary h3,
+      .rlz5-modal-study .rlz5-modal-summary h4,
+      body.dark .rlz5-modal-study .rlz5-modal-summary h3,
+      body.dark .rlz5-modal-study .rlz5-modal-summary h4{
+        font-size:clamp(20px,2.1vw,27px);
+        line-height:1.14;
+        margin:0 0 10px;
+      }
+      .rlz5-modal-study .rlz5-modal-summary p,
+      .rlz5-modal-study .rlz5-modal-summary li,
+      .rlz5-modal-study .rlz5-modal-summary td{
+        font-size:clamp(13px,1.2vw,15.5px);
+        line-height:1.55;
+        overflow-wrap:anywhere;
+      }
+      .rlz5-modal-study .rlz5-modal-summary .table-wrap{
+        overflow-x:auto;
+      }
+      .rlz5-modal-study .rlz5-modal-summary table{
+        min-width:720px;
+        table-layout:fixed;
+        font-size:13px;
+      }
+      .rlz5-modal-study .rlz5-modal-summary th,
+      .rlz5-modal-study .rlz5-modal-summary td{
+        padding:10px 12px;
+      }
+      .rlz5-modal-study .rlz5-modal-foot{
+        gap:12px;
+        align-items:center;
+        padding:12px 22px 14px;
+      }
+      .rlz5-modal-study .rlz5-modal-foot .rlz5-btn-secondary,
+      .rlz5-modal-study .rlz5-modal-foot .rlz5-btn-primary{
+        min-height:44px;
+        border-radius:16px;
+        border-width:2px;
+        padding:8px 16px;
+        font-size:clamp(14px,1.35vw,17px);
+        font-weight:950;
+        box-shadow:0 3px 0 rgba(88,204,2,.42);
+      }
+      @media(max-width:760px){
+        .rlz5-modal-study .rlz5-modal-head{
+          min-height:78px;
+          padding:13px 52px 13px 14px;
+          gap:10px;
+        }
+        .rlz5-modal-study .rlz5-modal-icon{
+          width:44px;
+          height:44px;
+          border-radius:15px;
+          font-size:21px;
+        }
+        .rlz5-modal-study .rlz5-modal-head h2,
+        body.dark .rlz5-modal-study .rlz5-modal-head h2{
+          font-size:26px;
+        }
+        .rlz5-modal-study .rlz5-modal-head p{
+          font-size:13px;
+        }
+        .rlz5-modal-study .rlz5-modal-close{
+          width:38px;
+          height:38px;
+          top:13px;
+          right:12px;
+          font-size:20px;
+        }
+        .rlz5-modal-study .rlz5-modal-body{
+          padding:12px;
+        }
+        .rlz5-modal-study .rlz5-modal-keypoints{
+          grid-template-columns:1fr;
+          padding:16px;
+          border-radius:18px;
+        }
+        .rlz5-modal-study .rlz5-modal-keypoints::before{
+          width:44px;
+          height:44px;
+          border-radius:14px;
+          font-size:21px;
+          margin-bottom:10px;
+        }
+        .rlz5-modal-study .rlz5-modal-keypoints h3,
+        body.dark .rlz5-modal-study .rlz5-modal-keypoints h3{
+          font-size:22px;
+        }
+        .rlz5-modal-study .rlz5-modal-summary .content-card,
+        .rlz5-modal-study .rlz5-modal-summary .lesson-hero,
+        .rlz5-modal-study .rlz5-modal-summary .mini-summary-card,
+        .rlz5-modal-study .rlz5-modal-summary .visual-note{
+          padding:15px;
+          border-radius:18px;
+        }
+        .rlz5-modal-study .rlz5-modal-summary h3,
+        .rlz5-modal-study .rlz5-modal-summary h4,
+        body.dark .rlz5-modal-study .rlz5-modal-summary h3,
+        body.dark .rlz5-modal-study .rlz5-modal-summary h4{
+          font-size:21px;
+        }
+        .rlz5-modal-study .rlz5-modal-summary table{
+          min-width:620px;
+        }
+        .rlz5-modal-study .rlz5-modal-foot{
+          display:grid;
+          grid-template-columns:1fr;
+          gap:10px;
+          padding:11px 12px 12px;
+        }
+        .rlz5-modal-study .rlz5-modal-foot .rlz5-btn-secondary,
+        .rlz5-modal-study .rlz5-modal-foot .rlz5-btn-primary{
+          width:100%;
+          min-height:40px;
+          font-size:14px;
+        }
+      }
 
       /* --- "KALDIĞIM ETKİNLİĞE GİT" BUTONU --- */
       .rlz5-goto-activity{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:0;background:linear-gradient(135deg,#7ee000,#58cc02);color:#fff;font-size:24px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 12px 28px rgba(40,120,0,.4);z-index:150;display:none;align-items:center;justify-content:center;padding:0;touch-action:manipulation;transition:transform .18s ease}
@@ -13575,7 +14255,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
     const unit = found.unit;
     const topic = unit.topic || {};
     const keyPoints = Array.isArray(topic.keyPoints) ? topic.keyPoints : [];
-    const safeId = String(topic.id || unitId).replace(/'/g, "\\'");
+    const safeId = String(topic.id || unit.id || unitId).replace(/'/g, "\\'");
     rlz5CloseTopicModal();
     const overlay = document.createElement("div");
     overlay.className = "rlz5-modal-overlay";
@@ -13596,7 +14276,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
         </div>
         <div class="rlz5-modal-foot">
           <button type="button" class="rlz5-btn-secondary" onclick="rlz5CloseTopicModal()">Kapat</button>
-          ${typeof window.openStudyTopic === "function" ? `<button type="button" class="rlz5-btn-primary" onclick="rlz5OpenFullTopic('${safeId}')">Çalışma Merkezi'nde Aç</button>` : ""}
+          <button type="button" class="rlz5-btn-primary" onclick="rlz5OpenStudyCenterTopic('${safeId}')">Çalışma Merkezi'nde Aç</button>
         </div>
       </div>`;
     overlay.addEventListener("click", (e) => { if (e.target === overlay) rlz5CloseTopicModal(); });
@@ -13663,7 +14343,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
         const sid = String(u.id).replace(/'/g, "\\'");
         const isCur = u.id === activeUnitId;
         return `
-          <button type="button" class="rlz5-all-topic${isCur ? " is-current" : ""}${st.cls === "locked" ? " is-locked" : ""}" onclick="rlz5OpenFullTopic('${sid}')" title="${rlzEsc(u.title)}">
+          <button type="button" class="rlz5-all-topic${isCur ? " is-current" : ""}${st.cls === "locked" ? " is-locked" : ""}" onclick="rlz5GoToUnit('${sid}')" title="${rlzEsc(u.title)}">
             <span class="rlz5-all-ico">${rlzEsc(u.icon || "📄")}</span>
             <span class="rlz5-all-copy">
               <strong>${rlzEsc(u.title)}</strong>
@@ -13695,7 +14375,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
           <div class="rlz5-all-list">${sectionsHtml}</div>
         </div>
         <div class="rlz5-modal-foot rlz5-uc-foot">
-          <span class="rlz5-uc-note"><span class="rlz5-uc-noteico">i</span> Geniş alan bütün konuları açar; sağdaki küçük buton sadece o konunun çalışma pop-up'ını açar.</span>
+          <span class="rlz5-uc-note"><span class="rlz5-uc-noteico">i</span> Konuya tıklayınca RavzaLingo içindeki başlığına gider; çalışma merkezi açılmaz.</span>
           <button type="button" class="rlz5-btn-secondary rlz5-uc-progbtn" onclick="rlz5UnitsProgressView()">📊 İlerlemeyi Görüntüle</button>
         </div>
       </div>`;
@@ -13709,13 +14389,22 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
     el.classList.remove("is-open");
     setTimeout(() => { el.remove(); }, 220);
   }
+  function rlz5FindUnitBanner(unitId) {
+    const root = rlzRoot();
+    if (!root) return null;
+    const id = String(unitId || "");
+    return Array.prototype.slice.call(root.querySelectorAll(".rlz5-unit-banner[data-unit-id]"))
+      .find((banner) => banner.id !== "rlz5UnitSticky" && banner.dataset.unitId === id) || null;
+  }
+  function rlz5ScrollToUnitBanner(unitId) {
+    const banner = rlz5FindUnitBanner(unitId);
+    if (!banner) return;
+    const top = banner.getBoundingClientRect().top + window.scrollY - rlzTopbarBottom() - 18;
+    window.scrollTo({ top: Math.max(0, Math.round(top)), behavior: "smooth" });
+  }
   function rlz5GoToUnit(unitId) {
     rlz5CloseTopicModal();
-    const go = () => {
-      const root = rlzRoot();
-      const banner = root && root.querySelector('.rlz5-unit-banner[data-unit-id="' + String(unitId).replace(/"/g, '\\"') + '"]');
-      if (banner) banner.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
+    const go = () => rlz5ScrollToUnitBanner(unitId);
     const page = document.getElementById("ravzalingo");
     if (page && !page.classList.contains("active") && typeof window.navigate === "function") {
       window.navigate("ravzalingo");
@@ -13724,14 +14413,122 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
       setTimeout(go, 60);
     }
   }
+  function rlz5UnitProgressPercent(progress) {
+    const lessonsPct = Math.min(RLZ_LESSONS_PER_UNIT, Math.max(0, progress.lessonsDone || 0)) / RLZ_LESSONS_PER_UNIT;
+    const starsPct = Math.min(5, Math.max(0, progress.stars || 0)) / 5;
+    return Math.round(Math.max(lessonsPct, starsPct) * 100);
+  }
+  function rlz5ShowProgressGraphModal() {
+    const content = rlzBuildContent();
+    const state = rlzLoad();
+    const unitsFlat = [];
+    content.sections.forEach((section, sectionIdx) => {
+      (section.units || []).forEach((unit, unitIdx) => {
+        const progress = rlzGetUnitProgress(state, unit.id);
+        const pct = rlz5UnitProgressPercent(progress);
+        const unlocked = rlzIsUnitUnlocked(state, content.sections, sectionIdx, unitIdx);
+        unitsFlat.push({ section, sectionIdx, unit, unitIdx, progress, pct, unlocked });
+      });
+    });
+    const totalUnits = unitsFlat.length;
+    const completedUnits = unitsFlat.filter((item) => (item.progress.stars || 0) >= 5).length;
+    const startedUnits = unitsFlat.filter((item) => (item.progress.stars || 0) > 0 || (item.progress.lessonsDone || 0) > 0).length;
+    const totalStars = unitsFlat.reduce((sum, item) => sum + Math.min(5, Math.max(0, item.progress.stars || 0)), 0);
+    const overallPct = totalUnits ? Math.round(unitsFlat.reduce((sum, item) => sum + item.pct, 0) / totalUnits) : 0;
+    const currentItem = unitsFlat.find((item) => item.unlocked && (item.progress.stars || 0) < 5) || unitsFlat[unitsFlat.length - 1];
+    const sectionsHtml = content.sections.map((section, sectionIdx) => {
+      const items = (section.units || []).map((unit, unitIdx) => {
+        const progress = rlzGetUnitProgress(state, unit.id);
+        const pct = rlz5UnitProgressPercent(progress);
+        const status = rlzUnitStatus(state, content.sections, sectionIdx, unitIdx, unit);
+        const sid = String(unit.id).replace(/'/g, "\\'");
+        const stars = Math.min(5, Math.max(0, progress.stars || 0));
+        const starsHtml = Array.from({ length: 5 }, (_, i) => `<span class="${i < stars ? "is-on" : ""}">★</span>`).join("");
+        return `
+          <button type="button" class="rlz5-progress-unit is-${status.cls}" onclick="rlz5GoToUnit('${sid}')" title="${rlzEsc(unit.title)}">
+            <span class="rlz5-progress-unit-head">
+              <span class="rlz5-progress-unit-icon">${rlzEsc(unit.icon || "📄")}</span>
+              <span class="rlz5-progress-unit-copy">
+                <strong>${rlzEsc(unit.title)}</strong>
+                <small>${unitIdx + 1}. Ünite · ${status.icon} ${status.label}</small>
+              </span>
+              <b>${pct}%</b>
+            </span>
+            <span class="rlz5-progress-track" aria-hidden="true"><span class="rlz5-progress-fill" style="width:${pct}%"></span></span>
+            <span class="rlz5-progress-stars" aria-label="${stars}/5 yıldız">${starsHtml}</span>
+          </button>`;
+      }).join("");
+      const sectionItems = unitsFlat.filter((item) => item.sectionIdx === sectionIdx);
+      const sectionPct = sectionItems.length ? Math.round(sectionItems.reduce((sum, item) => sum + item.pct, 0) / sectionItems.length) : 0;
+      return `
+        <section class="rlz5-progress-section" style="--section-pct:${sectionPct}">
+          <div class="rlz5-progress-section-head">
+            <div>
+              <span>${rlzEsc(section.kicker || section.title)}</span>
+              <strong>${rlzEsc(section.title)}</strong>
+            </div>
+            <b>${sectionPct}%</b>
+          </div>
+          <div class="rlz5-progress-section-bar" aria-hidden="true"><span></span></div>
+          <div class="rlz5-progress-units">${items}</div>
+        </section>`;
+    }).join("");
+    const overlay = document.createElement("div");
+    overlay.className = "rlz5-modal-overlay";
+    overlay.id = "rlz5TopicModal";
+    overlay.innerHTML = `
+      <div class="rlz5-modal rlz5-modal-units rlz5-progress-modal" role="dialog" aria-modal="true" aria-label="İlerleme grafiği">
+        <div class="rlz5-modal-head">
+          <span class="rlz5-modal-icon" aria-hidden="true">📊</span>
+          <div class="rlz5-modal-headtext">
+            <h2>İlerleme Grafiği</h2>
+            <p>RavzaLingo konu tamamlama durumu</p>
+          </div>
+          <button type="button" class="rlz5-modal-close" onclick="rlz5CloseTopicModal()" aria-label="Kapat">✕</button>
+        </div>
+        <div class="rlz5-modal-body">
+          <div class="rlz5-progress-hero">
+            <div class="rlz5-progress-ring" style="--pct:${overallPct}">
+              <span><strong>${overallPct}%</strong><small>genel ilerleme</small></span>
+            </div>
+            <div class="rlz5-progress-summary">
+              <div><b>${completedUnits}/${totalUnits}</b><small>Tamamlanan konu</small></div>
+              <div><b>${startedUnits}</b><small>Başlanan konu</small></div>
+              <div><b>${totalStars}</b><small>Toplam yıldız</small></div>
+              <div><b>${currentItem ? rlzEsc(currentItem.unit.title) : "-"}</b><small>Sıradaki başlık</small></div>
+            </div>
+          </div>
+          <div class="rlz5-progress-chart">${sectionsHtml}</div>
+        </div>
+        <div class="rlz5-modal-foot rlz5-uc-foot">
+          <span class="rlz5-uc-note"><span class="rlz5-uc-noteico">i</span> Grafikteki konu kartına tıklayınca RavzaLingo'daki başlığına gidersin.</span>
+          <button type="button" class="rlz5-btn-secondary rlz5-uc-progbtn" onclick="rlz5CloseTopicModal()">Kapat</button>
+        </div>
+      </div>`;
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) rlz5CloseTopicModal(); });
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
+  }
   function rlz5UnitsProgressView() {
     rlz5CloseTopicModal();
-    if (typeof window.navigate === "function") { try { window.navigate("ravzalingo"); } catch (_) {} }
-    setTimeout(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, 80);
+    const show = () => rlz5ShowProgressGraphModal();
+    const page = document.getElementById("ravzalingo");
+    if (page && !page.classList.contains("active") && typeof window.navigate === "function") {
+      try { window.navigate("ravzalingo"); } catch (_) {}
+      setTimeout(show, 320);
+    } else {
+      setTimeout(show, 240);
+    }
   }
   // Geriye uyumluluk (eski isim)
   function rlz5OpenFullTopic(topicId) {
-    if (typeof window.openStudyTopic === "function") { rlz5CloseTopicModal(); try { window.openStudyTopic(topicId); } catch (_) {} }
+    rlz5GoToUnit(topicId);
+  }
+  function rlz5OpenStudyCenterTopic(topicId) {
+    rlz5CloseTopicModal();
+    if (typeof window.openStudyTopic === "function") {
+      try { window.openStudyTopic(topicId); } catch (_) {}
+    }
   }
 
   /* --- "KALDIĞIM ETKİNLİĞE GİT" BUTONU --- */
@@ -13898,9 +14695,18 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
     el.id = "rlz5UnitSticky";
     el.dataset.unitId = active.dataset.unitId || "";
     el.title = active.title || "";
+    const stickyMain = el.querySelector(".rlz5-banner-main");
+    if (stickyMain) {
+      stickyMain.setAttribute("aria-label", "RavzaLingo konu başlığına git");
+      stickyMain.onclick = function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (el.dataset.unitId) rlz5GoToUnit(el.dataset.unitId);
+      };
+    }
     el.onclick = function (event) {
-      if (event?.target?.closest?.(".rlz5-banner-main,.rlz5-banner-guide")) return;
-      if (el.dataset.unitId) rlz5ShowAllTopicsModal(el.dataset.unitId);
+      if (event?.target?.closest?.(".rlz5-banner-guide")) return;
+      if (el.dataset.unitId) rlz5GoToUnit(el.dataset.unitId);
     };
     const section = active.closest(".rlz5-section");
     if (section) {
@@ -13909,11 +14715,15 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
       el.style.setProperty("--rlz-deep", cs.getPropertyValue("--rlz-deep"));
       el.style.setProperty("--rlz-light", cs.getPropertyValue("--rlz-light"));
     }
-    el.style.position = "fixed";
-    el.style.left = Math.round(ar.left) + "px";
-    el.style.width = Math.round(ar.width) + "px";
-    el.style.zIndex = "55";
-    el.style.display = "flex";
+    const stickyLeft = Math.max(0, Math.round(ar.left));
+    const stickyWidth = Math.max(0, Math.min(Math.round(ar.width), Math.round(window.innerWidth - stickyLeft - 12)));
+    el.style.setProperty("position", "fixed", "important");
+    el.style.setProperty("left", stickyLeft + "px", "important");
+    el.style.setProperty("right", "auto", "important");
+    el.style.setProperty("width", stickyWidth + "px", "important");
+    el.style.setProperty("max-width", stickyWidth + "px", "important");
+    el.style.setProperty("z-index", "55", "important");
+    el.style.setProperty("display", "flex", "important");
     // sıradaki banner yaklaşırsa "yukarı it" efekti
     let y = lineTop;
     const sh = el.getBoundingClientRect().height || ar.height;
@@ -13921,7 +14731,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
       const nr = next.getBoundingClientRect();
       if (nr.top < lineTop + sh) y = Math.max(rlzTopbarBottom() - sh + 6, nr.top - sh);
     }
-    el.style.top = Math.round(y) + "px";
+    el.style.setProperty("top", Math.round(y) + "px", "important");
   }
   function rlzScheduleFixedTopbar() {
     if (RLZ_FIXBAR_RAF != null) return;
@@ -13953,6 +14763,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
   window.rlz5ShowAllTopicsModal = rlz5ShowAllTopicsModal;
   window.rlz5CloseTopicModal = rlz5CloseTopicModal;
   window.rlz5OpenFullTopic = rlz5OpenFullTopic;
+  window.rlz5OpenStudyCenterTopic = rlz5OpenStudyCenterTopic;
   window.rlz5GoToUnit = rlz5GoToUnit;
   window.rlz5UnitsProgressView = rlz5UnitsProgressView;
   window.rlz5GotoActivity = rlz5GotoActivity;
@@ -14016,7 +14827,11 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
         const guide = e.target && e.target.closest && e.target.closest(".rlz5-banner-guide[data-unit-id]");
         if (guide && guide.dataset.unitId) { e.preventDefault(); rlz5ShowStudyTopicModal(guide.dataset.unitId); return; }
         const main = e.target && e.target.closest && e.target.closest(".rlz5-banner-main[data-unit-id]");
-        if (main && main.dataset.unitId) { e.preventDefault(); rlz5ShowAllTopicsModal(main.dataset.unitId); }
+        if (main && main.dataset.unitId) {
+          e.preventDefault();
+          if (main.closest("#rlz5UnitSticky")) rlz5GoToUnit(main.dataset.unitId);
+          else rlz5ShowAllTopicsModal(main.dataset.unitId);
+        }
       }
     });
     rlzLoadFromFirebase().then(() => {
