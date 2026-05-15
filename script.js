@@ -4173,6 +4173,7 @@ function navigate(pageId) {
   document.documentElement.classList.toggle("is-ravzalingo-page", isRavzaLingoPage);
   document.body.classList.toggle("is-ravzalingo-page", isRavzaLingoPage);
   document.body.classList.toggle("rlz5-page-active", isRavzaLingoPage);
+  document.body.classList.toggle("studydetail-active", pageId === "studydetail");
 
   document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
   document.querySelectorAll(".nav-links button").forEach((button) => button.classList.remove("active"));
@@ -4445,16 +4446,11 @@ function renderQuizHub(filterText = "") {
         <article class="topic-card">
           <div class="topic-card-top">
             <span class="unit-badge quiz-badge">${safeText(topic.unit)}</span>
-            <span class="status-chip ${quizDone ? "done" : "ready"}">${quizDone ? "Çözüldü" : "Hazır"}</span>
           </div>
           <div>
             <h3 class="topic-title">${safeText(topic.title)} Quiz</h3>
             <p>${topic.quiz.length} soru · ${safeText(topic.subtitle)}</p>
           </div>
-          <div class="topic-meta">
-            <span class="status-chip ${studyDone ? "done" : "waiting"}">${studyDone ? "Konu çalışıldı" : "Önce konu çalış"}</span>
-          </div>
-          <p class="helper-line">Quiz ekranı, çalışma notlarından ayrı tutuldu. Böylece soru çözme daha temiz ve odaklı olur.</p>
           <div class="topic-actions">
             <button class="primary-btn soft" onclick="openQuizTopic('${topic.id}')">Quiz Çöz</button>
             <button class="mark-btn ${quizDone ? "done" : ""}" onclick="toggleQuizDone('${topic.id}')">${quizDone ? "☑️ Quiz Bitti" : "✅ Quiz Tamamlandı"}</button>
@@ -4476,54 +4472,44 @@ function openStudyTopic(topicId) {
   const difficultyLabel = topic.difficulty === "easy" ? "Kolay" : topic.difficulty === "medium" ? "Orta" : "Zor";
 
   container.innerHTML = `
-    <div class="detail-shell">
-      <div class="detail-hero">
-        <div class="detail-topbar">
-          <button class="ghost-btn" onclick="navigate('studyhub')">← Çalışma Merkezine Dön</button>
-          <div class="topic-meta">
+    <div class="study-detail-panel">
+
+      <section class="study-detail-hero">
+        <div class="study-detail-top">
+          <button class="ghost-btn detail-back-btn" onclick="navigate('studyhub')">← Çalışma Merkezine Dön</button>
+          <div class="topic-meta detail-badges">
             <span class="unit-badge">${safeText(topic.unit)}</span>
             <span class="difficulty-chip ${topic.difficulty}">${difficultyLabel}</span>
             <span class="status-chip ${done ? "done" : "waiting"}">${done ? "Tamamlandı" : "Çalışılıyor"}</span>
           </div>
         </div>
-        <h2 class="detail-title">${safeText(topic.title)}</h2>
-        <p class="detail-subtitle">${safeText(topic.subtitle)}</p>
-      </div>
+        <div class="study-detail-title-block">
+          <h2 class="detail-title">${safeText(topic.title)}</h2>
+          <p class="detail-subtitle">${safeText(topic.subtitle)}</p>
+        </div>
+      </section>
 
-      <div class="detail-grid">
+      <section class="study-detail-content-card">
         <div class="study-content">
           ${topic.summaryHtml}
-          <div class="content-card">
+          <div class="content-card critical-card">
             <h3>Kritik noktalar</h3>
             <div class="keypoint-list">
               ${topic.keyPoints.map((point) => `<div class="keypoint-item">${safeText(point)}</div>`).join("")}
             </div>
           </div>
         </div>
+      </section>
 
-        <aside class="study-sidebar">
-          <div class="side-card">
-            <h3>Çalışma kartı</h3>
-            <p><strong>Tahmini süre:</strong> ${topic.time} dakika</p>
-            <p><strong>Seviye:</strong> ${difficultyLabel}</p>
-            <p><strong>Sonraki adım:</strong> Konuyu bitirince ilgili quiz sayfasına geç.</p><p><strong>Not:</strong> Uygun olan konularda verdiğin kaynak metinleri doğrudan bu sayfaya işlendi.</p>
-            <div class="topic-actions" style="margin-top:14px">
-              <button class="mark-btn ${done ? "done" : ""}" onclick="toggleStudyDone('${topic.id}', true)">${done ? "☑️ Tamamlandı" : "✅ Çalışmayı Bitirdim"}</button>
-              <button class="secondary-btn" onclick="openQuizTopic('${topic.id}')">İlgili Quize Geç</button>
-            </div>
-          </div>
-
-          <div class="side-card">
-            <h3>Nasıl tekrar edilmeli?</h3>
-            <ul>
-              <li>Kuralı sesli oku.</li>
-              <li>Örnek cümleyi kendin yeniden kur.</li>
-              <li>Karıştığın noktayı küçük not halinde yaz.</li>
-              <li>Ardından quiz sayfasına geç.</li>
-            </ul>
-          </div>
-        </aside>
+      <div class="study-detail-actionbar">
+        <button class="mark-btn ${done ? "done" : ""}" onclick="toggleStudyDone('${topic.id}', true)">
+          ${done ? "☑️ Tamamlandı" : "✅ Çalışmayı Bitirdim"}
+        </button>
+        <button class="secondary-btn detail-quiz-btn" onclick="openQuizTopic('${topic.id}')">
+          → İlgili Quize Geç
+        </button>
       </div>
+
     </div>
   `;
 

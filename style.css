@@ -817,6 +817,9 @@ body.dark[data-theme-style="noel-ask"] .memory-back {
   box-shadow: 0 18px 46px rgba(0, 0, 0, .25);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
 }
 
 #studyhub .hub-search::placeholder {
@@ -980,6 +983,275 @@ body.dark:has(#studyhub.active) .topbar {
 
   #studyhub .primary-btn,
   #studyhub .mark-btn {
+    min-height: 38px;
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+}
+
+/* ================= QUIZ MERKEZİ ================= */
+#quizhub {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 1180px);
+  max-width: 1180px !important;
+  min-height: calc(100vh - 78px);
+  margin: 0 auto;
+  padding: clamp(28px, 4vw, 52px) clamp(18px, 4vw, 44px);
+  background: transparent !important;
+}
+
+#quizhub.active::before {
+  content: "";
+  position: fixed;
+  inset: 78px 0 0 0;
+  z-index: -3;
+  pointer-events: none;
+  background-image: url("./assests/quiz-hub-bg-desktop.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#quizhub.active::after {
+  content: "";
+  position: fixed;
+  inset: 78px 0 0 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 8, 20, .10) 0%,
+      rgba(5, 8, 20, .18) 45%,
+      rgba(5, 8, 20, .25) 100%
+    );
+}
+
+#quizhub .page-header,
+#quizhub .hub-toolbar,
+#quizhub #quizHubGrid {
+  position: relative;
+  z-index: 1;
+}
+
+#quizhub .page-header {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 130, 170, .22);
+}
+
+#quizhub .quiz-badge {
+  background: linear-gradient(135deg, #f06f9e, #ff9fc0);
+}
+
+#quizhub .page-header-left h2 {
+  color: #ff8fbd;
+  text-shadow: 0 3px 18px rgba(0, 0, 0, .35);
+}
+
+#quizhub .page-header .subtitle {
+  color: rgba(255, 232, 240, .88);
+}
+
+#quizhub .hub-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+#quizhub .hub-search {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 58px;
+  padding: 0 24px;
+  color: #fff;
+  background: rgba(12, 10, 24, .82) !important;
+  border: 1px solid rgba(255, 130, 170, .35) !important;
+  border-radius: 999px;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+#quizhub .hub-search::placeholder {
+  color: rgba(255, 230, 238, .62);
+}
+
+#quizhub .hub-search:focus {
+  border-color: rgba(255, 143, 189, .72) !important;
+  box-shadow:
+    0 0 0 3px rgba(255, 143, 189, .14),
+    0 18px 46px rgba(0, 0, 0, .25);
+}
+
+#quizhub .hub-legend {
+  color: rgba(255, 232, 240, .78);
+}
+
+#quizhub .hub-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+#quizhub .topic-card {
+  min-height: auto;
+  text-align: center;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 20px;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: border-color .22s ease, transform .22s ease, box-shadow .22s ease;
+  color: #f0e6ed;
+}
+
+#quizhub .topic-card::before {
+  display: none;
+}
+
+#quizhub .topic-card-top {
+  justify-content: center;
+}
+
+#quizhub .topic-card h3,
+#quizhub .topic-title {
+  color: #f8eaf0;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+#quizhub .topic-card p {
+  color: rgba(240, 220, 232, 0.88);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+#quizhub .topic-meta {
+  justify-content: center;
+}
+
+#quizhub .topic-actions {
+  justify-content: center;
+}
+
+#quizhub .topic-card:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(212, 102, 156, 0.60) !important;
+  box-shadow: 0 0 0 1px rgba(212, 102, 156, 0.22), 0 8px 32px rgba(0, 0, 0, 0.22) !important;
+  transform: translateY(-3px);
+}
+
+#quizhub .primary-btn {
+  background: linear-gradient(135deg, #7b1731, #a51f4a);
+}
+
+#quizhub .mark-btn,
+#quizhub .mark-btn.done {
+  background: #10b981;
+  color: #fff;
+  border-color: #10b981;
+}
+
+#quizhub .helper-line {
+  color: rgba(240, 220, 232, 0.70);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+body.dark:has(#quizhub.active) .topbar {
+  background: rgba(13, 10, 24, .82);
+  border-bottom-color: rgba(255, 130, 170, .20);
+  box-shadow: 0 16px 46px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+
+@media (max-width: 1024px) {
+  #quizhub .hub-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  #quizhub {
+    min-height: calc(100vh - 70px);
+    padding: 24px 16px 40px;
+  }
+
+  #quizhub.active::before {
+    inset: 70px 0 0 0;
+    background-image: url("./assests/quiz-hub-bg-mobile.png");
+    background-position: center top;
+    background-attachment: scroll;
+  }
+
+  #quizhub.active::after {
+    inset: 70px 0 0 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(5, 8, 20, .10) 0%,
+        rgba(5, 8, 20, .20) 50%,
+        rgba(5, 8, 20, .30) 100%
+      );
+  }
+
+  #quizhub .hub-toolbar {
+    width: 100%;
+    gap: 12px;
+  }
+
+  #quizhub .hub-search {
+    flex: 1 1 100%;
+    min-height: 54px;
+    border-radius: 20px;
+    padding-inline: 18px;
+  }
+
+  #quizhub .hub-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px;
+  }
+
+  #quizhub .topic-card {
+    min-height: auto;
+    padding: 14px;
+    background: transparent !important;
+  }
+
+  #quizhub .topic-card-top,
+  #quizhub .topic-actions {
+    gap: 8px;
+  }
+
+  #quizhub .topic-title {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  #quizhub .topic-card p,
+  #quizhub .helper-line {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  #quizhub .unit-badge,
+  #quizhub .status-chip,
+  #quizhub .difficulty-chip {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  #quizhub .primary-btn,
+  #quizhub .mark-btn {
     min-height: 38px;
     padding: 9px 10px;
     font-size: 12px;
@@ -11658,5 +11930,458 @@ body:not(.dark) .kahoot-qr-link {
 /* Touch: hover'sız cihazlarda panel kaymasın */
 @media (hover: none) {
   .kahoot-qr-panel:hover { transform: none; }
+}
+
+
+/* =========================================================
+   STUDY DETAIL — PREMIUM DARK LIBRARY DESIGN
+   Sadece #studydetail sayfası için. Diğer sayfaları etkilemez.
+   ========================================================= */
+
+/* --- Sayfa arka planı --- */
+#studydetail {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - 78px);
+  padding: clamp(24px, 4vw, 44px) clamp(16px, 3vw, 32px);
+  background: transparent !important;
+}
+
+#studydetail.active::before {
+  content: "";
+  position: fixed;
+  inset: 78px 0 0;
+  z-index: -3;
+  pointer-events: none;
+  background-image: url("./assests/study-detail-bg-desktop.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#studydetail.active::after {
+  content: "";
+  position: fixed;
+  inset: 78px 0 0;
+  z-index: -2;
+  pointer-events: none;
+  /* Light mode: biraz daha koyu overlay (okunabilirlik) */
+  background: linear-gradient(180deg, rgba(5,4,12,0.30) 0%, rgba(5,4,12,0.44) 100%);
+}
+
+/* Dark mode: daha az overlay (arka plan daha görünür) */
+body.dark #studydetail.active::after {
+  background: linear-gradient(180deg, rgba(5,4,12,0.18) 0%, rgba(5,4,12,0.28) 100%);
+}
+
+/* --- Topbar — her iki modda da koyu (arka plan her zaman koyu resim) --- */
+body.studydetail-active .topbar,
+body:has(#studydetail.active) .topbar {
+  background: rgba(8, 6, 18, 0.82);
+  border-bottom-color: rgba(255, 120, 180, 0.18);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+}
+
+body.dark.studydetail-active .topbar,
+body.dark:has(#studydetail.active) .topbar {
+  background: rgba(6, 4, 14, 0.92);
+  border-bottom-color: rgba(255, 120, 180, 0.25);
+}
+
+/* --- Ana panel (glass container) --- */
+.study-detail-panel {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: clamp(18px, 3vw, 28px);
+  border-radius: 32px;
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  display: grid;
+  gap: 20px;
+}
+
+/* --- Hero bölümü --- */
+.study-detail-hero {
+  border-radius: 26px;
+  padding: clamp(20px, 3vw, 34px);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+  transition: border-color .22s ease;
+}
+.study-detail-hero:hover {
+  border-color: rgba(255, 130, 180, 0.50);
+}
+body.dark .study-detail-hero {
+  border-color: rgba(255, 255, 255, 0.10);
+}
+body.dark .study-detail-hero:hover {
+  border-color: rgba(255, 130, 180, 0.42);
+}
+
+.study-detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.detail-back-btn {
+  color: rgba(255,220,238,0.88) !important;
+  border-color: rgba(255,130,180,0.30) !important;
+  background: rgba(255,255,255,0.06) !important;
+  font-size: 14px;
+}
+.detail-back-btn:hover {
+  background: rgba(255,255,255,0.12) !important;
+  border-color: rgba(255,130,180,0.55) !important;
+  transform: translateX(-2px) translateY(-1px);
+}
+
+.detail-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.study-detail-title-block {
+  display: grid;
+  gap: 10px;
+}
+
+#studydetail .detail-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4.5vw, 50px);
+  font-weight: 700;
+  color: #ff91bf;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  text-shadow: 0 0 28px rgba(255,105,160,0.24);
+}
+
+#studydetail .detail-subtitle {
+  color: rgba(255,238,246,0.86);
+  font-size: clamp(14px, 1.6vw, 17px);
+  line-height: 1.75;
+}
+
+/* --- İçerik kartı --- */
+.study-detail-content-card {
+  border-radius: 26px;
+  padding: clamp(18px, 3vw, 30px);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  transition: border-color .22s ease;
+}
+.study-detail-content-card:hover {
+  border-color: rgba(255, 140, 190, 0.44);
+}
+body.dark .study-detail-content-card {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+body.dark .study-detail-content-card:hover {
+  border-color: rgba(255, 140, 190, 0.35);
+}
+
+/* İçerik kartı içindeki study-content grid */
+.study-detail-content-card .study-content {
+  display: grid;
+  gap: 20px;
+}
+
+/* İçerik kartları saydam */
+#studydetail .content-card {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 22px !important;
+  box-shadow: none !important;
+  transition: border-color .22s ease;
+}
+#studydetail .content-card:hover {
+  border-color: rgba(255, 140, 190, 0.44) !important;
+}
+body.dark #studydetail .content-card {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+body.dark #studydetail .content-card:hover {
+  border-color: rgba(255, 140, 190, 0.35) !important;
+}
+#studydetail .content-card::before { display: none; }
+
+#studydetail .content-card h3 {
+  color: #ff9ac5 !important;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(18px, 2vw, 22px);
+}
+
+#studydetail .content-card p,
+#studydetail .content-card li {
+  color: rgba(255,238,246,0.85) !important;
+}
+
+#studydetail .content-card strong {
+  color: #ffd6ea !important;
+}
+
+#studydetail .content-card ul,
+#studydetail .content-card ol {
+  padding-left: 20px;
+}
+
+#studydetail .keypoint-item {
+  background: rgba(255,130,180,0.08);
+  border: 1px solid rgba(255,130,180,0.16);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: rgba(255,238,246,0.88);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* --- Tablo tasarımı --- */
+#studydetail .table-wrap {
+  border-radius: 18px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 140, 190, 0.20);
+  -webkit-overflow-scrolling: touch;
+}
+
+#studydetail .source-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: rgba(255,255,255,0.88);
+  min-width: 480px;
+}
+
+#studydetail .source-table thead {
+  background: rgba(255, 120, 180, 0.14);
+}
+
+#studydetail .source-table th {
+  color: #ff9ac5;
+  font-weight: 700;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid rgba(255,140,190,0.22);
+}
+
+#studydetail .source-table td {
+  padding: 11px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  vertical-align: top;
+}
+
+#studydetail .source-table tr:last-child td { border-bottom: none; }
+#studydetail .source-table tbody tr:hover td {
+  background: rgba(255,130,180,0.06);
+}
+
+/* --- İç içerik elemanları: source-panel, example-card, warning-box, vb. --- */
+#studydetail .source-panel,
+#studydetail .example-card {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+  color: rgba(255, 238, 246, 0.88);
+}
+body.dark #studydetail .source-panel,
+body.dark #studydetail .example-card {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+#studydetail .source-panel p,
+#studydetail .example-card p {
+  color: rgba(255, 238, 246, 0.85) !important;
+}
+#studydetail .source-panel strong,
+#studydetail .example-card strong {
+  color: #ffd6ea !important;
+}
+
+#studydetail .warning-box,
+#studydetail .mistake-card {
+  background: transparent !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+  border-left-color: rgba(245, 158, 11, 0.60) !important;
+  box-shadow: none !important;
+  color: rgba(255, 238, 200, 0.90) !important;
+}
+body.dark #studydetail .warning-box,
+body.dark #studydetail .mistake-card {
+  border-color: rgba(245, 158, 11, 0.18) !important;
+}
+#studydetail .warning-box p,
+#studydetail .mistake-card p {
+  color: rgba(255, 238, 200, 0.90) !important;
+}
+#studydetail .warning-box strong,
+#studydetail .mistake-card strong {
+  color: #fcd34d !important;
+}
+
+#studydetail .note-box {
+  background: transparent !important;
+  border-color: rgba(255, 130, 180, 0.30) !important;
+  box-shadow: none !important;
+}
+#studydetail .note-box p { color: rgba(255, 238, 246, 0.88) !important; }
+
+#studydetail .info-box {
+  background: transparent !important;
+  border-color: rgba(124, 58, 237, 0.30) !important;
+  box-shadow: none !important;
+}
+#studydetail .info-box p { color: rgba(220, 210, 255, 0.90) !important; }
+
+#studydetail .visual-note,
+#studydetail .formula-card,
+#studydetail .mini-summary-card,
+#studydetail .grammar-map,
+#studydetail .word-card {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: none !important;
+  color: rgba(255, 238, 246, 0.88) !important;
+}
+body.dark #studydetail .visual-note,
+body.dark #studydetail .formula-card,
+body.dark #studydetail .mini-summary-card,
+body.dark #studydetail .grammar-map,
+body.dark #studydetail .word-card {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+#studydetail .visual-note,
+#studydetail .visual-note strong,
+#studydetail .formula-card strong,
+#studydetail .word-card strong {
+  color: #ffd6ea !important;
+}
+
+#studydetail .timeline-box {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 238, 246, 0.88) !important;
+  box-shadow: none !important;
+}
+
+/* Genel text rengi override — bu sayfa koyu arka planlı */
+#studydetail .study-content p,
+#studydetail .study-content li,
+#studydetail .study-content span {
+  color: rgba(255, 238, 246, 0.86);
+}
+#studydetail .study-content strong,
+#studydetail .study-content b {
+  color: #ffd6ea;
+}
+#studydetail .study-content em {
+  color: rgba(255, 220, 240, 0.80);
+}
+
+/* --- Aksiyon bar --- */
+.study-detail-actionbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 22px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.study-detail-actionbar .mark-btn {
+  min-height: 56px;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 16px;
+  width: 100%;
+}
+
+.study-detail-actionbar .detail-quiz-btn {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7b1731, #a51f4a);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: transform .18s ease, box-shadow .18s ease;
+  box-shadow: 0 8px 22px rgba(123,23,49,0.35);
+}
+
+.study-detail-actionbar .detail-quiz-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(123,23,49,0.48);
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  #studydetail {
+    min-height: calc(100vh - 64px);
+    padding: 16px 12px 32px;
+  }
+
+  #studydetail.active::before {
+    inset: 64px 0 0;
+    background-image: url("./assests/study-detail-bg-mobile.png");
+    background-position: center top;
+    background-attachment: scroll;
+  }
+
+  #studydetail.active::after {
+    inset: 64px 0 0;
+  }
+
+  .study-detail-panel {
+    border-radius: 22px;
+    padding: 14px;
+  }
+
+  .study-detail-hero {
+    border-radius: 20px;
+    padding: 18px;
+  }
+
+  .study-detail-top {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .detail-badges {
+    width: 100%;
+  }
+
+  .study-detail-actionbar {
+    grid-template-columns: 1fr;
+  }
+
+  .study-detail-actionbar .mark-btn,
+  .study-detail-actionbar .detail-quiz-btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 15px;
+  }
 }
 
