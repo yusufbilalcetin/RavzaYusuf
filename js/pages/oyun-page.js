@@ -1,3 +1,5 @@
+import { createGameAudio } from "../utils/game-audio.js";
+
 const GAME_META = {
   "candy-match": {
     badge: "SONSUZ",
@@ -407,6 +409,7 @@ function renderFlappyBird(target) {
     <div class="flappy-game">
       <div class="flappy-shell">
         <canvas id="flappyCanvas" class="flappy-canvas"></canvas>
+        <button type="button" class="flappy-sound-btn" id="flappySoundBtn" aria-label="Sesi ac/kapat"></button>
         <div class="flappy-overlay" id="flappyOverlay">
           <span class="flappy-medal" id="flappyMedal" hidden></span>
           <strong id="flappyOverlayTitle">Flappy Bird</strong>
@@ -426,7 +429,25 @@ function renderFlappyBird(target) {
   const bestLabel = target.querySelector("#flappyBest");
   const medal = target.querySelector("#flappyMedal");
   const menu = target.querySelector("#flappyMenu");
+  const soundBtn = target.querySelector("#flappySoundBtn");
   const context = canvas.getContext("2d");
+  const audio = createGameAudio({ storageKey: "flappySoundOn" });
+
+  function refreshSoundBtn() {
+    const on = audio.isEnabled();
+    soundBtn.textContent = on ? "\u{1F50A}" : "\u{1F507}";
+    soundBtn.classList.toggle("is-muted", !on);
+  }
+
+  function onSoundBtnClick(event) {
+    event.stopPropagation();
+    const on = audio.toggle();
+    refreshSoundBtn();
+    if (on && (state.phase === "ready" || state.phase === "playing")) audio.startMusic();
+  }
+
+  soundBtn.addEventListener("click", onSoundBtnClick);
+  refreshSoundBtn();
 
   const GRAVITY = 1900;
   const FLAP_VELOCITY = -560;
@@ -494,6 +515,7 @@ function renderFlappyBird(target) {
   function showMenu() {
     state.phase = "menu";
     resetRound();
+    audio.stopMusic();
     medal.hidden = true;
     overlayTitle.textContent = "Flappy Bird";
     overlayText.textContent = "Zorluk seviyeni sec.";
@@ -508,6 +530,7 @@ function renderFlappyBird(target) {
   function showReady() {
     state.phase = "ready";
     resetRound();
+    audio.startMusic();
     state.best = readFlappyBest(state.difficulty);
     medal.hidden = true;
     overlayTitle.textContent = `${params().label} Mod`;
@@ -519,6 +542,8 @@ function renderFlappyBird(target) {
 
   function endRound() {
     state.phase = "dead";
+    audio.stopMusic();
+    audio.play("crash");
     if (state.score > state.best) {
       state.best = state.score;
       writeFlappyBest(state.difficulty, state.best);
@@ -541,6 +566,7 @@ function renderFlappyBird(target) {
     state.phase = "playing";
     overlay.hidden = true;
     state.bird.velocity = FLAP_VELOCITY;
+    audio.play("flap");
   }
 
   function flap() {
@@ -550,6 +576,7 @@ function renderFlappyBird(target) {
     }
     if (state.phase === "playing") {
       state.bird.velocity = FLAP_VELOCITY;
+      audio.play("flap");
     }
   }
 
@@ -573,6 +600,7 @@ function renderFlappyBird(target) {
       if (!pipe.passed && pipe.x + PIPE_WIDTH < birdX - BIRD_RADIUS) {
         pipe.passed = true;
         state.score += 1;
+        audio.play("score");
       }
     }
     state.pipes = state.pipes.filter((pipe) => pipe.x + PIPE_WIDTH > -10);
@@ -802,7 +830,7 @@ function renderFlappyBird(target) {
   }
 
   function onPointerDown(event) {
-    if (event.target.closest(".flappy-menu-btn")) return;
+    if (event.target.closest(".flappy-menu-btn, .flappy-sound-btn")) return;
     event.preventDefault();
     flap();
   }
@@ -844,8 +872,10 @@ function renderFlappyBird(target) {
   flappyState = {
     cleanup() {
       cancelAnimationFrame(state.rafId);
+      audio.stopMusic();
       shell.removeEventListener("pointerdown", onPointerDown);
       menu.removeEventListener("click", onMenuClick);
+      soundBtn.removeEventListener("click", onSoundBtnClick);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("resize", resizeCanvas);
     }
