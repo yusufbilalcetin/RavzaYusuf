@@ -748,6 +748,71 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   transform: scale(.97);
 }
 
+.flappy-menu-back {
+  margin-top: 4px;
+}
+
+.flappy-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+  pointer-events: auto;
+}
+
+.flappy-shop-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px 14px;
+  border: 2px solid rgba(255, 255, 255, .38);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.flappy-shop-card:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, .26);
+  border-color: rgba(255, 255, 255, .60);
+}
+
+.flappy-shop-card:active {
+  transform: scale(.97);
+}
+
+.flappy-shop-card.is-equipped {
+  border-color: #ffd23f;
+  box-shadow: 0 0 0 2px rgba(255, 210, 63, .5);
+}
+
+.flappy-shop-card.is-locked {
+  opacity: .6;
+}
+
+.flappy-shop-swatch {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .55);
+}
+
+.flappy-shop-label {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.flappy-shop-card small {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, .78);
+}
+
 body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-game {
   position: fixed;
   inset: 0;

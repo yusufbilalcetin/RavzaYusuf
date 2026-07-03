@@ -399,9 +399,30 @@ function renderCandyBoard(target) {
 /* ============================= FLAPPY BIRD ============================= */
 
 const FLAPPY_DIFFICULTY = {
-  kolay: { label: "Kolay", gapRatio: 0.30, minGap: 170, speed: 150, interval: 1.8 },
-  orta: { label: "Orta", gapRatio: 0.26, minGap: 150, speed: 185, interval: 1.5 },
-  zor: { label: "Zor", gapRatio: 0.22, minGap: 130, speed: 225, interval: 1.25 }
+  kolay: {
+    label: "Kolay", gapRatio: 0.32, minGap: 185, speed: 140, interval: 1.9,
+    speedRampPerPoint: 1.2, intervalRampPerPoint: -0.006, gapRampPerPoint: -0.0015,
+    speedCap: 230, intervalFloor: 1.3, gapFloor: 0.22
+  },
+  orta: {
+    label: "Orta", gapRatio: 0.25, minGap: 145, speed: 190, interval: 1.45,
+    speedRampPerPoint: 2.0, intervalRampPerPoint: -0.010, gapRampPerPoint: -0.0022,
+    speedCap: 300, intervalFloor: 0.95, gapFloor: 0.16
+  },
+  zor: {
+    label: "Zor", gapRatio: 0.19, minGap: 115, speed: 250, interval: 1.1,
+    speedRampPerPoint: 3.0, intervalRampPerPoint: -0.014, gapRampPerPoint: -0.0032,
+    speedCap: 380, intervalFloor: 0.65, gapFloor: 0.11
+  }
+};
+
+const FLAPPY_CHARACTERS = {
+  klasik: { label: "Klasik", price: 0, body1: "#ffe66d", body2: "#ffd23f", body3: "#f5a623", stroke: "#d98e04", belly: "#fff3c4", wing: "#f5a623", wingStroke: "#d98e04", beak: "#ff7043", beakStroke: "#d84315" },
+  mavi: { label: "Gokyuzu", price: 40, body1: "#a7e8ff", body2: "#5fc9f5", body3: "#2e93cc", stroke: "#1c6f9e", belly: "#eaf9ff", wing: "#5fc9f5", wingStroke: "#1c6f9e", beak: "#ff8a5c", beakStroke: "#d8552a" },
+  pembe: { label: "Gunbatimi", price: 60, body1: "#ffc7de", body2: "#f077a8", body3: "#c04a7e", stroke: "#96355f", belly: "#fff0f6", wing: "#f077a8", wingStroke: "#96355f", beak: "#ff7043", beakStroke: "#d84315" },
+  yesil: { label: "Orman", price: 80, body1: "#c8f2a6", body2: "#8fd85a", body3: "#5aa72e", stroke: "#3f7a1f", belly: "#f1ffe0", wing: "#8fd85a", wingStroke: "#3f7a1f", beak: "#ffa94d", beakStroke: "#d97a1e" },
+  mor: { label: "Ametist", price: 100, body1: "#e3c8ff", body2: "#b17ef0", body3: "#7d47bf", stroke: "#5c2f92", belly: "#f5ecff", wing: "#b17ef0", wingStroke: "#5c2f92", beak: "#ff8a65", beakStroke: "#d8552a" },
+  altin: { label: "Altin", price: 150, body1: "#fff3b0", body2: "#ffd23f", body3: "#c98f1c", stroke: "#8f6110", belly: "#fffbe0", wing: "#ffe066", wingStroke: "#8f6110", beak: "#ff7043", beakStroke: "#d84315" }
 };
 
 function renderFlappyBird(target) {
@@ -459,6 +480,9 @@ function renderFlappyBird(target) {
   const state = {
     phase: "menu",
     difficulty: "orta",
+    character: readFlappyEquipped(),
+    coins: readFlappyCoins(),
+    runCoins: 0,
     bird: { y: 0, velocity: 0 },
     pipes: [],
     score: 0,
@@ -472,6 +496,8 @@ function renderFlappyBird(target) {
     height: 0
   };
 
+  if (!readFlappyOwned().includes(state.character)) state.character = "klasik";
+
   const clouds = Array.from({ length: 6 }, (_, index) => ({
     x: index * 0.19 + 0.04,
     y: 0.08 + ((index * 37) % 30) / 100,
@@ -479,7 +505,14 @@ function renderFlappyBird(target) {
   }));
 
   function params() {
-    return FLAPPY_DIFFICULTY[state.difficulty] || FLAPPY_DIFFICULTY.orta;
+    const base = FLAPPY_DIFFICULTY[state.difficulty] || FLAPPY_DIFFICULTY.orta;
+    const s = state.score;
+    return {
+      ...base,
+      speed: Math.min(base.speed + s * base.speedRampPerPoint, base.speedCap),
+      interval: Math.max(base.interval + s * base.intervalRampPerPoint, base.intervalFloor),
+      gapRatio: Math.max(base.gapRatio + s * base.gapRampPerPoint, base.gapFloor)
+    };
   }
 
   function resizeCanvas() {
@@ -518,12 +551,56 @@ function renderFlappyBird(target) {
     audio.stopMusic();
     medal.hidden = true;
     overlayTitle.textContent = "Flappy Bird";
+    overlayText.textContent = "Ne yapmak istersin?";
+    bestLabel.textContent = `Altin: ${state.coins} \u{1FA99}`;
+    menu.innerHTML = `
+      <button class="flappy-menu-btn" type="button" data-action="play">Oyna</button>
+      <button class="flappy-menu-btn" type="button" data-action="shop">Magaza</button>
+    `;
+    overlay.hidden = false;
+  }
+
+  function showDifficultyPicker() {
+    state.phase = "menu";
+    resetRound();
+    audio.stopMusic();
+    medal.hidden = true;
+    overlayTitle.textContent = "Zorluk Sec";
     overlayText.textContent = "Zorluk seviyeni sec.";
     bestLabel.textContent = "";
     menu.innerHTML = Object.entries(FLAPPY_DIFFICULTY).map(([key, diff]) => {
       const best = readFlappyBest(key);
       return `<button class="flappy-menu-btn" type="button" data-diff="${key}">${diff.label}${best ? `<small>Rekor ${best}</small>` : ""}</button>`;
-    }).join("");
+    }).join("") + `<button class="flappy-menu-btn flappy-menu-back" type="button" data-action="back">Geri</button>`;
+    overlay.hidden = false;
+  }
+
+  function renderShopGrid() {
+    const owned = readFlappyOwned();
+    return `<div class="flappy-shop-grid">` + Object.entries(FLAPPY_CHARACTERS).map(([id, c]) => {
+      const isOwned = owned.includes(id);
+      const isEquipped = state.character === id;
+      const affordable = state.coins >= c.price;
+      const cls = ["flappy-shop-card", isEquipped ? "is-equipped" : "", !isOwned && !affordable ? "is-locked" : ""].filter(Boolean).join(" ");
+      const statusLabel = isEquipped ? "Kusanildi" : isOwned ? "Sahipsin" : `${c.price} \u{1FA99}`;
+      return `
+        <button class="${cls}" type="button" data-char="${id}">
+          <span class="flappy-shop-swatch" style="background: linear-gradient(135deg, ${c.body1}, ${c.body2} 60%, ${c.body3})"></span>
+          <span class="flappy-shop-label">${c.label}</span>
+          <small>${statusLabel}</small>
+        </button>`;
+    }).join("") + `</div>`;
+  }
+
+  function showShop() {
+    state.phase = "shop";
+    resetRound();
+    audio.stopMusic();
+    medal.hidden = true;
+    overlayTitle.textContent = "Magaza";
+    overlayText.textContent = `Altin: ${state.coins} \u{1FA99}`;
+    bestLabel.textContent = "";
+    menu.innerHTML = renderShopGrid() + `<button class="flappy-menu-btn flappy-menu-back" type="button" data-action="back">Geri</button>`;
     overlay.hidden = false;
   }
 
@@ -548,15 +625,20 @@ function renderFlappyBird(target) {
       state.best = state.score;
       writeFlappyBest(state.difficulty, state.best);
     }
+    state.coins += state.runCoins;
+    writeFlappyCoins(state.coins);
+    const earned = state.runCoins;
+    state.runCoins = 0;
     const medalIcon = state.score >= 50 ? "\u{1F947}" : state.score >= 25 ? "\u{1F948}" : state.score >= 10 ? "\u{1F949}" : "";
     medal.textContent = medalIcon;
     medal.hidden = !medalIcon;
     overlayTitle.textContent = "Oyun Bitti";
-    overlayText.textContent = `Skorun: ${state.score}`;
-    bestLabel.textContent = `Rekor (${params().label}): ${state.best}`;
+    overlayText.textContent = `Skorun: ${state.score} — Kazanilan: ${earned} \u{1FA99}`;
+    bestLabel.textContent = `Rekor (${params().label}): ${state.best} | Toplam Altin: ${state.coins}`;
     menu.innerHTML = `
       <button class="flappy-menu-btn" type="button" data-action="retry">Tekrar Oyna</button>
       <button class="flappy-menu-btn" type="button" data-action="menu">Zorluk Degistir</button>
+      <button class="flappy-menu-btn" type="button" data-action="home">Ana Menu</button>
     `;
     overlay.hidden = false;
   }
@@ -600,6 +682,7 @@ function renderFlappyBird(target) {
       if (!pipe.passed && pipe.x + PIPE_WIDTH < birdX - BIRD_RADIUS) {
         pipe.passed = true;
         state.score += 1;
+        state.runCoins += 1;
         audio.play("score");
       }
     }
@@ -727,6 +810,7 @@ function renderFlappyBird(target) {
   }
 
   function drawBird() {
+    const palette = FLAPPY_CHARACTERS[state.character] || FLAPPY_CHARACTERS.klasik;
     const birdX = state.width * BIRD_X_RATIO;
     const dead = state.phase === "dead";
     const tilt = dead ? 0.9 : Math.max(-0.45, Math.min(0.9, state.bird.velocity / 700));
@@ -736,18 +820,18 @@ function renderFlappyBird(target) {
     context.rotate(tilt);
 
     const body = context.createRadialGradient(-4, -6, 4, 0, 0, BIRD_RADIUS + 6);
-    body.addColorStop(0, "#ffe66d");
-    body.addColorStop(0.65, "#ffd23f");
-    body.addColorStop(1, "#f5a623");
+    body.addColorStop(0, palette.body1);
+    body.addColorStop(0.65, palette.body2);
+    body.addColorStop(1, palette.body3);
     context.fillStyle = body;
     context.beginPath();
     context.ellipse(0, 0, BIRD_RADIUS + 4, BIRD_RADIUS, 0, 0, Math.PI * 2);
     context.fill();
-    context.strokeStyle = "#d98e04";
+    context.strokeStyle = palette.stroke;
     context.lineWidth = 2;
     context.stroke();
 
-    context.fillStyle = "#fff3c4";
+    context.fillStyle = palette.belly;
     context.beginPath();
     context.ellipse(2, 6, 10, 6, 0, 0, Math.PI * 2);
     context.fill();
@@ -756,11 +840,11 @@ function renderFlappyBird(target) {
     context.save();
     context.translate(-4, 0);
     context.rotate(wingAngle);
-    context.fillStyle = "#f5a623";
+    context.fillStyle = palette.wing;
     context.beginPath();
     context.ellipse(-6, 0, 11, 7, -0.3, 0, Math.PI * 2);
     context.fill();
-    context.strokeStyle = "#d98e04";
+    context.strokeStyle = palette.wingStroke;
     context.lineWidth = 1.5;
     context.stroke();
     context.restore();
@@ -785,14 +869,14 @@ function renderFlappyBird(target) {
       context.fill();
     }
 
-    context.fillStyle = "#ff7043";
+    context.fillStyle = palette.beak;
     context.beginPath();
     context.moveTo(14, -1);
     context.lineTo(26, 2);
     context.lineTo(14, 6);
     context.closePath();
     context.fill();
-    context.strokeStyle = "#d84315";
+    context.strokeStyle = palette.beakStroke;
     context.lineWidth = 1.5;
     context.stroke();
 
@@ -830,24 +914,54 @@ function renderFlappyBird(target) {
   }
 
   function onPointerDown(event) {
-    if (event.target.closest(".flappy-menu-btn, .flappy-sound-btn")) return;
+    if (event.target.closest(".flappy-menu-btn, .flappy-sound-btn, .flappy-shop-card")) return;
     event.preventDefault();
     flap();
   }
 
+  function onShopCardClick(id) {
+    const owned = readFlappyOwned();
+    if (owned.includes(id)) {
+      if (state.character === id) return;
+      state.character = id;
+      writeFlappyEquipped(id);
+      audio.play("equip");
+      showShop();
+      return;
+    }
+    const price = FLAPPY_CHARACTERS[id]?.price ?? Infinity;
+    if (state.coins < price) {
+      audio.play("click");
+      return;
+    }
+    state.coins -= price;
+    writeFlappyCoins(state.coins);
+    writeFlappyOwned([...owned, id]);
+    state.character = id;
+    writeFlappyEquipped(id);
+    audio.play("purchase");
+    showShop();
+  }
+
   function onMenuClick(event) {
-    const button = event.target.closest(".flappy-menu-btn");
+    const button = event.target.closest(".flappy-menu-btn, .flappy-shop-card");
     if (!button) return;
     if (button.dataset.diff) {
       state.difficulty = button.dataset.diff;
       showReady();
       return;
     }
-    if (button.dataset.action === "retry") {
-      showReady();
+    if (button.dataset.char) {
+      onShopCardClick(button.dataset.char);
       return;
     }
-    if (button.dataset.action === "menu") showMenu();
+    const action = button.dataset.action;
+    if (action === "play") { showDifficultyPicker(); return; }
+    if (action === "shop") { showShop(); return; }
+    if (action === "back") { showMenu(); return; }
+    if (action === "retry") { showReady(); return; }
+    if (action === "menu") { showDifficultyPicker(); return; }
+    if (action === "home") { showMenu(); return; }
   }
 
   function onKeyDown(event) {
@@ -893,6 +1007,55 @@ function readFlappyBest(difficulty) {
 function writeFlappyBest(difficulty, score) {
   try {
     localStorage.setItem(`flappyBestScore-${difficulty}`, String(score));
+  } catch {
+    /* localStorage kapali olabilir */
+  }
+}
+
+function readFlappyCoins() {
+  try {
+    return Number(localStorage.getItem("flappyCoins")) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function writeFlappyCoins(amount) {
+  try {
+    localStorage.setItem("flappyCoins", String(amount));
+  } catch {
+    /* localStorage kapali olabilir */
+  }
+}
+
+function readFlappyOwned() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("flappyOwnedCharacters"));
+    return Array.isArray(parsed) && parsed.length ? parsed : ["klasik"];
+  } catch {
+    return ["klasik"];
+  }
+}
+
+function writeFlappyOwned(list) {
+  try {
+    localStorage.setItem("flappyOwnedCharacters", JSON.stringify(list));
+  } catch {
+    /* localStorage kapali olabilir */
+  }
+}
+
+function readFlappyEquipped() {
+  try {
+    return localStorage.getItem("flappyEquippedCharacter") || "klasik";
+  } catch {
+    return "klasik";
+  }
+}
+
+function writeFlappyEquipped(id) {
+  try {
+    localStorage.setItem("flappyEquippedCharacter", id);
   } catch {
     /* localStorage kapali olabilir */
   }

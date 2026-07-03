@@ -77,6 +77,15 @@ export function createGameAudio({ storageKey = "gameSoundOn" } = {}) {
     },
     click() {
       tone({ freq: 660, dur: 0.07, type: "triangle", vol: 0.3 });
+    },
+    purchase() {
+      tone({ freq: 660, dur: 0.08, type: "triangle", vol: 0.35 });
+      tone({ freq: 990, dur: 0.1, type: "triangle", vol: 0.3, delay: 0.07 });
+      tone({ freq: 1320, dur: 0.12, type: "triangle", vol: 0.28, delay: 0.14 });
+    },
+    equip() {
+      tone({ freq: 520, dur: 0.06, type: "sine", vol: 0.28 });
+      tone({ freq: 780, dur: 0.09, type: "sine", vol: 0.26, delay: 0.05 });
     }
   };
 
