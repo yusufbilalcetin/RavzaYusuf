@@ -95,7 +95,7 @@ export default function GameScreen({
               </div>
             ))}
           </div>
-          <p className="scene-message">{stats?.message || level.tutorial || "Kristal hedeflerini tamamla."}</p>
+          <p className="scene-message">{stats?.message || level.tutorial || "Seker hedeflerini tamamla."}</p>
         </aside>
 
         <div className="phaser-shell" ref={hostRef} aria-label="Candy Crush oyun tahtasi" />

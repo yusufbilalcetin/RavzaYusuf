@@ -32,7 +32,7 @@ export function getGoalLabel(level) {
   const goal = level.goal;
 
   if (goal.type === "collect") return formatTargets(goal.targets);
-  if (goal.type === "clear_ice") return `${goal.count} buz tabakasi temizle`;
+  if (goal.type === "clear_ice") return `${goal.count} frosting temizle`;
   if (goal.type === "break_chains") return `${goal.count} zincir kir`;
   if (goal.type === "break_crates") return `${goal.count} tas kutu kir`;
   if (goal.type === "clear_darkness") return `${goal.count} karanlik madde temizle`;
@@ -46,24 +46,24 @@ export function getGoalLabel(level) {
     ].filter(Boolean).join(" + ");
   }
 
-  return "Kristal hedeflerini tamamla";
+  return "Seker hedeflerini tamamla";
 }
 
 export function colorLabel(color) {
   const labels = {
-    ruby: "yakut",
-    sapphire: "safir",
-    emerald: "zumrut",
-    sunstone: "gunes tasi",
-    amethyst: "ametist",
-    pearl: "inci"
+    ruby: "cizgili seker",
+    sapphire: "mavi jel",
+    emerald: "yesil kare",
+    sunstone: "turuncu seker",
+    amethyst: "mor bonbon",
+    pearl: "sari lokum"
   };
   return labels[color] || color;
 }
 
 export function blockerLabel(type) {
   const labels = {
-    ice: "buz",
+    ice: "frosting",
     chain: "zincir",
     crate: "tas kutu",
     darkness: "karanlik",

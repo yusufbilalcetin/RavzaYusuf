@@ -853,6 +853,261 @@
   text-shadow: 0 3px 0 rgba(255, 255, 255, .58);
 }
 
+.level-start-screen.screen {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 22% 72%, #ff69b4 0 6%, transparent 7%),
+    radial-gradient(circle at 68% 58%, #e93691 0 5%, transparent 6%),
+    linear-gradient(90deg, #1d5a57 0 24%, #766fd3 25% 70%, #215f58 71%);
+}
+
+.level-start-screen.screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(110deg, transparent 0 47%, rgba(255, 255, 255, .16) 48% 49%, transparent 50%),
+    rgba(8, 23, 57, .66);
+}
+
+.level-start-card {
+  width: min(92vw, 520px);
+  min-height: auto;
+  display: grid;
+  gap: 18px;
+  padding: clamp(30px, 7vw, 48px) clamp(22px, 6vw, 42px) 34px;
+  border: 8px solid #ff67ad;
+  border-radius: 34px;
+  background: linear-gradient(180deg, #fff6f1, #ffe0d6);
+  color: #8a2a65;
+  text-align: center;
+  box-shadow:
+    inset 0 0 0 5px rgba(255, 255, 255, .38),
+    0 10px 0 rgba(185, 34, 108, .50),
+    0 28px 58px rgba(5, 16, 39, .42);
+}
+
+.level-card-string {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 4px);
+  width: 6px;
+  height: 170px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e93491, #ff86c4 45%, #b71967);
+  transform: translateX(-50%);
+}
+
+.level-card-string::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -30px;
+  width: 42px;
+  height: 42px;
+  border: 9px solid #fff8e6;
+  border-radius: 50%;
+  background: #ff8fc8;
+  transform: translateX(-50%);
+}
+
+.level-close-button {
+  position: absolute;
+  top: 18px;
+  right: -18px;
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  border: 5px solid rgba(255, 255, 255, .70);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff6e56, #e52323);
+  color: #fff;
+  font-size: 32px;
+  font-weight: 1000;
+  box-shadow: inset 0 6px 0 rgba(255, 255, 255, .24), 0 7px 0 rgba(134, 27, 49, .34);
+  cursor: pointer;
+}
+
+.level-start-card h1 {
+  margin: 0;
+  color: #e75c9f;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(44px, 10vw, 66px);
+  line-height: 1;
+  text-shadow: 0 3px 0 #fff, 0 5px 0 rgba(151, 44, 106, .22);
+}
+
+.level-order-row {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  text-align: left;
+}
+
+.level-order-row strong {
+  display: block;
+  color: #8a2a65;
+  font-size: clamp(23px, 6vw, 34px);
+  font-weight: 900;
+}
+
+.level-order-row small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(138, 42, 101, .70);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.target-medallion {
+  width: 82px;
+  height: 82px;
+  display: block;
+  border: 5px solid rgba(255, 255, 255, .72);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, .82), transparent 22%),
+    linear-gradient(145deg, #36baff, #075fe4);
+  box-shadow: inset 0 -10px 0 rgba(0, 45, 155, .22), 0 8px 0 rgba(130, 58, 103, .16);
+}
+
+.target-medallion.ice {
+  border-radius: 28px;
+  background:
+    radial-gradient(ellipse at 50% 15%, #fff 0 13%, transparent 14%),
+    radial-gradient(ellipse at 82% 38%, #fff7e6 0 18%, transparent 19%),
+    radial-gradient(ellipse at 62% 82%, #fff7e6 0 18%, transparent 19%),
+    radial-gradient(ellipse at 18% 62%, #fff7e6 0 18%, transparent 19%),
+    linear-gradient(145deg, #fffdf2, #ead0ab);
+}
+
+.target-medallion.ruby { border-radius: 26px; background: repeating-linear-gradient(35deg, #ff3f57 0 14px, #fff 15px 25px); }
+.target-medallion.emerald { background: radial-gradient(circle at 30% 22%, rgba(255,255,255,.82), transparent 22%), linear-gradient(145deg, #29e43e, #078a18); }
+.target-medallion.sunstone { border-radius: 50%; background: radial-gradient(circle at 30% 22%, rgba(255,255,255,.82), transparent 22%), linear-gradient(145deg, #ffa726, #f06b00); }
+.target-medallion.amethyst { border-radius: 45%; background: radial-gradient(circle at 30% 22%, rgba(255,255,255,.82), transparent 22%), linear-gradient(145deg, #ee40ff, #a900e6); }
+.target-medallion.pearl { transform: rotate(45deg); background: radial-gradient(circle at 30% 22%, rgba(255,255,255,.82), transparent 22%), linear-gradient(145deg, #ffe277, #f7a817); }
+
+.level-start-card .level-meta-row {
+  justify-content: center;
+  gap: 8px;
+}
+
+.level-start-card .level-meta-row span {
+  min-height: 32px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .58);
+  color: rgba(138, 42, 101, .78);
+  font-size: 12px;
+}
+
+.level-card-divider {
+  height: 2px;
+  margin: 2px -18px 0;
+  background: repeating-linear-gradient(90deg, rgba(188, 86, 113, .35) 0 18px, transparent 18px 28px);
+}
+
+.level-start-card h2 {
+  margin: 0;
+  color: #8a2a65;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 8vw, 48px);
+}
+
+.level-start-card .pre-booster-list {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.level-start-card .pre-booster-card {
+  justify-items: center;
+}
+
+.level-start-card .booster-button {
+  width: clamp(64px, 17vw, 92px);
+  min-height: auto;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  padding: 0;
+  border: 6px solid rgba(162, 232, 244, .74);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, .86), transparent 28%),
+    linear-gradient(180deg, #bff8ff, #58c7ee);
+  color: #38609f;
+  box-shadow: inset 0 -8px 0 rgba(52, 128, 174, .20), 0 9px 0 rgba(107, 70, 122, .15);
+}
+
+.level-start-card .booster-button strong,
+.level-start-card .booster-button small,
+.level-start-card .mini-buy {
+  display: none;
+}
+
+.level-start-card .booster-button span {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  font-size: clamp(18px, 4.2vw, 26px);
+}
+
+.level-start-card .booster-button.selected {
+  border-color: #ffe278;
+  box-shadow: inset 0 -8px 0 rgba(52, 128, 174, .20), 0 0 0 6px rgba(255, 226, 120, .28), 0 9px 0 rgba(107, 70, 122, .15);
+}
+
+.level-start-card .tutorial-callout,
+.level-start-card .no-lives-panel {
+  margin: 0;
+  border-color: rgba(225, 78, 143, .20);
+  background: rgba(255, 255, 255, .50);
+  color: #8a2a65;
+}
+
+.level-start-card .play-level-button {
+  width: min(72%, 280px);
+  min-height: 64px;
+  justify-self: center;
+  margin: 4px 0 0;
+  border: 5px solid rgba(255, 255, 255, .62);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff75c7, #ed0870);
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 8vw, 48px);
+  text-shadow: 0 3px 0 rgba(102, 18, 72, .58);
+  box-shadow: inset 0 7px 0 rgba(255, 255, 255, .30), inset 0 -9px 0 rgba(133, 14, 81, .24), 0 8px 0 rgba(137, 20, 89, .35);
+}
+
+.mini-candy.ice {
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 50% 15%, #fff 0 13%, transparent 14%),
+    radial-gradient(ellipse at 82% 38%, #fff7e6 0 18%, transparent 19%),
+    radial-gradient(ellipse at 62% 82%, #fff7e6 0 18%, transparent 19%),
+    radial-gradient(ellipse at 18% 62%, #fff7e6 0 18%, transparent 19%),
+    linear-gradient(145deg, #fffdf2, #ead0ab);
+  box-shadow: inset 0 -7px 0 rgba(184, 145, 91, .20), 0 4px 0 rgba(126, 86, 58, .16);
+}
+
+.mini-candy.chain,
+.mini-candy.crate,
+.mini-candy.darkness,
+.mini-candy.relic {
+  border-radius: 14px;
+  background: linear-gradient(145deg, #fff2c9, #e9a13a);
+}
+
 @media (max-width: 720px) {
   .screen-topbar.candy-map-topbar {
     grid-template-columns: 42px minmax(82px, 1fr) 58px minmax(74px, 1fr) 48px;
@@ -999,6 +1254,37 @@
     width: 52px;
     height: 52px;
     font-size: 24px;
+  }
+
+  .level-start-screen.screen {
+    padding: 18px;
+  }
+
+  .level-start-card {
+    border-width: 6px;
+    border-radius: 28px;
+    gap: 14px;
+  }
+
+  .level-close-button {
+    right: -12px;
+    width: 58px;
+    height: 58px;
+    font-size: 27px;
+  }
+
+  .level-order-row {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .target-medallion {
+    width: 70px;
+    height: 70px;
+  }
+
+  .level-start-card .pre-booster-list {
+    gap: 8px;
   }
 }
 

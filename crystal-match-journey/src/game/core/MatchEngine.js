@@ -1,10 +1,10 @@
 export const CRYSTALS = {
-  ruby: { label: "Yakut", color: 0xf25a76, glow: 0xff9ab0 },
-  sapphire: { label: "Safir", color: 0x4b8dff, glow: 0xa8c9ff },
-  emerald: { label: "Zumrut", color: 0x36d39a, glow: 0xa2ffd8 },
-  sunstone: { label: "Gunes Tasi", color: 0xffc857, glow: 0xffe6a0 },
-  amethyst: { label: "Ametist", color: 0xa66bff, glow: 0xd9c0ff },
-  pearl: { label: "Inci", color: 0xf4f0ff, glow: 0xffffff }
+  ruby: { label: "Cizgili seker", color: 0xf25a76, glow: 0xff9ab0 },
+  sapphire: { label: "Mavi jel", color: 0x4b8dff, glow: 0xa8c9ff },
+  emerald: { label: "Yesil kare", color: 0x36d39a, glow: 0xa2ffd8 },
+  sunstone: { label: "Turuncu seker", color: 0xffc857, glow: 0xffe6a0 },
+  amethyst: { label: "Mor bonbon", color: 0xa66bff, glow: 0xd9c0ff },
+  pearl: { label: "Sari lokum", color: 0xf4f0ff, glow: 0xffffff }
 };
 
 const BLOCKER_GOAL_MAP = {
@@ -25,7 +25,8 @@ export class MatchEngine {
     this.collected = {};
     this.cleared = { ice: 0, chain: 0, crate: 0, darkness: 0 };
     this.relics = 0;
-    this.message = this.level.tutorial || "Kristalleri eslestirerek hedefi tamamla.";
+    this.events = [];
+    this.message = this.level.tutorial || "Sekerleri eslestirerek hedefi tamamla.";
     this.board = this.createPlayableBoard();
     this.applyLevelBlockers();
     this.applyPreBoosters(this.level.preBoosters || []);
@@ -48,8 +49,15 @@ export class MatchEngine {
   }
 
   trySwap(first, second, options = {}) {
-    if (!this.areAdjacent(first, second)) return { ok: false, reason: "Yan yana iki kristal sec." };
-    if (!options.free && !this.canSwap(first, second)) return { ok: false, reason: "Bu hucre hareket edemez." };
+    this.events = [];
+    if (!this.areAdjacent(first, second)) {
+      this.message = "Yan yana iki seker sec.";
+      return this.result(false, 0);
+    }
+    if (!options.free && !this.canSwap(first, second)) {
+      this.message = "Bu hucre hareket edemez.";
+      return this.result(false, 0);
+    }
 
     const firstCell = this.board[first];
     const secondCell = this.board[second];
@@ -57,7 +65,7 @@ export class MatchEngine {
     if (firstCell.special && secondCell.special) {
       this.consumeMove(options.free ? 0 : 1);
       const cleared = this.activateSpecialCombo(first, second);
-      this.afterSuccessfulMove(cleared, "Ozel kristal kombinasyonu patladi.");
+      this.afterSuccessfulMove(cleared, "Ozel seker kombinasyonu patladi.");
       return this.result(true, cleared);
     }
 
@@ -65,7 +73,7 @@ export class MatchEngine {
       this.consumeMove(options.free ? 0 : 1);
       const targetColor = firstCell.special === "rainbow" ? secondCell.color : firstCell.color;
       const cleared = this.clearColor(targetColor);
-      this.afterSuccessfulMove(cleared, "Renk Kuresi ayni renkteki kristalleri temizledi.");
+      this.afterSuccessfulMove(cleared, "Renk bombasi ayni renkteki sekerleri temizledi.");
       return this.result(true, cleared);
     }
 
@@ -80,11 +88,12 @@ export class MatchEngine {
 
     this.consumeMove(options.free ? 0 : 1);
     const cleared = matches.length ? this.resolveMatches(second) : 0;
-    this.afterSuccessfulMove(cleared, options.free ? "Serbest Degisim kullanildi." : `${cleared} kristal temizlendi.`);
+    this.afterSuccessfulMove(cleared, options.free ? "Serbest Degisim kullanildi." : `${cleared} seker temizlendi.`);
     return this.result(true, cleared);
   }
 
   applyHammer(index) {
+    this.events = [];
     const cell = this.board[index];
     if (!cell || cell.void) return this.result(false, 0);
     const cleared = this.clearCells(new Set([index]), null, 1);
@@ -96,25 +105,28 @@ export class MatchEngine {
   }
 
   applyColorBlast(index) {
+    this.events = [];
     const color = this.board[index]?.color;
     if (!color) return this.result(false, 0);
     const cleared = this.clearColor(color);
-    this.afterSuccessfulMove(cleared, `${CRYSTALS[color]?.label || "Renk"} kristalleri patladi.`);
+    this.afterSuccessfulMove(cleared, `${CRYSTALS[color]?.label || "Renk"} sekerleri patladi.`);
     return this.result(true, cleared);
   }
 
   applyTargetFly() {
+    this.events = [];
     const target = this.findPriorityTarget();
     if (target === null) return this.result(false, 0);
     const cleared = this.clearCells(new Set([target]), null, 1);
     this.applyGravity();
     this.collectDroppedRelics();
     this.ensurePlayableBoard();
-    this.message = "Ucan Kristal en kritik hedefe vurdu.";
+    this.message = "Ucan seker en kritik hedefe vurdu.";
     return this.result(true, cleared || 1);
   }
 
   addMoves(amount) {
+    this.events = [];
     this.moves += amount;
     this.message = `${amount} hamle eklendi.`;
     return this.result(true, 0);
@@ -403,6 +415,7 @@ export class MatchEngine {
   clearCells(clearSet, specialPlan = null, cascade = 1) {
     let cleared = 0;
     const blockersToDamage = new Set();
+    const eventIndexes = new Set();
 
     for (const index of clearSet) {
       const cell = this.board[index];
@@ -414,18 +427,25 @@ export class MatchEngine {
       });
 
       if (cell.blocker) {
-        if (this.damageBlocker(index)) cleared += 1;
+        if (this.damageBlocker(index)) {
+          cleared += 1;
+          eventIndexes.add(index);
+        }
       }
 
       if (cell.color && !this.isSolidBlocker(cell)) {
         this.collected[cell.color] = (this.collected[cell.color] || 0) + 1;
         cleared += 1;
+        eventIndexes.add(index);
         Object.assign(cell, { color: null, special: null, item: null, seed: `${index}-${Date.now()}` });
       }
     }
 
     blockersToDamage.forEach((index) => {
-      if (this.damageBlocker(index)) cleared += 1;
+      if (this.damageBlocker(index)) {
+        cleared += 1;
+        eventIndexes.add(index);
+      }
     });
 
     if (specialPlan) {
@@ -439,6 +459,27 @@ export class MatchEngine {
           seed: `special-${Date.now()}-${Math.random()}`
         });
       }
+    }
+
+    if (cleared > 0) {
+      this.events.push({
+        type: "clear",
+        indexes: [...eventIndexes],
+        cascade,
+        count: cleared,
+        special: specialPlan?.special || null,
+        clearSize: clearSet.size
+      });
+    }
+
+    if (specialPlan) {
+      this.events.push({
+        type: "createSpecial",
+        index: specialPlan.index,
+        special: specialPlan.special,
+        color: specialPlan.color,
+        cascade
+      });
     }
 
     this.score += cleared * 20 * cascade;
@@ -555,7 +596,7 @@ export class MatchEngine {
 
   ensurePlayableBoard() {
     if (this.hasPossibleMove(this.board)) return;
-    this.message = "Tahtada hamle kalmadi, kristaller yeniden dizildi.";
+    this.message = "Tahtada hamle kalmadi, sekerler yeniden dizildi.";
     for (let attempt = 0; attempt < 120; attempt += 1) {
       this.board.forEach((cell, index) => {
         if (!cell || cell.void || this.isSolidBlocker(cell) || cell.item === "relic") return;
@@ -693,9 +734,12 @@ export class MatchEngine {
   }
 
   result(ok, cleared) {
+    const events = this.events.slice();
+    this.events = [];
     return {
       ok,
       cleared,
+      events,
       status: this.getStatus(),
       won: this.isGoalComplete(),
       lost: this.moves <= 0 && !this.isGoalComplete()

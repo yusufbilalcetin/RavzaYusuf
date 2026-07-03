@@ -22,7 +22,7 @@
     },
     "blockers": [],
     "emptyCells": [],
-    "tutorial": "Uc ayni renk kristali yan yana getir.",
+    "tutorial": "Uc ayni renk sekeri yan yana getir.",
     "preLevelBoosters": [
       "startLine",
       "startBomb",
@@ -37,7 +37,7 @@
     "difficulty": "normal",
     "rows": 8,
     "cols": 8,
-    "moves": 30,
+    "moves": 25,
     "colors": [
       "ruby",
       "sapphire",
@@ -46,14 +46,51 @@
       "amethyst"
     ],
     "goal": {
-      "type": "collect",
-      "targets": {
-        "emerald": 16
-      }
+      "type": "clear_ice",
+      "count": 25
     },
-    "blockers": [],
-    "emptyCells": [],
-    "tutorial": "Dortlu eslesme bir Isin Kristali olusturur.",
+    "blockers": [
+      { "type": "ice", "row": 3, "col": 3, "layer": 1 },
+      { "type": "ice", "row": 3, "col": 4, "layer": 1 },
+      { "type": "ice", "row": 3, "col": 5, "layer": 1 },
+      { "type": "ice", "row": 3, "col": 6, "layer": 1 },
+      { "type": "ice", "row": 3, "col": 7, "layer": 1 },
+      { "type": "ice", "row": 4, "col": 3, "layer": 1 },
+      { "type": "ice", "row": 4, "col": 4, "layer": 1 },
+      { "type": "ice", "row": 4, "col": 5, "layer": 1 },
+      { "type": "ice", "row": 4, "col": 6, "layer": 1 },
+      { "type": "ice", "row": 4, "col": 7, "layer": 1 },
+      { "type": "ice", "row": 5, "col": 3, "layer": 1 },
+      { "type": "ice", "row": 5, "col": 4, "layer": 1 },
+      { "type": "ice", "row": 5, "col": 5, "layer": 1 },
+      { "type": "ice", "row": 5, "col": 6, "layer": 1 },
+      { "type": "ice", "row": 5, "col": 7, "layer": 1 },
+      { "type": "ice", "row": 6, "col": 3, "layer": 1 },
+      { "type": "ice", "row": 6, "col": 4, "layer": 1 },
+      { "type": "ice", "row": 6, "col": 5, "layer": 1 },
+      { "type": "ice", "row": 6, "col": 6, "layer": 1 },
+      { "type": "ice", "row": 6, "col": 7, "layer": 1 },
+      { "type": "ice", "row": 7, "col": 3, "layer": 1 },
+      { "type": "ice", "row": 7, "col": 4, "layer": 1 },
+      { "type": "ice", "row": 7, "col": 5, "layer": 1 },
+      { "type": "ice", "row": 7, "col": 6, "layer": 1 },
+      { "type": "ice", "row": 7, "col": 7, "layer": 1 }
+    ],
+    "emptyCells": [
+      { "row": 0, "col": 0 },
+      { "row": 0, "col": 1 },
+      { "row": 0, "col": 2 },
+      { "row": 0, "col": 3 },
+      { "row": 0, "col": 4 },
+      { "row": 1, "col": 0 },
+      { "row": 1, "col": 1 },
+      { "row": 1, "col": 2 },
+      { "row": 1, "col": 3 },
+      { "row": 1, "col": 4 },
+      { "row": 2, "col": 0 },
+      { "row": 2, "col": 1 }
+    ],
+    "tutorial": "Frosting kapli hucrelerin ustunde eslesme yaparak siparisi temizle.",
     "preLevelBoosters": [
       "startLine",
       "startBomb",
@@ -84,7 +121,7 @@
     },
     "blockers": [],
     "emptyCells": [],
-    "tutorial": "Besli eslesme Renk Kuresi olusturur.",
+    "tutorial": "Besli eslesme renk bombasi olusturur.",
     "preLevelBoosters": [
       "startLine",
       "startBomb",

@@ -6,6 +6,7 @@ import BoosterButton from "../components/BoosterButton.jsx";
 export default function LevelStartScreen({ level, progress, onBack, onPlay, onBuyBooster }) {
   const [selected, setSelected] = useState([]);
   const noLives = progress.lives <= 0;
+  const target = getPrimaryTarget(level);
 
   function toggleBooster(id) {
     if ((progress.boosters[id] || 0) <= 0) return;
@@ -15,17 +16,25 @@ export default function LevelStartScreen({ level, progress, onBack, onPlay, onBu
   return (
     <main className="level-start-screen screen">
       <section className={`level-start-card ${level.difficulty}`}>
-        <button className="ghost-action compact" type="button" onClick={onBack}>Harita</button>
-        <p className="eyebrow">{level.world}</p>
-        <h1>Seviye {level.level}</h1>
+        <span className="level-card-string" aria-hidden="true" />
+        <button className="level-close-button" type="button" onClick={onBack} aria-label="Haritaya don">X</button>
+        <h1>Level {level.level}</h1>
+        <div className="level-order-row">
+          <span className={`target-medallion ${target.key}`} aria-hidden="true" />
+          <div>
+            <strong>Collect all orders</strong>
+            <small>{target.count} {target.label}</small>
+          </div>
+        </div>
         <div className="level-meta-row">
           <span>{getDifficultyLabel(level.difficulty)}</span>
           <span>{level.moves} hamle</span>
           <span>{level.rows}x{level.cols}</span>
         </div>
-        <h2>{getGoalLabel(level)}</h2>
         {level.tutorial && <p className="tutorial-callout">{level.tutorial}</p>}
 
+        <div className="level-card-divider" />
+        <h2>Select boosters:</h2>
         <div className="pre-booster-list">
           {PRE_LEVEL_BOOSTERS.map((booster) => (
             <div className="pre-booster-card" key={booster.id}>
@@ -51,9 +60,28 @@ export default function LevelStartScreen({ level, progress, onBack, onPlay, onBu
         )}
 
         <button className="primary-action play-level-button" type="button" disabled={noLives} onClick={() => onPlay(selected)}>
-          Oyna
+          Play!
         </button>
       </section>
     </main>
   );
+}
+
+function getPrimaryTarget(level) {
+  const goal = level.goal || {};
+  if (goal.type === "collect") {
+    const [key, count] = Object.entries(goal.targets || {})[0] || ["sapphire", 0];
+    return { key, count, label: getGoalLabel({ goal: { type: "collect", targets: { [key]: count } } }).replace(`${count} `, "") };
+  }
+  if (goal.type === "clear_ice") return { key: "ice", count: goal.count || 0, label: "frosting" };
+  if (goal.type === "break_chains") return { key: "chain", count: goal.count || 0, label: "chain" };
+  if (goal.type === "break_crates") return { key: "crate", count: goal.count || 0, label: "crate" };
+  if (goal.type === "drop_relic") return { key: "relic", count: goal.count || 0, label: "drop" };
+  if (goal.type === "mixed") {
+    const clear = Object.entries(goal.clear || {})[0];
+    if (clear) return { key: clear[0], count: clear[1], label: clear[0] };
+    const target = Object.entries(goal.targets || {})[0];
+    if (target) return { key: target[0], count: target[1], label: target[0] };
+  }
+  return { key: "sapphire", count: 0, label: "orders" };
 }

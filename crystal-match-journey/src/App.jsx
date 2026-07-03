@@ -4,6 +4,8 @@ import MapScreen from "./screens/MapScreen.jsx";
 import LevelStartScreen from "./screens/LevelStartScreen.jsx";
 import GameScreen from "./screens/GameScreen.jsx";
 import SettingsScreen from "./screens/SettingsScreen.jsx";
+import SplashScreen from "./screens/SplashScreen.jsx";
+import LoadingScreen from "./screens/LoadingScreen.jsx";
 import DailyRewardModal from "./components/DailyRewardModal.jsx";
 import { getLevel, getLevels } from "./game/core/LevelManager.js";
 import { getBoosterPrice } from "./game/core/BoosterManager.js";
@@ -25,6 +27,7 @@ import {
 } from "./game/core/ProgressManager.js";
 
 export default function App() {
+  const [bootPhase, setBootPhase] = useState("splash");
   const [screen, setScreen] = useState("home");
   const [previousScreen, setPreviousScreen] = useState("home");
   const [progress, setProgress] = useState(() => loadProgress());
@@ -33,6 +36,15 @@ export default function App() {
   const [dailyReward, setDailyReward] = useState(null);
   const progressRef = useRef(progress);
   const levels = getLevels();
+
+  useEffect(() => {
+    const splashTimer = window.setTimeout(() => setBootPhase("loading"), 850);
+    const readyTimer = window.setTimeout(() => setBootPhase("ready"), 1850);
+    return () => {
+      window.clearTimeout(splashTimer);
+      window.clearTimeout(readyTimer);
+    };
+  }, []);
 
   const updateProgress = useCallback((next) => {
     progressRef.current = next;
@@ -141,6 +153,9 @@ export default function App() {
   const handleSettingsChange = useCallback((patch) => {
     updateProgress(updateSettings(progressRef.current, patch));
   }, [updateProgress]);
+
+  if (bootPhase === "splash") return <SplashScreen />;
+  if (bootPhase === "loading") return <LoadingScreen />;
 
   return (
     <div className="app-shell">
