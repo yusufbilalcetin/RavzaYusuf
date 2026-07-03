@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { CRYSTALS, MatchEngine } from "../core/MatchEngine.js";
+import { MatchEngine } from "../core/MatchEngine.js";
 import { playSound } from "../utils/SoundManager.js";
 
 const SPECIAL_LABELS = {
@@ -15,6 +15,15 @@ const BLOCKER_LABELS = {
   chain: "Z",
   crate: "K",
   darkness: "D"
+};
+
+const CANDY_STYLES = {
+  ruby: { fill: 0xff435b, shadow: 0xb70e2d, shine: 0xffd8df, type: "stripe" },
+  sapphire: { fill: 0x1598ff, shadow: 0x0757c9, shine: 0xc6efff, type: "sphere" },
+  emerald: { fill: 0x27d83d, shadow: 0x087d1b, shine: 0xd6ffdc, type: "square" },
+  sunstone: { fill: 0xff981f, shadow: 0xb94e05, shine: 0xffe0a1, type: "drop" },
+  amethyst: { fill: 0xce22ff, shadow: 0x7d0fb8, shine: 0xffc7ff, type: "cluster" },
+  pearl: { fill: 0xffd451, shadow: 0xc17d06, shine: 0xffffff, type: "lozenge" }
 };
 
 export default class GameScene extends Phaser.Scene {
@@ -36,7 +45,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBackgroundColor("#100719");
+    this.cameras.main.setBackgroundColor("rgba(0,0,0,0)");
     this.scale.on("resize", this.renderBoard, this);
     this.input.on("pointerup", this.handlePointerUp, this);
     this.callbacks.onSceneReady?.(this);
@@ -93,10 +102,19 @@ export default class GameScene extends Phaser.Scene {
     this.metrics = { originX, originY, cellSize, boardWidth, boardHeight };
 
     const back = this.add.graphics();
-    back.fillStyle(0x1a0d2f, 0.88);
-    back.fillRoundedRect(originX - 10, originY - 10, boardWidth + 20, boardHeight + 20, 22);
-    back.lineStyle(2, 0x70e6ff, 0.18);
-    back.strokeRoundedRect(originX - 10, originY - 10, boardWidth + 20, boardHeight + 20, 22);
+    back.fillStyle(0x2f7ca5, 0.96);
+    back.fillRoundedRect(originX - 12, originY - 12, boardWidth + 24, boardHeight + 24, 18);
+    back.lineStyle(5, 0x6ab7d6, 0.52);
+    back.strokeRoundedRect(originX - 12, originY - 12, boardWidth + 24, boardHeight + 24, 18);
+    back.lineStyle(2, 0x1f5f80, 0.28);
+    for (let col = 1; col < cols; col += 1) {
+      const lineX = originX + col * cellSize;
+      back.lineBetween(lineX, originY - 4, lineX, originY + boardHeight + 4);
+    }
+    for (let row = 1; row < rows; row += 1) {
+      const lineY = originY + row * cellSize;
+      back.lineBetween(originX - 4, lineY, originX + boardWidth + 4, lineY);
+    }
     this.boardLayer.add(back);
 
     this.engine.board.forEach((cell, index) => {
@@ -122,35 +140,16 @@ export default class GameScene extends Phaser.Scene {
       return;
     }
 
-    base.fillStyle(0xffffff, this.selected === index ? 0.24 : 0.10);
-    base.fillRoundedRect(pad, pad, inner, inner, 13);
-    base.lineStyle(this.selected === index ? 3 : 1, this.selected === index ? 0xffdf7a : 0xffffff, this.selected === index ? 0.9 : 0.16);
+    base.fillStyle(this.selected === index ? 0x63c8f0 : 0x2d749b, this.selected === index ? 0.58 : 0.20);
+    base.fillRoundedRect(pad, pad, inner, inner, 10);
+    base.lineStyle(this.selected === index ? 4 : 1, this.selected === index ? 0xfff09b : 0x72b8d7, this.selected === index ? 0.95 : 0.16);
     base.strokeRoundedRect(pad, pad, inner, inner, 13);
     group.add(base);
 
     if (cell.color) {
-      const palette = CRYSTALS[cell.color] || CRYSTALS.ruby;
-      const crystal = this.add.graphics();
       const cx = size / 2;
       const cy = size / 2;
-      const r = inner * 0.34;
-      crystal.fillStyle(palette.glow, 0.34);
-      crystal.fillCircle(cx, cy, r * 1.2);
-      crystal.fillStyle(palette.color, 1);
-      crystal.fillPoints([
-        new Phaser.Geom.Point(cx, cy - r),
-        new Phaser.Geom.Point(cx + r * 0.78, cy),
-        new Phaser.Geom.Point(cx, cy + r),
-        new Phaser.Geom.Point(cx - r * 0.78, cy)
-      ], true);
-      crystal.lineStyle(2, 0xffffff, 0.44);
-      crystal.strokePoints([
-        new Phaser.Geom.Point(cx, cy - r),
-        new Phaser.Geom.Point(cx + r * 0.78, cy),
-        new Phaser.Geom.Point(cx, cy + r),
-        new Phaser.Geom.Point(cx - r * 0.78, cy)
-      ], true);
-      group.add(crystal);
+      this.drawCandy(group, cell.color, cx, cy, inner);
 
       if (cell.special) {
         group.add(this.add.text(cx, cy, SPECIAL_LABELS[cell.special] || "+", {
@@ -209,6 +208,74 @@ export default class GameScene extends Phaser.Scene {
         ease: "Cubic.easeOut"
       });
     }
+  }
+
+  drawCandy(group, color, cx, cy, inner) {
+    const style = CANDY_STYLES[color] || CANDY_STYLES.ruby;
+    const candy = this.add.graphics();
+    const r = inner * 0.36;
+
+    candy.fillStyle(style.shadow, 0.32);
+    candy.fillEllipse(cx + r * 0.10, cy + r * 0.18, r * 1.82, r * 1.46);
+    candy.fillStyle(style.fill, 1);
+
+    if (style.type === "square") {
+      candy.fillRoundedRect(cx - r * 0.88, cy - r * 0.72, r * 1.76, r * 1.44, r * 0.28);
+      candy.lineStyle(2, 0xffffff, 0.36);
+      candy.strokeRoundedRect(cx - r * 0.88, cy - r * 0.72, r * 1.76, r * 1.44, r * 0.28);
+    } else if (style.type === "drop") {
+      candy.fillEllipse(cx, cy, r * 1.24, r * 1.78);
+      candy.lineStyle(2, 0xffffff, 0.34);
+      candy.strokeEllipse(cx, cy, r * 1.24, r * 1.78);
+      candy.lineStyle(Math.max(2, r * 0.16), 0xfff1b9, 0.45);
+      candy.strokeEllipse(cx, cy, r * 0.72, r * 1.08);
+    } else if (style.type === "cluster") {
+      const petal = r * 0.43;
+      const points = [
+        [0, -0.56],
+        [0.54, -0.16],
+        [0.34, 0.50],
+        [-0.34, 0.50],
+        [-0.54, -0.16]
+      ];
+      points.forEach(([px, py]) => candy.fillCircle(cx + px * r, cy + py * r, petal));
+      candy.fillCircle(cx, cy, petal * 1.04);
+      candy.lineStyle(2, 0xffffff, 0.28);
+      points.forEach(([px, py]) => candy.strokeCircle(cx + px * r, cy + py * r, petal));
+    } else if (style.type === "stripe") {
+      candy.fillRoundedRect(cx - r * 0.72, cy - r * 0.90, r * 1.44, r * 1.80, r * 0.66);
+      candy.lineStyle(5, 0xffffff, 0.82);
+      candy.lineBetween(cx - r * 0.68, cy - r * 0.52, cx + r * 0.48, cy + r * 0.64);
+      candy.lineBetween(cx - r * 0.50, cy - r * 0.82, cx + r * 0.72, cy + r * 0.40);
+      candy.lineStyle(2, 0xffffff, 0.34);
+      candy.strokeRoundedRect(cx - r * 0.72, cy - r * 0.90, r * 1.44, r * 1.80, r * 0.66);
+    } else if (style.type === "lozenge") {
+      candy.fillPoints([
+        new Phaser.Geom.Point(cx, cy - r * 0.98),
+        new Phaser.Geom.Point(cx + r * 0.76, cy),
+        new Phaser.Geom.Point(cx, cy + r * 0.98),
+        new Phaser.Geom.Point(cx - r * 0.76, cy)
+      ], true);
+      candy.lineStyle(2, 0xffffff, 0.36);
+      candy.strokePoints([
+        new Phaser.Geom.Point(cx, cy - r * 0.98),
+        new Phaser.Geom.Point(cx + r * 0.76, cy),
+        new Phaser.Geom.Point(cx, cy + r * 0.98),
+        new Phaser.Geom.Point(cx - r * 0.76, cy)
+      ], true);
+    } else {
+      candy.fillEllipse(cx, cy, r * 1.74, r * 1.52);
+      candy.lineStyle(2, 0xffffff, 0.34);
+      candy.strokeEllipse(cx, cy, r * 1.74, r * 1.52);
+      candy.lineStyle(3, 0xffffff, 0.28);
+      candy.lineBetween(cx - r * 0.78, cy + r * 0.08, cx + r * 0.78, cy + r * 0.08);
+    }
+
+    candy.fillStyle(style.shine, 0.70);
+    candy.fillEllipse(cx - r * 0.28, cy - r * 0.36, r * 0.56, r * 0.20);
+    candy.fillStyle(0xffffff, 0.22);
+    candy.fillEllipse(cx + r * 0.24, cy + r * 0.28, r * 0.68, r * 0.16);
+    group.add(candy);
   }
 
   handlePointerUp(pointer) {

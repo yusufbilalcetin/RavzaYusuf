@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import TopBar from "../components/TopBar.jsx";
 import { getDifficultyLabel, getGoalLabel } from "../game/core/LevelManager.js";
 
 export default function MapScreen({
@@ -15,6 +14,19 @@ export default function MapScreen({
   onAcceptLife
 }) {
   const currentRef = useRef(null);
+  const rowHeight = 126;
+  const mapRoadHeight = levels.length * rowHeight + 180;
+  const getNodeOffset = (index) => index % 4 === 0 ? -36 : index % 4 === 1 ? 18 : index % 4 === 2 ? 46 : -8;
+  const roadPoints = levels.map((level, index) => ({
+    x: 215 + getNodeOffset(index),
+    y: 84 + index * rowHeight
+  }));
+  const roadPath = roadPoints.reduce((path, point, index) => {
+    if (index === 0) return `M ${point.x} ${point.y - 72}`;
+    const previous = roadPoints[index - 1];
+    const midY = (previous.y + point.y) / 2;
+    return `${path} C ${previous.x} ${midY}, ${point.x} ${midY}, ${point.x} ${point.y}`;
+  }, "");
 
   useEffect(() => {
     currentRef.current?.scrollIntoView({ block: "center" });
@@ -22,12 +34,15 @@ export default function MapScreen({
 
   return (
     <main className="map-screen screen">
-      <header className="screen-topbar">
-        <button className="ghost-action compact" type="button" onClick={onBack}>Ana menu</button>
-        <TopBar progress={progress} onSettings={onSettings} />
+      <header className="screen-topbar candy-map-topbar">
+        <button className="map-mail-button" type="button" onClick={onAcceptLife} aria-label="Posta">✉</button>
+        <div className="map-life-pill"><strong>♥ {progress.lives}</strong><span>Full</span></div>
+        <div className="map-avatar" aria-hidden="true">☺</div>
+        <div className="map-coin-pill"><strong>▰</strong><span>{progress.coins}</span></div>
+        <button className="settings-fab map-settings" type="button" onClick={onSettings} aria-label="Ayarlar">⚙</button>
       </header>
 
-      <section className="map-heading">
+      <section className="map-heading candy-map-heading">
         <p className="eyebrow">Buyulu ada yolu</p>
         <h2>Harita</h2>
         <p>Yuvarlak bolum noktalarini takip et. Eski bolumleri tekrar oynayabilir, siradaki acik bolumu ilerletebilirsin.</p>
@@ -46,13 +61,30 @@ export default function MapScreen({
         </section>
       )}
 
-      <section className="island-map" aria-label="Seviye haritasi">
+      <section className="island-map candy-island-map" aria-label="Seviye haritasi">
+        <svg
+          className="candy-map-road"
+          viewBox={`0 0 430 ${mapRoadHeight}`}
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <pattern id="candy-road-stripe" patternUnits="userSpaceOnUse" width="42" height="42" patternTransform="rotate(28)">
+              <rect width="42" height="42" fill="#fff4cf" />
+              <rect width="21" height="42" fill="#ff73ba" />
+            </pattern>
+          </defs>
+          <path className="candy-map-road-border" d={roadPath} />
+          <path className="candy-map-road-fill" d={roadPath} stroke="url(#candy-road-stripe)" />
+        </svg>
+        <div className="map-character map-character-left" aria-hidden="true">☁</div>
+        <div className="map-character map-character-right" aria-hidden="true">♧</div>
         {levels.map((level, index) => {
           const unlocked = level.level <= progress.maxUnlocked;
           const completed = Number(progress.stars[level.level] || 0) > 0;
           const stars = Number(progress.stars[level.level] || 0);
           const isCurrent = level.level === progress.maxUnlocked;
-          const offset = index % 4 === 0 ? -36 : index % 4 === 1 ? 18 : index % 4 === 2 ? 46 : -8;
+          const offset = getNodeOffset(index);
           return (
             <article className={`map-row ${level.difficulty}`} key={level.level}>
               {(level.level === 1 || (level.level - 1) % 20 === 0) && (
@@ -77,6 +109,14 @@ export default function MapScreen({
           );
         })}
       </section>
+
+      <nav className="map-bottom-nav" aria-label="Harita menusu">
+        <button type="button" className="active" onClick={onBack}><span>🗺</span>Map</button>
+        <button type="button"><span>✓</span>Tasks</button>
+        <button type="button" onClick={onRequestLife}><span>👥</span>Friends</button>
+        <button type="button" onClick={onAdLife}><span>★</span>Boost</button>
+        <button type="button" onClick={onBuyLife}><span>🏪</span>Shop</button>
+      </nav>
     </main>
   );
 }

@@ -1,10 +1,9 @@
 import Phaser from "phaser";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IN_GAME_BOOSTERS } from "../game/core/BoosterManager.js";
-import { blockerLabel, colorLabel, getDifficultyLabel, getGoalLabel } from "../game/core/LevelManager.js";
+import { blockerLabel, colorLabel, getGoalLabel } from "../game/core/LevelManager.js";
 import GameScene from "../game/scenes/GameScene.js";
 import BoosterButton from "../components/BoosterButton.jsx";
-import HeartLives from "../components/HeartLives.jsx";
 import WinModal from "../components/WinModal.jsx";
 import LoseModal from "../components/LoseModal.jsx";
 
@@ -64,20 +63,24 @@ export default function GameScreen({
   }, [callbacks, level]);
 
   const progressItems = stats?.goalProgress || [];
+  const primaryTarget = progressItems[0];
 
   return (
     <main className="game-screen screen">
-      <header className="game-hud">
-        <button className="ghost-action compact" type="button" onClick={onBack}>Harita</button>
-        <div className="hud-title">
-          <span>{getDifficultyLabel(level.difficulty)}</span>
-          <strong>Seviye {level.level}</strong>
+      <header className="game-hud candy-game-hud">
+        <div className="hud-left-stack">
+          <span className="hud-lives">{progress.lives} ♥ 5</span>
+          <strong className="hud-moves">{stats?.moves ?? level.moves}</strong>
         </div>
-        <div className="hud-stats">
-          <span>Hamle <strong>{stats?.moves ?? level.moves}</strong></span>
-          <span>Skor <strong>{stats?.score ?? 0}</strong></span>
+        <div className="hud-star-meter" aria-label="Seviye yildizlari">
+          <span className="meter-fill" style={{ "--meter": `${Math.min(100, Math.max(8, ((stats?.score || 0) / 600) * 100))}%` }} />
+          <i>★</i><i>★</i><i>★</i>
         </div>
-        <HeartLives progress={progress} />
+        <div className="hud-target-candy">
+          <span className={`mini-candy ${primaryTarget?.key || "sapphire"}`} />
+          <strong>{primaryTarget ? Math.max(0, primaryTarget.target - primaryTarget.current) : 0}</strong>
+        </div>
+        <div className="hud-helper-face" aria-hidden="true">☺</div>
       </header>
 
       <section className="game-layout">
@@ -97,7 +100,7 @@ export default function GameScreen({
 
         <div className="phaser-shell" ref={hostRef} aria-label="Candy Crush oyun tahtasi" />
 
-        <aside className="booster-card">
+        <aside className="booster-card candy-booster-dock">
           <p className="eyebrow">Booster</p>
           <div className="booster-grid">
             {IN_GAME_BOOSTERS.map((booster) => (
@@ -112,6 +115,8 @@ export default function GameScreen({
           </div>
         </aside>
       </section>
+
+      <button className="settings-fab game-settings" type="button" onClick={onBack} aria-label="Haritaya don">⚙</button>
 
       {result?.type === "win" && (
         <WinModal
