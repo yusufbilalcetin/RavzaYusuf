@@ -624,39 +624,6 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   height: 100%;
 }
 
-.flappy-sound-btn {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  z-index: 3;
-  width: 42px;
-  height: 42px;
-  display: grid;
-  place-items: center;
-  border: 2px solid rgba(255, 255, 255, .38);
-  border-radius: 50%;
-  background: rgba(16, 7, 25, .46);
-  color: #fff;
-  font-size: 18px;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: transform .15s ease, background .15s ease, border-color .15s ease;
-}
-
-.flappy-sound-btn:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, .22);
-  border-color: rgba(255, 255, 255, .60);
-}
-
-.flappy-sound-btn:active {
-  transform: scale(.95);
-}
-
-.flappy-sound-btn.is-muted {
-  color: rgba(255, 255, 255, .55);
-}
-
 .flappy-overlay {
   position: absolute;
   inset: 0;
@@ -752,6 +719,551 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   margin-top: 4px;
 }
 
+.flappy-overlay.is-menu {
+  z-index: 4;
+  place-items: stretch;
+  align-content: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.flappy-overlay.is-menu .flappy-menu {
+  display: block;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+.flappy-main-menu {
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 87% 57%, rgba(145, 232, 255, .55) 0 80px, transparent 180px),
+    linear-gradient(180deg, #0093f8 0%, #23b8ff 42%, #8beeff 100%);
+  color: #ffffff;
+  cursor: default;
+}
+
+.flappy-main-menu strong {
+  font-family: inherit;
+}
+
+.flappy-menu-ray,
+.flappy-menu-cloud,
+.flappy-menu-hills,
+.flappy-menu-bushes,
+.flappy-menu-ground {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.flappy-menu-ray {
+  left: -8%;
+  top: -20%;
+  width: 42%;
+  height: 70%;
+  transform-origin: 0 0;
+  background: linear-gradient(110deg, rgba(255, 255, 255, .58), rgba(255, 255, 255, .16) 42%, transparent 68%);
+  filter: blur(1px);
+  opacity: .66;
+}
+
+.flappy-menu-ray--a {
+  transform: rotate(12deg);
+}
+
+.flappy-menu-ray--b {
+  left: 0;
+  width: 26%;
+  transform: rotate(28deg);
+  opacity: .34;
+}
+
+.flappy-menu-cloud {
+  width: clamp(118px, 14vw, 260px);
+  height: clamp(42px, 4.6vw, 82px);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 22% 66%, rgba(255, 255, 255, .96) 0 31%, transparent 32%),
+    radial-gradient(circle at 46% 40%, rgba(255, 255, 255, .92) 0 42%, transparent 43%),
+    radial-gradient(circle at 72% 62%, rgba(255, 255, 255, .90) 0 34%, transparent 35%),
+    rgba(255, 255, 255, .64);
+  box-shadow: inset -22px -12px 0 rgba(174, 211, 242, .24), 0 12px 0 rgba(52, 139, 204, .10);
+}
+
+.flappy-menu-cloud--1 {
+  left: 14%;
+  top: 17%;
+  transform: scale(.66);
+}
+
+.flappy-menu-cloud--2 {
+  right: 16%;
+  top: 9%;
+  transform: scale(.84);
+}
+
+.flappy-menu-cloud--3 {
+  left: 3%;
+  top: 41%;
+  transform: scale(1.05);
+}
+
+.flappy-menu-cloud--4 {
+  right: -2%;
+  top: 26%;
+  transform: scale(1.22);
+}
+
+.flappy-menu-hills {
+  left: -5%;
+  right: -5%;
+  bottom: 70px;
+  height: 230px;
+  opacity: .42;
+  background:
+    radial-gradient(ellipse at 20% 100%, #2caac0 0 12%, transparent 13%),
+    radial-gradient(ellipse at 76% 100%, #2bb4c6 0 14%, transparent 15%),
+    radial-gradient(ellipse at 90% 100%, #79d46a 0 24%, transparent 25%),
+    radial-gradient(ellipse at 42% 100%, #87d57d 0 22%, transparent 23%),
+    radial-gradient(ellipse at 10% 100%, #5bc45e 0 18%, transparent 19%);
+}
+
+.flappy-menu-bushes {
+  left: -6%;
+  right: -6%;
+  bottom: 50px;
+  height: 138px;
+  background:
+    radial-gradient(circle at 3% 80%, #2eb33e 0 54px, transparent 55px),
+    radial-gradient(circle at 9% 62%, #8ce028 0 70px, transparent 71px),
+    radial-gradient(circle at 16% 92%, #45c038 0 62px, transparent 63px),
+    radial-gradient(circle at 86% 86%, #37b23d 0 72px, transparent 73px),
+    radial-gradient(circle at 94% 64%, #9be63b 0 74px, transparent 75px),
+    radial-gradient(circle at 101% 90%, #54c43c 0 66px, transparent 67px);
+}
+
+.flappy-menu-ground {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62px;
+  border-top: 9px solid #9bf12c;
+  background:
+    linear-gradient(135deg, rgba(66, 38, 15, .38) 0 18%, transparent 19%) 0 12px / 54px 42px,
+    linear-gradient(45deg, rgba(255, 170, 70, .14) 0 14%, transparent 15%) 12px 4px / 38px 34px,
+    linear-gradient(180deg, #a66021, #733614);
+  box-shadow: inset 0 5px 0 rgba(47, 148, 22, .45);
+}
+
+.flappy-main-content {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 92vw);
+  min-height: 100%;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: clamp(8px, 1.2vw, 14px);
+  padding: clamp(24px, 4vw, 42px) 0 92px;
+}
+
+.flappy-logo-row {
+  position: relative;
+  min-height: clamp(150px, 23vw, 260px);
+  display: grid;
+  place-items: center;
+  width: min(760px, 78vw);
+}
+
+.flappy-game-logo {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  margin: 0;
+  color: #ffe6a4;
+  font-size: clamp(62px, 8.9vw, 132px);
+  font-weight: 950;
+  line-height: .72;
+  letter-spacing: 0;
+  text-align: center;
+  -webkit-text-stroke: clamp(3px, .45vw, 7px) #08305d;
+  text-shadow:
+    0 5px 0 #d27814,
+    0 11px 0 #07305d,
+    0 18px 22px rgba(0, 44, 91, .34);
+}
+
+.flappy-game-logo span {
+  display: block;
+  background: linear-gradient(180deg, #fff8da 0 18%, #ffe7a5 28%, #ffc653 64%, #f09322 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.flappy-game-logo::before,
+.flappy-game-logo::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 44%;
+  width: clamp(52px, 7vw, 90px);
+  height: clamp(36px, 4vw, 58px);
+  border-radius: 70% 12% 70% 20%;
+  background: linear-gradient(180deg, #fff8e7, #e5bd82);
+  box-shadow: 0 5px 0 #07305d;
+}
+
+.flappy-game-logo::before {
+  left: -58px;
+  transform: rotate(-22deg);
+}
+
+.flappy-game-logo::after {
+  right: -58px;
+  transform: scaleX(-1) rotate(-22deg);
+}
+
+.flappy-menu-bird {
+  position: absolute;
+  z-index: 3;
+  left: clamp(14px, 7vw, 78px);
+  top: 43%;
+  width: clamp(96px, 12vw, 150px);
+  aspect-ratio: 1.22;
+  transform: translateY(-50%) rotate(-10deg);
+  filter: drop-shadow(0 8px 0 rgba(14, 66, 110, .20));
+}
+
+.flappy-menu-bird::before {
+  content: "";
+  position: absolute;
+  inset: 16% 18% 22% 13%;
+  border: 4px solid #9b5400;
+  border-radius: 58% 50% 54% 60%;
+  background:
+    radial-gradient(circle at 67% 31%, #ffffff 0 11%, #1c1720 12% 17%, transparent 18%),
+    radial-gradient(ellipse at 56% 65%, #fff0c9 0 26%, transparent 27%),
+    radial-gradient(circle at 34% 30%, #ffe97d 0 18%, #ffb225 46%, #f05a13 100%);
+}
+
+.flappy-menu-bird::after {
+  content: "";
+  position: absolute;
+  right: 3%;
+  top: 39%;
+  width: 26%;
+  height: 23%;
+  background: #ff7c16;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  filter: drop-shadow(0 2px 0 #8a4000);
+}
+
+.flappy-menu-bird span {
+  position: absolute;
+  display: block;
+}
+
+.flappy-menu-bird span:nth-child(1) {
+  left: 10%;
+  top: 54%;
+  width: 31%;
+  height: 24%;
+  border-radius: 60% 40% 54% 38%;
+  background: #e94217;
+  transform: rotate(-22deg);
+}
+
+.flappy-menu-bird span:nth-child(2) {
+  left: 4%;
+  top: 36%;
+  width: 28%;
+  height: 31%;
+  background: #ef4b16;
+  clip-path: polygon(100% 50%, 8% 0, 34% 44%, 0 90%);
+}
+
+.flappy-menu-bird span:nth-child(3) {
+  right: 18%;
+  top: 46%;
+  width: 24%;
+  height: 7%;
+  border-radius: 999px;
+  background: #b63d08;
+}
+
+.flappy-menu-bird span:nth-child(4) {
+  left: -56%;
+  top: 58%;
+  width: 64%;
+  height: 26%;
+  background:
+    linear-gradient(165deg, transparent 0 35%, rgba(255, 255, 255, .78) 36% 43%, transparent 44%),
+    linear-gradient(172deg, transparent 0 55%, rgba(255, 255, 255, .52) 56% 62%, transparent 63%);
+}
+
+.flappy-main-menu .flappy-main-question {
+  margin: -2px 0 0;
+  color: #ffffff;
+  font-size: clamp(22px, 2.5vw, 34px);
+  font-weight: 950;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 3px 0 #155a91, 0 0 9px rgba(0, 0, 0, .22);
+}
+
+.flappy-main-coins {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #ffd339;
+  font-size: clamp(25px, 3.1vw, 40px);
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 3px 0 #8d5810, 0 0 10px rgba(255, 238, 133, .42);
+}
+
+.flappy-main-coins i {
+  width: clamp(31px, 3.4vw, 48px);
+  aspect-ratio: 1;
+  border: 3px solid #d97900;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 26%, #fff8ac 0 16%, transparent 17%),
+    radial-gradient(circle, #ffd749, #f69400 68%, #cf6a00 100%);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .58), 0 4px 0 #a75200;
+}
+
+.flappy-main-coins i::before {
+  content: "$";
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: #fff5a6;
+  font-style: normal;
+  font-size: .62em;
+  font-weight: 950;
+  text-shadow: 0 2px 0 #b96900;
+}
+
+.flappy-main-actions {
+  display: flex;
+  justify-content: center;
+  gap: clamp(18px, 3vw, 42px);
+  margin-top: 4px;
+}
+
+.flappy-main-btn {
+  min-width: clamp(170px, 18vw, 244px);
+  min-height: clamp(64px, 7vw, 88px);
+  display: grid;
+  place-items: center;
+  padding: 8px clamp(24px, 3vw, 42px);
+  border: 5px solid rgba(255, 255, 255, .86);
+  border-radius: 26px;
+  color: #ffffff;
+  font-size: clamp(30px, 3.6vw, 48px);
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, .34);
+  cursor: pointer;
+  box-shadow:
+    inset 0 5px 0 rgba(255, 255, 255, .36),
+    inset 0 -7px 0 rgba(0, 0, 0, .18),
+    0 7px 0 rgba(5, 42, 84, .40),
+    0 15px 28px rgba(0, 67, 129, .24);
+  transition: transform .16s ease, filter .16s ease;
+}
+
+.flappy-main-btn:hover {
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+}
+
+.flappy-main-btn:active {
+  transform: translateY(4px);
+}
+
+.flappy-main-btn--play {
+  background: linear-gradient(180deg, #9dff35, #31c412 54%, #04a60e);
+  outline: 4px solid #229a0c;
+}
+
+.flappy-main-btn--shop {
+  background: linear-gradient(180deg, #34d6ff, #0f93ef 55%, #0b67dd);
+  outline: 4px solid #0966bc;
+}
+
+.flappy-audio-panel {
+  position: relative;
+  width: min(660px, 68vw);
+  margin-top: clamp(14px, 2.4vw, 26px);
+  padding: 14px 18px 16px;
+  border: 1px solid rgba(255, 255, 255, .62);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .36), rgba(255, 255, 255, .22));
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .72),
+    0 10px 28px rgba(0, 72, 135, .18);
+}
+
+.flappy-audio-tab {
+  position: static;
+  width: max-content;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 0 auto 12px;
+  padding: 4px 14px;
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 999px;
+  background: rgba(11, 86, 172, .62);
+  color: #ffffff;
+  font-size: clamp(15px, 1.35vw, 19px);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .26);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .36), 0 5px 16px rgba(0, 53, 112, .18);
+}
+
+.flappy-audio-tab span {
+  display: none;
+}
+
+.flappy-audio-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.18fr;
+  gap: clamp(10px, 1.5vw, 18px);
+  align-items: center;
+}
+
+.flappy-audio-control {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding-inline: clamp(2px, .8vw, 12px);
+  border-right: 1px solid rgba(255, 255, 255, .24);
+}
+
+.flappy-audio-control:last-child {
+  border-right: 0;
+}
+
+.flappy-audio-control > strong {
+  color: rgba(12, 38, 72, .78);
+  font-size: clamp(13px, 1.25vw, 17px);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .52);
+}
+
+.flappy-audio-toggle {
+  width: min(100%, 154px);
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 5px 4px 11px;
+  border: 1px solid rgba(255, 255, 255, .36);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(90, 220, 55, .96), rgba(21, 170, 24, .96));
+  color: #ffffff;
+  font-size: clamp(14px, 1.45vw, 18px);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .24);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .52), 0 5px 12px rgba(18, 94, 23, .18);
+}
+
+.flappy-audio-toggle.is-off {
+  border-color: rgba(255, 255, 255, .28);
+  background: linear-gradient(180deg, rgba(130, 145, 164, .92), rgba(82, 96, 115, .92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32), 0 5px 12px rgba(38, 55, 75, .18);
+}
+
+.flappy-audio-toggle-icon {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  font-size: 1em;
+}
+
+.flappy-audio-toggle i {
+  width: 30px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #ffffff 0 34%, #ecf3ff 35% 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), 0 2px 5px rgba(0, 0, 0, .18);
+}
+
+.flappy-audio-toggle.is-off i {
+  order: -1;
+}
+
+.flappy-volume-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+}
+
+.flappy-volume-btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .38);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(47, 176, 255, .96), rgba(17, 103, 218, .96));
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 950;
+  line-height: .7;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .26);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .44), 0 5px 12px rgba(7, 73, 147, .18);
+  cursor: pointer;
+}
+
+.flappy-volume-bars {
+  min-width: 82px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  align-items: end;
+}
+
+.flappy-volume-bars span {
+  height: 24px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(43, 64, 82, .36);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .20);
+}
+
+.flappy-volume-bars span.is-filled {
+  background: linear-gradient(180deg, #a8ff58, #30c818);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .56), 0 2px 8px rgba(24, 157, 20, .20);
+}
+
 .flappy-shop-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
@@ -811,6 +1323,1044 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   font-size: 11px;
   font-weight: 700;
   color: rgba(255, 255, 255, .78);
+}
+
+.flappy-overlay.is-shop {
+  z-index: 4;
+  place-items: stretch;
+  align-content: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: auto;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.flappy-overlay.is-shop .flappy-menu {
+  display: block;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+.flappy-store {
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  padding: clamp(14px, 2.4vw, 24px) clamp(14px, 4vw, 44px) clamp(60px, 6vw, 76px);
+  overflow: hidden auto;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: clamp(10px, 1.6vw, 16px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, 0) 38%),
+    linear-gradient(180deg, #049de9 0%, #35c8ff 55%, #8beaff 100%);
+  color: #ffffff;
+  cursor: default;
+}
+
+.flappy-store strong {
+  font-family: inherit;
+}
+
+.flappy-store--sunset {
+  background:
+    linear-gradient(180deg, rgba(255, 230, 145, .22), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, #ff7646 0%, #ffb65e 50%, #7a57c9 100%);
+}
+
+.flappy-store--night {
+  background:
+    radial-gradient(circle at 75% 16%, rgba(255, 245, 179, .48) 0 34px, transparent 36px),
+    linear-gradient(180deg, #071633 0%, #172f67 56%, #1a1c42 100%);
+}
+
+.flappy-store--snow {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .36), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, #66c8ff 0%, #b9ecff 58%, #eefbff 100%);
+}
+
+.flappy-store--desert {
+  background:
+    radial-gradient(circle at 73% 19%, rgba(255, 245, 172, .58) 0 42px, transparent 44px),
+    linear-gradient(180deg, #ff9b3f 0%, #ffd46f 58%, #ffefb0 100%);
+}
+
+.flappy-store--forest {
+  background:
+    linear-gradient(180deg, rgba(200, 255, 205, .20), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, #3dbbff 0%, #93e6ff 52%, #c8ffd2 100%);
+}
+
+.flappy-store--skylands {
+  background:
+    radial-gradient(circle at 74% 18%, rgba(255, 227, 140, .55) 0 38px, transparent 40px),
+    linear-gradient(180deg, #73c5ff 0%, #d4d7ff 56%, #fff0c5 100%);
+}
+
+.flappy-store::before,
+.flappy-store::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.flappy-store::before {
+  left: 0;
+  right: 0;
+  bottom: 38px;
+  height: 190px;
+  opacity: .36;
+  background:
+    linear-gradient(90deg, transparent 0 6%, rgba(31, 112, 169, .45) 6% 8%, transparent 8% 13%, rgba(31, 112, 169, .38) 13% 16%, transparent 16% 26%, rgba(31, 112, 169, .44) 26% 31%, transparent 31% 44%, rgba(31, 112, 169, .40) 44% 48%, transparent 48% 62%, rgba(31, 112, 169, .42) 62% 66%, transparent 66% 76%, rgba(31, 112, 169, .44) 76% 82%, transparent 82% 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 38%, #000 100%);
+}
+
+.flappy-store::after {
+  left: -4%;
+  right: -4%;
+  bottom: 0;
+  height: 56px;
+  background:
+    linear-gradient(135deg, #2e891d 25%, transparent 25%) 0 0 / 34px 24px repeat-x,
+    linear-gradient(225deg, #2e891d 25%, transparent 25%) 0 0 / 34px 24px repeat-x,
+    linear-gradient(180deg, #78d844 0 26%, #3ea723 26% 33%, #9b5a24 33% 100%);
+  box-shadow: 0 -4px 0 rgba(255, 255, 255, .22) inset;
+}
+
+.flappy-store-cloud,
+.flappy-store-city,
+.flappy-store-bushes,
+.flappy-store-ground {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.flappy-store-cloud {
+  width: 180px;
+  height: 54px;
+  border-radius: 999px;
+  opacity: .72;
+  background:
+    radial-gradient(circle at 25% 58%, rgba(255, 255, 255, .92) 0 28px, transparent 29px),
+    radial-gradient(circle at 47% 36%, rgba(255, 255, 255, .86) 0 40px, transparent 41px),
+    radial-gradient(circle at 70% 58%, rgba(255, 255, 255, .90) 0 28px, transparent 29px),
+    rgba(255, 255, 255, .56);
+  filter: drop-shadow(0 8px 0 rgba(48, 154, 219, .15));
+}
+
+.flappy-store-cloud--1 {
+  top: 22px;
+  left: 15%;
+  transform: scale(.9);
+}
+
+.flappy-store-cloud--2 {
+  top: 36px;
+  right: 17%;
+  transform: scale(.74);
+}
+
+.flappy-store-cloud--3 {
+  top: 112px;
+  left: 4%;
+  transform: scale(.58);
+}
+
+.flappy-store-city {
+  inset-inline: 0;
+  bottom: 68px;
+  height: 170px;
+  opacity: .32;
+  background:
+    linear-gradient(90deg, transparent 0 8%, rgba(21, 117, 171, .48) 8% 13%, transparent 13% 20%, rgba(21, 117, 171, .42) 20% 24%, transparent 24% 37%, rgba(21, 117, 171, .46) 37% 43%, transparent 43% 64%, rgba(21, 117, 171, .45) 64% 70%, transparent 70% 84%, rgba(21, 117, 171, .42) 84% 92%, transparent 92%);
+}
+
+.flappy-store-bushes {
+  left: -5%;
+  right: -5%;
+  bottom: 44px;
+  height: 98px;
+  opacity: .92;
+  background:
+    radial-gradient(circle at 2% 84%, #48b82f 0 56px, transparent 57px),
+    radial-gradient(circle at 9% 75%, #66d83d 0 50px, transparent 51px),
+    radial-gradient(circle at 17% 92%, #3fae2e 0 58px, transparent 59px),
+    radial-gradient(circle at 83% 86%, #53bb33 0 58px, transparent 59px),
+    radial-gradient(circle at 92% 76%, #76da3e 0 54px, transparent 55px),
+    radial-gradient(circle at 99% 92%, #41af2e 0 60px, transparent 61px);
+}
+
+.flappy-store-back,
+.flappy-store-wallet,
+.flappy-store-title-wrap,
+.flappy-store-tabs,
+.flappy-store-message,
+.flappy-store-grid,
+.flappy-store-info {
+  position: relative;
+  z-index: 1;
+}
+
+.flappy-store-back {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  left: calc(14px + env(safe-area-inset-left, 0px));
+  z-index: 3;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #053f7c;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #54c7ff, #0b62bd);
+  color: #ffffff;
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .32);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45), inset 0 -4px 0 rgba(0, 0, 0, .22), 0 8px 0 rgba(0, 42, 91, .45);
+  cursor: pointer;
+}
+
+.flappy-store-wallet {
+  position: absolute;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  right: calc(104px + env(safe-area-inset-right, 0px));
+  z-index: 3;
+  min-width: 136px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 6px 5px 10px;
+  border: 3px solid #063a74;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #134f98, #061c3d);
+  color: #ffffff;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .22), inset 0 -4px 0 rgba(0, 0, 0, .34), 0 9px 0 rgba(0, 39, 83, .35);
+}
+
+.flappy-store-wallet strong {
+  min-width: 36px;
+  font-size: 25px;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .45);
+}
+
+.flappy-store-coin {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 3px solid #de7000;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #fff2a4 0 15%, #ffc429 16% 58%, #ed8500 59% 100%);
+  color: #fff8b7;
+  font-size: 0;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .65), 0 2px 0 rgba(0, 0, 0, .26);
+}
+
+.flappy-store-coin::before {
+  content: "$";
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff2a4;
+  text-shadow: 0 2px 0 #c56a00;
+}
+
+.flappy-store-coin--small {
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+}
+
+.flappy-store-coin--small::before {
+  font-size: 14px;
+}
+
+.flappy-store-plus {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #1d6e12;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #9cff34, #31b61e);
+  color: #ffffff;
+  font-size: 29px;
+  font-weight: 900;
+  line-height: .8;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .34);
+  cursor: pointer;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .55), 0 3px 0 rgba(0, 74, 13, .55);
+}
+
+.flappy-store-title-wrap {
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  padding: 0 150px;
+  margin-top: -2px;
+}
+
+.flappy-store-title-wrap h3 {
+  margin: 0;
+  color: #ffe883;
+  font-size: clamp(44px, 7.2vw, 78px);
+  line-height: .86;
+  font-weight: 950;
+  text-transform: uppercase;
+  -webkit-text-stroke: 3px #21304e;
+  text-shadow:
+    0 4px 0 #b65d00,
+    0 8px 0 #35213a,
+    0 12px 16px rgba(0, 0, 0, .32);
+}
+
+.flappy-store-title-wrap p {
+  margin: 4px 0 0;
+  color: #ffffff;
+  font-size: clamp(17px, 2.1vw, 25px);
+  font-weight: 900;
+  line-height: 1.05;
+  text-shadow: 0 3px 0 rgba(0, 42, 96, .55);
+}
+
+.flappy-store-wing {
+  position: absolute;
+  top: 24px;
+  width: 62px;
+  height: 40px;
+  border: 3px solid #21304e;
+  border-radius: 80% 18% 80% 18%;
+  background: linear-gradient(180deg, #fff3dc, #e2bd91);
+  box-shadow: 0 5px 0 rgba(21, 28, 48, .55);
+}
+
+.flappy-store-wing--left {
+  left: calc(50% - 250px);
+  transform: rotate(-15deg);
+}
+
+.flappy-store-wing--right {
+  right: calc(50% - 250px);
+  transform: scaleX(-1) rotate(-15deg);
+}
+
+.flappy-store-tabs {
+  width: min(100%, 900px);
+  justify-self: center;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.flappy-store-tab {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border: 3px solid #083f7f;
+  border-radius: 13px 13px 6px 6px;
+  background: linear-gradient(180deg, #61d4ff, #098bd8);
+  color: #ffffff;
+  font-size: clamp(13px, 1.55vw, 20px);
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .42);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .34), inset 0 -5px 0 rgba(0, 0, 0, .22), 0 5px 0 rgba(0, 41, 88, .36);
+  cursor: pointer;
+}
+
+.flappy-store-tab--gift {
+  background: linear-gradient(180deg, #c05aff, #7725b5);
+  border-color: #54208b;
+}
+
+.flappy-store-tab.is-active {
+  background: linear-gradient(180deg, #ffe654, #ffab05);
+  border-color: #945600;
+  color: #ffffff;
+}
+
+.flappy-store-tab span {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .22);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .42);
+}
+
+.flappy-store-tab--bird span::before,
+.flappy-store-tab--land span::before,
+.flappy-store-tab--gift span::before {
+  content: "";
+  display: block;
+}
+
+.flappy-store-tab--bird span::before {
+  width: 22px;
+  height: 16px;
+  border-radius: 55% 48% 50% 55%;
+  background: #ffd520;
+  box-shadow: 8px 3px 0 -3px #ff9d1b, -7px 3px 0 -3px #f2b400;
+}
+
+.flappy-store-tab--land span::before {
+  width: 24px;
+  height: 20px;
+  border-radius: 5px;
+  background:
+    radial-gradient(circle at 74% 25%, #ffffff 0 4px, transparent 5px),
+    linear-gradient(135deg, transparent 47%, #359f40 48% 100%),
+    linear-gradient(45deg, #4fbf5e 0 54%, #1c88d8 55% 100%);
+}
+
+.flappy-store-tab--gift span::before {
+  width: 23px;
+  height: 23px;
+  border-radius: 4px;
+  background:
+    linear-gradient(90deg, transparent 42%, #ffe45a 42% 58%, transparent 58%),
+    linear-gradient(180deg, transparent 38%, #ffe45a 38% 52%, transparent 52%),
+    linear-gradient(180deg, #ff6ba8, #e51b70);
+  box-shadow: 0 -6px 0 -2px #ff9cc4;
+}
+
+.flappy-store-message {
+  justify-self: center;
+  min-height: 34px;
+  max-width: min(720px, 100%);
+  display: grid;
+  place-items: center;
+  padding: 7px 16px;
+  border: 2px solid rgba(255, 255, 255, .34);
+  border-radius: 999px;
+  background: rgba(7, 38, 77, .66);
+  color: #fff2a4;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.15;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .32);
+  backdrop-filter: blur(8px);
+}
+
+.flappy-store-grid {
+  width: min(100%, 980px);
+  justify-self: center;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.4vw, 16px);
+  align-content: start;
+}
+
+.flappy-store-grid--packages {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.flappy-item-card {
+  position: relative;
+  min-width: 0;
+  min-height: 174px;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 7px;
+  padding: 9px;
+  border: 3px solid #063f80;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 31%, rgba(255, 255, 255, .20), transparent 36%),
+    linear-gradient(180deg, #48cfff, #078dda);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, .48),
+    inset 0 -5px 0 rgba(0, 0, 0, .22),
+    0 7px 0 rgba(0, 41, 88, .38),
+    0 12px 24px rgba(0, 42, 92, .20);
+}
+
+.flappy-item-card.is-selected {
+  border-color: #ffbe00;
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, .54),
+    inset 0 -5px 0 rgba(0, 0, 0, .20),
+    0 0 0 3px rgba(255, 222, 78, .46),
+    0 7px 0 rgba(157, 84, 0, .62),
+    0 12px 24px rgba(0, 42, 92, .20);
+}
+
+.flappy-item-card.is-locked {
+  background:
+    radial-gradient(circle at 50% 31%, rgba(255, 255, 255, .08), transparent 36%),
+    linear-gradient(180deg, #244663, #0d2740);
+  border-color: #0c2b46;
+}
+
+.flappy-item-card.is-locked .flappy-item-art,
+.flappy-item-card.is-locked h4 {
+  opacity: .48;
+  filter: saturate(.3) brightness(.65);
+}
+
+.flappy-store-check {
+  position: absolute;
+  top: -4px;
+  left: 12px;
+  z-index: 2;
+  width: 36px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #196611;
+  border-radius: 0 0 9px 9px;
+  background: linear-gradient(180deg, #a9ff42, #35b51d);
+  color: #ffffff;
+  font-size: 27px;
+  font-weight: 950;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .32);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .55), 0 3px 0 rgba(0, 70, 13, .42);
+}
+
+.flappy-item-art {
+  min-height: 80px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.flappy-item-card--background .flappy-item-art {
+  min-height: 92px;
+  margin: -1px -1px 0;
+}
+
+.flappy-item-card h4 {
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(14px, 1.8vw, 19px);
+  font-weight: 950;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .44);
+  overflow-wrap: anywhere;
+}
+
+.flappy-store-buy {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 3px solid #247515;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #a8ff35, #49bd14 58%, #26990d);
+  color: #ffffff;
+  font-size: clamp(13px, 1.8vw, 20px);
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .42);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .58), inset 0 -4px 0 rgba(0, 0, 0, .20), 0 3px 0 rgba(0, 73, 12, .52);
+  cursor: pointer;
+}
+
+.flappy-store-buy:disabled {
+  border-color: #304b66;
+  background: linear-gradient(180deg, #6d8aa6, #30465f);
+  cursor: not-allowed;
+}
+
+.flappy-mini-lock {
+  position: relative;
+  width: 19px;
+  height: 16px;
+  display: inline-block;
+  border: 3px solid #e7f4ff;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .28);
+}
+
+.flappy-mini-lock::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 11px;
+  margin: -13px 0 0 -1px;
+  border: 3px solid #e7f4ff;
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+}
+
+.flappy-store-bird {
+  position: relative;
+  width: 82px;
+  height: 58px;
+  border: 3px solid rgba(50, 45, 38, .85);
+  border-radius: 58% 47% 47% 58%;
+  background: radial-gradient(circle at 28% 24%, var(--body-a), var(--body-b) 57%, var(--body-c));
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .20));
+  transform: rotate(-7deg);
+}
+
+.store-bird-wing,
+.store-bird-tail,
+.store-bird-eye,
+.store-bird-beak,
+.store-bird-detail {
+  position: absolute;
+  display: block;
+}
+
+.store-bird-wing {
+  left: 14px;
+  top: 25px;
+  width: 28px;
+  height: 20px;
+  border: 2px solid rgba(55, 39, 24, .62);
+  border-radius: 55% 35% 55% 45%;
+  background: var(--wing);
+  transform: rotate(18deg);
+}
+
+.store-bird-tail {
+  left: -13px;
+  top: 21px;
+  width: 24px;
+  height: 21px;
+  background: var(--body-c);
+  clip-path: polygon(100% 48%, 0 5%, 23% 49%, 0 96%);
+}
+
+.store-bird-eye {
+  right: 15px;
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #1e2630;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 64% 47%, #111827 0 4px, transparent 5px),
+    #ffffff;
+}
+
+.store-bird-beak {
+  right: -18px;
+  top: 27px;
+  width: 27px;
+  height: 19px;
+  border: 2px solid #9b5700;
+  background: #ffad28;
+  clip-path: polygon(0 0, 100% 48%, 0 100%);
+}
+
+.flappy-store-bird--speed .store-bird-detail--one {
+  left: 10px;
+  top: 7px;
+  width: 28px;
+  height: 38px;
+  background: #151923;
+  clip-path: polygon(48% 0, 8% 43%, 39% 43%, 13% 100%, 86% 35%, 53% 35%, 78% 0);
+}
+
+.flappy-store-bird--ninja .store-bird-detail--one {
+  left: -2px;
+  right: 23px;
+  top: 12px;
+  height: 8px;
+  background: #e73838;
+  box-shadow: -17px 6px 0 -1px #e73838;
+}
+
+.flappy-store-bird--monster .store-bird-detail--one {
+  left: 31px;
+  top: 2px;
+  width: 16px;
+  height: 13px;
+  border-top: 3px solid #1b5121;
+  border-radius: 50%;
+}
+
+.flappy-store-bird--monster .store-bird-detail--two,
+.flappy-store-bird--monster .store-bird-detail--three {
+  top: 30px;
+  width: 8px;
+  height: 10px;
+  border: 2px solid #26303b;
+  border-radius: 2px;
+  background: #7b8794;
+}
+
+.flappy-store-bird--monster .store-bird-detail--two {
+  left: -7px;
+}
+
+.flappy-store-bird--monster .store-bird-detail--three {
+  right: -6px;
+}
+
+.flappy-store-bird--unicorn .store-bird-detail--one {
+  left: 43px;
+  top: -19px;
+  width: 15px;
+  height: 27px;
+  border: 2px solid #7441b8;
+  background: linear-gradient(180deg, #fff9b3, #ffb33f);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.flappy-store-bird--unicorn .store-bird-detail--two {
+  left: 2px;
+  top: 2px;
+  width: 34px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff4fa3, #ffd83d, #36d1ff, #7ef15e);
+}
+
+.flappy-store-bird--pilot .store-bird-detail--one {
+  left: 12px;
+  top: -4px;
+  width: 50px;
+  height: 24px;
+  border: 2px solid #3d220f;
+  border-bottom: 0;
+  border-radius: 999px 999px 10px 10px;
+  background: #7a451d;
+}
+
+.flappy-store-bird--pilot .store-bird-detail--two {
+  right: 10px;
+  top: 9px;
+  width: 20px;
+  height: 16px;
+  border: 3px solid #3d220f;
+  border-radius: 50%;
+  background: rgba(139, 232, 255, .58);
+  box-shadow: -22px 0 0 -3px rgba(139, 232, 255, .58), -22px 0 0 0 #3d220f;
+}
+
+.flappy-store-bird--secret {
+  opacity: .42;
+  filter: saturate(.35) brightness(.5) drop-shadow(0 6px 0 rgba(0, 0, 0, .18));
+}
+
+.flappy-bg-preview {
+  position: relative;
+  width: 100%;
+  height: 96px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, .38);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #0aa8f4, #69d9ff 58%, #a7efff);
+}
+
+.flappy-bg-preview--sunset {
+  background: linear-gradient(180deg, #ff7b45, #ffba5d 56%, #7b56bd);
+}
+
+.flappy-bg-preview--night {
+  background: linear-gradient(180deg, #071633, #172f67 54%, #121d3e);
+}
+
+.flappy-bg-preview--snow {
+  background: linear-gradient(180deg, #72cfff, #c7efff 58%, #f4fdff);
+}
+
+.flappy-bg-preview--desert {
+  background: linear-gradient(180deg, #ffa147, #ffd36e 58%, #ffe8aa);
+}
+
+.flappy-bg-preview--forest {
+  background: linear-gradient(180deg, #43bcff, #8ce4ff 55%, #bdf4c6);
+}
+
+.flappy-bg-preview--skylands {
+  background: linear-gradient(180deg, #78c9ff, #d6d5ff 56%, #fff0c8);
+}
+
+.flappy-bg-preview--locked {
+  background: linear-gradient(180deg, #183750, #0d2239);
+}
+
+.preview-sun,
+.preview-moon,
+.preview-cloud,
+.preview-city,
+.preview-tree,
+.preview-ground {
+  position: absolute;
+  display: block;
+}
+
+.preview-sun {
+  right: 30px;
+  top: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffe27a;
+  box-shadow: 0 0 20px rgba(255, 226, 122, .7);
+}
+
+.flappy-bg-preview--classic .preview-sun,
+.flappy-bg-preview--snow .preview-sun,
+.flappy-bg-preview--forest .preview-sun,
+.flappy-bg-preview--locked .preview-sun {
+  display: none;
+}
+
+.preview-moon {
+  right: 34px;
+  top: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff0a5;
+  box-shadow: 0 0 14px rgba(255, 240, 165, .54);
+  display: none;
+}
+
+.preview-moon::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #172f67;
+}
+
+.flappy-bg-preview--night .preview-moon {
+  display: block;
+}
+
+.flappy-bg-preview--night .preview-sun {
+  display: none;
+}
+
+.preview-cloud {
+  width: 64px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .80);
+}
+
+.preview-cloud::before,
+.preview-cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .86);
+}
+
+.preview-cloud::before {
+  left: 12px;
+  top: -9px;
+  width: 24px;
+  height: 24px;
+}
+
+.preview-cloud::after {
+  left: 32px;
+  top: -6px;
+  width: 22px;
+  height: 22px;
+}
+
+.preview-cloud--a {
+  left: 18px;
+  top: 18px;
+}
+
+.preview-cloud--b {
+  right: 18px;
+  top: 42px;
+  transform: scale(.72);
+}
+
+.flappy-bg-preview--night .preview-cloud,
+.flappy-bg-preview--desert .preview-cloud {
+  opacity: .28;
+}
+
+.preview-city {
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  height: 36px;
+  opacity: .48;
+  background:
+    linear-gradient(90deg, transparent 0 8%, rgba(13, 64, 107, .72) 8% 16%, transparent 16% 25%, rgba(13, 64, 107, .62) 25% 34%, transparent 34% 52%, rgba(13, 64, 107, .72) 52% 64%, transparent 64% 78%, rgba(13, 64, 107, .62) 78% 89%, transparent 89%);
+}
+
+.preview-tree {
+  bottom: 22px;
+  width: 38px;
+  height: 46px;
+  background:
+    linear-gradient(90deg, transparent 42%, #7a4a24 42% 58%, transparent 58%),
+    radial-gradient(circle at 50% 35%, #44b83b 0 18px, transparent 19px);
+}
+
+.preview-tree--a {
+  left: 26px;
+}
+
+.preview-tree--b {
+  right: 28px;
+  transform: scale(.84);
+}
+
+.flappy-bg-preview--desert .preview-tree {
+  width: 26px;
+  background:
+    linear-gradient(90deg, transparent 42%, #2f9a3a 42% 58%, transparent 58%),
+    linear-gradient(90deg, transparent 0 20%, #2f9a3a 20% 35%, transparent 35% 65%, #2f9a3a 65% 80%, transparent 80%);
+}
+
+.flappy-bg-preview--snow .preview-tree {
+  background:
+    linear-gradient(90deg, transparent 42%, #8a5931 42% 58%, transparent 58%),
+    linear-gradient(135deg, transparent 28%, #f7fdff 28% 72%, transparent 72%),
+    linear-gradient(45deg, transparent 28%, #c8f1ff 28% 72%, transparent 72%);
+}
+
+.flappy-bg-preview--night .preview-tree,
+.flappy-bg-preview--locked .preview-tree {
+  opacity: .34;
+}
+
+.preview-ground {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 24px;
+  background: linear-gradient(180deg, #6fd748 0 45%, #7a4219 45% 100%);
+}
+
+.flappy-bg-preview--snow .preview-ground {
+  background: linear-gradient(180deg, #ffffff 0 55%, #86bfdc 55% 100%);
+}
+
+.flappy-bg-preview--desert .preview-ground {
+  background: linear-gradient(180deg, #efbd46 0 55%, #a9651f 55% 100%);
+}
+
+.flappy-bg-preview--forest .preview-ground {
+  background: linear-gradient(180deg, #42be3e 0 55%, #5f3a18 55% 100%);
+}
+
+.flappy-bg-preview--night .preview-ground,
+.flappy-bg-preview--locked .preview-ground {
+  background: linear-gradient(180deg, #245b52 0 55%, #15233d 55% 100%);
+}
+
+.flappy-package-art {
+  position: relative;
+  width: 86px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+}
+
+.flappy-package-art span {
+  width: 62px;
+  height: 58px;
+  border: 3px solid #8d2356;
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, transparent 41%, #ffe45a 41% 59%, transparent 59%),
+    linear-gradient(180deg, transparent 40%, #ffe45a 40% 55%, transparent 55%),
+    linear-gradient(180deg, #ff7ab3, #e71f76);
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, .44), 0 8px 0 rgba(0, 0, 0, .20);
+}
+
+.flappy-package-art i {
+  position: absolute;
+  color: #ffe45a;
+  font-style: normal;
+  font-size: 21px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .30);
+}
+
+.flappy-package-art i:nth-child(2) {
+  left: 2px;
+  top: 9px;
+}
+
+.flappy-package-art i:nth-child(3) {
+  right: 0;
+  bottom: 7px;
+}
+
+.flappy-package-art--hero span {
+  border-color: #274d96;
+  background:
+    linear-gradient(90deg, transparent 41%, #ffe45a 41% 59%, transparent 59%),
+    linear-gradient(180deg, transparent 40%, #ffe45a 40% 55%, transparent 55%),
+    linear-gradient(180deg, #61d4ff, #167bd4);
+}
+
+.flappy-package-art--legend span {
+  border-color: #6541a8;
+  background:
+    linear-gradient(90deg, transparent 41%, #ffe45a 41% 59%, transparent 59%),
+    linear-gradient(180deg, transparent 40%, #ffe45a 40% 55%, transparent 55%),
+    linear-gradient(180deg, #d6a2ff, #7a3fd1);
+}
+
+.flappy-package-art--locked {
+  opacity: .42;
+  filter: saturate(.3) brightness(.65);
+}
+
+.flappy-store-info {
+  justify-self: center;
+  width: min(720px, 100%);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border: 3px solid #063f80;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(31, 111, 176, .90), rgba(4, 46, 86, .92));
+  color: #ffffff;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .28), 0 4px 0 rgba(0, 31, 69, .38);
+}
+
+.flappy-store-info span {
+  color: #ffcb23;
+  font-size: 25px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .38);
+}
+
+.flappy-store-info strong {
+  min-width: 0;
+  color: #ffffff;
+  font-size: clamp(12px, 1.5vw, 17px);
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .34);
 }
 
 body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-game {
@@ -1144,6 +2694,129 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   .games-page.is-game-fullscreen .game-stage-body {
     padding: 64px 12px 18px;
   }
+
+  .flappy-main-content {
+    width: min(720px, 94vw);
+    gap: 9px;
+    padding: 18px 0 78px;
+  }
+
+  .flappy-logo-row {
+    min-height: 150px;
+    width: min(520px, 80vw);
+  }
+
+  .flappy-game-logo {
+    font-size: clamp(52px, 12vw, 86px);
+  }
+
+  .flappy-game-logo::before,
+  .flappy-game-logo::after {
+    display: none;
+  }
+
+  .flappy-menu-bird {
+    left: 0;
+    width: clamp(76px, 14vw, 104px);
+  }
+
+  .flappy-main-actions {
+    gap: 16px;
+  }
+
+  .flappy-main-btn {
+    min-width: 164px;
+    min-height: 62px;
+    border-width: 4px;
+    border-radius: 20px;
+    font-size: 30px;
+  }
+
+  .flappy-audio-panel {
+    width: min(620px, 92vw);
+    margin-top: 18px;
+    padding: 14px 14px 15px;
+    border-width: 1px;
+  }
+
+  .flappy-audio-body {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .flappy-audio-control {
+    grid-template-columns: minmax(110px, .7fr) minmax(0, 1fr);
+    align-items: center;
+    justify-items: stretch;
+    gap: 12px;
+    padding: 0;
+    border-right: 0;
+  }
+
+  .flappy-audio-control > strong {
+    text-align: right;
+  }
+
+  .flappy-audio-toggle {
+    justify-self: start;
+    width: min(180px, 100%);
+  }
+
+  .flappy-audio-control--volume {
+    grid-template-columns: minmax(110px, .7fr) minmax(0, 1fr);
+  }
+
+  .flappy-store {
+    padding: 16px 12px 58px;
+  }
+
+  .flappy-store-title-wrap {
+    padding: 0 92px;
+    margin-top: 2px;
+  }
+
+  .flappy-store-title-wrap h3 {
+    font-size: clamp(36px, 8.4vw, 60px);
+  }
+
+  .flappy-store-title-wrap p {
+    font-size: clamp(14px, 3.6vw, 20px);
+  }
+
+  .flappy-store-wing {
+    display: none;
+  }
+
+  .flappy-store-wallet {
+    top: calc(70px + env(safe-area-inset-top, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    min-width: 122px;
+    height: 44px;
+  }
+
+  .flappy-store-back {
+    width: 50px;
+    height: 50px;
+    font-size: 40px;
+  }
+
+  .flappy-store-tabs {
+    margin-top: 44px;
+  }
+
+  .flappy-store-grid,
+  .flappy-store-grid--packages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 620px;
+  }
+
+  .flappy-item-card {
+    min-height: 160px;
+  }
+
+  .flappy-store-info {
+    width: min(620px, 100%);
+  }
 }
 
 @media (max-width: 420px) {
@@ -1174,5 +2847,314 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
 
   .candy-crush-game-frame {
     min-height: 520px;
+  }
+
+  .flappy-shell {
+    border-radius: 18px;
+  }
+
+  .flappy-main-menu {
+    overflow-y: auto;
+  }
+
+  .flappy-menu-cloud--1 {
+    left: 12%;
+    top: 12%;
+  }
+
+  .flappy-menu-cloud--2 {
+    right: -8%;
+    top: 10%;
+  }
+
+  .flappy-menu-cloud--3,
+  .flappy-menu-cloud--4 {
+    opacity: .72;
+  }
+
+  .flappy-menu-bushes {
+    height: 112px;
+    bottom: 42px;
+  }
+
+  .flappy-menu-ground {
+    height: 50px;
+  }
+
+  .flappy-main-content {
+    min-height: 100%;
+    width: min(100%, 390px);
+    gap: 8px;
+    padding: 18px 8px 70px;
+    align-content: start;
+  }
+
+  .flappy-logo-row {
+    width: min(100%, 330px);
+    min-height: 116px;
+    margin-top: 4px;
+  }
+
+  .flappy-game-logo {
+    font-size: 50px;
+    -webkit-text-stroke-width: 2px;
+    text-shadow:
+      0 3px 0 #d27814,
+      0 7px 0 #07305d,
+      0 12px 16px rgba(0, 44, 91, .28);
+  }
+
+  .flappy-menu-bird {
+    left: 0;
+    top: 58%;
+    width: 68px;
+  }
+
+  .flappy-main-menu .flappy-main-question {
+    font-size: 19px;
+  }
+
+  .flappy-main-coins {
+    font-size: 24px;
+  }
+
+  .flappy-main-actions {
+    width: 100%;
+    gap: 9px;
+  }
+
+  .flappy-main-btn {
+    flex: 1;
+    min-width: 0;
+    min-height: 54px;
+    padding-inline: 10px;
+    border-width: 3px;
+    border-radius: 17px;
+    font-size: 25px;
+    outline-width: 3px;
+  }
+
+  .flappy-audio-panel {
+    width: min(100%, 360px);
+    margin-top: 14px;
+    padding: 12px 10px;
+    border-width: 1px;
+    border-radius: 16px;
+  }
+
+  .flappy-audio-tab {
+    min-height: 28px;
+    padding: 4px 12px;
+    border-width: 1px;
+    border-radius: 999px;
+    font-size: 15px;
+  }
+
+  .flappy-audio-body {
+    gap: 10px;
+  }
+
+  .flappy-audio-control,
+  .flappy-audio-control--volume {
+    grid-template-columns: 86px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .flappy-audio-control > strong {
+    font-size: 15px;
+  }
+
+  .flappy-audio-toggle {
+    min-height: 38px;
+    gap: 6px;
+    padding: 4px 5px 4px 10px;
+    border-width: 1px;
+    font-size: 15px;
+  }
+
+  .flappy-audio-toggle i {
+    width: 28px;
+  }
+
+  .flappy-volume-row {
+    gap: 6px;
+  }
+
+  .flappy-volume-btn {
+    width: 32px;
+    height: 32px;
+    border-width: 1px;
+    border-radius: 9px;
+    font-size: 24px;
+  }
+
+  .flappy-volume-bars {
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .flappy-volume-bars span {
+    height: 22px;
+    border-width: 0;
+    border-radius: 999px;
+  }
+
+  .flappy-store {
+    gap: 9px;
+    padding: 14px 8px 54px;
+  }
+
+  .flappy-store-title-wrap {
+    padding: 0 60px;
+  }
+
+  .flappy-store-title-wrap h3 {
+    font-size: 34px;
+    -webkit-text-stroke-width: 2px;
+    text-shadow:
+      0 3px 0 #b65d00,
+      0 6px 0 #35213a,
+      0 10px 14px rgba(0, 0, 0, .30);
+  }
+
+  .flappy-store-title-wrap p {
+    font-size: 13px;
+  }
+
+  .flappy-store-back {
+    width: 44px;
+    height: 44px;
+    border-width: 2px;
+    border-radius: 12px;
+    font-size: 34px;
+  }
+
+  .flappy-store-wallet {
+    top: calc(62px + env(safe-area-inset-top, 0px));
+    min-width: 112px;
+    height: 40px;
+    gap: 7px;
+  }
+
+  .flappy-store-wallet strong {
+    min-width: 28px;
+    font-size: 20px;
+  }
+
+  .flappy-store-coin {
+    width: 28px;
+    height: 28px;
+  }
+
+  .flappy-store-plus {
+    width: 30px;
+    height: 30px;
+    border-width: 2px;
+    font-size: 24px;
+  }
+
+  .flappy-store-tabs {
+    gap: 6px;
+    margin-top: 40px;
+  }
+
+  .flappy-store-tab {
+    min-height: 46px;
+    gap: 5px;
+    padding: 6px 4px;
+    border-width: 2px;
+    border-radius: 10px 10px 5px 5px;
+    font-size: 10px;
+  }
+
+  .flappy-store-tab span {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  .flappy-store-message {
+    min-height: 30px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .flappy-store-grid,
+  .flappy-store-grid--packages {
+    gap: 8px;
+  }
+
+  .flappy-item-card {
+    min-height: 142px;
+    padding: 7px;
+    border-width: 2px;
+    border-radius: 13px;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, .45),
+      inset 0 -4px 0 rgba(0, 0, 0, .20),
+      0 5px 0 rgba(0, 41, 88, .34);
+  }
+
+  .flappy-item-art {
+    min-height: 66px;
+  }
+
+  .flappy-item-card--background .flappy-item-art {
+    min-height: 72px;
+  }
+
+  .flappy-store-bird {
+    width: 64px;
+    height: 46px;
+  }
+
+  .store-bird-eye {
+    right: 10px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .store-bird-beak {
+    right: -15px;
+    top: 22px;
+    width: 23px;
+    height: 16px;
+  }
+
+  .flappy-bg-preview {
+    height: 74px;
+  }
+
+  .flappy-package-art {
+    width: 68px;
+    height: 62px;
+  }
+
+  .flappy-package-art span {
+    width: 52px;
+    height: 48px;
+  }
+
+  .flappy-item-card h4 {
+    min-height: 28px;
+    font-size: 12px;
+  }
+
+  .flappy-store-buy {
+    min-height: 34px;
+    padding: 5px 8px;
+    border-width: 2px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  .flappy-store-info {
+    min-height: 38px;
+    padding: 7px 10px;
+    border-width: 2px;
+  }
+
+  .flappy-store-info strong {
+    font-size: 11px;
   }
 }

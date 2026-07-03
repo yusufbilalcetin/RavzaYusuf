@@ -402,27 +402,55 @@ const FLAPPY_DIFFICULTY = {
   kolay: {
     label: "Kolay", gapRatio: 0.32, minGap: 185, speed: 140, interval: 1.9,
     speedRampPerPoint: 1.2, intervalRampPerPoint: -0.006, gapRampPerPoint: -0.0015,
-    speedCap: 230, intervalFloor: 1.3, gapFloor: 0.22
+    speedCap: 230, intervalFloor: 1.3, gapFloor: 0.22, coinChance: 0.18
   },
   orta: {
     label: "Orta", gapRatio: 0.25, minGap: 145, speed: 190, interval: 1.45,
     speedRampPerPoint: 2.0, intervalRampPerPoint: -0.010, gapRampPerPoint: -0.0022,
-    speedCap: 300, intervalFloor: 0.95, gapFloor: 0.16
+    speedCap: 300, intervalFloor: 0.95, gapFloor: 0.16, coinChance: 0.30
   },
   zor: {
     label: "Zor", gapRatio: 0.19, minGap: 115, speed: 250, interval: 1.1,
     speedRampPerPoint: 3.0, intervalRampPerPoint: -0.014, gapRampPerPoint: -0.0032,
-    speedCap: 380, intervalFloor: 0.65, gapFloor: 0.11
+    speedCap: 380, intervalFloor: 0.65, gapFloor: 0.11, coinChance: 0.45
   }
 };
 
+const FLAPPY_STARTING_COINS = 20;
+
+const FLAPPY_SHOP_TABS = [
+  { id: "characters", label: "KARAKTERLER", icon: "bird" },
+  { id: "backgrounds", label: "ARKA PLANLAR", icon: "land" },
+  { id: "packages", label: "PAKETLER", icon: "gift" }
+];
+
 const FLAPPY_CHARACTERS = {
-  klasik: { label: "Klasik", price: 0, body1: "#ffe66d", body2: "#ffd23f", body3: "#f5a623", stroke: "#d98e04", belly: "#fff3c4", wing: "#f5a623", wingStroke: "#d98e04", beak: "#ff7043", beakStroke: "#d84315" },
-  mavi: { label: "Gokyuzu", price: 40, body1: "#a7e8ff", body2: "#5fc9f5", body3: "#2e93cc", stroke: "#1c6f9e", belly: "#eaf9ff", wing: "#5fc9f5", wingStroke: "#1c6f9e", beak: "#ff8a5c", beakStroke: "#d8552a" },
-  pembe: { label: "Gunbatimi", price: 60, body1: "#ffc7de", body2: "#f077a8", body3: "#c04a7e", stroke: "#96355f", belly: "#fff0f6", wing: "#f077a8", wingStroke: "#96355f", beak: "#ff7043", beakStroke: "#d84315" },
-  yesil: { label: "Orman", price: 80, body1: "#c8f2a6", body2: "#8fd85a", body3: "#5aa72e", stroke: "#3f7a1f", belly: "#f1ffe0", wing: "#8fd85a", wingStroke: "#3f7a1f", beak: "#ffa94d", beakStroke: "#d97a1e" },
-  mor: { label: "Ametist", price: 100, body1: "#e3c8ff", body2: "#b17ef0", body3: "#7d47bf", stroke: "#5c2f92", belly: "#f5ecff", wing: "#b17ef0", wingStroke: "#5c2f92", beak: "#ff8a65", beakStroke: "#d8552a" },
-  altin: { label: "Altin", price: 150, body1: "#fff3b0", body2: "#ffd23f", body3: "#c98f1c", stroke: "#8f6110", belly: "#fffbe0", wing: "#ffe066", wingStroke: "#8f6110", beak: "#ff7043", beakStroke: "#d84315" }
+  klasik: { label: "KLASIK", price: 0, defaultOwned: true, body1: "#fff27a", body2: "#ffc914", body3: "#e58a00", stroke: "#cf7600", belly: "#fff8c9", wing: "#f0a800", wingStroke: "#bd6c00", beak: "#ffab28", beakStroke: "#9c5700", art: "classic" },
+  kirmizi: { label: "KIRMIZI KUS", price: 100, body1: "#ff7a44", body2: "#ff2d18", body3: "#b21412", stroke: "#8d1715", belly: "#ffd7bc", wing: "#ff9a2e", wingStroke: "#a84a08", beak: "#ffb12c", beakStroke: "#9c5700", art: "red" },
+  pilot: { label: "PILOT KUS", price: 250, body1: "#68d5ff", body2: "#1686d9", body3: "#0b4f94", stroke: "#073c78", belly: "#eaf9ff", wing: "#2aa9ea", wingStroke: "#07598f", beak: "#ffb12c", beakStroke: "#9c5700", art: "pilot" },
+  simsek: { label: "SIMSEK KUS", price: 250, body1: "#fff36a", body2: "#ffd014", body3: "#ef9100", stroke: "#c67000", belly: "#fff8c9", wing: "#f5b400", wingStroke: "#bd6c00", beak: "#ffab28", beakStroke: "#9c5700", art: "speed" },
+  ninja: { label: "NINJA KUS", price: 400, body1: "#344258", body2: "#121823", body3: "#06090f", stroke: "#03060b", belly: "#d8e1ef", wing: "#1d2635", wingStroke: "#03060b", beak: "#ffab28", beakStroke: "#9c5700", art: "ninja" },
+  canavar: { label: "CANAVAR KUS", price: 400, body1: "#a7f35d", body2: "#5fc722", body3: "#2c881f", stroke: "#1f6419", belly: "#ecffd7", wing: "#76d942", wingStroke: "#2a7a1d", beak: "#ffb12c", beakStroke: "#9c5700", art: "monster" },
+  unicorn: { label: "UNICORN KUS", price: 600, body1: "#dfb8ff", body2: "#9c6af2", body3: "#6239bd", stroke: "#47268f", belly: "#f7eaff", wing: "#c390ff", wingStroke: "#6940a8", beak: "#ffb9a2", beakStroke: "#9a4a36", art: "unicorn" },
+  gizli: { label: "GIZLI KUS", price: null, locked: true, body1: "#44546d", body2: "#1b2d45", body3: "#0e1c2c", stroke: "#0a1522", belly: "#6c7d91", wing: "#263951", wingStroke: "#0b1928", beak: "#8fa1b8", beakStroke: "#263951", art: "secret" }
+};
+
+const FLAPPY_BACKGROUNDS = {
+  klasik: { label: "KLASIK", price: 0, defaultOwned: true, theme: "classic", sky: ["#0aa8f4", "#68d8ff", "#b7f2ff"], far: "#58b7d7", near: "#33a5c0", groundTop: "#75d944", groundBottom: "#8f4d18", star: false, sun: null },
+  gunbatimi: { label: "GUN BATIMI", price: 100, theme: "sunset", sky: ["#ff8a40", "#ffbc62", "#7357b9"], far: "#c25b68", near: "#733a62", groundTop: "#4fa83a", groundBottom: "#8a4418", star: false, sun: "#ffd86e" },
+  gece: { label: "GECE SEHIR", price: 250, theme: "night", sky: ["#071635", "#17336d", "#3d286b"], far: "#0e2446", near: "#111a35", groundTop: "#245b52", groundBottom: "#15233d", star: true, sun: "#fff3a8" },
+  kar: { label: "KAR TEMASI", price: 250, theme: "snow", sky: ["#78ceff", "#bdeeff", "#eefbff"], far: "#8fb9d9", near: "#b9e9ff", groundTop: "#f7fcff", groundBottom: "#71b5d8", star: false, sun: null },
+  col: { label: "COL", price: 400, theme: "desert", sky: ["#ffa84b", "#ffd071", "#ffe5a3"], far: "#e59a3a", near: "#cb7f25", groundTop: "#edbb42", groundBottom: "#a9651f", star: false, sun: "#fff09d" },
+  orman: { label: "ORMAN", price: 400, theme: "forest", sky: ["#53c4ff", "#8fe1ff", "#d7ffdc"], far: "#257d5a", near: "#145d42", groundTop: "#49c54f", groundBottom: "#5f3a18", star: false, sun: null },
+  gokyuzu: { label: "GOKYUZU ADALARI", price: 600, theme: "skylands", sky: ["#80c9ff", "#d4d6ff", "#fff1c8"], far: "#8f9ddc", near: "#6fb5d6", groundTop: "#7bd861", groundBottom: "#7a4b2a", star: false, sun: "#ffe38c" },
+  yakinda: { label: "YAKINDA", price: null, locked: true, theme: "locked", sky: ["#193a5a", "#10263f", "#0c1d32"], far: "#223c58", near: "#142a42", groundTop: "#36546b", groundBottom: "#172535", star: false, sun: null }
+};
+
+const FLAPPY_PACKAGES = {
+  baslangic: { label: "BASLANGIC", price: 180, theme: "starter", unlockCharacters: ["kirmizi"], unlockBackgrounds: ["gunbatimi"] },
+  kahraman: { label: "KAHRAMAN", price: 500, theme: "hero", unlockCharacters: ["pilot", "simsek"], unlockBackgrounds: ["gece"] },
+  efsane: { label: "EFSANE", price: 900, theme: "legend", unlockCharacters: ["unicorn"], unlockBackgrounds: ["gokyuzu"] },
+  yakinda: { label: "YAKINDA", price: null, locked: true, theme: "locked", unlockCharacters: [], unlockBackgrounds: [] }
 };
 
 function renderFlappyBird(target) {
@@ -430,7 +458,6 @@ function renderFlappyBird(target) {
     <div class="flappy-game">
       <div class="flappy-shell">
         <canvas id="flappyCanvas" class="flappy-canvas"></canvas>
-        <button type="button" class="flappy-sound-btn" id="flappySoundBtn" aria-label="Sesi ac/kapat"></button>
         <div class="flappy-overlay" id="flappyOverlay">
           <span class="flappy-medal" id="flappyMedal" hidden></span>
           <strong id="flappyOverlayTitle">Flappy Bird</strong>
@@ -450,25 +477,12 @@ function renderFlappyBird(target) {
   const bestLabel = target.querySelector("#flappyBest");
   const medal = target.querySelector("#flappyMedal");
   const menu = target.querySelector("#flappyMenu");
-  const soundBtn = target.querySelector("#flappySoundBtn");
   const context = canvas.getContext("2d");
-  const audio = createGameAudio({ storageKey: "flappySoundOn" });
-
-  function refreshSoundBtn() {
-    const on = audio.isEnabled();
-    soundBtn.textContent = on ? "\u{1F50A}" : "\u{1F507}";
-    soundBtn.classList.toggle("is-muted", !on);
-  }
-
-  function onSoundBtnClick(event) {
-    event.stopPropagation();
-    const on = audio.toggle();
-    refreshSoundBtn();
-    if (on && (state.phase === "ready" || state.phase === "playing")) audio.startMusic();
-  }
-
-  soundBtn.addEventListener("click", onSoundBtnClick);
-  refreshSoundBtn();
+  const audio = createGameAudio({
+    storageKey: "flappySoundOn",
+    settingsKey: "flappyAudioSettings",
+    defaultSettings: { musicEnabled: true, sfxEnabled: true, masterVolume: 70 }
+  });
 
   const GRAVITY = 1900;
   const FLAP_VELOCITY = -560;
@@ -481,10 +495,14 @@ function renderFlappyBird(target) {
     phase: "menu",
     difficulty: "orta",
     character: readFlappyEquipped(),
+    background: readFlappyEquippedBackground(),
+    shopTab: "characters",
+    shopMessage: "",
     coins: readFlappyCoins(),
     runCoins: 0,
     bird: { y: 0, velocity: 0 },
     pipes: [],
+    coinItems: [],
     score: 0,
     best: 0,
     lastTime: 0,
@@ -497,6 +515,7 @@ function renderFlappyBird(target) {
   };
 
   if (!readFlappyOwned().includes(state.character)) state.character = "klasik";
+  if (!readFlappyOwnedBackgrounds().includes(state.background)) state.background = "klasik";
 
   const clouds = Array.from({ length: 6 }, (_, index) => ({
     x: index * 0.19 + 0.04,
@@ -532,6 +551,7 @@ function renderFlappyBird(target) {
     state.bird.y = state.height * 0.45;
     state.bird.velocity = 0;
     state.pipes = [];
+    state.coinItems = [];
     state.score = 0;
     state.spawnTimer = params().interval * 0.6;
     state.distance = 0;
@@ -543,29 +563,107 @@ function renderFlappyBird(target) {
     const margin = Math.max(playHeight * 0.08, 40);
     const gapTop = margin + Math.random() * (playHeight - gap - margin * 2);
     state.pipes.push({ x: state.width + PIPE_WIDTH, gapTop, gapBottom: gapTop + gap, passed: false });
+    if (Math.random() < params().coinChance) {
+      state.coinItems.push({
+        x: state.width + PIPE_WIDTH + PIPE_WIDTH / 2,
+        y: gapTop + gap / 2,
+        collected: false,
+        wobble: Math.random() * Math.PI * 2
+      });
+    }
   }
 
   function showMenu() {
     state.phase = "menu";
     resetRound();
     audio.stopMusic();
+    overlay.classList.add("is-menu");
+    overlay.classList.remove("is-shop");
+    overlayTitle.hidden = true;
+    overlayText.hidden = true;
+    bestLabel.hidden = true;
     medal.hidden = true;
-    overlayTitle.textContent = "Flappy Bird";
-    overlayText.textContent = "Ne yapmak istersin?";
-    bestLabel.textContent = `Altin: ${state.coins} \u{1FA99}`;
-    menu.innerHTML = `
-      <button class="flappy-menu-btn" type="button" data-action="play">Oyna</button>
-      <button class="flappy-menu-btn" type="button" data-action="shop">Magaza</button>
-    `;
+    menu.innerHTML = renderMainMenu();
     overlay.hidden = false;
+  }
+
+  function renderMainMenu() {
+    const settings = audio.getSettings();
+    const activeBars = Math.round(settings.masterVolume / 10);
+    return `
+      <section class="flappy-main-menu" aria-label="Flappy Bird ana menü">
+        <div class="flappy-menu-ray flappy-menu-ray--a"></div>
+        <div class="flappy-menu-ray flappy-menu-ray--b"></div>
+        <div class="flappy-menu-cloud flappy-menu-cloud--1"></div>
+        <div class="flappy-menu-cloud flappy-menu-cloud--2"></div>
+        <div class="flappy-menu-cloud flappy-menu-cloud--3"></div>
+        <div class="flappy-menu-cloud flappy-menu-cloud--4"></div>
+        <div class="flappy-menu-hills"></div>
+        <div class="flappy-menu-bushes"></div>
+        <div class="flappy-menu-ground"></div>
+
+        <div class="flappy-main-content">
+          <div class="flappy-logo-row">
+            <div class="flappy-menu-bird" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <h2 class="flappy-game-logo"><span>Flappy</span><span>Bird</span></h2>
+          </div>
+          <p class="flappy-main-question">Ne yapmak istersin?</p>
+          <div class="flappy-main-coins">
+            <span>Altın: ${state.coins}</span>
+            <i aria-hidden="true"></i>
+          </div>
+          <div class="flappy-main-actions">
+            <button class="flappy-main-btn flappy-main-btn--play" type="button" data-action="play">Oyna</button>
+            <button class="flappy-main-btn flappy-main-btn--shop" type="button" data-action="shop">Mağaza</button>
+          </div>
+          <section class="flappy-audio-panel" aria-label="Ses ayarları">
+            <div class="flappy-audio-tab"><span aria-hidden="true"></span>Ses Ayarları<span aria-hidden="true"></span></div>
+            <div class="flappy-audio-body">
+              ${renderAudioToggle("music", "Müzik", "♪", settings.musicEnabled)}
+              ${renderAudioToggle("sfx", "Ses Efektleri", "◔", settings.sfxEnabled)}
+              <div class="flappy-audio-control flappy-audio-control--volume">
+                <strong>Genel Ses</strong>
+                <div class="flappy-volume-row">
+                  <button class="flappy-volume-btn" type="button" data-action="volume-down" aria-label="Sesi azalt">−</button>
+                  <div class="flappy-volume-bars" aria-label="Genel ses ${settings.masterVolume}">
+                    ${Array.from({ length: 10 }, (_, index) => `<span class="${index < activeBars ? "is-filled" : ""}"></span>`).join("")}
+                  </div>
+                  <button class="flappy-volume-btn" type="button" data-action="volume-up" aria-label="Sesi artır">+</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderAudioToggle(type, label, icon, enabled) {
+    return `
+      <div class="flappy-audio-control">
+        <strong>${label}</strong>
+        <button class="flappy-audio-toggle${enabled ? " is-on" : " is-off"}" type="button" data-action="toggle-${type}" aria-pressed="${enabled}">
+          <span class="flappy-audio-toggle-icon" aria-hidden="true">${icon}</span>
+          <span>${enabled ? "Açık" : "Kapalı"}</span>
+          <i aria-hidden="true"></i>
+        </button>
+      </div>
+    `;
   }
 
   function showDifficultyPicker() {
     state.phase = "menu";
     resetRound();
     audio.stopMusic();
+    overlay.classList.remove("is-menu");
+    overlay.classList.remove("is-shop");
+    overlayTitle.hidden = false;
+    overlayText.hidden = false;
+    bestLabel.hidden = false;
     medal.hidden = true;
-    overlayTitle.textContent = "Zorluk Sec";
+    overlayTitle.textContent = "Zorluk Seç";
     overlayText.textContent = "Zorluk seviyeni sec.";
     bestLabel.textContent = "";
     menu.innerHTML = Object.entries(FLAPPY_DIFFICULTY).map(([key, diff]) => {
@@ -575,33 +673,181 @@ function renderFlappyBird(target) {
     overlay.hidden = false;
   }
 
-  function renderShopGrid() {
-    const owned = readFlappyOwned();
-    return `<div class="flappy-shop-grid">` + Object.entries(FLAPPY_CHARACTERS).map(([id, c]) => {
-      const isOwned = owned.includes(id);
-      const isEquipped = state.character === id;
-      const affordable = state.coins >= c.price;
-      const cls = ["flappy-shop-card", isEquipped ? "is-equipped" : "", !isOwned && !affordable ? "is-locked" : ""].filter(Boolean).join(" ");
-      const statusLabel = isEquipped ? "Kusanildi" : isOwned ? "Sahipsin" : `${c.price} \u{1FA99}`;
-      return `
-        <button class="${cls}" type="button" data-char="${id}">
-          <span class="flappy-shop-swatch" style="background: linear-gradient(135deg, ${c.body1}, ${c.body2} 60%, ${c.body3})"></span>
-          <span class="flappy-shop-label">${c.label}</span>
-          <small>${statusLabel}</small>
-        </button>`;
-    }).join("") + `</div>`;
-  }
-
-  function showShop() {
+  function showShop(tab = state.shopTab || "characters") {
+    state.shopTab = FLAPPY_SHOP_TABS.some((item) => item.id === tab) ? tab : "characters";
     state.phase = "shop";
     resetRound();
     audio.stopMusic();
+    overlay.classList.remove("is-menu");
+    overlay.classList.add("is-shop");
+    overlayTitle.hidden = true;
+    overlayText.hidden = true;
+    bestLabel.hidden = true;
     medal.hidden = true;
-    overlayTitle.textContent = "Magaza";
-    overlayText.textContent = `Altin: ${state.coins} \u{1FA99}`;
-    bestLabel.textContent = "";
-    menu.innerHTML = renderShopGrid() + `<button class="flappy-menu-btn flappy-menu-back" type="button" data-action="back">Geri</button>`;
+    menu.innerHTML = renderStoreScreen();
     overlay.hidden = false;
+  }
+
+  function renderStoreScreen() {
+    const tab = state.shopTab;
+    const subtitle = tab === "backgrounds" ? "Arka planları satın al" : tab === "packages" ? "Paketleri satın al" : "Karakterleri satın al";
+    const info = tab === "backgrounds"
+      ? "Yeni arka planlar oynayarak veya özel paketlerle açılabilir."
+      : tab === "packages"
+        ? "Paketler karakterleri ve arka planları birlikte açar."
+        : "Yeni karakterler oynayarak veya özel paketlerle açılabilir.";
+    const gridClass = tab === "packages" ? "flappy-store-grid flappy-store-grid--packages" : "flappy-store-grid";
+
+    return `
+      <section class="flappy-store flappy-store--${FLAPPY_BACKGROUNDS[state.background]?.theme || "classic"}" aria-label="Flappy Bird mağazası">
+        <div class="flappy-store-cloud flappy-store-cloud--1"></div>
+        <div class="flappy-store-cloud flappy-store-cloud--2"></div>
+        <div class="flappy-store-cloud flappy-store-cloud--3"></div>
+        <div class="flappy-store-city"></div>
+        <div class="flappy-store-bushes"></div>
+        <div class="flappy-store-ground"></div>
+
+        <button class="flappy-store-back" type="button" data-action="back" aria-label="Geri">‹</button>
+
+        <div class="flappy-store-wallet" aria-label="Altın miktarı">
+          <span class="flappy-store-coin" aria-hidden="true">S</span>
+          <strong>${state.coins}</strong>
+          <button class="flappy-store-plus" type="button" data-action="add-coins" aria-label="Altın ekle">+</button>
+        </div>
+
+        <header class="flappy-store-title-wrap">
+          <span class="flappy-store-wing flappy-store-wing--left" aria-hidden="true"></span>
+          <h3>MAĞAZA</h3>
+          <span class="flappy-store-wing flappy-store-wing--right" aria-hidden="true"></span>
+          <p>${subtitle}</p>
+        </header>
+
+        <nav class="flappy-store-tabs" aria-label="Mağaza sekmeleri">
+          ${FLAPPY_SHOP_TABS.map((shopTab) => `
+            <button class="flappy-store-tab flappy-store-tab--${shopTab.icon}${tab === shopTab.id ? " is-active" : ""}" type="button" data-tab="${shopTab.id}">
+              <span aria-hidden="true"></span>
+              ${shopTab.label}
+            </button>
+          `).join("")}
+        </nav>
+
+        ${state.shopMessage ? `<div class="flappy-store-message" role="status">${state.shopMessage}</div>` : ""}
+
+        <div class="${gridClass}">
+          ${tab === "backgrounds" ? renderBackgroundCards() : tab === "packages" ? renderPackageCards() : renderCharacterCards()}
+        </div>
+
+        <div class="flappy-store-info">
+          <span aria-hidden="true">★</span>
+          <strong>${info}</strong>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderCharacterCards() {
+    const owned = readFlappyOwned();
+    return Object.entries(FLAPPY_CHARACTERS).map(([id, item]) => {
+      const locked = Boolean(item.locked);
+      const isOwned = item.defaultOwned || owned.includes(id);
+      const isEquipped = state.character === id;
+      const classes = ["flappy-item-card", "flappy-item-card--character", isEquipped ? "is-selected" : "", locked ? "is-locked" : ""].filter(Boolean).join(" ");
+      return `
+        <article class="${classes}">
+          ${isEquipped ? `<span class="flappy-store-check" aria-hidden="true">✓</span>` : ""}
+          <div class="flappy-item-art">${renderStoreBird(id, item)}</div>
+          <h4>${item.label}</h4>
+          <button class="flappy-store-buy" type="button" data-char="${id}" ${locked ? "disabled" : ""}>
+            ${renderStoreButton({ item, locked, selected: isEquipped, owned: isOwned })}
+          </button>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function renderBackgroundCards() {
+    const owned = readFlappyOwnedBackgrounds();
+    return Object.entries(FLAPPY_BACKGROUNDS).map(([id, item]) => {
+      const locked = Boolean(item.locked);
+      const isOwned = item.defaultOwned || owned.includes(id);
+      const isEquipped = state.background === id;
+      const classes = ["flappy-item-card", "flappy-item-card--background", isEquipped ? "is-selected" : "", locked ? "is-locked" : ""].filter(Boolean).join(" ");
+      return `
+        <article class="${classes}">
+          ${isEquipped ? `<span class="flappy-store-check" aria-hidden="true">✓</span>` : ""}
+          <div class="flappy-item-art">${renderBackgroundPreview(item.theme)}</div>
+          <h4>${item.label}</h4>
+          <button class="flappy-store-buy" type="button" data-bg="${id}" ${locked ? "disabled" : ""}>
+            ${renderStoreButton({ item, locked, selected: isEquipped, owned: isOwned })}
+          </button>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function renderPackageCards() {
+    const owned = readFlappyOwnedPackages();
+    return Object.entries(FLAPPY_PACKAGES).map(([id, item]) => {
+      const locked = Boolean(item.locked);
+      const isOwned = owned.includes(id);
+      const classes = ["flappy-item-card", "flappy-item-card--package", isOwned ? "is-selected" : "", locked ? "is-locked" : ""].filter(Boolean).join(" ");
+      return `
+        <article class="${classes}">
+          ${isOwned ? `<span class="flappy-store-check" aria-hidden="true">✓</span>` : ""}
+          <div class="flappy-item-art">${renderPackageArt(item.theme)}</div>
+          <h4>${item.label}</h4>
+          <button class="flappy-store-buy" type="button" data-package="${id}" ${locked ? "disabled" : ""}>
+            ${renderStoreButton({ item, locked, selected: false, owned: isOwned, packageCard: true })}
+          </button>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function renderStoreButton({ item, locked, selected, owned, packageCard = false }) {
+    if (locked) return `<span class="flappy-mini-lock" aria-hidden="true"></span> YAKINDA`;
+    if (selected) return `<span aria-hidden="true">✓</span> KULLANILIYOR`;
+    if (owned) return packageCard ? `<span aria-hidden="true">✓</span> AÇILDI` : "KULLAN";
+    return `<span class="flappy-store-coin flappy-store-coin--small" aria-hidden="true">S</span> ${item.price}`;
+  }
+
+  function renderStoreBird(id, item) {
+    return `
+      <div class="flappy-store-bird flappy-store-bird--${item.art}" style="--body-a:${item.body1};--body-b:${item.body2};--body-c:${item.body3};--wing:${item.wing};" aria-hidden="true">
+        <span class="store-bird-wing"></span>
+        <span class="store-bird-tail"></span>
+        <span class="store-bird-eye"></span>
+        <span class="store-bird-beak"></span>
+        <span class="store-bird-detail store-bird-detail--one"></span>
+        <span class="store-bird-detail store-bird-detail--two"></span>
+        <span class="store-bird-detail store-bird-detail--three"></span>
+      </div>
+    `;
+  }
+
+  function renderBackgroundPreview(theme) {
+    return `
+      <div class="flappy-bg-preview flappy-bg-preview--${theme}" aria-hidden="true">
+        <span class="preview-sun"></span>
+        <span class="preview-moon"></span>
+        <span class="preview-cloud preview-cloud--a"></span>
+        <span class="preview-cloud preview-cloud--b"></span>
+        <span class="preview-city"></span>
+        <span class="preview-tree preview-tree--a"></span>
+        <span class="preview-tree preview-tree--b"></span>
+        <span class="preview-ground"></span>
+      </div>
+    `;
+  }
+
+  function renderPackageArt(theme) {
+    return `
+      <div class="flappy-package-art flappy-package-art--${theme}" aria-hidden="true">
+        <span></span>
+        <i>★</i>
+        <i>★</i>
+      </div>
+    `;
   }
 
   function showReady() {
@@ -609,6 +855,11 @@ function renderFlappyBird(target) {
     resetRound();
     audio.startMusic();
     state.best = readFlappyBest(state.difficulty);
+    overlay.classList.remove("is-menu");
+    overlay.classList.remove("is-shop");
+    overlayTitle.hidden = false;
+    overlayText.hidden = false;
+    bestLabel.hidden = false;
     medal.hidden = true;
     overlayTitle.textContent = `${params().label} Mod`;
     overlayText.textContent = "Baslamak icin ekrana dokun veya bosluk tusuna bas.";
@@ -632,6 +883,11 @@ function renderFlappyBird(target) {
     const medalIcon = state.score >= 50 ? "\u{1F947}" : state.score >= 25 ? "\u{1F948}" : state.score >= 10 ? "\u{1F949}" : "";
     medal.textContent = medalIcon;
     medal.hidden = !medalIcon;
+    overlay.classList.remove("is-menu");
+    overlay.classList.remove("is-shop");
+    overlayTitle.hidden = false;
+    overlayText.hidden = false;
+    bestLabel.hidden = false;
     overlayTitle.textContent = "Oyun Bitti";
     overlayText.textContent = `Skorun: ${state.score} — Kazanilan: ${earned} \u{1FA99}`;
     bestLabel.textContent = `Rekor (${params().label}): ${state.best} | Toplam Altin: ${state.coins}`;
@@ -682,11 +938,25 @@ function renderFlappyBird(target) {
       if (!pipe.passed && pipe.x + PIPE_WIDTH < birdX - BIRD_RADIUS) {
         pipe.passed = true;
         state.score += 1;
-        state.runCoins += 1;
         audio.play("score");
       }
     }
     state.pipes = state.pipes.filter((pipe) => pipe.x + PIPE_WIDTH > -10);
+
+    const COIN_RADIUS = 14;
+    for (const coin of state.coinItems) {
+      coin.x -= diff.speed * delta;
+      if (!coin.collected) {
+        const dx = birdX - coin.x;
+        const dy = state.bird.y - coin.y;
+        if (Math.hypot(dx, dy) < BIRD_RADIUS + COIN_RADIUS) {
+          coin.collected = true;
+          state.runCoins += 1;
+          audio.play("score");
+        }
+      }
+    }
+    state.coinItems = state.coinItems.filter((coin) => !coin.collected && coin.x > -30);
 
     if (state.bird.y - BIRD_RADIUS <= 0) {
       state.bird.y = BIRD_RADIUS;
@@ -713,17 +983,47 @@ function renderFlappyBird(target) {
   function drawBackground() {
     const { width, height } = state;
     const groundY = height - GROUND_H;
+    const theme = FLAPPY_BACKGROUNDS[state.background] || FLAPPY_BACKGROUNDS.klasik;
 
     const sky = context.createLinearGradient(0, 0, 0, height);
-    sky.addColorStop(0, "#69c8f2");
-    sky.addColorStop(0.75, "#aee3f7");
-    sky.addColorStop(1, "#d8f3fb");
+    sky.addColorStop(0, theme.sky[0]);
+    sky.addColorStop(0.68, theme.sky[1]);
+    sky.addColorStop(1, theme.sky[2]);
     context.fillStyle = sky;
     context.fillRect(0, 0, width, height);
 
+    if (theme.sun) {
+      context.save();
+      context.fillStyle = theme.sun;
+      context.shadowColor = theme.sun;
+      context.shadowBlur = 28;
+      context.beginPath();
+      context.arc(width * 0.74, height * 0.17, 34, 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+    }
+
+    if (theme.star) {
+      context.fillStyle = "rgba(255, 247, 185, .85)";
+      for (let i = 0; i < 34; i += 1) {
+        const x = (i * 97 + state.distance * 0.03) % width;
+        const y = 24 + ((i * 53) % Math.max(80, groundY * 0.5));
+        const size = 1 + (i % 3);
+        context.fillRect(x, y, size, size);
+      }
+      context.fillStyle = "rgba(255, 245, 178, .92)";
+      context.beginPath();
+      context.arc(width * 0.78, height * 0.15, 22, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = theme.sky[0];
+      context.beginPath();
+      context.arc(width * 0.79, height * 0.13, 20, 0, Math.PI * 2);
+      context.fill();
+    }
+
     const cloudSpan = width + 260;
     const cloudShift = (state.distance * 0.12) % cloudSpan;
-    context.fillStyle = "rgba(255, 255, 255, .85)";
+    context.fillStyle = theme.theme === "night" ? "rgba(142, 172, 222, .32)" : "rgba(255, 255, 255, .85)";
     for (const cloud of clouds) {
       let x = cloud.x * cloudSpan - cloudShift;
       if (x < -260) x += cloudSpan;
@@ -736,7 +1036,7 @@ function renderFlappyBird(target) {
       context.fill();
     }
 
-    context.fillStyle = "#b6e8c5";
+    context.fillStyle = theme.far;
     const backShift = (state.distance * 0.18) % 170;
     for (let x = -backShift; x < width + 170; x += 170) {
       context.beginPath();
@@ -744,7 +1044,7 @@ function renderFlappyBird(target) {
       context.fill();
     }
 
-    context.fillStyle = "#93dcaa";
+    context.fillStyle = theme.near;
     const frontShift = (state.distance * 0.3) % 130;
     for (let x = -frontShift + 55; x < width + 130; x += 130) {
       context.beginPath();
@@ -781,15 +1081,48 @@ function renderFlappyBird(target) {
     context.strokeRect(pipe.x - 5, pipe.gapBottom, PIPE_WIDTH + 10, capH);
   }
 
+  function drawCoin(coin) {
+    const spin = Math.cos(coin.wobble + state.distance * 0.012);
+    const radiusX = Math.max(Math.abs(spin) * 15, 3);
+    const radiusY = 15;
+
+    context.save();
+    context.translate(coin.x, coin.y);
+
+    const bodyGrad = context.createLinearGradient(-radiusX, 0, radiusX, 0);
+    bodyGrad.addColorStop(0, "#f7d35a");
+    bodyGrad.addColorStop(0.5, "#ffe98a");
+    bodyGrad.addColorStop(1, "#e0a92e");
+    context.fillStyle = bodyGrad;
+    context.beginPath();
+    context.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
+    context.fill();
+
+    context.strokeStyle = "rgba(150, 96, 8, .7)";
+    context.lineWidth = 2;
+    context.stroke();
+
+    if (Math.abs(spin) > 0.35) {
+      context.fillStyle = "rgba(150, 96, 8, .55)";
+      context.font = "700 15px 'Segoe UI', Arial, sans-serif";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText("$", 0, 1);
+    }
+
+    context.restore();
+  }
+
   function drawGround() {
     const { width, height } = state;
     const groundY = height - GROUND_H;
+    const theme = FLAPPY_BACKGROUNDS[state.background] || FLAPPY_BACKGROUNDS.klasik;
 
-    context.fillStyle = "#e0c98c";
+    context.fillStyle = theme.groundBottom;
     context.fillRect(0, groundY, width, GROUND_H);
 
     const shift = state.distance % 34;
-    context.fillStyle = "rgba(184, 152, 90, .5)";
+    context.fillStyle = "rgba(0, 0, 0, .16)";
     for (let x = -shift - 34; x < width + 34; x += 34) {
       context.beginPath();
       context.moveTo(x, height);
@@ -801,11 +1134,11 @@ function renderFlappyBird(target) {
     }
 
     const grass = context.createLinearGradient(0, groundY, 0, groundY + 12);
-    grass.addColorStop(0, "#8be066");
-    grass.addColorStop(1, "#5cb944");
+    grass.addColorStop(0, theme.groundTop);
+    grass.addColorStop(1, theme.groundBottom);
     context.fillStyle = grass;
     context.fillRect(0, groundY, width, 12);
-    context.fillStyle = "rgba(46, 125, 50, .6)";
+    context.fillStyle = "rgba(255, 255, 255, .18)";
     context.fillRect(0, groundY + 12, width, 2);
   }
 
@@ -830,6 +1163,99 @@ function renderFlappyBird(target) {
     context.strokeStyle = palette.stroke;
     context.lineWidth = 2;
     context.stroke();
+
+    if (palette.art === "speed") {
+      context.fillStyle = "#161923";
+      context.beginPath();
+      context.moveTo(-2, -15);
+      context.lineTo(-12, -5);
+      context.lineTo(-5, -5);
+      context.lineTo(-15, 8);
+      context.lineTo(1, -3);
+      context.lineTo(-7, -3);
+      context.closePath();
+      context.fill();
+    }
+
+    if (palette.art === "ninja") {
+      context.fillStyle = "#e73838";
+      context.fillRect(-18, -11, 26, 6);
+      context.beginPath();
+      context.moveTo(-16, -8);
+      context.lineTo(-29, -15);
+      context.lineTo(-23, -4);
+      context.closePath();
+      context.fill();
+      context.beginPath();
+      context.moveTo(-17, -5);
+      context.lineTo(-31, 3);
+      context.lineTo(-22, 5);
+      context.closePath();
+      context.fill();
+    }
+
+    if (palette.art === "monster") {
+      context.strokeStyle = "#1b5121";
+      context.lineWidth = 1.8;
+      context.beginPath();
+      context.moveTo(-5, -13);
+      context.lineTo(0, -7);
+      context.lineTo(5, -13);
+      context.stroke();
+      context.fillStyle = "#7b8794";
+      context.strokeStyle = "#26303b";
+      context.lineWidth = 1.2;
+      context.beginPath();
+      context.rect(-22, -2, 5, 7);
+      context.rect(15, -2, 5, 7);
+      context.fill();
+      context.stroke();
+    }
+
+    if (palette.art === "unicorn") {
+      const horn = context.createLinearGradient(2, -28, 9, -11);
+      horn.addColorStop(0, "#fff9b3");
+      horn.addColorStop(1, "#ffb33f");
+      context.fillStyle = horn;
+      context.beginPath();
+      context.moveTo(2, -15);
+      context.lineTo(7, -30);
+      context.lineTo(12, -14);
+      context.closePath();
+      context.fill();
+      context.strokeStyle = "#7441b8";
+      context.lineWidth = 1.4;
+      context.stroke();
+      ["#ff4fa3", "#ffd83d", "#36d1ff", "#7ef15e"].forEach((color, index) => {
+        context.fillStyle = color;
+        context.beginPath();
+        context.arc(-12 + index * 4, -15 - (index % 2) * 3, 4, 0, Math.PI * 2);
+        context.fill();
+      });
+    }
+
+    if (palette.art === "pilot") {
+      context.fillStyle = "#7a451d";
+      context.beginPath();
+      context.ellipse(-2, -13, 17, 9, 0.1, Math.PI, Math.PI * 2);
+      context.fill();
+      context.strokeStyle = "#3d220f";
+      context.lineWidth = 1.5;
+      context.stroke();
+      context.strokeStyle = "#3d220f";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.arc(5, -12, 6, 0, Math.PI * 2);
+      context.arc(17, -11, 6, 0, Math.PI * 2);
+      context.moveTo(11, -12);
+      context.lineTo(12, -12);
+      context.stroke();
+      context.fillStyle = "rgba(139, 232, 255, .55)";
+      context.beginPath();
+      context.arc(5, -12, 4, 0, Math.PI * 2);
+      context.arc(17, -11, 4, 0, Math.PI * 2);
+      context.fill();
+    }
 
     context.fillStyle = palette.belly;
     context.beginPath();
@@ -886,6 +1312,7 @@ function renderFlappyBird(target) {
   function draw() {
     drawBackground();
     for (const pipe of state.pipes) drawPipe(pipe);
+    for (const coin of state.coinItems) drawCoin(coin);
     drawGround();
     drawBird();
 
@@ -914,54 +1341,190 @@ function renderFlappyBird(target) {
   }
 
   function onPointerDown(event) {
-    if (event.target.closest(".flappy-menu-btn, .flappy-sound-btn, .flappy-shop-card")) return;
+    if (event.target.closest(".flappy-menu-btn, .flappy-main-menu, .flappy-store")) return;
     event.preventDefault();
     flap();
   }
 
-  function onShopCardClick(id) {
+  function addShopMessage(message) {
+    state.shopMessage = message;
+  }
+
+  function onCharacterClick(id) {
+    const item = FLAPPY_CHARACTERS[id];
+    if (!item || item.locked) {
+      addShopMessage("Bu karakter yakinda acilacak.");
+      showShop("characters");
+      return;
+    }
+
     const owned = readFlappyOwned();
-    if (owned.includes(id)) {
-      if (state.character === id) return;
+    if (item.defaultOwned || owned.includes(id)) {
       state.character = id;
       writeFlappyEquipped(id);
       audio.play("equip");
-      showShop();
+      addShopMessage(`${item.label} kullaniliyor.`);
+      showShop("characters");
       return;
     }
-    const price = FLAPPY_CHARACTERS[id]?.price ?? Infinity;
+
+    const price = item.price ?? Infinity;
     if (state.coins < price) {
       audio.play("click");
+      addShopMessage("Yeterli altin yok.");
+      showShop("characters");
       return;
     }
+
     state.coins -= price;
     writeFlappyCoins(state.coins);
     writeFlappyOwned([...owned, id]);
     state.character = id;
     writeFlappyEquipped(id);
     audio.play("purchase");
-    showShop();
+    addShopMessage(`${item.label} satin alindi.`);
+    showShop("characters");
+  }
+
+  function onBackgroundClick(id) {
+    const item = FLAPPY_BACKGROUNDS[id];
+    if (!item || item.locked) {
+      addShopMessage("Bu arka plan yakinda acilacak.");
+      showShop("backgrounds");
+      return;
+    }
+
+    const owned = readFlappyOwnedBackgrounds();
+    if (item.defaultOwned || owned.includes(id)) {
+      state.background = id;
+      writeFlappyEquippedBackground(id);
+      audio.play("equip");
+      addShopMessage(`${item.label} kullaniliyor.`);
+      showShop("backgrounds");
+      return;
+    }
+
+    const price = item.price ?? Infinity;
+    if (state.coins < price) {
+      audio.play("click");
+      addShopMessage("Yeterli altin yok.");
+      showShop("backgrounds");
+      return;
+    }
+
+    state.coins -= price;
+    writeFlappyCoins(state.coins);
+    writeFlappyOwnedBackgrounds([...owned, id]);
+    state.background = id;
+    writeFlappyEquippedBackground(id);
+    audio.play("purchase");
+    addShopMessage(`${item.label} satin alindi.`);
+    showShop("backgrounds");
+  }
+
+  function onPackageClick(id) {
+    const item = FLAPPY_PACKAGES[id];
+    if (!item || item.locked) {
+      addShopMessage("Bu paket yakinda acilacak.");
+      showShop("packages");
+      return;
+    }
+
+    const ownedPackages = readFlappyOwnedPackages();
+    if (ownedPackages.includes(id)) {
+      audio.play("equip");
+      addShopMessage(`${item.label} paketi acik.`);
+      showShop("packages");
+      return;
+    }
+
+    const price = item.price ?? Infinity;
+    if (state.coins < price) {
+      audio.play("click");
+      addShopMessage("Yeterli altin yok.");
+      showShop("packages");
+      return;
+    }
+
+    const ownedCharacters = new Set(readFlappyOwned());
+    const ownedBackgrounds = new Set(readFlappyOwnedBackgrounds());
+    item.unlockCharacters.forEach((key) => {
+      if (FLAPPY_CHARACTERS[key] && !FLAPPY_CHARACTERS[key].locked) ownedCharacters.add(key);
+    });
+    item.unlockBackgrounds.forEach((key) => {
+      if (FLAPPY_BACKGROUNDS[key] && !FLAPPY_BACKGROUNDS[key].locked) ownedBackgrounds.add(key);
+    });
+
+    state.coins -= price;
+    writeFlappyCoins(state.coins);
+    writeFlappyOwnedPackages([...ownedPackages, id]);
+    writeFlappyOwned([...ownedCharacters]);
+    writeFlappyOwnedBackgrounds([...ownedBackgrounds]);
+    audio.play("purchase");
+    addShopMessage(`${item.label} paketi acildi.`);
+    showShop("packages");
   }
 
   function onMenuClick(event) {
-    const button = event.target.closest(".flappy-menu-btn, .flappy-shop-card");
+    const button = event.target.closest("[data-action], [data-diff], [data-char], [data-bg], [data-package], [data-tab]");
     if (!button) return;
     if (button.dataset.diff) {
+      state.shopMessage = "";
       state.difficulty = button.dataset.diff;
       showReady();
       return;
     }
     if (button.dataset.char) {
-      onShopCardClick(button.dataset.char);
+      onCharacterClick(button.dataset.char);
+      return;
+    }
+    if (button.dataset.bg) {
+      onBackgroundClick(button.dataset.bg);
+      return;
+    }
+    if (button.dataset.package) {
+      onPackageClick(button.dataset.package);
+      return;
+    }
+    if (button.dataset.tab) {
+      state.shopMessage = "";
+      showShop(button.dataset.tab);
       return;
     }
     const action = button.dataset.action;
-    if (action === "play") { showDifficultyPicker(); return; }
-    if (action === "shop") { showShop(); return; }
-    if (action === "back") { showMenu(); return; }
-    if (action === "retry") { showReady(); return; }
-    if (action === "menu") { showDifficultyPicker(); return; }
-    if (action === "home") { showMenu(); return; }
+    if (action === "play") { state.shopMessage = ""; audio.play("click"); showDifficultyPicker(); return; }
+    if (action === "shop") { state.shopMessage = ""; audio.play("purchase"); showShop("characters"); return; }
+    if (action === "toggle-music") {
+      audio.toggleMusic();
+      audio.play("click");
+      showMenu();
+      return;
+    }
+    if (action === "toggle-sfx") {
+      const next = audio.toggleSfx();
+      if (next) audio.play("click");
+      showMenu();
+      return;
+    }
+    if (action === "volume-down" || action === "volume-up") {
+      const current = audio.getSettings().masterVolume;
+      audio.setMasterVolume(current + (action === "volume-up" ? 10 : -10));
+      audio.play("click");
+      showMenu();
+      return;
+    }
+    if (action === "add-coins") {
+      state.coins += 250;
+      writeFlappyCoins(state.coins);
+      audio.play("purchase");
+      addShopMessage("250 altin eklendi.");
+      showShop(state.shopTab);
+      return;
+    }
+    if (action === "back") { state.shopMessage = ""; showMenu(); return; }
+    if (action === "retry") { state.shopMessage = ""; showReady(); return; }
+    if (action === "menu") { state.shopMessage = ""; showDifficultyPicker(); return; }
+    if (action === "home") { state.shopMessage = ""; showMenu(); return; }
   }
 
   function onKeyDown(event) {
@@ -989,7 +1552,6 @@ function renderFlappyBird(target) {
       audio.stopMusic();
       shell.removeEventListener("pointerdown", onPointerDown);
       menu.removeEventListener("click", onMenuClick);
-      soundBtn.removeEventListener("click", onSoundBtnClick);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("resize", resizeCanvas);
     }
@@ -1014,9 +1576,12 @@ function writeFlappyBest(difficulty, score) {
 
 function readFlappyCoins() {
   try {
-    return Number(localStorage.getItem("flappyCoins")) || 0;
+    const raw = localStorage.getItem("flappyCoins");
+    if (raw === null) return FLAPPY_STARTING_COINS;
+    const amount = Number(raw);
+    return Number.isFinite(amount) ? amount : FLAPPY_STARTING_COINS;
   } catch {
-    return 0;
+    return FLAPPY_STARTING_COINS;
   }
 }
 
@@ -1031,7 +1596,8 @@ function writeFlappyCoins(amount) {
 function readFlappyOwned() {
   try {
     const parsed = JSON.parse(localStorage.getItem("flappyOwnedCharacters"));
-    return Array.isArray(parsed) && parsed.length ? parsed : ["klasik"];
+    const list = Array.isArray(parsed) && parsed.length ? parsed : ["klasik"];
+    return normalizeFlappyKeys(list, FLAPPY_CHARACTERS, ["klasik"]);
   } catch {
     return ["klasik"];
   }
@@ -1039,7 +1605,7 @@ function readFlappyOwned() {
 
 function writeFlappyOwned(list) {
   try {
-    localStorage.setItem("flappyOwnedCharacters", JSON.stringify(list));
+    localStorage.setItem("flappyOwnedCharacters", JSON.stringify(normalizeFlappyKeys(list, FLAPPY_CHARACTERS, ["klasik"])));
   } catch {
     /* localStorage kapali olabilir */
   }
@@ -1047,7 +1613,9 @@ function writeFlappyOwned(list) {
 
 function readFlappyEquipped() {
   try {
-    return localStorage.getItem("flappyEquippedCharacter") || "klasik";
+    const id = localStorage.getItem("flappyEquippedCharacter") || "klasik";
+    const item = FLAPPY_CHARACTERS[id];
+    return item && !item.locked ? id : "klasik";
   } catch {
     return "klasik";
   }
@@ -1055,10 +1623,75 @@ function readFlappyEquipped() {
 
 function writeFlappyEquipped(id) {
   try {
-    localStorage.setItem("flappyEquippedCharacter", id);
+    if (FLAPPY_CHARACTERS[id] && !FLAPPY_CHARACTERS[id].locked) {
+      localStorage.setItem("flappyEquippedCharacter", id);
+    }
   } catch {
     /* localStorage kapali olabilir */
   }
+}
+
+function readFlappyOwnedBackgrounds() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("flappyOwnedBackgrounds"));
+    const list = Array.isArray(parsed) && parsed.length ? parsed : ["klasik"];
+    return normalizeFlappyKeys(list, FLAPPY_BACKGROUNDS, ["klasik"]);
+  } catch {
+    return ["klasik"];
+  }
+}
+
+function writeFlappyOwnedBackgrounds(list) {
+  try {
+    localStorage.setItem("flappyOwnedBackgrounds", JSON.stringify(normalizeFlappyKeys(list, FLAPPY_BACKGROUNDS, ["klasik"])));
+  } catch {
+    /* localStorage kapali olabilir */
+  }
+}
+
+function readFlappyEquippedBackground() {
+  try {
+    const id = localStorage.getItem("flappyEquippedBackground") || "klasik";
+    const item = FLAPPY_BACKGROUNDS[id];
+    return item && !item.locked ? id : "klasik";
+  } catch {
+    return "klasik";
+  }
+}
+
+function writeFlappyEquippedBackground(id) {
+  try {
+    if (FLAPPY_BACKGROUNDS[id] && !FLAPPY_BACKGROUNDS[id].locked) {
+      localStorage.setItem("flappyEquippedBackground", id);
+    }
+  } catch {
+    /* localStorage kapali olabilir */
+  }
+}
+
+function readFlappyOwnedPackages() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("flappyOwnedPackages"));
+    return normalizeFlappyKeys(Array.isArray(parsed) ? parsed : [], FLAPPY_PACKAGES, []);
+  } catch {
+    return [];
+  }
+}
+
+function writeFlappyOwnedPackages(list) {
+  try {
+    localStorage.setItem("flappyOwnedPackages", JSON.stringify(normalizeFlappyKeys(list, FLAPPY_PACKAGES, [])));
+  } catch {
+    /* localStorage kapali olabilir */
+  }
+}
+
+function normalizeFlappyKeys(list, source, defaults) {
+  const valid = Array.isArray(list) ? list : [];
+  return Array.from(new Set([
+    ...defaults,
+    ...valid.filter((id) => source[id] && !source[id].locked)
+  ]));
 }
 
 /* =============================== SUDOKU =============================== */
