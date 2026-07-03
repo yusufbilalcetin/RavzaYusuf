@@ -1,6 +1,12 @@
 import { createGameAudio } from "../utils/game-audio.js";
+import { renderBoyamaApp } from "./boyama-page.js";
 
 const GAME_META = {
+  "boyama": {
+    badge: "YENİ NESİL",
+    title: "Boyama",
+    subtitle: "Fotoğrafını yükle, piksel piksel numaraya göre boya."
+  },
   "candy-match": {
     badge: "SONSUZ",
     title: "Candy Crush",
@@ -50,6 +56,7 @@ const CANDY_CRUSH_APP_URL = "./games/candy-crush/dist/index.html";
 let candyState = null;
 let flappyState = null;
 let sudokuState = null;
+let boyamaState = null;
 
 export function initOyun(options = {}) {
   const root = document.getElementById("games");
@@ -93,18 +100,22 @@ function openGame(root, gameId) {
   if (gameId === "candy-match") {
     enterGameFullscreen(root);
     root.classList.add("is-candy-crush-app");
-    root.classList.remove("is-sudoku");
+    root.classList.remove("is-sudoku", "is-boyama");
     renderCandyCrushApp(body);
   } else if (gameId === "flappy-bird") {
     enterGameFullscreen(root);
-    root.classList.remove("is-candy-crush-app");
-    root.classList.remove("is-sudoku");
+    root.classList.remove("is-candy-crush-app", "is-sudoku", "is-boyama");
     renderFlappyBird(body);
   } else if (gameId === "sudoku") {
     enterGameFullscreen(root);
-    root.classList.remove("is-candy-crush-app");
+    root.classList.remove("is-candy-crush-app", "is-boyama");
     root.classList.add("is-sudoku");
     renderSudoku(body);
+  } else if (gameId === "boyama") {
+    enterGameFullscreen(root);
+    root.classList.remove("is-candy-crush-app", "is-sudoku");
+    root.classList.add("is-boyama");
+    boyamaState = renderBoyamaApp(body);
   } else {
     exitGameFullscreen(root);
     root.classList.remove("is-candy-crush-app");
@@ -153,6 +164,10 @@ function destroyActiveGame() {
     sudokuState.cleanup?.();
     sudokuState = null;
   }
+  if (boyamaState) {
+    boyamaState.cleanup?.();
+    boyamaState = null;
+  }
 }
 
 function enterGameFullscreen(root) {
@@ -164,6 +179,7 @@ function exitGameFullscreen(root) {
   root.classList.remove("is-game-fullscreen");
   root.classList.remove("is-candy-crush-app");
   root.classList.remove("is-sudoku");
+  root.classList.remove("is-boyama");
   document.body.classList.remove("is-game-fullscreen");
 }
 
