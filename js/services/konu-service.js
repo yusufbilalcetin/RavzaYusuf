@@ -1,4 +1,4 @@
-import { KONU_LISTESI } from "../../data-js/konu-listesi.js";
+import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { loadTopicHtml } from "../core/html-loader.js";
 
 export function getKonuListesi() {

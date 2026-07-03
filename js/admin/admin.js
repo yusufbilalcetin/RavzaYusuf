@@ -1,5 +1,5 @@
-import { db } from "./firebase-config.js";
-import { DEFAULT_TOPICS, DEFAULT_QUIZZES, DEFAULT_EXAMS } from "./content-defaults.js";
+import { db } from "../config/firebase-config.js";
+import { DEFAULT_TOPICS, DEFAULT_QUIZZES, DEFAULT_EXAMS } from "../../data/content-defaults.js";
 import {
   collection,
   doc,

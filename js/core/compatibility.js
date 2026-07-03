@@ -1,4 +1,4 @@
-import { KONU_LISTESI } from "../../data-js/konu-listesi.js";
+import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { loadTopicHtml } from "./html-loader.js";
 import { loadQuiz } from "../services/quiz-service.js";
 import { safeText } from "../utils/helpers.js";

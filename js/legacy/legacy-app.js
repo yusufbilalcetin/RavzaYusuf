@@ -1,5 +1,5 @@
-import { db } from "../../firebase-config.js";
-import { KONU_LISTESI } from "../../data-js/konu-listesi.js";
+import { db } from "../config/firebase-config.js";
+import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { loadAllQuizzes } from "../services/quiz-service.js";
 import {
   doc,
@@ -2398,7 +2398,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 
-/* Topic continuation content moved to content/topics/*.html and data-js/quizzes/*.js. */
+/* Topic continuation content moved to content/topics/*.html and data/quizzes/*.js. */
 
 /* ============================================================
  *  THEME + EXAM EXPANSION PATCH

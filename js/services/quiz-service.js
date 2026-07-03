@@ -4,7 +4,7 @@ export async function loadQuiz(topicId) {
   if (quizCache.has(topicId)) return quizCache.get(topicId);
 
   try {
-    const module = await import(`../../data-js/quizzes/${topicId}.js`);
+    const module = await import(`../../data/quizzes/${topicId}.js`);
     const questions = Array.isArray(module.default) ? module.default : [];
     quizCache.set(topicId, questions);
     return questions;

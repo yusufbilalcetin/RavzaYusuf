@@ -8,7 +8,7 @@ export const KONU_LISTESI = [
     "difficulty": "easy",
     "order": 1,
     "contentPath": "./content/topics/wordlist1a.html",
-    "quizPath": "./data-js/quizzes/wordlist1a.js",
+    "quizPath": "./data/quizzes/wordlist1a.js",
     "quizCount": 10,
     "keyPoints": [
       "Researchers, evidence, survey, the average ve scale temel akademik kelimelerdir.",
@@ -25,7 +25,7 @@ export const KONU_LISTESI = [
     "difficulty": "easy",
     "order": 2,
     "contentPath": "./content/topics/objectpronouns.html",
-    "quizPath": "./data-js/quizzes/objectpronouns.js",
+    "quizPath": "./data/quizzes/objectpronouns.js",
     "quizCount": 10,
     "keyPoints": [
       "Direct object usually answers what; indirect object usually answers to whom / for whom.",
@@ -42,7 +42,7 @@ export const KONU_LISTESI = [
     "difficulty": "easy",
     "order": 3,
     "contentPath": "./content/topics/adjectives.html",
-    "quizPath": "./data-js/quizzes/adjectives.js",
+    "quizPath": "./data/quizzes/adjectives.js",
     "quizCount": 10,
     "keyPoints": [
       "Adjective + singular noun kullanıldığında a/an gerekir.",
@@ -59,7 +59,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 4,
     "contentPath": "./content/topics/presenttenses.html",
-    "quizPath": "./data-js/quizzes/presenttenses.js",
+    "quizPath": "./data/quizzes/presenttenses.js",
     "quizCount": 10,
     "keyPoints": [
       "Stative verbs normalde Present Continuous ile kullanılmaz.",
@@ -76,7 +76,7 @@ export const KONU_LISTESI = [
     "difficulty": "easy",
     "order": 5,
     "contentPath": "./content/topics/possessives.html",
-    "quizPath": "./data-js/quizzes/possessives.js",
+    "quizPath": "./data/quizzes/possessives.js",
     "quizCount": 10,
     "keyPoints": [
       "Plural noun -s ile bitiyorsa sadece apostrophe eklenir: teachers'.",
@@ -93,7 +93,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 6,
     "contentPath": "./content/topics/pasttenses.html",
-    "quizPath": "./data-js/quizzes/pasttenses.js",
+    "quizPath": "./data/quizzes/pasttenses.js",
     "quizCount": 10,
     "keyPoints": [
       "Soru ve olumsuzda Verb 2 kullanılmaz.",
@@ -110,7 +110,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 7,
     "contentPath": "./content/topics/prepositions.html",
-    "quizPath": "./data-js/quizzes/prepositions.js",
+    "quizPath": "./data/quizzes/prepositions.js",
     "quizCount": 13,
     "keyPoints": [
       "towards yönü gösterir, to hedefe ulaşıldığını gösterir.",
@@ -130,7 +130,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 8,
     "contentPath": "./content/topics/futureforms.html",
-    "quizPath": "./data-js/quizzes/futureforms.js",
+    "quizPath": "./data/quizzes/futureforms.js",
     "quizCount": 13,
     "keyPoints": [
       "will anlık karar, söz verme ve opinion-based prediction için kullanılır.",
@@ -150,7 +150,7 @@ export const KONU_LISTESI = [
     "difficulty": "hard",
     "order": 9,
     "contentPath": "./content/topics/conditionals12.html",
-    "quizPath": "./data-js/quizzes/conditionals12.js",
+    "quizPath": "./data/quizzes/conditionals12.js",
     "quizCount": 13,
     "keyPoints": [
       "First Conditional: If + Present Simple, will + Verb1.",
@@ -170,7 +170,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 10,
     "contentPath": "./content/topics/perfect.html",
-    "quizPath": "./data-js/quizzes/perfect.js",
+    "quizPath": "./data/quizzes/perfect.js",
     "quizCount": 13,
     "keyPoints": [
       "Have/has + V3 temel yapıdır.",
@@ -190,7 +190,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 11,
     "contentPath": "./content/topics/perfectcont.html",
-    "quizPath": "./data-js/quizzes/perfectcont.js",
+    "quizPath": "./data/quizzes/perfectcont.js",
     "quizCount": 13,
     "keyPoints": [
       "Have/has been + V-ing kullanılır.",
@@ -210,7 +210,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 12,
     "contentPath": "./content/topics/modals.html",
-    "quizPath": "./data-js/quizzes/modals.js",
+    "quizPath": "./data/quizzes/modals.js",
     "quizCount": 13,
     "keyPoints": [
       "Geçmiş zorunluluk için had to kullanılır.",
@@ -230,7 +230,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 13,
     "contentPath": "./content/topics/ability.html",
-    "quizPath": "./data-js/quizzes/ability.js",
+    "quizPath": "./data/quizzes/ability.js",
     "quizCount": 13,
     "keyPoints": [
       "Use can for present ability, could for past general ability, and be able to for all tenses.",
@@ -259,7 +259,7 @@ export const KONU_LISTESI = [
     "difficulty": "hard",
     "order": 14,
     "contentPath": "./content/topics/phrasal.html",
-    "quizPath": "./data-js/quizzes/phrasal.js",
+    "quizPath": "./data/quizzes/phrasal.js",
     "quizCount": 13,
     "keyPoints": [
       "Type 1 phrasal verbs do not take an object and stay inseparable: go away, eat out, get up.",
@@ -290,7 +290,7 @@ export const KONU_LISTESI = [
     "difficulty": "hard",
     "order": 15,
     "contentPath": "./content/topics/verbpatterns.html",
-    "quizPath": "./data-js/quizzes/verbpatterns.js",
+    "quizPath": "./data/quizzes/verbpatterns.js",
     "quizCount": 13,
     "keyPoints": [
       "Enjoy, avoid, finish gibi fiiller genelde -ing alır.",
@@ -310,7 +310,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 16,
     "contentPath": "./content/topics/causative.html",
-    "quizPath": "./data-js/quizzes/causative.js",
+    "quizPath": "./data/quizzes/causative.js",
     "quizCount": 13,
     "keyPoints": [
       "Have my hair cut = saçımı kestirdim.",
@@ -330,7 +330,7 @@ export const KONU_LISTESI = [
     "difficulty": "hard",
     "order": 17,
     "contentPath": "./content/topics/passive.html",
-    "quizPath": "./data-js/quizzes/passive.js",
+    "quizPath": "./data/quizzes/passive.js",
     "quizCount": 13,
     "keyPoints": [
       "Passive odaklı cümlelerde agent sonradan by ile gelebilir.",
@@ -350,7 +350,7 @@ export const KONU_LISTESI = [
     "difficulty": "hard",
     "order": 18,
     "contentPath": "./content/topics/reported.html",
-    "quizPath": "./data-js/quizzes/reported.js",
+    "quizPath": "./data/quizzes/reported.js",
     "quizCount": 13,
     "keyPoints": [
       "Yes / no questions için if / whether kullanılır.",
@@ -370,7 +370,7 @@ export const KONU_LISTESI = [
     "difficulty": "hard",
     "order": 19,
     "contentPath": "./content/topics/conditionals3.html",
-    "quizPath": "./data-js/quizzes/conditionals3.js",
+    "quizPath": "./data/quizzes/conditionals3.js",
     "quizCount": 13,
     "keyPoints": [
       "If I'd known, I would have called gibi yapılar third conditional'dır.",
@@ -390,7 +390,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 20,
     "contentPath": "./content/topics/auxiliaries.html",
-    "quizPath": "./data-js/quizzes/auxiliaries.js",
+    "quizPath": "./data/quizzes/auxiliaries.js",
     "quizCount": 13,
     "keyPoints": [
       "Does he like...? ve Is he feeling...? farklı yardımcı fiiller kullanır.",
@@ -410,7 +410,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 21,
     "contentPath": "./content/topics/readingreviews.html",
-    "quizPath": "./data-js/quizzes/readingreviews.js",
+    "quizPath": "./data/quizzes/readingreviews.js",
     "quizCount": 10,
     "keyPoints": [
       "Main idea sorusunda cevap: online reviews influence customer decisions.",
@@ -427,7 +427,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 22,
     "contentPath": "./content/topics/readingwork.html",
-    "quizPath": "./data-js/quizzes/readingwork.js",
+    "quizPath": "./data/quizzes/readingwork.js",
     "quizCount": 12,
     "keyPoints": [
       "Main idea: The world of work is changing in many ways.",
@@ -444,7 +444,7 @@ export const KONU_LISTESI = [
     "difficulty": "medium",
     "order": 23,
     "contentPath": "./content/topics/vocabcontext.html",
-    "quizPath": "./data-js/quizzes/vocabcontext.js",
+    "quizPath": "./data/quizzes/vocabcontext.js",
     "quizCount": 10,
     "keyPoints": [
       "Fill-gap kelimelerinde anlamı cümle içinde düşün: denied, allowed, according to, take on.",
