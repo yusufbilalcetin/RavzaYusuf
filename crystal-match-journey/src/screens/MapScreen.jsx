@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { getDifficultyLabel, getGoalLabel } from "../game/core/LevelManager.js";
+import { playSound } from "../game/utils/SoundManager.js";
 
 export default function MapScreen({
   levels,
@@ -16,8 +17,10 @@ export default function MapScreen({
   const currentRef = useRef(null);
   const rowHeight = 126;
   const mapRoadHeight = levels.length * rowHeight + 180;
+  // Candy Crush order: level 1 sits at the bottom, the path climbs upwards
+  const orderedLevels = [...levels].reverse();
   const getNodeOffset = (index) => index % 4 === 0 ? -36 : index % 4 === 1 ? 18 : index % 4 === 2 ? 46 : -8;
-  const roadPoints = levels.map((level, index) => ({
+  const roadPoints = orderedLevels.map((level, index) => ({
     x: 215 + getNodeOffset(index),
     y: 84 + index * rowHeight
   }));
@@ -79,7 +82,7 @@ export default function MapScreen({
         </svg>
         <div className="map-character map-character-left" aria-hidden="true">☁</div>
         <div className="map-character map-character-right" aria-hidden="true">♧</div>
-        {levels.map((level, index) => {
+        {orderedLevels.map((level, index) => {
           const unlocked = level.level <= progress.maxUnlocked;
           const completed = Number(progress.stars[level.level] || 0) > 0;
           const stars = Number(progress.stars[level.level] || 0);
@@ -94,17 +97,23 @@ export default function MapScreen({
               )}
               <button
                 ref={isCurrent ? currentRef : null}
-                className={`level-node ${unlocked ? "unlocked" : "locked"} ${completed ? "completed" : ""} ${level.difficulty}`}
+                className={`level-node ${unlocked ? "unlocked" : "locked"} ${completed ? "completed" : ""} ${isCurrent ? "current" : ""} ${level.difficulty}`}
                 type="button"
                 disabled={!unlocked}
                 style={{ "--offset": `${offset}px` }}
-                onClick={() => onStartLevel(level.level)}
+                onClick={() => { playSound("click"); onStartLevel(level.level); }}
               >
-                <span className="level-number">{unlocked ? level.level : "L"}</span>
+                <span className="level-number">{unlocked ? level.level : "🔒"}</span>
                 <strong>{getDifficultyLabel(level.difficulty)}</strong>
                 <small>{getGoalLabel(level)}</small>
                 <span className="node-stars">{"★".repeat(stars)}{"☆".repeat(3 - stars)}</span>
               </button>
+              {isCurrent && (
+                <span className="map-current-avatar" style={{ "--offset": `${offset}px` }} aria-hidden="true">
+                  <span className="avatar-face">☺</span>
+                  <i className="avatar-alert">!</i>
+                </span>
+              )}
             </article>
           );
         })}
@@ -114,8 +123,14 @@ export default function MapScreen({
         <button type="button" className="active" onClick={onBack}><span>🗺</span>Map</button>
         <button type="button"><span>✓</span>Tasks</button>
         <button type="button" onClick={onRequestLife}><span>👥</span>Friends</button>
-        <button type="button" onClick={onAdLife}><span>★</span>Boost</button>
-        <button type="button" onClick={onBuyLife}><span>🏪</span>Shop</button>
+        <button type="button" className="nav-locked" onClick={onAdLife}>
+          <span>★</span>
+          <i className="nav-lock" aria-hidden="true">🔒</i>
+        </button>
+        <button type="button" className="has-badge" onClick={onBuyLife}>
+          <span>🏪</span>Shop
+          <i className="nav-badge" aria-hidden="true">1</i>
+        </button>
       </nav>
     </main>
   );

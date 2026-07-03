@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PRE_LEVEL_BOOSTERS } from "../game/core/BoosterManager.js";
 import { getDifficultyLabel, getGoalLabel } from "../game/core/LevelManager.js";
+import { playSound } from "../game/utils/SoundManager.js";
 import BoosterButton from "../components/BoosterButton.jsx";
 
 export default function LevelStartScreen({ level, progress, onBack, onPlay, onBuyBooster }) {
@@ -10,11 +11,18 @@ export default function LevelStartScreen({ level, progress, onBack, onPlay, onBu
 
   function toggleBooster(id) {
     if ((progress.boosters[id] || 0) <= 0) return;
+    playSound("click");
     setSelected((items) => items.includes(id) ? items.filter((item) => item !== id) : [...items, id]);
   }
 
   return (
-    <main className="level-start-screen screen">
+    <div
+      className="level-start-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Level ${level.level}`}
+      onClick={(event) => { if (event.target === event.currentTarget) onBack(); }}
+    >
       <section className={`level-start-card ${level.difficulty}`}>
         <span className="level-card-string" aria-hidden="true" />
         <button className="level-close-button" type="button" onClick={onBack} aria-label="Haritaya don">X</button>
@@ -59,11 +67,16 @@ export default function LevelStartScreen({ level, progress, onBack, onPlay, onBu
           </div>
         )}
 
-        <button className="primary-action play-level-button" type="button" disabled={noLives} onClick={() => onPlay(selected)}>
+        <button
+          className="primary-action play-level-button"
+          type="button"
+          disabled={noLives}
+          onClick={() => { playSound("boost"); onPlay(selected); }}
+        >
           Play!
         </button>
       </section>
-    </main>
+    </div>
   );
 }
 

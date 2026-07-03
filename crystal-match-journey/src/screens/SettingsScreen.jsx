@@ -1,4 +1,4 @@
-export default function SettingsScreen({ progress, onBack, onChange }) {
+export default function SettingsScreen({ progress, onBack, onChange, onReset }) {
   const settings = progress.settings || {};
 
   return (
@@ -19,6 +19,15 @@ export default function SettingsScreen({ progress, onBack, onChange }) {
           <span>Az hareket</span>
           <input type="checkbox" checked={Boolean(settings.reducedMotion)} onChange={(event) => onChange({ reducedMotion: event.target.checked })} />
         </label>
+        {onReset && (
+          <button
+            className="ghost-action settings-reset"
+            type="button"
+            onClick={() => { if (window.confirm("Tum ilerleme silinecek. Emin misin?")) onReset(); }}
+          >
+            Ilerlemeyi sifirla
+          </button>
+        )}
       </section>
     </main>
   );

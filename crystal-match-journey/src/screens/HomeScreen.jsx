@@ -4,7 +4,6 @@ export default function HomeScreen({
   dailyMessage,
   onPlay,
   onDailyReward,
-  onReset,
   onSettings
 }) {
   return (
@@ -41,12 +40,6 @@ export default function HomeScreen({
           </button>
         </div>
 
-        <div className="home-mini-stats" aria-label="Oyuncu durumu">
-          <span>♥ {progress.lives}/5</span>
-          <span>◆ {progress.coins}</span>
-          <span>Level {progress.maxUnlocked}</span>
-        </div>
-        <button className="ghost-action candy-reset-link" type="button" onClick={onReset}>Sifirla</button>
         {dailyMessage && <p className="reward-message">{dailyMessage}</p>}
       </section>
 

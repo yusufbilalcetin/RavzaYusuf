@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { MatchEngine } from "../core/MatchEngine.js";
-import { playSound } from "../utils/SoundManager.js";
+import { playSound, vibrate } from "../utils/SoundManager.js";
 
 const CANDY_STYLES = {
   ruby: { fill: 0xff435b, shadow: 0xb70e2d, shine: 0xffd8df, type: "stripe" },
@@ -25,6 +25,7 @@ export default class GameScene extends Phaser.Scene {
   init(data) {
     this.level = data.level;
     this.callbacks = data.callbacks || {};
+    this.reducedMotion = Boolean(data.reducedMotion);
     this.engine = new MatchEngine(this.level);
     this.selected = null;
     this.activeBooster = null;
@@ -48,18 +49,27 @@ export default class GameScene extends Phaser.Scene {
     this.renderBoard({ animate: true, drop: true });
   }
 
+  spendBooster(boosterId) {
+    const ok = Boolean(this.callbacks.onSpendBooster?.(boosterId));
+    if (ok) {
+      playSound("boost");
+      vibrate("boost");
+    }
+    return ok;
+  }
+
   activateBooster(boosterId) {
     if (this.finished || this.inputLocked) return;
 
     if (boosterId === "extraMoves") {
-      if (!this.callbacks.onSpendBooster?.(boosterId)) return;
+      if (!this.spendBooster(boosterId)) return;
       this.inputLocked = true;
       this.runResolvedAction(this.engine.addMoves(5), { sourceIndex: null });
       return;
     }
 
     if (boosterId === "targetFly") {
-      if (!this.callbacks.onSpendBooster?.(boosterId)) return;
+      if (!this.spendBooster(boosterId)) return;
       this.inputLocked = true;
       this.runResolvedAction(this.engine.applyTargetFly(), { sourceIndex: null });
       return;
@@ -95,10 +105,10 @@ export default class GameScene extends Phaser.Scene {
     this.metrics = { originX, originY, cellSize, boardWidth, boardHeight };
 
     const back = this.add.graphics();
-    back.fillStyle(0x1d6f93, 0.20);
-    back.fillRoundedRect(originX - 14, originY - 14, boardWidth + 28, boardHeight + 28, 20);
-    back.lineStyle(5, 0x6ab7d6, 0.42);
-    back.strokeRoundedRect(originX - 14, originY - 14, boardWidth + 28, boardHeight + 28, 20);
+    back.fillStyle(0x14586f, 0.30);
+    back.fillRoundedRect(originX - 14, originY - 14, boardWidth + 28, boardHeight + 28, 22);
+    back.lineStyle(4, 0x8fd9ea, 0.30);
+    back.strokeRoundedRect(originX - 14, originY - 14, boardWidth + 28, boardHeight + 28, 22);
     this.boardLayer.add(back);
 
     this.engine.board.forEach((cell, index) => {
@@ -125,10 +135,15 @@ export default class GameScene extends Phaser.Scene {
     }
 
     const base = this.add.graphics();
-    base.fillStyle(this.selected === index ? 0x6acbf1 : 0x2d749b, this.selected === index ? 0.62 : 0.42);
-    base.fillRoundedRect(pad, pad, inner, inner, 11);
-    base.lineStyle(this.selected === index ? 4 : 1, this.selected === index ? 0xfff09b : 0x72b8d7, this.selected === index ? 0.95 : 0.22);
-    base.strokeRoundedRect(pad, pad, inner, inner, 11);
+    if (this.selected === index) {
+      base.fillStyle(0x6acbf1, 0.55);
+      base.fillRoundedRect(pad, pad, inner, inner, 11);
+      base.lineStyle(4, 0xfff09b, 0.95);
+      base.strokeRoundedRect(pad, pad, inner, inner, 11);
+    } else {
+      base.fillStyle(0xffffff, 0.03);
+      base.fillRoundedRect(pad, pad, inner, inner, 11);
+    }
     group.add(base);
 
     const piece = this.add.container(0, 0);
@@ -242,8 +257,14 @@ export default class GameScene extends Phaser.Scene {
       candy.lineBetween(cx - r * 0.78, cy + r * 0.08, cx + r * 0.78, cy + r * 0.08);
     }
 
+    // Glassy candy pop: a soft inner-rim glow under the highlight, then the
+    // highlight itself, then a crisp comma-shaped specular glint on top.
+    candy.fillStyle(0xffffff, 0.14);
+    candy.fillEllipse(cx - r * 0.05, cy - r * 0.30, r * 1.30, r * 0.68);
     candy.fillStyle(style.shine, 0.70);
     candy.fillEllipse(cx - r * 0.28, cy - r * 0.36, r * 0.56, r * 0.20);
+    candy.fillStyle(0xffffff, 0.85);
+    candy.fillEllipse(cx - r * 0.34, cy - r * 0.40, r * 0.22, r * 0.10);
     candy.fillStyle(0xffffff, 0.22);
     candy.fillEllipse(cx + r * 0.24, cy + r * 0.28, r * 0.68, r * 0.16);
 
@@ -279,27 +300,47 @@ export default class GameScene extends Phaser.Scene {
     const r = inner * 0.40;
 
     if (blocker.type === "ice") {
+      // Frosted glass slab: tinted base, crystal petals, a crack line and a
+      // bright rim so it reads as a solid layer sitting over the candy.
+      gfx.fillStyle(0xbfeaff, 0.30);
+      gfx.fillRoundedRect(cx - r * 1.05, cy - r * 1.05, r * 2.1, r * 2.1, r * 0.4);
       gfx.fillStyle(0xfff9ee, 0.96);
       const petals = [[0, -0.38], [0.38, 0], [0, 0.38], [-0.38, 0], [0.27, -0.27], [-0.27, 0.27]];
       petals.forEach(([px, py]) => gfx.fillEllipse(cx + px * r, cy + py * r, r * 0.92, r * 1.16));
       gfx.fillStyle(0xf5dfbd, 0.54);
       gfx.fillCircle(cx, cy, r * 0.36);
+      gfx.lineStyle(1.5, 0x8fd6ee, 0.55);
+      gfx.lineBetween(cx - r * 0.5, cy - r * 0.62, cx + r * 0.18, cy - r * 0.08);
+      gfx.lineBetween(cx + r * 0.18, cy - r * 0.08, cx - r * 0.1, cy + r * 0.5);
       gfx.lineStyle(2, 0xffffff, 0.68);
       gfx.strokeCircle(cx, cy, r * 1.02);
     } else if (blocker.type === "chain") {
-      gfx.lineStyle(Math.max(5, r * 0.18), 0x3f4972, 0.88);
-      gfx.lineBetween(cx - r, cy - r, cx + r, cy + r);
-      gfx.lineBetween(cx + r, cy - r, cx - r, cy + r);
-      gfx.lineStyle(2, 0xffffff, 0.36);
-      gfx.strokeRoundedRect(cx - r, cy - r, r * 2, r * 2, 12);
+      // Two overlapping wrought-iron rings, like a lock over the candy.
+      gfx.lineStyle(Math.max(5, r * 0.20), 0x2b3252, 0.92);
+      gfx.strokeEllipse(cx - r * 0.30, cy, r * 0.56, r * 0.74);
+      gfx.strokeEllipse(cx + r * 0.30, cy, r * 0.56, r * 0.74);
+      gfx.lineStyle(2, 0x9fb0e0, 0.42);
+      gfx.strokeEllipse(cx - r * 0.30, cy, r * 0.40, r * 0.56);
+      gfx.strokeEllipse(cx + r * 0.30, cy, r * 0.40, r * 0.56);
     } else if (blocker.type === "darkness") {
+      // Layered violet fog with a soft vignette instead of a flat square.
       gfx.fillStyle(0x11091f, 0.86);
       gfx.fillRoundedRect(cx - r, cy - r, r * 2, r * 2, 12);
-      gfx.fillStyle(0x6d4bb0, 0.20);
+      gfx.fillStyle(0x2c1a4a, 0.40);
+      gfx.fillCircle(cx, cy, r * 0.88);
+      gfx.fillStyle(0x6d4bb0, 0.24);
       gfx.fillCircle(cx - r * 0.18, cy - r * 0.22, r * 0.58);
+      gfx.fillStyle(0xb99cf0, 0.14);
+      gfx.fillCircle(cx + r * 0.22, cy + r * 0.20, r * 0.30);
     } else {
+      // Wooden crate: base fill, cross braces, and plank-grain stripes.
       gfx.fillStyle(0xa76a3a, 0.95);
       gfx.fillRoundedRect(cx - r, cy - r, r * 2, r * 2, 12);
+      gfx.lineStyle(1.5, 0x7a4a26, 0.30);
+      for (let stripe = -2; stripe <= 2; stripe += 1) {
+        const y = cy + stripe * r * 0.38;
+        gfx.lineBetween(cx - r * 0.94, y, cx + r * 0.94, y);
+      }
       gfx.lineStyle(4, 0x6a3e24, 0.55);
       gfx.lineBetween(cx - r * 0.86, cy - r * 0.86, cx + r * 0.86, cy + r * 0.86);
       gfx.lineBetween(cx + r * 0.86, cy - r * 0.86, cx - r * 0.86, cy + r * 0.86);
@@ -367,15 +408,20 @@ export default class GameScene extends Phaser.Scene {
     const dx = pointer.x - this.dragState.startX;
     const dy = pointer.y - this.dragState.startY;
     const horizontal = Math.abs(dx) >= Math.abs(dy);
-    const maxPull = cellSize * 0.46;
+    const maxPull = cellSize * 0.62;
     const softPull = cellSize * 0.10;
     const piece = this.dragState.piece;
 
     piece.x = horizontal ? Phaser.Math.Clamp(dx, -maxPull, maxPull) : Phaser.Math.Clamp(dx, -softPull, softPull);
     piece.y = horizontal ? Phaser.Math.Clamp(dy, -softPull, softPull) : Phaser.Math.Clamp(dy, -maxPull, maxPull);
 
+    // A deliberate swipe should feel identical to before, but a light tap
+    // that wobbles a few pixels (finger roll, mouse jitter) must never be
+    // mistaken for a swap with the neighbor — hence the larger, floor-backed
+    // commit distance instead of the old flat 42% of a cell.
     const distance = horizontal ? dx : dy;
-    if (Math.abs(distance) < cellSize * 0.42) return;
+    const commitThreshold = Math.max(cellSize * 0.56, 24);
+    if (Math.abs(distance) < commitThreshold) return;
 
     const { row, col } = this.engine.toRowCol(this.dragState.index);
     const targetRow = row + (!horizontal ? (distance > 0 ? 1 : -1) : 0);
@@ -461,7 +507,7 @@ export default class GameScene extends Phaser.Scene {
     playSound("click");
 
     if (this.activeBooster === "hammer") {
-      if (!this.callbacks.onSpendBooster?.("hammer")) return;
+      if (!this.spendBooster("hammer")) return;
       this.inputLocked = true;
       const result = this.engine.applyHammer(index);
       this.activeBooster = null;
@@ -474,7 +520,7 @@ export default class GameScene extends Phaser.Scene {
         this.pulseInvalid(index);
         return;
       }
-      if (!this.callbacks.onSpendBooster?.("colorBlast")) return;
+      if (!this.spendBooster("colorBlast")) return;
       this.inputLocked = true;
       const result = this.engine.applyColorBlast(index);
       this.activeBooster = null;
@@ -499,7 +545,7 @@ export default class GameScene extends Phaser.Scene {
         this.renderBoard({ animate: false });
         return;
       }
-      if (!this.callbacks.onSpendBooster?.("freeSwap")) return;
+      if (!this.spendBooster("freeSwap")) return;
       this.inputLocked = true;
       this.activeBooster = null;
       this.runResolvedAction(this.engine.trySwap(first, index, { free: true }), { sourceIndex: index });
@@ -514,7 +560,10 @@ export default class GameScene extends Phaser.Scene {
       return;
     }
 
-    if (result.cleared > 0) playSound("pop");
+    if (result.cleared > 0) {
+      playSound("pop");
+      vibrate("pop");
+    }
     this.emitStats();
     this.playResolutionEffects(result, options).then(() => {
       this.renderBoard({ animate: result.cleared > 0, drop: result.cleared > 0 });
@@ -523,10 +572,12 @@ export default class GameScene extends Phaser.Scene {
       if (result.won) {
         this.finished = true;
         playSound("win");
+        vibrate("win");
         this.time.delayedCall(420, () => this.callbacks.onWin?.(this.engine.getStatus()));
       } else if (result.lost) {
         this.finished = true;
         playSound("lose");
+        vibrate("lose");
         this.time.delayedCall(420, () => this.callbacks.onLose?.(this.engine.getStatus()));
       } else {
         this.inputLocked = false;
@@ -554,7 +605,11 @@ export default class GameScene extends Phaser.Scene {
           this.waveEffect(cascade);
           this.shakeBoard(Math.min(10, 3 + cascade * 2));
         }
-        if (cascade > 1) this.showCombo(cascade, event.count);
+        if (cascade > 1) {
+          this.showCombo(cascade, event.count);
+          playSound("combo");
+          vibrate("combo");
+        }
       });
     });
 
@@ -571,13 +626,14 @@ export default class GameScene extends Phaser.Scene {
       targets: flash,
       scale: 2.4,
       alpha: 0,
-      duration: 300,
+      duration: this.reducedMotion ? 160 : 300,
       ease: "Cubic.easeOut",
       onComplete: () => flash.destroy()
     });
 
     const colors = [0xffffff, 0xfff0a8, 0xff77bd, 0x7ee7ff, 0xffcf43];
-    for (let i = 0; i < 9; i += 1) {
+    const particleCount = this.reducedMotion ? 4 : 9;
+    for (let i = 0; i < particleCount; i += 1) {
       const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
       const distance = this.metrics.cellSize * Phaser.Math.FloatBetween(0.22, 0.58);
       const particle = this.add.circle(center.x, center.y, Phaser.Math.Between(2, 4), colors[i % colors.length], 0.95);
@@ -637,7 +693,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   waveEffect(cascade = 1) {
-    if (!this.metrics || !this.fxLayer) return;
+    if (!this.metrics || !this.fxLayer || this.reducedMotion) return;
     const wave = this.add.circle(
       this.metrics.originX + this.metrics.boardWidth / 2,
       this.metrics.originY + this.metrics.boardHeight / 2,
@@ -659,9 +715,23 @@ export default class GameScene extends Phaser.Scene {
 
   showCombo(cascade, count) {
     if (!this.metrics || !this.fxLayer) return;
+    const x = this.metrics.originX + this.metrics.boardWidth / 2;
+    const y = this.metrics.originY + this.metrics.boardHeight * 0.38;
+
+    const glow = this.add.circle(x, y, this.metrics.cellSize * 0.9, 0xffe14d, 0.30);
+    this.fxLayer.add(glow);
+    this.tweens.add({
+      targets: glow,
+      scale: 1.8,
+      alpha: 0,
+      duration: 380,
+      ease: "Cubic.easeOut",
+      onComplete: () => glow.destroy()
+    });
+
     const text = this.add.text(
-      this.metrics.originX + this.metrics.boardWidth / 2,
-      this.metrics.originY + this.metrics.boardHeight * 0.38,
+      x,
+      y,
       `Combo x${cascade}`,
       {
         fontFamily: "Georgia, serif",
@@ -713,7 +783,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   shakeBoard(amount = 5) {
-    if (!this.boardLayer) return;
+    if (!this.boardLayer || this.reducedMotion) return;
     this.tweens.add({
       targets: this.boardLayer,
       x: { from: -amount, to: 0 },

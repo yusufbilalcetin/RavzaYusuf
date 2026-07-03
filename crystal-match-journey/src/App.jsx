@@ -25,6 +25,7 @@ import {
   spendBooster,
   updateSettings
 } from "./game/core/ProgressManager.js";
+import { setAudioEnabled } from "./game/utils/SoundManager.js";
 
 export default function App() {
   const [bootPhase, setBootPhase] = useState("splash");
@@ -58,6 +59,11 @@ export default function App() {
     }, 30000);
     return () => window.clearInterval(timer);
   }, [updateProgress]);
+
+  useEffect(() => {
+    const settings = progress.settings || {};
+    setAudioEnabled(settings.sound !== false, Boolean(settings.music));
+  }, [progress.settings]);
 
   const openSettings = useCallback(() => {
     setPreviousScreen(screen);
@@ -154,10 +160,7 @@ export default function App() {
     updateProgress(updateSettings(progressRef.current, patch));
   }, [updateProgress]);
 
-  if (bootPhase === "splash") return <SplashScreen />;
-  if (bootPhase === "loading") return <LoadingScreen />;
-
-  return (
+  const appShell = (
     <div className="app-shell">
       {screen === "home" && (
         <HomeScreen
@@ -166,12 +169,11 @@ export default function App() {
           dailyMessage={dailyMessage}
           onPlay={() => setScreen("map")}
           onDailyReward={handleDailyReward}
-          onReset={handleReset}
           onSettings={openSettings}
         />
       )}
 
-      {screen === "map" && (
+      {(screen === "map" || screen === "level-start") && (
         <MapScreen
           levels={levels}
           progress={progress}
@@ -210,10 +212,21 @@ export default function App() {
           progress={progress}
           onBack={() => setScreen(previousScreen)}
           onChange={handleSettingsChange}
+          onReset={handleReset}
         />
       )}
 
       <DailyRewardModal reward={dailyReward} onClose={() => setDailyReward(null)} />
+    </div>
+  );
+
+  return (
+    <div className="app-frame">
+      <div className="device-viewport">
+        {bootPhase === "splash" && <SplashScreen />}
+        {bootPhase === "loading" && <LoadingScreen />}
+        {bootPhase === "ready" && appShell}
+      </div>
     </div>
   );
 }

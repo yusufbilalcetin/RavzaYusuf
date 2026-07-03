@@ -7,7 +7,29 @@
 
   <div class="game-tile-grid" aria-label="Oyun listesi">
     <button class="game-tile is-live" type="button" data-game="candy-match">
-      <span class="game-tile-art">🍬</span>
+      <span class="game-tile-art game-tile-art--icon" aria-hidden="true">
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <defs>
+            <linearGradient id="candyIconBg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff8fc8" />
+              <stop offset="46%" stop-color="#f0439a" />
+              <stop offset="100%" stop-color="#ff9d3d" />
+            </linearGradient>
+            <radialGradient id="candyIconGloss" cx="32%" cy="20%" r="65%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity=".55" />
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#candyIconBg)" />
+          <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#candyIconGloss)" />
+          <rect x="2" y="2" width="96" height="96" rx="24" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="2" />
+          <circle cx="34" cy="62" r="13" fill="#3fb6ff" stroke="#fff" stroke-width="2.5" stroke-opacity=".8" />
+          <rect x="53" y="30" width="24" height="22" rx="7" fill="#3fd66b" stroke="#fff" stroke-width="2.5" stroke-opacity=".8" />
+          <path d="M67 58 L79 72 L67 86 L55 72 Z" fill="#ffe14d" stroke="#fff" stroke-width="2.5" stroke-opacity=".8" stroke-linejoin="round" />
+          <circle cx="30" cy="30" r="10" fill="#ffffff" fill-opacity=".9" />
+          <path d="M30 22c2 3 6 3 6 8s-4 5-6 8c-2-3-6-3-6-8s4-5 6-8Z" fill="#ff5470" />
+        </svg>
+      </span>
       <span class="game-tile-copy">
         <strong>Candy Crush</strong>
         <small>Kristal adasi match-3 macerasi</small>

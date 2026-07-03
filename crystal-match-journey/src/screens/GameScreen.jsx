@@ -1,8 +1,6 @@
-import Phaser from "phaser";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IN_GAME_BOOSTERS } from "../game/core/BoosterManager.js";
 import { blockerLabel, colorLabel, getGoalLabel } from "../game/core/LevelManager.js";
-import GameScene from "../game/scenes/GameScene.js";
 import BoosterButton from "../components/BoosterButton.jsx";
 import WinModal from "../components/WinModal.jsx";
 import LoseModal from "../components/LoseModal.jsx";
@@ -20,6 +18,7 @@ export default function GameScreen({
   const sceneRef = useRef(null);
   const [stats, setStats] = useState(null);
   const [result, setResult] = useState(null);
+  const reducedMotion = Boolean(progress.settings?.reducedMotion);
 
   const callbacks = useMemo(() => ({
     onSceneReady: (scene) => { sceneRef.current = scene; },
@@ -37,48 +36,69 @@ export default function GameScreen({
 
   useEffect(() => {
     if (!hostRef.current) return undefined;
+    let cancelled = false;
+    let game = null;
     setResult(null);
     setStats(null);
     sceneRef.current = null;
 
-    const game = new Phaser.Game({
-      type: Phaser.AUTO,
-      parent: hostRef.current,
-      width: hostRef.current.clientWidth,
-      height: hostRef.current.clientHeight,
-      transparent: true,
-      scene: [GameScene],
-      scale: {
-        mode: Phaser.Scale.RESIZE,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+    // Phaser (~1.4MB) is only needed once a level actually opens, so it is
+    // fetched lazily instead of bundled into the Home/Map screens' chunk.
+    Promise.all([import("phaser"), import("../game/scenes/GameScene.js")]).then(
+      ([{ default: Phaser }, { default: GameScene }]) => {
+        if (cancelled || !hostRef.current) return;
+        game = new Phaser.Game({
+          type: Phaser.AUTO,
+          parent: hostRef.current,
+          width: hostRef.current.clientWidth,
+          height: hostRef.current.clientHeight,
+          transparent: true,
+          scene: [GameScene],
+          scale: {
+            mode: Phaser.Scale.RESIZE,
+            autoCenter: Phaser.Scale.CENTER_BOTH
+          }
+        });
+        game.scene.start("GameScene", { level, callbacks, reducedMotion });
       }
-    });
-
-    game.scene.start("GameScene", { level, callbacks });
+    );
 
     return () => {
+      cancelled = true;
       sceneRef.current = null;
-      game.destroy(true);
+      game?.destroy(true);
     };
-  }, [callbacks, level]);
+  }, [callbacks, level, reducedMotion]);
 
   const progressItems = stats?.goalProgress || [];
-  const primaryTarget = progressItems[0];
+  const earnedStars = stats?.stars || 0;
+  const meterPct = Math.min(100, Math.max(4, ((stats?.score || 0) / (level.moves * 180)) * 100));
 
   return (
     <main className="game-screen screen">
       <header className="game-hud candy-game-hud">
         <div className="hud-left-stack">
-          <span className="hud-lives">{progress.lives} ♥ 5</span>
+          <span className="hud-lives">{level.level}/ ♥{progress.lives}</span>
           <strong className="hud-moves">{stats?.moves ?? level.moves}</strong>
         </div>
-        <div className="hud-star-meter" aria-label="Seviye yildizlari">
-          <span className="meter-fill" style={{ "--meter": `${Math.min(100, Math.max(8, ((stats?.score || 0) / 600) * 100))}%` }} />
-          <i>★</i><i>★</i><i>★</i>
+        <div className="hud-star-meter" aria-label={`Seviye yildizlari: ${earnedStars}/3`}>
+          <span className="meter-fill" style={{ "--meter": `${meterPct}%` }} />
+          {[1, 2, 3].map((star) => (
+            <i key={star} className={earnedStars >= star ? "lit" : ""}>★</i>
+          ))}
         </div>
-        <div className="hud-target-candy">
-          <span className={`mini-candy ${primaryTarget?.key || "sapphire"}`} />
-          <strong>{primaryTarget ? Math.max(0, primaryTarget.target - primaryTarget.current) : 0}</strong>
+        <div className="hud-target-candy" aria-label="Kalan hedefler">
+          {(progressItems.length ? progressItems : [{ key: "sapphire", current: 0, target: 0 }]).slice(0, 3).map((item) => {
+            const remaining = Math.max(0, item.target - item.current);
+            return (
+              <span className="hud-goal-item" key={item.key}>
+                <span className={`mini-candy ${item.key}`} />
+                {remaining > 0
+                  ? <strong>{remaining}</strong>
+                  : <strong className="goal-done">✓</strong>}
+              </span>
+            );
+          })}
         </div>
         <div className="hud-helper-face" aria-hidden="true">☺</div>
       </header>
