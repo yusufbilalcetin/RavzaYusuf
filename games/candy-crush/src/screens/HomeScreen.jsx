@@ -51,7 +51,7 @@ export default function HomeScreen({
           </button>
         </div>
         <div><span>Can</span><strong>{progress.lives}/5</strong></div>
-        <div><span>Crystal Coin</span><strong>{progress.coins}</strong></div>
+        <div><span>Seker Parasi</span><strong>{progress.coins}</strong></div>
         <div><span>Acik seviye</span><strong>{progress.maxUnlocked}</strong></div>
         <div><span>Posta kutusu</span><strong>{progress.mailboxLives}/200</strong></div>
       </aside>

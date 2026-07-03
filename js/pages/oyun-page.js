@@ -43,7 +43,7 @@ const GAME_META = {
 
 const CANDIES = ["\u{1F353}", "\u{1F34B}", "\u{1F347}", "\u{1F36C}", "\u{1F36D}", "\u{1F9C1}"];
 const BOARD_SIZE = 7;
-const CRYSTAL_MATCH_APP_URL = "./crystal-match-journey/dist/index.html";
+const CANDY_CRUSH_APP_URL = "./games/candy-crush/dist/index.html";
 
 let candyState = null;
 let flappyState = null;
@@ -90,22 +90,22 @@ function openGame(root, gameId) {
 
   if (gameId === "candy-match") {
     enterGameFullscreen(root);
-    root.classList.add("is-crystal-app");
+    root.classList.add("is-candy-crush-app");
     root.classList.remove("is-sudoku");
-    renderCrystalMatchApp(body);
+    renderCandyCrushApp(body);
   } else if (gameId === "flappy-bird") {
     enterGameFullscreen(root);
-    root.classList.remove("is-crystal-app");
+    root.classList.remove("is-candy-crush-app");
     root.classList.remove("is-sudoku");
     renderFlappyBird(body);
   } else if (gameId === "sudoku") {
     enterGameFullscreen(root);
-    root.classList.remove("is-crystal-app");
+    root.classList.remove("is-candy-crush-app");
     root.classList.add("is-sudoku");
     renderSudoku(body);
   } else {
     exitGameFullscreen(root);
-    root.classList.remove("is-crystal-app");
+    root.classList.remove("is-candy-crush-app");
     body.innerHTML = `
       <div class="game-soon-box">
         <strong>Yakinda</strong>
@@ -117,17 +117,17 @@ function openGame(root, gameId) {
   stage.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function renderCrystalMatchApp(target) {
+function renderCandyCrushApp(target) {
   target.innerHTML = `
-    <div class="crystal-game-shell">
+    <div class="candy-crush-game-shell">
       <iframe
-        class="crystal-game-frame"
-        src="${CRYSTAL_MATCH_APP_URL}"
+        class="candy-crush-game-frame"
+        src="${CANDY_CRUSH_APP_URL}"
         title="Candy Crush"
         loading="eager"
         allow="autoplay; fullscreen"
       ></iframe>
-      <a class="crystal-game-link" href="${CRYSTAL_MATCH_APP_URL}" target="_blank" rel="noopener">Tam ekranda ac</a>
+      <a class="candy-crush-game-link" href="${CANDY_CRUSH_APP_URL}" target="_blank" rel="noopener">Tam ekranda ac</a>
     </div>
   `;
 }
@@ -160,7 +160,7 @@ function enterGameFullscreen(root) {
 
 function exitGameFullscreen(root) {
   root.classList.remove("is-game-fullscreen");
-  root.classList.remove("is-crystal-app");
+  root.classList.remove("is-candy-crush-app");
   root.classList.remove("is-sudoku");
   document.body.classList.remove("is-game-fullscreen");
 }

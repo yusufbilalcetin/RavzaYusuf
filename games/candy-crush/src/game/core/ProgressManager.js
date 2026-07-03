@@ -1,4 +1,4 @@
-const STORAGE_KEY = "candy_crush_crystal_progress_v2";
+const STORAGE_KEY = "candy_crush_progress_v3";
 const MAX_LIVES = 5;
 const LIFE_REFILL_MS = 30 * 60 * 1000;
 const DAILY_ACCEPT_LIMIT = 20;
@@ -183,12 +183,12 @@ export function claimDailyReward(progress) {
     : 1;
 
   const rewards = [
-    { day: 1, type: "coins", amount: 50, label: "50 Crystal Coin" },
+    { day: 1, type: "coins", amount: 50, label: "50 Seker Parasi" },
     { day: 2, type: "booster", id: "hammer", amount: 1, label: "1 Cekic" },
-    { day: 3, type: "coins", amount: 75, label: "75 Crystal Coin" },
+    { day: 3, type: "coins", amount: 75, label: "75 Seker Parasi" },
     { day: 4, type: "booster", id: "freeSwap", amount: 1, label: "1 Serbest Degisim" },
     { day: 5, type: "booster", id: "colorBlast", amount: 1, label: "1 Renk Temizleyici" },
-    { day: 6, type: "coins", amount: 100, label: "100 Crystal Coin" },
+    { day: 6, type: "coins", amount: 100, label: "100 Seker Parasi" },
     { day: 7, type: "bundle", label: "Buyuk Sandik" }
   ];
   const reward = rewards[next.dailyRewardStreak - 1];

@@ -314,7 +314,7 @@ body.is-game-fullscreen .dash-right {
   overflow: auto;
 }
 
-.games-page.is-game-fullscreen.is-crystal-app .game-stage-body {
+.games-page.is-game-fullscreen.is-candy-crush-app .game-stage-body {
   padding: 0;
   overflow: hidden;
 }
@@ -322,8 +322,8 @@ body.is-game-fullscreen .dash-right {
 body.is-game-fullscreen .games-page.is-game-fullscreen,
 body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage,
 body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-body,
-body.is-game-fullscreen .games-page.is-game-fullscreen .crystal-game-shell,
-body.is-game-fullscreen .games-page.is-game-fullscreen .crystal-game-frame {
+body.is-game-fullscreen .games-page.is-game-fullscreen .candy-crush-game-shell,
+body.is-game-fullscreen .games-page.is-game-fullscreen .candy-crush-game-frame {
   width: 100vw !important;
   max-width: none !important;
   height: 100dvh !important;
@@ -345,7 +345,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-body {
   z-index: 9001;
 }
 
-body.is-game-fullscreen .games-page.is-game-fullscreen .crystal-game-frame {
+body.is-game-fullscreen .games-page.is-game-fullscreen .candy-crush-game-frame {
   position: fixed !important;
   inset: 0 !important;
   pointer-events: auto !important;
@@ -371,12 +371,12 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   width: min(100%, 640px);
 }
 
-.crystal-game-shell {
+.candy-crush-game-shell {
   display: grid;
   gap: 12px;
 }
 
-.crystal-game-frame {
+.candy-crush-game-frame {
   width: 100%;
   height: min(82svh, 820px);
   min-height: 640px;
@@ -387,7 +387,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   box-shadow: 0 24px 60px rgba(0, 0, 0, .24);
 }
 
-.crystal-game-link {
+.candy-crush-game-link {
   justify-self: end;
   min-height: 38px;
   display: inline-grid;
@@ -403,19 +403,19 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
 
-.crystal-game-link:hover {
+.candy-crush-game-link:hover {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, .16);
   border-color: rgba(255, 218, 238, .42);
 }
 
-.games-page.is-game-fullscreen .crystal-game-shell {
+.games-page.is-game-fullscreen .candy-crush-game-shell {
   width: 100vw;
   height: 100dvh;
   margin: 0;
 }
 
-.games-page.is-game-fullscreen .crystal-game-frame {
+.games-page.is-game-fullscreen .candy-crush-game-frame {
   width: 100vw;
   height: 100dvh;
   min-height: 0;
@@ -424,7 +424,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   box-shadow: none;
 }
 
-.games-page.is-game-fullscreen .crystal-game-link {
+.games-page.is-game-fullscreen .candy-crush-game-link {
   display: none;
 }
 
@@ -1037,7 +1037,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
     grid-column: 1 / -1;
   }
 
-  .crystal-game-frame {
+  .candy-crush-game-frame {
     height: 76svh;
     min-height: 560px;
     border-radius: 20px;
@@ -1074,7 +1074,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
     border-radius: 11px;
   }
 
-  .crystal-game-frame {
+  .candy-crush-game-frame {
     min-height: 520px;
   }
 }

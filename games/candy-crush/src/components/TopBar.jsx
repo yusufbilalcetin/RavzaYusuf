@@ -6,7 +6,7 @@ export default function TopBar({ progress, onSettings }) {
       <HeartLives progress={progress} />
       <div className="coin-pill">
         <strong>◆ {progress.coins}</strong>
-        <small>Crystal Coin</small>
+        <small>Seker Parasi</small>
       </div>
       <button className="ghost-action compact" type="button" onClick={onSettings} aria-label="Ayarlar">Ayarlar</button>
     </header>
