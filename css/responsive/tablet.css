@@ -1,0 +1,1281 @@
+@media (max-width: 1024px) {
+  #studyhub .hub-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  #quizhub .hub-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  :root { --radius: 20px; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .28s ease;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 24px 0 60px rgba(15,23,42,.28);
+  }
+  .main-content { margin-left: 0; }
+  .menu-toggle { display: inline-grid; }
+  body.nav-open .sidebar-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 90;
+  }
+
+  .content-wrapper { padding: 24px; }
+  .topbar { padding: 12px 18px; }
+
+  .hero { padding: 34px 28px; }
+  .hero h1 { font-size: 30px; }
+
+  .detail-grid,
+  .quiz-layout { grid-template-columns: 1fr; }
+
+  .theme-sheet {
+    right: 16px;
+    width: min(460px, calc(100vw - 32px));
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+}
+
+@media (max-width: 420px) {
+  .sidebar { width: min(86vw, 300px); }
+
+  .menu-toggle {
+    width: 40px;
+    height: 40px;
+  }
+  .topbar { gap: 8px; }
+
+  .theme-open-btn {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+  .topbar-theme-btn {
+    min-height: 40px;
+    padding: 6px 6px 6px 10px;
+  }
+  .mode-toggle-switch { width: 42px; height: 24px; }
+  .mode-toggle-knob { width: 18px; height: 18px; }
+  .mode-toggle-btn.is-dark .mode-toggle-knob { transform: translateX(18px); }
+
+  .content-wrapper { padding: 10px; }
+
+  .hero {
+    padding: 18px 14px;
+    border-radius: 18px;
+  }
+  .hero h1 { font-size: 20px; }
+  .hero p,
+  .subtitle,
+  .helper-line { font-size: 13px; }
+
+  .page-header-left h2,
+  .detail-title,
+  .quiz-title { font-size: 20px; }
+
+  .exam-nav-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .exam-nav-btn {
+    min-height: 40px;
+    font-size: 12px;
+  }
+
+  .exam-question-title,
+  .memory-prompt-text { font-size: 17px !important; }
+
+  .source-table { min-width: 440px; }
+
+  .theme-sheet {
+    left: 6px !important;
+    right: 6px !important;
+    bottom: 6px !important;
+    padding: 14px;
+    border-radius: 18px;
+  }
+  .theme-choice-preview { height: 72px; }
+
+  .recap-dropdown-buttons { grid-template-columns: 1fr; }
+
+  .stat-num { font-size: 22px; }
+  .flashcard,
+  .topic-card,
+  .feature-panel,
+  .dashboard-card,
+  .exam-mode-card { padding: 14px; }
+
+  .memory-face { padding: 14px; }
+  .memory-face strong { font-size: 19px; }
+}
+
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  .hero { padding: 18px; }
+  .hero h1 { font-size: 20px; }
+  .theme-sheet {
+    top: 10px !important;
+    bottom: 10px !important;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+  }
+}
+
+@media (hover: none) {
+  .topic-card:hover,
+  .feature-panel:hover,
+  .dashboard-card:hover,
+  .exam-mode-card:hover,
+  .flashcard:hover,
+  .review-card:hover,
+  .content-card:hover,
+  .side-card:hover,
+  .question-card:hover,
+  .exam-meta-box:hover {
+    transform: none;
+    box-shadow: var(--shadow-md);
+    border-color: var(--card-border);
+  }
+  .primary-btn:hover,
+  .secondary-btn:hover,
+  .ghost-btn:hover,
+  .check-btn:hover,
+  .mark-btn:hover,
+  .exam-nav-btn:hover,
+  .memory-mode-btn:hover,
+  .memory-view-btn:hover {
+    transform: none;
+  }
+  .exam-option-btn:hover {
+    transform: none;
+    border-color: var(--card-border);
+  }
+  .exam-option-btn.selected {
+    border-color: rgba(124,58,237,.42);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .exam-shell-actions {
+    flex-direction: column;
+  }
+  .exam-shell-actions > * { flex: 1 1 100%; }
+
+  .exam-cancel-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 390px) {
+  .memory-tab-btn { flex: 1 1 100%; }
+  .matching-card { font-size: 13px; min-height: 48px; }
+  .typing-prompt { font-size: 22px; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn,
+  .check-btn,
+  .mark-btn,
+  .nav-links button,
+  .tab-btn,
+  .memory-tab-btn,
+  .exam-nav-btn,
+  .topic-card,
+  .feature-panel button,
+  input[type="submit"],
+  input[type="button"],
+  a.btn {
+    touch-action: manipulation;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 360px) {
+  :root { --radius: 16px; }
+  .content-wrapper { padding: 10px; }
+  .hero { padding: 16px 12px; }
+  .stat-card,
+  .progress-card,
+  .feature-panel,
+  .dashboard-card,
+  .topic-card,
+  .exam-mode-card,
+  .flashcard,
+  .review-card,
+  .content-card { padding: 12px; }
+  .stat-num { font-size: 20px; }
+  .stat-label { font-size: 10px; }
+  .unit-badge,
+  .panel-badge { font-size: 10px; padding: 4px 8px; }
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn { padding: 10px 14px; font-size: 13px; }
+}
+
+@media (max-width: 360px) {
+  .theme-sheet-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 720px) {
+  .memory-options-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .memory-grid { gap: 8px; }
+  .memory-card,
+  .memory-card-inner { min-height: 150px !important; }
+  .memory-face { padding: 12px !important; }
+  .memory-face strong { font-size: 15px !important; }
+}
+
+@media (max-width: 360px) {
+  .memory-card,
+  .memory-card-inner { min-height: 138px !important; }
+  .memory-face strong { font-size: 14px !important; }
+}
+
+@media (max-width: 420px) {
+  #memoryPracticeSection .memory-practice-shell {
+    padding: 14px;
+    border-radius: 18px;
+  }
+  .memory-question-card {
+    padding: 16px 12px;
+    min-height: 110px;
+  }
+  .memory-question-text { font-size: clamp(20px, 6.5vw, 26px); }
+  .memory-question-label { font-size: 10px; letter-spacing: .1em; }
+  .memory-option-card {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    min-height: 56px;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  .memory-option-tag {
+    justify-self: start;
+    font-size: 9px;
+  }
+  .memory-option-label { font-size: 14px; }
+}
+
+@media (max-width: 390px) {
+  #memoryPracticeSection .memory-practice-shell { padding: 12px; }
+  .memory-question-card { padding: 14px 10px; min-height: 100px; }
+  .memory-question-text { font-size: clamp(19px, 6.8vw, 24px); }
+  .memory-mode-btn { font-size: 12px; padding: 8px 6px; }
+  .memory-option-card { padding: 10px 12px; }
+  .memory-option-label { font-size: 13.5px; }
+  .memory-feedback { font-size: 12.5px; padding: 9px 10px; }
+}
+
+@media (max-width: 360px) {
+  .memory-mode-switch { grid-template-columns: 1fr; }
+  .memory-question-text { font-size: 18px; }
+}
+
+@media (hover: none) {
+  .memory-option-card:hover {
+    border-color: var(--card-border);
+    background: var(--white);
+  }
+  .memory-option-card:active {
+    border-color: var(--pink);
+    background: rgba(212,102,156,.08);
+    transform: scale(.98);
+  }
+}
+
+@media (max-width: 390px) {
+  .matching-scroll .matching-board {
+    min-width: 520px;
+  }
+}
+
+@media (min-width: 768px) {
+  #memoryHubGrid.memory-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  #memoryHubGrid.memory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  #memoryHubGrid.memory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .content-wrapper { max-width: min(100%, 1640px); }
+  .stats-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .panel-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hub-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .exam-modes { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .memory-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .flashcard-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 900px) and (max-width: 1279px) {
+  .content-wrapper { padding: 24px; }
+  .exam-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hub-grid,
+  .panel-grid,
+  .flashcard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 640px) and (max-width: 899px) {
+  .exam-modes,
+  .stats-row,
+  .panel-grid,
+  .dashboard-grid,
+  .hub-grid,
+  .flashcard-grid,
+  .progress-shell { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1024px) {
+  .detail-grid,
+  .quiz-layout { grid-template-columns: 1fr; }
+  .topbar { padding-inline: 18px; }
+  .topbar-right { gap: 8px; }
+  .topbar-badge { display: none; }
+}
+
+@media (max-width: 520px) {
+  .content-wrapper { padding: 16px 14px; }
+  .memory-search-row,
+  .memory-search-inner { grid-template-columns: 1fr; }
+  .memory-favorite-filter-btn { width: 100%; min-height: 46px; }
+  .memory-search-sticky .hub-legend { font-size: 12px; gap: 8px; }
+}
+
+@media (max-width: 420px) {
+  .memory-grid { gap: 10px; }
+  .memory-card,
+  .memory-card-inner { min-height: 154px; }
+  .memory-face { padding: 11px; }
+  .memory-face strong { font-size: clamp(.95rem, 4.6vw, 1.22rem); }
+  .page-header-left h2 { font-size: 25px; }
+  .topbar { height: 70px; padding-inline: 12px; }
+  .theme-open-btn span:not(.theme-open-icon),
+  .mode-toggle-text { display: none; }
+}
+
+@media (max-width: 420px) {
+  .memory-search-sticky {
+    top: auto !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  #memoryhub #memoryMatchingSection {
+    width: calc(100vw - clamp(24px, 5vw, 48px));
+  }
+}
+
+@media (max-width: 420px) {
+  #memoryhub #memoryMatchingSection {
+    width: calc(100vw - 20px);
+  }
+}
+
+@media (min-width: 1280px) {
+  #memoryhub #memoryMatchingSection .matching-board {
+    gap: 20px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-card {
+    min-height: 58px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  #memoryhub #memoryMatchingSection {
+    width: 100% !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-toolbar {
+    align-items: stretch !important;
+  }
+}
+
+@media (max-width: 520px) {
+  #memoryhub #memoryMatchingSection .memory-section-title {
+    font-size: 20px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .helper-line {
+    font-size: 12.5px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-board {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-column {
+    gap: 8px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-column-title {
+    font-size: 10.5px !important;
+    margin-bottom: 2px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-card {
+    min-height: 46px !important;
+    padding: 9px 7px !important;
+    border-radius: 12px !important;
+    font-size: clamp(11.5px, 3.15vw, 13.5px) !important;
+    line-height: 1.25 !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-pill {
+    padding: 6px 9px !important;
+    font-size: 12px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-controls {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    gap: 8px !important;
+    align-items: end !important;
+  }
+}
+
+@media (max-width: 390px) {
+  #memoryhub #memoryMatchingSection .matching-board {
+    gap: 7px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-card {
+    min-height: 44px !important;
+    padding: 8px 6px !important;
+    font-size: 11.5px !important;
+  }
+
+  #memoryhub #memoryMatchingSection .matching-pill {
+    padding: 5px 8px !important;
+    font-size: 11.5px !important;
+  }
+}
+
+@media (min-width: 1500px) {
+  .exam-pro-shell { width: min(100%, 1760px); }
+}
+
+@media (max-width: 1320px) {
+  .exam-pro-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .exam-pro-main-grid { grid-template-columns: 1fr; }
+  .exam-categories-panel,
+  .exam-chart-panel,
+  .exam-history-panel,
+  .exam-tips-panel,
+  .exam-actions-panel,
+  .exam-goals-panel { grid-column: 1; }
+  .exam-category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .exam-pro-header { align-items: stretch; flex-direction: column; }
+  .exam-history-btn { justify-content: center; width: 100%; }
+  .exam-pro-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .exam-stat-card { min-height: 112px; padding: 16px; }
+  .exam-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .exam-recent-item { grid-template-columns: auto 1fr auto; }
+  .exam-quality-pill,
+  .exam-recent-score { display: none; }
+}
+
+@media (max-width: 560px) {
+  .exam-pro-shell { gap: 14px; }
+  .exam-pro-header h2 { font-size: 30px; }
+  .exam-pro-stats { grid-template-columns: 1fr; }
+  .exam-stat-card { gap: 14px; }
+  .exam-category-grid { grid-template-columns: 1fr; }
+  .exam-category-card { min-height: 190px; }
+  .exam-action-grid { grid-template-columns: 1fr; }
+  .exam-panel-head { align-items: flex-start; flex-direction: column; }
+  .exam-recent-item { grid-template-columns: auto 1fr; }
+  .exam-score-ring { display: none; }
+  .exam-pro-panel { padding: 14px; border-radius: 18px; }
+}
+
+@media (max-width: 1024px) {
+  .exam-result-actions.simple {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .result-question-detail {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .result-question-text,
+  .result-explanation-box {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .result-option-review {
+    padding: 11px 12px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 1320px) {
+  .exam-pro-main-grid { grid-template-columns: 1fr; }
+  .exam-categories-panel,
+  .exam-chart-panel,
+  .exam-history-panel,
+  .exam-goals-panel { grid-column: 1; }
+}
+
+@media (max-width: 760px) {
+  .exam-history-modal-item {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+  .exam-history-modal-item .exam-quality-pill,
+  .exam-history-open-label {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+  .exam-history-score {
+    justify-items: end;
+  }
+}
+
+@media (max-width: 520px) {
+  .exam-chart-panel .exam-chart-box {
+    padding: 4px;
+    min-height: 240px;
+  }
+  #examPerformanceSvg {
+    min-height: 220px;
+  }
+  .exam-recent-item {
+    grid-template-columns: auto 1fr auto;
+  }
+  .exam-recent-score,
+  .exam-quality-pill {
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 1180px) {
+  .exam-chart-insights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .exam-chart-head {
+    display: grid;
+  }
+
+  .exam-chart-controls {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .exam-chart-controls select,
+  #examChartMode {
+    flex: 1 1 180px;
+    width: 100%;
+  }
+
+  .exam-chart-insights {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-chart-mini-card.trend-wide {
+    grid-column: auto;
+  }
+
+  .detailed-chart-box {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .detailed-chart-box svg {
+    min-width: 720px;
+  }
+}
+
+@media (max-width: 900px) {
+  .exam-chart-detail-panel {
+    padding: 18px !important;
+  }
+
+  .exam-chart-head,
+  .exam-chart-panel .exam-panel-head {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .exam-chart-controls {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .exam-chart-controls select,
+  #examChartRange,
+  #examChartMode {
+    width: 100% !important;
+    min-height: 46px;
+    border-radius: 14px;
+    font-size: 13px;
+  }
+
+  .exam-chart-insights {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .exam-chart-mini-card {
+    min-height: 68px;
+    padding: 11px 12px;
+  }
+
+  .exam-chart-mini-card strong {
+    font-size: 17px;
+  }
+
+  .exam-chart-legend {
+    gap: 8px 10px;
+    font-size: 11.5px;
+  }
+}
+
+@media (max-width: 390px) {
+  .exam-chart-detail-panel {
+    padding: 12px !important;
+  }
+
+  .exam-chart-insights {
+    gap: 8px !important;
+  }
+
+  .exam-chart-mini-card {
+    padding: 9px;
+  }
+
+  .exam-chart-mini-card strong {
+    font-size: 15px !important;
+  }
+
+  .detailed-chart-box svg,
+  .exam-chart-panel .exam-chart-box svg,
+  #examPerformanceSvg {
+    min-height: 285px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .fill-gap-hero,
+  .fill-gap-work-head { grid-template-columns: 1fr; }
+  .fill-gap-hero-stats { grid-template-columns: repeat(3, 1fr); width: 100%; }
+  .fill-gap-score { min-width: 0; width: 100%; }
+}
+
+@media (max-width: 900px) {
+  .fill-gap-card p {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .streak-module {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .streak-main-card {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .streak-status-pill {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .streak-fire-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+  }
+
+  .streak-fire {
+    font-size: 31px;
+  }
+
+  .streak-week-card {
+    padding: 18px;
+  }
+
+  .streak-week-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .streak-days {
+    gap: 6px;
+  }
+
+  .streak-days span {
+    min-height: 42px;
+    border-radius: 14px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 900px) {
+  #fillgaphub.fill-gap-focus-mode .fill-gap-wordbar {
+    top: 72px !important;
+  }
+
+  #fillgaphub.fill-gap-focus-mode .fill-gap-work-head {
+    grid-template-columns: 1fr !important;
+  }
+
+  #fillgaphub.fill-gap-focus-mode .fill-gap-score {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .device-permission-modal {
+    align-items: end;
+    padding: 10px;
+  }
+
+  .device-permission-card {
+    border-radius: 26px 26px 22px 22px;
+    padding: 20px;
+  }
+
+  .device-permission-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .device-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 680px) {
+  .device-permission-modal.device-cookie-style {
+    padding: 10px;
+  }
+
+  .device-cookie-style .device-permission-card {
+    border-radius: 26px 26px 22px 22px;
+  }
+
+  .device-permission-head {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .device-cookie-style .device-permission-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .device-cookie-style .device-btn-ghost {
+    order: 2;
+  }
+
+  .device-cookie-style .device-btn-primary {
+    order: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .lesson-hero {
+    border-radius: 20px;
+    padding: 18px;
+  }
+
+  .timeline-box {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline-box strong {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+
+  .visual-note,
+  .formula-card,
+  .example-card,
+  .mistake-card,
+  .grammar-map,
+  .word-card {
+    border-radius: 16px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .topbar {
+    padding-left: 22px !important;
+    padding-right: 32px !important;
+  }
+
+  .content-wrapper {
+    padding-left: clamp(24px, 3vw, 46px) !important;
+    padding-right: clamp(24px, 3vw, 46px) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    flex-wrap: nowrap !important;
+  }
+
+  .theme-open-btn span:not(.theme-open-icon),
+  .mode-toggle-text,
+  .topbar-badge {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .topbar-love-brand { padding-inline: 12px; }
+  .love-brand-main { font-size: clamp(20px, 3vw, 30px); }
+  .love-brand-sub::before,
+  .love-brand-sub::after { width: 22px; margin-inline: 6px; }
+}
+
+@media (max-width: 360px) {
+  .love-brand-main { font-size: 13px; }
+  .love-brand-sub { display: none; }
+}
+
+@media (max-width: 1024px) {
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-shell {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body.rlz5-page-active .page.ravzalingo-page,
+  body.rlz5-page-active .page.ravzalingo-page.active {
+    min-height: calc(100dvh - 70px) !important;
+  }
+
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-shell {
+    min-height: calc(100dvh - 70px) !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-top: 12px !important;
+    padding-bottom: 18px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  html.is-ravzalingo-page::before,
+  html.is-ravzalingo-page::after {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  html.is-ravzalingo-page::before {
+    background-image: url("../../assets/ravzalingo-bg-mobile.png") !important;
+    background-position: center top !important;
+    background-attachment: scroll !important;
+  }
+
+  html.is-ravzalingo-page::after {
+    background: linear-gradient(180deg, rgba(7, 18, 24, 0.18), rgba(7, 18, 24, 0.48));
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  html.is-ravzalingo-page::before {
+    background-image: url("../../assets/ravzalingo-background.png");
+    background-position: center center;
+    background-size: cover;
+    background-attachment: scroll;
+  }
+}
+
+@media (max-width: 380px) {
+  html.is-ravzalingo-page::before {
+    background-position: center top;
+  }
+}
+
+@media (max-width: 1024px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before,
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    left: 0 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body.is-ravzalingo-page .page.ravzalingo-page,
+  body.rlz5-page-active .page.ravzalingo-page,
+  body.is-ravzalingo-page .page.ravzalingo-page.active,
+  body.rlz5-page-active .page.ravzalingo-page.active {
+    min-height: calc(100svh - 70px) !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    top: 70px !important;
+    left: 0 !important;
+    background-image: url("../../assets/ravzalingo-bg-mobile.png") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    top: 70px !important;
+    left: 0 !important;
+    background:
+      linear-gradient(180deg, rgba(5, 18, 18, .12), rgba(5, 18, 18, .42)) !important;
+  }
+
+  body.is-ravzalingo-page #ravzaLingoRoot .rlz5-shell,
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-shell,
+  body.is-ravzalingo-page #ravzaLingoRoot .rlz5-lesson-shell,
+  body.rlz5-page-active #ravzaLingoRoot .rlz5-lesson-shell {
+    min-height: calc(100svh - 70px) !important;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-image: url("../../assets/ravzalingo-background.png") !important;
+    background-position: center center !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-image: url("../../assets/ravzalingo-bg-mobile.png") !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    opacity: 1 !important;
+  }
+
+  body.is-ravzalingo-page .page.ravzalingo-page.active::after,
+  body.rlz5-page-active .page.ravzalingo-page.active::after {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.03),
+      rgba(0, 0, 0, 0.10)
+    ) !important;
+  }
+}
+
+@media (min-width: 901px) {
+  body.is-ravzalingo-page .page.ravzalingo-page.active::before,
+  body.rlz5-page-active .page.ravzalingo-page.active::before {
+    background-image: url("../../assets/ravzalingo-background.png") !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+  }
+}
+
+@media (max-width:1180px){.kahoot-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kahoot-hero-card{grid-template-columns:1fr}.kahoot-device-art{min-height:210px}.kahoot-bottom-grid,.kahoot-result-shell{grid-template-columns:1fr}}
+
+@media (max-width:760px){.kahoot-page{padding:0}.kahoot-top-stats{grid-template-columns:1fr 1fr;padding:10px}.kahoot-hero-card{padding:24px 18px;border-radius:22px}.kahoot-title-line{align-items:flex-start}.kahoot-big-logo{width:68px;height:68px;border-radius:20px;font-size:38px}.kahoot-hero-copy h1{font-size:34px}.kahoot-hero-copy h2{font-size:17px}.kahoot-hero-copy p{font-size:14px}.kahoot-category-grid{grid-template-columns:1fr;padding:12px}.kahoot-section-head{padding:14px;flex-direction:column;align-items:stretch}.kahoot-create-btn{width:100%}.kahoot-recent-list{grid-template-columns:1fr}.kahoot-answer-grid{grid-template-columns:1fr}.kahoot-answer{min-height:86px;font-size:15px}.kahoot-play-top{align-items:stretch;flex-direction:column;text-align:center}.kahoot-question-card h2{font-size:22px}.kahoot-result-stats{grid-template-columns:1fr}.kahoot-device{width:260px;min-height:160px}.kahoot-device strong{font-size:28px}.kahoot-trophy{font-size:58px;right:2%;bottom:8%}}
+
+@media (max-width:420px){.kahoot-top-stats{grid-template-columns:1fr}.kahoot-category-card{grid-template-columns:auto 1fr;padding:14px}.kahoot-arrow{display:none}.kahoot-hero-actions button{width:100%}.kahoot-modal{padding:22px}}
+
+@media (max-width:900px){
+  .kahoot-room-launch-inner{grid-template-columns:1fr;padding:22px}
+  .kahoot-room-launch-art{min-height:160px}
+  .kahoot-room-launch-qr-mock{width:140px;height:140px}
+}
+
+@media (max-width:520px){
+  .kahoot-room-launch-actions{flex-direction:column}
+  .kahoot-room-launch-actions button{width:100%}
+}
+
+@media (max-width:1024px){
+  .kahoot-host-grid{grid-template-columns:1fr}
+}
+
+@media (max-width:760px){
+  .kahoot-host-head{flex-wrap:wrap}
+  .kahoot-host-head .kahoot-host-title{order:3;flex-basis:100%;text-align:left;margin-top:4px}
+  .kahoot-host-info-card,
+  .kahoot-host-qr-card,
+  .kahoot-host-players,
+  .kahoot-host-final{padding:18px}
+  .kahoot-join-link-row{grid-template-columns:1fr}
+  .kahoot-host-actions{flex-direction:column}
+  .kahoot-host-actions .kahoot-primary-btn,
+  .kahoot-host-actions .kahoot-secondary-btn{width:100%}
+  .kahoot-host-play-head{flex-direction:column;align-items:stretch;text-align:center;gap:8px}
+  .kahoot-host-answered{align-items:center}
+  .kahoot-pin-value{letter-spacing:.12em}
+  .kahoot-room-launch-card{margin-bottom:14px}
+  .kahoot-podium{flex-wrap:wrap;gap:10px}
+  .kahoot-podium-spot{flex:1 1 100px;min-width:100px}
+  .kahoot-host-final-actions .kahoot-primary-btn,
+  .kahoot-host-final-actions .kahoot-secondary-btn{flex:1 1 100%}
+  .kahoot-setup-row{grid-template-columns:1fr}
+  .kahoot-setup-actions{flex-direction:column-reverse}
+  .kahoot-setup-actions .kahoot-primary-btn,
+  .kahoot-setup-actions .kahoot-secondary-btn{flex:1 1 100%;width:100%}
+}
+
+@media (hover:none){
+  .kahoot-answer:hover{transform:none;filter:none}
+}
+
+@media (max-width: 760px) {
+  .kahoot-host-qr-card { min-height: 430px; padding: 24px 8px 34px !important; border-radius: 28px !important; }
+  .kahoot-qr-stage { padding: 28px 8px 0; max-width: 100%; }
+  .kahoot-qr-panel { padding: 32px 22px 44px; border-radius: 28px; max-width: 320px; }
+  .kahoot-qr-panel canvas { max-width: 230px; }
+  .kahoot-qr-top-badge { padding: 9px 18px; font-size: 11.5px; letter-spacing: 0.10em; }
+  .kahoot-qr-helper { margin-top: 50px; font-size: 13px; }
+  .kahoot-qr-link { font-size: 11.5px; }
+}
+
+@media (max-width: 360px) {
+  .kahoot-qr-panel canvas { max-width: 180px; }
+  .kahoot-qr-panel { padding: 26px 14px 34px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kahoot-qr-bolt,
+  .kahoot-qr-logo-badge,
+  .kahoot-qr-sparkle { animation: none !important; }
+}
+
+@media (hover: none) {
+  .kahoot-qr-panel:hover { transform: none; }
+}
+
+@media (min-width: 1600px) {
+  #dashboard {
+    gap: 20px !important;
+  }
+
+  #dashboard .dash-quick-access,
+  #dashboard .quick-access-panel {
+    flex-basis: 254px !important;
+    width: 254px !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1180px) {
+  body:has(#dashboard.active) .content-wrapper {
+    padding-inline: 20px !important;
+  }
+
+  #dashboard {
+    gap: 14px !important;
+  }
+
+  #dashboard .dash-quick-access,
+  #dashboard .quick-access-panel {
+    flex-basis: 226px !important;
+    width: 226px !important;
+  }
+
+  #dashboard .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    flex-basis: 156px !important;
+  }
+
+  #dashboard .stat-card {
+    height: 72px !important;
+    min-height: 72px !important;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 769px) {
+  #dashboard .quick-access-item {
+    min-height: 36px !important;
+    padding-block: 6px !important;
+  }
+
+  #dashboard .stats-row {
+    flex-basis: 68px !important;
+  }
+
+  #dashboard .stat-card {
+    height: 68px !important;
+    min-height: 68px !important;
+    padding-block: 10px !important;
+  }
+
+  #dashboard .progress-card {
+    min-height: 100px !important;
+    padding-block: 18px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  body:has(#dashboard.active) .content-wrapper {
+    padding: 10px !important;
+  }
+
+  body:has(#dashboard.active) .topbar {
+    grid-template-columns: 40px minmax(0, 1fr) auto !important;
+    padding-inline: 10px !important;
+  }
+
+  body:has(#dashboard.active) .menu-toggle,
+  body:has(#dashboard.active) .theme-open-btn,
+  body:has(#dashboard.active) .topbar-theme-btn {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+
+  body:has(#dashboard.active) .topbar-love-brand {
+    padding-inline: 7px !important;
+  }
+
+  body:has(#dashboard.active) .love-brand-main {
+    font-size: clamp(14px, 4.7vw, 18px) !important;
+  }
+
+  body:has(#dashboard.active) .love-brand-sub::before,
+  body:has(#dashboard.active) .love-brand-sub::after,
+  body:has(#dashboard.active) .love-brand-spark {
+    display: none !important;
+  }
+
+  #dashboard .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #dashboard .dash-quick-access,
+  #dashboard .quick-access-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  #dashboard .stat-card {
+    min-height: 72px !important;
+  }
+
+  #dashboard .dashboard-visual-stage {
+    min-height: clamp(390px, 64svh, 600px) !important;
+  }
+}
+
+@media (max-width: 340px) {
+  #dashboard .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 769px) {
+  #page-root,
+  #page-root > .page,
+  #dashboard,
+  #ravzalingo,
+  #kahoot,
+  #studyhub,
+  #studydetail,
+  #memoryhub,
+  #fillgaphub,
+  #quizhub,
+  #quizdetail,
+  #examcenter,
+  #sinavcoz,
+  #recap {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  #studyhub .hub-grid,
+  #quizhub .hub-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  }
+
+  #studyhub .hub-toolbar,
+  #quizhub .hub-toolbar {
+    max-width: none !important;
+  }
+}
+
+@media (min-width: 1500px) {
+  #studyhub .hub-grid,
+  #quizhub .hub-grid {
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)) !important;
+  }
+}

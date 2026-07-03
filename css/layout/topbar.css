@@ -1,0 +1,88 @@
+/* ================= MAIN + TOPBAR ================= */
+
+.theme-open-btn:hover,
+.topbar-theme-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--pink);
+}
+
+.mode-toggle-btn.is-dark {
+  border-color: rgba(255,255,255,.14);
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+}
+
+.mode-toggle-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--pink);
+  box-shadow: 0 6px 20px rgba(15,23,42,.14);
+}
+
+.mode-toggle-switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, .35);
+  flex-shrink: 0;
+}
+
+.mode-toggle-btn.is-dark .mode-toggle-switch {
+  background: rgba(255,255,255,.28);
+}
+
+.mode-toggle-btn.is-dark .mode-toggle-knob {
+  transform: translateX(22px);
+}
+
+/* 17) Topbar mobile arama: focus halinde tam genişlik */
+
+.menu-toggle {
+  display: inline-grid !important;
+  align-items: center;
+  justify-items: center;
+  justify-self: start;
+  order: 0;
+}
+
+.topbar-right {
+  justify-self: end !important;
+  margin-left: unset !important;
+  order: 0;
+}
+
+.topbar-love-brand::before {
+  content: "";
+  position: absolute;
+  inset: 4px 8px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,.82), rgba(252,228,240,.72));
+  border: 1px solid rgba(212, 102, 156, .20);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.60),
+    0 8px 24px rgba(123,23,49,.08);
+  opacity: 1;
+  transition: background .3s ease, border-color .3s ease;
+}
+
+.topbar-love-brand:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.05);
+}
+
+.love-brand-sub::before,
+.love-brand-sub::after {
+  content: "";
+  display: inline-block;
+  width: 42px;
+  height: 1px;
+  margin: 0 10px 4px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity: .72;
+}
+
+.love-brand-spark-left { left: 30px; }
+
+.love-brand-spark-right { right: 30px; animation-delay: .8s; }
+
+/* --- Topbar — her iki modda da koyu (arka plan her zaman koyu resim) --- */

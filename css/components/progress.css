@@ -1,0 +1,54 @@
+.stats-row { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 22px; }
+
+.progress-bar-bg.alt .progress-fill,
+.progress-fill.alt {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.empty-state { text-align: center; padding: 24px; }
+
+.result-stat.success strong { color: #059669; }
+
+.result-stat.danger strong { color: #dc2626; }
+
+.result-stat.neutral strong { color: #334155; }
+
+.review-status-correct {
+  background: rgba(16,185,129,.14);
+  color: #047857;
+  border-color: rgba(16,185,129,.28);
+}
+
+.review-status-wrong {
+  background: rgba(239,68,68,.14);
+  color: #b91c1c;
+  border-color: rgba(239,68,68,.24);
+}
+
+.review-status-empty {
+  background: #ffffff;
+  color: #334155;
+  border-color: rgba(226,232,240,.95);
+}
+
+.exam-empty-state { min-height: 220px; }
+
+/* =========================================================
+   DUOLINGO TARZI SADE STREAK MODÜLÜ
+   ========================================================= */
+
+.streak-fire.is-active {
+  animation: streakPulse 1.2s ease-in-out infinite;
+}
+
+.streak-main-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.streak-days span.today {
+  outline: 2px solid color-mix(in srgb, var(--pink) 55%, transparent);
+  outline-offset: 2px;
+}
+
+/* Sabit istatistik barı da yeni tam-genişlik alanına göre ölçülür. */

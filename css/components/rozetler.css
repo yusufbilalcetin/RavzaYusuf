@@ -1,0 +1,32 @@
+.dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: #cbd5e1;
+}
+
+.dot.success { background: var(--success); }
+
+.dot.exam { background: var(--exam); }
+
+.dot.neutral { background: #94a3b8; }
+
+.exam-quality-pill.mid { color: #2563eb; background: #dbeafe; }
+
+.exam-quality-pill.low { color: #ea580c; background: #ffedd5; }
+
+.streak-status-pill.done {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: rgba(16,185,129,.28);
+}
+
+/* ASKER KOKOREÇ .category-pills birebir mantık */
+
+/* ASKER KOKOREÇ .pill mantığı */
+
+/* Light mode: soft white pill */
+
+/* Üst gradient pill */

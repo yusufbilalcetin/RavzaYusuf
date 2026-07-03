@@ -1,0 +1,65 @@
+[
+  {
+    "id": "startLine",
+    "name": "Baslangic Isini",
+    "category": "pre",
+    "price": 85,
+    "description": "Bolum basinda rastgele bir Isin Kristali ekler."
+  },
+  {
+    "id": "startBomb",
+    "name": "Baslangic Patlayicisi",
+    "category": "pre",
+    "price": 110,
+    "description": "Bolum basinda Patlayici Kristal ekler."
+  },
+  {
+    "id": "startRainbow",
+    "name": "Renk Kuresi",
+    "category": "pre",
+    "price": 140,
+    "description": "Bolum basinda Renk Kuresi ekler."
+  },
+  {
+    "id": "startMoves",
+    "name": "+3 Hamle",
+    "category": "pre",
+    "price": 75,
+    "description": "Bolume 3 hamle ekler."
+  },
+  {
+    "id": "hammer",
+    "name": "Cekic",
+    "category": "in_game",
+    "price": 90,
+    "description": "Secilen tas veya engeli kirar."
+  },
+  {
+    "id": "freeSwap",
+    "name": "Serbest Degisim",
+    "category": "in_game",
+    "price": 110,
+    "description": "Eslesme gerektirmeden iki komsu tasi degistirir."
+  },
+  {
+    "id": "colorBlast",
+    "name": "Renk Temizleyici",
+    "category": "in_game",
+    "price": 120,
+    "description": "Secilen renkteki kristalleri temizler."
+  },
+  {
+    "id": "targetFly",
+    "name": "Hedef Ucusu",
+    "category": "in_game",
+    "price": 130,
+    "description": "En kritik hedefe odaklanan ucusan kristal etkisi."
+  },
+  {
+    "id": "extraMoves",
+    "name": "+5 Hamle",
+    "category": "end_game",
+    "price": 100,
+    "description": "Bolume 5 hamle ekler."
+  }
+]

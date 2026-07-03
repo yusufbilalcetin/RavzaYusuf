@@ -1,0 +1,69 @@
+.theme-sheet.open { transform: translateY(0) scale(1); }
+
+.theme-sheet-close {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--card-border);
+  background: var(--input-bg);
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.theme-choice-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--pink);
+}
+
+.theme-choice-card.active {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px rgba(212,102,156,.32), 0 18px 30px rgba(212,102,156,.14);
+}
+
+.theme-choice-preview {
+  height: 98px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-noel-ask {
+  background:
+    radial-gradient(circle at 16% 22%, rgba(255, 103, 146, .7), transparent 16%),
+    radial-gradient(circle at 78% 72%, rgba(255, 219, 127, .35), transparent 22%),
+    linear-gradient(135deg, #4b0d19 0%, #7d1832 52%, #142a1e 100%);
+}
+
+.preview-gece-mavisi { background: linear-gradient(135deg, #07122b 0%, #122850 55%, #090d1d 100%); }
+
+.preview-orman-yesili { background: linear-gradient(135deg, #0c1f18 0%, #1d4d37 55%, #10271d 100%); }
+
+.preview-mor-isik { background: linear-gradient(135deg, #170827 0%, #4d1682 55%, #25053e 100%); }
+
+.preview-klasik-koyu { background: linear-gradient(135deg, #111827 0%, #1f2937 55%, #0f172a 100%); }
+
+.preview-pembe-tema {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 159, 192, .85), transparent 18%),
+    radial-gradient(circle at 80% 72%, rgba(216, 95, 147, .35), transparent 24%),
+    linear-gradient(135deg, #fff4f8 0%, #ffd8e8 46%, #f3a1c0 100%);
+}
+
+.theme-choice-meta small { color: var(--text-light); line-height: 1.5; }
+
+.theme-choice-card.active .theme-choice-check {
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  color: #fff;
+  border-color: transparent;
+}
+
+@supports (height: 100dvh) {
+  .theme-sheet { max-height: 100dvh; }
+  .exam-cancel-dialog { max-height: 100dvh; overflow-y: auto; }
+}
+
+.theme-sheet {
+  z-index: 3010 !important;
+}

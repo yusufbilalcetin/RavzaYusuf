@@ -1,0 +1,75 @@
+<section id="games" class="page school-page games-page">
+  <div class="school-hero games-hero">
+    <span class="unit-badge">OYUN</span>
+    <h2>Oyun Alanı</h2>
+    <p>Kutu kutu oyun seç, tıklayınca oyun alanı açılsın.</p>
+  </div>
+
+  <div class="game-tile-grid" aria-label="Oyun listesi">
+    <button class="game-tile is-live" type="button" data-game="candy-match">
+      <span class="game-tile-art">🍬</span>
+      <span class="game-tile-copy">
+        <strong>Candy Crush</strong>
+        <small>Kristal adasi match-3 macerasi</small>
+      </span>
+      <span class="game-tile-status">100 Bolum</span>
+    </button>
+
+    <button class="game-tile" type="button" data-game="memory-boxes">
+      <span class="game-tile-art">🧠</span>
+      <span class="game-tile-copy">
+        <strong>Hafıza Kutuları</strong>
+        <small>Aynı kartları bul</small>
+      </span>
+      <span class="game-tile-status">Yakında</span>
+    </button>
+
+    <button class="game-tile" type="button" data-game="speed-race">
+      <span class="game-tile-art">⚡</span>
+      <span class="game-tile-copy">
+        <strong>Hızlı Yarış</strong>
+        <small>Süreye karşı soru çöz</small>
+      </span>
+      <span class="game-tile-status">Yakında</span>
+    </button>
+
+    <button class="game-tile" type="button" data-game="word-pop">
+      <span class="game-tile-art">🎈</span>
+      <span class="game-tile-copy">
+        <strong>Kelime Patlat</strong>
+        <small>Doğru kelime balonunu seç</small>
+      </span>
+      <span class="game-tile-status">Yakında</span>
+    </button>
+
+    <button class="game-tile" type="button" data-game="picture-puzzle">
+      <span class="game-tile-art">🧩</span>
+      <span class="game-tile-copy">
+        <strong>Resim Puzzle</strong>
+        <small>Parçaları yerine taşı</small>
+      </span>
+      <span class="game-tile-status">Yakında</span>
+    </button>
+
+    <button class="game-tile" type="button" data-game="quiz-battle">
+      <span class="game-tile-art">🏆</span>
+      <span class="game-tile-copy">
+        <strong>Quiz Kapışması</strong>
+        <small>Puan toplayan kazanır</small>
+      </span>
+      <span class="game-tile-status">Yakında</span>
+    </button>
+  </div>
+
+  <div class="game-stage" id="gameStage" hidden>
+    <div class="game-stage-head">
+      <div>
+        <span class="unit-badge" id="gameStageBadge">OYUN</span>
+        <h3 id="gameStageTitle">Oyun</h3>
+        <p id="gameStageSubtitle">Oyunu başlat.</p>
+      </div>
+      <button class="game-close-btn" type="button" id="gameCloseBtn">Kapat</button>
+    </div>
+    <div class="game-stage-body" id="gameStageBody"></div>
+  </div>
+</section>

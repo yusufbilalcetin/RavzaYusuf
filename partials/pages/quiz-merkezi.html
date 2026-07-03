@@ -1,0 +1,19 @@
+<section id="quizhub" class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <span class="unit-badge quiz-badge">QUIZ HUB</span>
+            <h2>Quiz Merkezi</h2>
+            <p class="subtitle">Sadece soru çözmeye odaklanan ayrı alan.</p>
+          </div>
+        </div>
+
+        <div class="hub-toolbar">
+          <input type="text" id="quizFilter" class="hub-search" placeholder="Quiz merkezinde konu ara…" oninput="renderQuizHub(this.value)">
+          <div class="hub-legend">
+            <span><i class="dot success"></i> Bitti</span>
+            <span><i class="dot exam"></i> Hazır</span>
+          </div>
+        </div>
+
+        <div id="quizHubGrid" class="hub-grid"></div>
+      </section>

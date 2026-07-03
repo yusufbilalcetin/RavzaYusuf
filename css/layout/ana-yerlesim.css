@@ -1,0 +1,408 @@
+/* ================= TEMA VARYANTLARI ================= */
+
+/* ================= RESET + TEMEL ================= */
+
+*::before, *::after { min-width: 0; }
+
+img, video, canvas, svg, iframe { max-width: 100%; height: auto; }
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+.theme-switch {
+  position: relative;
+  width: 48px; height: 26px;
+  background: rgba(255,255,255,.16);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+/* ================= TEMA SHEET ================= */
+
+/* Noel Aşk ekstra stilleri */
+
+/* ================= CONTENT WRAPPER + PAGE ================= */
+
+.content-wrapper {
+  width: 100%;
+  max-width: 1260px;
+  padding: 34px;
+  padding-bottom: max(34px, env(safe-area-inset-bottom));
+}
+
+.page.active { display: block; }
+
+/* Çalışma Merkezi: yalnızca ana liste sayfası görünümü */
+
+/* Study Hub kartları — arka plan her zaman koyu resim, metin her zaman açık */
+
+/* ================= QUIZ MERKEZİ ================= */
+
+/* ================= HERO ================= */
+
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -40px;
+  bottom: -40px;
+  width: 160px;
+  height: 160px;
+  background: rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+
+/* ================= GRID LAYOUTS ================= */
+
+/* ================= KART TEMELİ ================= */
+
+/* Kart üst highlight çizgisi */
+
+/* ================= PAGE HEADER ================= */
+
+.detail-subtitle,
+.quiz-subtitle { color: var(--text-light); line-height: 1.75; }
+
+/* ================= QUIZ ================= */
+
+/* ================= EXAM ================= */
+
+.review-answer strong { color: var(--text); }
+
+.result-nav-grid { margin-bottom: 16px; }
+
+.result-action-row.secondary { margin-bottom: 18px; }
+
+.review-answer-row strong { min-width: 112px; }
+
+.review-answer-row span { color: var(--text); line-height: 1.6; }
+
+.review-answer-correct {
+  background: rgba(16,185,129,.10);
+  border-color: rgba(16,185,129,.22);
+}
+
+.review-answer-wrong {
+  background: rgba(239,68,68,.10);
+  border-color: rgba(239,68,68,.20);
+}
+
+.review-answer-empty {
+  background: #ffffff;
+  border-color: rgba(226,232,240,.95);
+}
+
+.review-explanation {
+  color: var(--text-light);
+  line-height: 1.7;
+  margin: 10px 0 12px;
+}
+
+/* ================= SCROLLBAR ================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ==============================================================
+   ============== MOBİL RESPONSIVE (tek, temiz katman) ==========
+   ============================================================== */
+
+/* ========= TELEFON (≤ 768px) ========= */
+
+/* ========= KÜÇÜK TELEFON (≤ 640px) ========= */
+
+/* ========= ÇOK KÜÇÜK EKRAN (≤ 420px) — iPhone SE vb. ========= */
+
+/* ========= YATAY MOD (kısa boy) ========= */
+
+/* ========= DOKUNMATIK CİHAZ (hover'ı yoksa sticky hover'ı kaldır) ========= */
+
+/* ========= ERİŞİLEBİLİRLİK ========= */
+
+/* ================= EXAM ACTION ROW ================= */
+
+/* Sınavı İptal Et — ayrı satır, tam genişlik */
+
+.exam-cancel-actions > * {
+  flex: 1 1 0;
+}
+
+/* WEAK WORDS LIST */
+
+.weak-actions > * { min-height: 48px; }
+
+.weak-empty {
+  background: rgba(36, 72, 255, 0.06);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted, #64748b);
+}
+
+/* MOBILE RESPONSIVE */
+
+/* ==============================================================
+   ============== GLOBAL MOBİL SERTLEŞTİRME KATMANI ============
+   Tüm sitenin her sayfasında çalışır. Mevcut katmanı bozmaz,
+   sadece eksik garantileri ve modern viewport özelliklerini ekler.
+   ============================================================== */
+
+/* 2) Tüm media elementleri esnek */
+
+img, video, iframe, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+iframe { border: 0; }
+
+/* 3) Uzun metinleri kaydırılabilir tut, tablodan taşmasın */
+
+/* 4) Pre/code blokları yatay kayar */
+
+/* 5) Tablo wrapper'ı olmayan tablolar bile yatay kayabilsin */
+
+/* 6) Touch dostu temel */
+
+/* 9) Safe area padding — notch/dinamik ada cihazlar için */
+
+/* 10) Touch hedefi minimumu — tüm interaktif elementler en az 40px */
+
+/* 13) Tablo zorunlu kayma (mobil) */
+
+/* 14) Çok küçük ekran (≤ 360px) — Galaxy Fold kapalı vs */
+
+/* 15) Sınavda klavye aşağıdan açılınca alt aksiyonların görünür kalması */
+
+/* 18) Karanlık moddaki seçim rengi */
+
+/* 20) Theme sheet mobil gerçek kayan grid */
+
+/* Mode switch — segmented control */
+
+/* Options grid */
+
+/* Feedback */
+
+/* ============================================================
+   EŞLEŞTİRME — Mobil yatay scroll
+   ============================================================ */
+
+/* ============================================================
+   YAZMA TESTİ — Mobil sıkılaştırma
+   ============================================================ */
+
+/* Klavye açıldığında alt aksiyonlar görünür kalsın */
+
+/* Touch cihazlarda hover efektini kaldır */
+
+/* Sayfa yatay taşma kilidi (tekrar garanti) */
+
+/* 480px altı: yatay scroll devreye girer, board min-width 560px */
+
+/* ============================================================
+   SAĞ ALT YUKARI ÇIK BUTONU
+   ============================================================ */
+
+/* =========================================================
+   FINAL RESPONSIVE + PEMBE TEMA + OKUNABİLİRLİK DÜZELTMELERİ
+   Bu blok mevcut sistemi bozmadan en alttan güvenli override sağlar.
+   ========================================================= */
+
+/* Eski Gün Işığı localStorage/tema kalıntıları görünürse Pembe Tema gibi davranır. */
+
+/* Geniş ekranlarda sağdaki boşluğu azalt, içerik daha iyi yayılsın. */
+
+/* Tüm tema ve kartlarda yazı okunabilirliği. */
+
+/* ============================================================
+   EZBER MERKEZI — ESLESTIRME ESKI ARAYUZ + TAM EKRAN
+   Altin kural: Eslestirme kart/gorunum stillerine dokunmadan
+   sadece bolum genisligi tam ekrana oturtulur.
+   ============================================================ */
+
+.exam-recent-item:last-child { border-bottom: 0; }
+
+.exam-score-ring::before {
+  content: "";
+  position: absolute; inset: 5px;
+  border-radius: 50%; background: #fff;
+}
+
+.exam-score-ring span { position: relative; z-index: 1; }
+
+.exam-goal-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.exam-goal-bar i {
+  display: block; height: 100%;
+  border-radius: inherit;
+  background: #7c3aed;
+}
+
+.exam-goal-bar.green i { background: #22c55e; }
+
+.exam-goal-bar.orange i { background: #f59e0b; }
+
+/* =========================================================
+   SIMPLE EXAM RESULT ACTIONS — sade sonuç butonları
+   Sadece Sınav Merkezi sonuç ekranındaki aksiyonları etkiler.
+   ========================================================= */
+
+.result-option-review.is-correct-answer {
+  background: rgba(16,185,129,.10);
+  border-color: rgba(16,185,129,.34);
+}
+
+.result-option-review.is-correct-answer .result-option-letter,
+.correct-tag {
+  background: #10b981;
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ============================================================
+   EXAM RESULT QUESTION DETAIL — DETAILED TURKISH EXPLANATION
+   Sadece sonuç ekranındaki açıklama kutusunu daha okunabilir yapar.
+   ============================================================ */
+
+/* ============================================================
+   EXAM RESULT DETAIL — DETAILED TURKISH OPTION EXPLANATIONS
+   Only affects the result question detail explanation area.
+   ============================================================ */
+
+.exam-recent-item:hover {
+  background: color-mix(in srgb, var(--pink-pale) 38%, transparent);
+  border-radius: 16px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* SVG içindeki başarı oranı / eksen / etiket yazılarının dark modda kaybolmasını engeller */
+
+/* Sticky çalışması için parent overflow kilitlerini aç */
+
+/* Konu seçilince liste ve filtreler gizlenir */
+
+/* ASKER KOKOREÇ .category-bar birebir mantık */
+
+/* Kırmızı alandaki ekstra açıklama/header kesin kapalı */
+
+/* =========================================================
+   PROFESSIONAL DEVICE CONSENT BANNER — COOKIE STYLE FINAL
+   Model seçtirme yok; sadece izin alır ve kod otomatik analiz eder.
+   ========================================================= */
+
+.device-cookie-style .device-permission-icon {
+  margin-bottom: 0;
+}
+
+.device-cookie-style .device-permission-actions {
+  grid-template-columns: 1fr 1fr;
+  margin: 18px 0 10px;
+}
+
+/* =========================================================
+   SOURCE-BASED LESSON ENRICHMENTS
+   Konu anlatımlarındaki tablo, not ve okuma blokları
+   ========================================================= */
+
+.visual-note {
+  padding: 15px;
+  color: var(--text-light);
+  line-height: 1.65;
+}
+
+.visual-note strong {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: var(--navy);
+}
+
+.main-content {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Kartlar okunabilir kalsın; arka plan tamamen kapanmasın */
+
+/* Oda başlatma kartı (ana ekran) */
+
+/* Localhost / public URL eksik uyarısı */
+
+/* Bekleyen oyuncular */
+
+/* Countdown */
+
+/* Host play */
+
+/* Host final */
+
+/* Player */
+
+/* Responsive */
+
+/* Neon QR poster: referans görseldeki koyu, parlayan davet kartı */
+
+/* Stage — dış kompozisyon */
+
+/* Dekoratif sparkle yıldızları */
+
+/* QR canvas — okunabilirlik birinci öncelik */
+
+/* Fallback alanı (CDN yüklenmezse linki gösterir) */
+
+/* Helper + link */
+
+/* Açık temada link okunabilirliği */
+
+/* Mobile */
+
+/* Reduced motion: animasyonları kapat */
+
+/* --- Sayfa arka planı --- */
+
+/* Dark mode: daha az overlay (arka plan daha görünür) */
+
+/* --- Hero bölümü --- */
+
+/* --- İçerik kartı --- */
+
+/* İçerik kartları saydam */
+
+/* --- Tablo tasarımı --- */
+
+/* Genel text rengi override — bu sayfa koyu arka planlı */
+
+/* --- Aksiyon bar --- */
+
+/* --- Mobile --- */

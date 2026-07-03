@@ -1,0 +1,50 @@
+<nav class="sidebar" id="sidebar">
+  <div class="logo">
+    <span class="logo-hearts">♡ ♡ ♡</span>
+    <h2>Yusuf ❤️ Ravza</h2>
+    <p>Ravza'nın daha düzenli çalışma alanı 💗</p>
+  </div>
+
+  <ul class="nav-links">
+    <li><button onclick="navigate('ana-sayfa')" id="nav-dashboard" class="active"><span class="nav-icon">🏠</span>Ana Sayfa</button></li>
+    <li class="nav-group">
+      <details class="nav-dropdown" id="nav-hazirlik">
+        <summary class="nav-dropdown-summary"><span class="nav-icon">🎓</span>Hazırlık<span class="nav-dropdown-icon">▾</span></summary>
+        <ul class="nav-sublinks">
+          <li><button onclick="navigate('ravzalingo')" id="nav-ravzalingo"><span class="nav-icon">🟢</span>RavzaLingo</button></li>
+          <li><button onclick="navigate('kahoot')" id="nav-kahoot"><span class="nav-icon kahoot-nav-mark">K!</span>Kahoot</button></li>
+          <li><button onclick="navigate('calisma-merkezi')" id="nav-studyhub"><span class="nav-icon">📚</span>Çalışma Merkezi</button></li>
+          <li><button onclick="navigate('ezber-merkezi')" id="nav-memoryhub"><span class="nav-icon">🧠</span>Ezber Merkezi</button></li>
+          <li><button onclick="navigate('bosluk-doldurma')" id="nav-fillgaphub"><span class="nav-icon">🧩</span>Boşluk Doldurma</button></li>
+          <li><button onclick="navigate('quiz-merkezi')" id="nav-quizhub"><span class="nav-icon">📝</span>Quiz Merkezi</button></li>
+          <li><button onclick="navigate('sinav-merkezi')" id="nav-examcenter"><span class="nav-icon">🎯</span>Sınav Merkezi</button></li>
+          <li><button onclick="navigate('hizli-tekrar')" id="nav-recap"><span class="nav-icon">⚡</span>Hızlı Tekrar</button></li>
+        </ul>
+      </details>
+    </li>
+    <li class="nav-section-label">Sınıflar</li>
+    <li><button onclick="navigate('birinci-sinif')" id="nav-grade1"><span class="nav-icon">📘</span>1. Sınıf</button></li>
+    <li><button onclick="navigate('ikinci-sinif')" id="nav-grade2"><span class="nav-icon">📗</span>2. Sınıf</button></li>
+    <li class="nav-section-label nav-section-label-game">Oyun</li>
+    <li><button onclick="navigate('oyun')" id="nav-games"><span class="nav-icon">🎮</span>Oyun Alanı</button></li>
+  </ul>
+
+  <div class="sidebar-theme">
+    <div class="theme-switch-label">
+      <span class="icon">☀️</span>
+      <span>Tema</span>
+    </div>
+    <button
+      class="theme-switch"
+      id="theme-switch"
+      onclick="toggleTheme()"
+      aria-label="Karanlık moda geç"
+      title="Gündüz / Gece modu"></button>
+    <div class="theme-switch-label">
+      <span class="icon">🌙</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">Yusuf'tan Ravza'ya özel çalışma sistemi <span>♡</span></div>
+</nav>
+<button class="sidebar-backdrop" id="sidebar-backdrop" aria-label="Menüyü kapat" onclick="closeMobileMenu()"></button>

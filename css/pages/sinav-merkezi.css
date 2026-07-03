@@ -1,0 +1,249 @@
+.exam-modes { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 18px; }
+
+#examcenter.exam-live-state .exam-modes,
+#examcenter.exam-live-state .exam-meta-box {
+  display: none;
+}
+
+.exam-progress-mini strong { color: var(--text); }
+
+.exam-modes,
+.exam-meta-box,
+.exam-workspace {
+  width: 100%;
+}
+
+.exam-mode-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 190px;
+}
+
+.exam-mode-card .primary-btn { align-self: flex-start; }
+
+#examcenter {
+  color: #0f172a;
+}
+
+#examcenter .page-header,
+#examcenter > .page-header,
+#examcenter .exam-modes,
+#examcenter #examMetaBox {
+  display: none !important;
+}
+
+.exam-pro-panel {
+  background: var(--exam-surface);
+  border: 1px solid var(--exam-line);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, .06);
+  min-width: 0;
+}
+
+.exam-categories-panel,
+.exam-chart-panel { grid-column: 1; }
+
+.exam-history-panel,
+.exam-tips-panel { grid-column: 2; }
+
+.exam-chart-box {
+  min-height: 260px;
+  overflow: hidden;
+}
+
+.exam-pro-empty {
+  text-align: center;
+  background: var(--exam-surface);
+  border: 1px solid var(--exam-line);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, .06);
+}
+
+.exam-pro-main-grid {
+  grid-template-columns: minmax(0, 1.55fr) minmax(340px, .9fr);
+}
+
+.exam-categories-panel,
+.exam-chart-panel { grid-column: 1; }
+
+.exam-history-panel,
+.exam-goals-panel { grid-column: 2; }
+
+.exam-history-modal.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.exam-history-modal-item:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--pink) 45%, var(--card-border));
+}
+
+.exam-history-modal-item {
+  grid-template-columns: 42px minmax(0, 1fr) auto auto auto;
+}
+
+.exam-history-modal-item:hover .exam-history-open-label {
+  color: var(--pink);
+}
+
+.exam-chart-panel .exam-chart-box {
+  min-height: 300px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 76%, var(--pink) 24%);
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--pink) 13%, transparent), transparent 30%),
+    color-mix(in srgb, var(--white) 78%, transparent);
+  padding: 8px;
+}
+
+.exam-chart-label,
+.exam-chart-score {
+  fill: var(--text-light);
+}
+
+.exam-chart-panel {
+  overflow: hidden;
+}
+
+.exam-chart-panel .exam-panel-head {
+  align-items: center;
+}
+
+.exam-chart-panel .exam-chart-box {
+  position: relative;
+  min-height: 330px;
+  border-radius: 28px;
+  border: 1px solid color-mix(in srgb, var(--card-border) 72%, var(--pink) 28%);
+  background:
+    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--pink) 16%, transparent), transparent 30%),
+    radial-gradient(circle at 92% 20%, color-mix(in srgb, var(--pink-bright) 15%, transparent), transparent 28%),
+    linear-gradient(135deg, color-mix(in srgb, var(--white) 90%, transparent), color-mix(in srgb, var(--input-bg) 78%, transparent));
+  padding: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    0 16px 38px rgba(15,23,42,.08);
+}
+
+.exam-chart-panel .exam-chart-box::before {
+  content: none !important;
+  display: none !important;
+}
+
+.exam-chart-detail-panel {
+  overflow: hidden;
+}
+
+.exam-chart-controls select:focus,
+#examChartMode:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pink) 20%, transparent);
+}
+
+.exam-chart-mini-card.success {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(16,185,129,.20), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 78%, var(--white) 22%);
+}
+
+.exam-chart-mini-card.danger {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(239,68,68,.18), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 78%, var(--white) 22%);
+}
+
+.exam-chart-mini-card.trend {
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--navy-light) 20%, transparent), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 78%, var(--white) 22%);
+}
+
+.exam-chart-mini-card.trend-wide {
+  grid-column: span 2;
+}
+
+.exam-chart-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.exam-chart-detail-panel,
+.exam-chart-panel {
+  color: var(--text);
+}
+
+.exam-chart-subtitle,
+.exam-chart-legend,
+.exam-chart-legend span {
+  color: color-mix(in srgb, var(--text) 74%, var(--text-light) 26%) !important;
+}
+
+.exam-chart-controls select,
+#examChartRange,
+#examChartMode {
+  color: var(--text) !important;
+  background: color-mix(in srgb, var(--input-bg) 82%, var(--white) 18%) !important;
+  border-color: color-mix(in srgb, var(--card-border) 72%, var(--pink) 28%) !important;
+}
+
+.exam-chart-mini-card {
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--pink) 16%, transparent), transparent 34%),
+    color-mix(in srgb, var(--input-bg) 74%, var(--white) 26%) !important;
+}
+
+.exam-chart-mini-card span,
+.exam-chart-mini-card small {
+  color: color-mix(in srgb, var(--text) 70%, var(--text-light) 30%) !important;
+}
+
+.exam-chart-mini-card strong {
+  color: var(--text) !important;
+}
+
+.detailed-chart-box,
+.exam-chart-panel .exam-chart-box {
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--pink) 10%, transparent), transparent 28%),
+    color-mix(in srgb, var(--white) 88%, var(--bg) 12%) !important;
+  border-color: color-mix(in srgb, var(--card-border) 74%, var(--pink) 26%) !important;
+}
+
+.exam-chart-detail-panel,
+.exam-chart-panel {
+  width: 100%;
+  max-width: 100%;
+}
+
+.exam-chart-detail-panel .exam-panel-head,
+.exam-chart-panel .exam-panel-head,
+.exam-chart-head {
+  min-width: 0;
+}
+
+.exam-chart-controls,
+.exam-chart-controls select,
+#examChartRange,
+#examChartMode {
+  min-width: 0;
+}
+
+.detailed-chart-box,
+.exam-chart-panel .exam-chart-box {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden !important;
+  touch-action: pan-y;
+}
+
+#examcenter .exam-chart-detail-panel,
+#examcenter .exam-chart-panel {
+  color: var(--text) !important;
+}

@@ -1,0 +1,19 @@
+<section id="studyhub" class="page">
+        <div class="page-header">
+          <div class="page-header-left">
+            <span class="unit-badge">STUDY HUB</span>
+            <h2>Çalışma Merkezi</h2>
+            <p class="subtitle">Konu anlatımı ve çalışma takibi burada.</p>
+          </div>
+        </div>
+
+        <div class="hub-toolbar">
+          <input type="text" id="studyFilter" class="hub-search" placeholder="Çalışma merkezinde konu ara…" oninput="renderStudyHub(this.value)">
+          <div class="hub-legend">
+            <span><i class="dot success"></i> Tamamlandı</span>
+            <span><i class="dot neutral"></i> Bekliyor</span>
+          </div>
+        </div>
+
+        <div id="studyHubGrid" class="hub-grid"></div>
+      </section>

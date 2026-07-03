@@ -1,0 +1,70 @@
+#quizhub.active::after {
+  content: "";
+  position: fixed;
+  inset: 78px 0 0 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 8, 20, .10) 0%,
+      rgba(5, 8, 20, .18) 45%,
+      rgba(5, 8, 20, .25) 100%
+    );
+}
+
+#quizhub .page-header,
+#quizhub .hub-toolbar,
+#quizhub #quizHubGrid {
+  position: relative;
+  z-index: 1;
+}
+
+#quizhub .page-header {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 130, 170, .22);
+}
+
+#quizhub .quiz-badge {
+  background: linear-gradient(135deg, #f06f9e, #ff9fc0);
+}
+
+#quizhub .hub-search::placeholder {
+  color: rgba(255, 230, 238, .62);
+}
+
+#quizhub .hub-search:focus {
+  border-color: rgba(255, 143, 189, .72) !important;
+  box-shadow:
+    0 0 0 3px rgba(255, 143, 189, .14),
+    0 18px 46px rgba(0, 0, 0, .25);
+}
+
+#quizhub .hub-legend {
+  color: rgba(255, 232, 240, .78);
+}
+
+#quizhub .topic-meta {
+  justify-content: center;
+}
+
+#quizhub .topic-actions {
+  justify-content: center;
+}
+
+#quizhub .primary-btn {
+  background: linear-gradient(135deg, #7b1731, #a51f4a);
+}
+
+#quizhub .mark-btn,
+#quizhub .mark-btn.done {
+  background: #10b981;
+  color: #fff;
+  border-color: #10b981;
+}
+
+#quizhub .helper-line {
+  color: rgba(240, 220, 232, 0.70);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}

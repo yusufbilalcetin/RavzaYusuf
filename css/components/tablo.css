@@ -1,0 +1,14 @@
+.source-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+  background: var(--white);
+}
+
+/* ========= TABLET (≤ 1024px) ========= */
+
+table {
+  max-width: 100%;
+}
+
+/* Tablet ve mobil özel ayarlar */

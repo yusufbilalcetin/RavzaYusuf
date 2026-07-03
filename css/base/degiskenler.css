@@ -1,0 +1,32 @@
+:root {
+  --navy: #1a2850;
+  --navy-mid: #243070;
+  --navy-light: #31449c;
+  --pink: #d4669c;
+  --pink-bright: #e879a0;
+  --pink-pale: #fce7f3;
+  --bg: #f5f4fb;
+  --white: #ffffff;
+  --text: #2d3748;
+  --text-light: #64748b;
+  --card-border: #e7ebf7;
+  --input-bg: #f8f9fe;
+  --input-brd: #e8eaf6;
+  --table-row: #fafbff;
+  --table-hover: #f5f7ff;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --exam: #7c3aed;
+  --sidebar-w: 278px;
+  --radius: 22px;
+  --shadow: 0 14px 38px rgba(18, 29, 58, .10);
+  --shadow-xs: 0 4px 12px rgba(15,23,42,.05);
+  --shadow-sm: 0 8px 20px rgba(15,23,42,.08);
+  --shadow-md: 0 14px 34px rgba(15,23,42,.10);
+  --shadow-lg: 0 20px 54px rgba(15,23,42,.14);
+  --glass-light: rgba(255,255,255,.74);
+  --glass-dark: rgba(23,27,37,.76);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }

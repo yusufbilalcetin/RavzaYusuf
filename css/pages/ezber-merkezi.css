@@ -1,0 +1,527 @@
+.flashcard-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+.memory-badge {
+  background: linear-gradient(135deg, rgba(124,58,237,.16), rgba(212,102,156,.16));
+  color: #7c3aed;
+}
+
+/* ================= MEMORY HUB ================= */
+
+.memory-section-shell[hidden],
+.memory-section-shell.is-hidden {
+  display: none !important;
+}
+
+.memory-toolbar { margin-bottom: 0; }
+
+.memory-card {
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  perspective: 1200px;
+  min-height: 220px;
+  cursor: pointer;
+}
+
+.memory-card-inner {
+  position: relative;
+  width: 100%;
+  min-height: 220px;
+  transform-style: preserve-3d;
+  transition: transform .6s ease;
+}
+
+.memory-card.flipped .memory-card-inner { transform: rotateY(180deg); }
+
+.memory-front {
+  background:
+    radial-gradient(circle at 88% 18%, rgba(212,102,156,.10), transparent 14%),
+    linear-gradient(145deg, var(--white), color-mix(in srgb, var(--pink-pale) 62%, white 38%));
+}
+
+.memory-back {
+  background:
+    radial-gradient(circle at 16% 14%, rgba(255,255,255,.14), transparent 14%),
+    linear-gradient(145deg, var(--navy), var(--navy-light));
+  color: #fff;
+  transform: rotateY(180deg);
+}
+
+.memory-back small { color: rgba(255,255,255,.72); }
+
+.memory-back strong { color: #fff; }
+
+.memory-back em { color: rgba(255,255,255,.78); }
+
+.memory-card:focus-visible {
+  outline: 3px solid rgba(212,102,156,.35);
+  outline-offset: 6px;
+  border-radius: 24px;
+}
+
+.memory-view-btn:hover,
+.memory-mode-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--pink);
+}
+
+.memory-view-btn.active {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(15,23,42,.14);
+}
+
+.memory-mode-btn.active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(124,58,237,.18);
+}
+
+.memory-practice-card {
+  background: linear-gradient(145deg, var(--white), #fdf2f8);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.memory-option {
+  text-align: left;
+  border: 1.5px solid var(--input-brd);
+  background: var(--input-bg);
+  color: var(--text);
+  border-radius: 18px;
+  padding: 16px;
+  cursor: pointer;
+  transition: .15s ease;
+  min-height: 60px;
+  touch-action: manipulation;
+}
+
+.memory-option:hover {
+  border-color: var(--pink);
+  background: var(--table-hover);
+  transform: translateY(-1px);
+}
+
+.memory-option.correct {
+  background: #dcfce7;
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.memory-option.wrong {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.memory-option.locked { cursor: default; }
+
+.memory-option:disabled { opacity: 1; }
+
+.memory-feedback.success {
+  border-color: rgba(16,185,129,.35);
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.memory-feedback.error {
+  border-color: rgba(239,68,68,.28);
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.memory-next-btn { min-height: 46px; }
+
+.memory-next-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================================
+   MEMORY HUB UPGRADE — tabs, matching, typing, weak words
+   ============================================================ */
+
+.memory-tab-btn:hover {
+  background: rgba(36, 72, 255, 0.08);
+}
+
+.memory-tab-btn.active {
+  background: linear-gradient(135deg, var(--pink, #d4669c), var(--pink-bright, #e879a0));
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(212, 102, 156, 0.35);
+  transform: translateY(-1px);
+}
+
+/* MATCHING GAME */
+
+.matching-card:hover { transform: translateY(-1px); }
+
+.matching-card.selected {
+  border-color: var(--pink, #d4669c);
+  background: rgba(212, 102, 156, 0.12);
+  box-shadow: 0 0 0 3px rgba(212, 102, 156, 0.18);
+}
+
+.matching-card.matched {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.18);
+  color: #065f46;
+  cursor: default;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.matching-card.wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.16);
+  animation: match-shake .35s ease;
+}
+
+.matching-result.shown { display: block; }
+
+.matching-result-stat {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+
+/* TYPING TEST */
+
+.typing-input:focus {
+  border-color: var(--pink, #d4669c);
+  box-shadow: 0 0 0 4px rgba(212, 102, 156, 0.18);
+}
+
+.typing-input.success {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.typing-input.error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+  animation: match-shake .35s ease;
+}
+
+.typing-actions > * { flex: 1 1 140px; min-height: 48px; }
+
+.typing-feedback.success {
+  background: rgba(16, 185, 129, 0.14);
+  color: #065f46;
+}
+
+.typing-feedback.error {
+  background: rgba(239, 68, 68, 0.14);
+  color: #991b1b;
+}
+
+.weak-word-stats span {
+  background: rgba(239, 68, 68, 0.14);
+  color: #991b1b;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.weak-word-stats span.good {
+  background: rgba(16, 185, 129, 0.14);
+  color: #065f46;
+}
+
+.weak-word-stats span.mastery {
+  background: rgba(36, 72, 255, 0.14);
+  color: var(--navy, #1a2850);
+}
+
+/* FAVORITE BUTTON ON FLASHCARDS */
+
+.memory-fav-btn:hover { transform: scale(1.1); }
+
+.memory-fav-btn.active { color: #ef4444; }
+
+.memory-card { position: relative; }
+
+/* SPEAK BUTTON ON FLASHCARDS */
+
+.memory-speak-btn:hover {
+  transform: scale(1.12);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 14px rgba(126, 32, 70, 0.18);
+}
+
+.memory-speak-btn:focus-visible {
+  outline: 2px solid rgba(212, 102, 156, 0.55);
+  outline-offset: 2px;
+}
+
+.memory-speak-btn.speaking {
+  background: rgba(212, 102, 156, 0.18);
+  animation: memory-speak-pulse .8s ease-in-out infinite;
+}
+
+.memory-card.flipped > .memory-speak-btn,
+.memory-speak-btn.is-back-side {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(25, 16, 35, 0.88);
+  color: #fff;
+}
+
+.memory-card.flipped > .memory-speak-btn:hover,
+.memory-speak-btn.is-back-side:hover {
+  background: rgba(25, 16, 35, 0.96);
+}
+
+.memory-card.flipped > .memory-speak-btn.speaking,
+.memory-speak-btn.is-back-side.speaking {
+  background: rgba(255, 255, 255, 0.24);
+  animation: memory-speak-pulse-back .8s ease-in-out infinite;
+}
+
+.memory-fav-toggle.active {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* keyboard-safe footer for typing on mobile */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .typing-card { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+}
+
+.example-list li,
+.review-question,
+.exam-question-title,
+.option-item,
+.exam-option-text,
+.memory-prompt-text,
+.typing-prompt {
+  hyphens: auto;
+}
+
+.memory-panel { display: none; }
+
+.memory-panel.active { display: block; }
+
+#memoryPracticeSection .memory-practice-head > div:first-child { flex: 1 1 200px; }
+
+.memory-mode-btn.active {
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(212, 102, 156, .28);
+}
+
+.memory-mode-btn:not(.active):hover {
+  color: var(--navy);
+  background: rgba(212, 102, 156, .08);
+}
+
+.memory-option-card:hover { border-color: var(--pink); background: rgba(212,102,156,.04); }
+
+.memory-option-card:active { transform: scale(.98); }
+
+.memory-option-card[disabled] { cursor: default; }
+
+.memory-option-card.correct {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, .12);
+  color: #065f46;
+}
+
+.memory-option-card.correct .memory-option-tag {
+  color: #065f46;
+  background: rgba(16, 185, 129, .16);
+}
+
+.memory-option-card.wrong {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, .12);
+  color: #991b1b;
+  animation: memShake .35s ease;
+}
+
+.memory-option-card.wrong .memory-option-tag {
+  color: #991b1b;
+  background: rgba(239, 68, 68, .16);
+}
+
+.memory-option-card.locked { opacity: 0.92; pointer-events: none; }
+
+.memory-feedback.success {
+  background: rgba(16, 185, 129, .14);
+  color: #065f46;
+}
+
+.memory-feedback.error {
+  background: rgba(239, 68, 68, .14);
+  color: #991b1b;
+}
+
+.memory-next-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================================
+   FLASHCARD — Mobil 2 kolon
+   ============================================================ */
+
+@supports (height: 100dvh) {
+  #memoryTypingSection .typing-card {
+    max-height: calc(100dvh - 140px);
+    overflow-y: auto;
+  }
+}
+
+#memoryhub,
+#memoryhub * {
+  max-width: 100%;
+}
+
+.memory-grid,
+.memory-options-grid,
+.typing-card,
+.weak-words-list { min-width: 0; }
+
+/* ============================================================
+   MATCHING SCROLL WRAPPER — mobilde yatay scroll, board sabit min-width
+   ============================================================ */
+
+.matching-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 4px;
+}
+
+/* ============================================================
+   STICKY ARAMA KUTUSU (Ezber Merkezi flashcard alanı)
+   ============================================================ */
+
+/* ============================================================
+   FLASHCARD GRID — mobil 2 sütun zorunlu (kuralı sertleştir)
+   ============================================================ */
+
+/* Flashcard okunabilirliği ve mobil kart oranları. */
+
+.memory-front small,
+.memory-front em { color: #735062; }
+
+.memory-back small,
+.memory-back em { color: rgba(255,255,255,.90); }
+
+.memory-fav-btn,
+.favorite-btn,
+.memory-favorite-btn {
+  z-index: 5;
+  color: var(--pink);
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(212,102,156,.18);
+  box-shadow: 0 10px 24px rgba(126,32,70,.16);
+}
+
+/* Flashcard arama barı: sayfanın en üstünde ince, cam efektli sticky alan. */
+
+#memoryhub,
+.memory-cards-section,
+.memory-cards-shell,
+.memory-section-shell {
+  overflow: visible;
+}
+
+.memory-search-sticky .hub-search {
+  min-height: 48px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.86);
+  color: var(--text);
+}
+
+.memory-favorite-filter-btn.active,
+.memory-favorite-filter-btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ============================================================
+   TEMA PANELI / FLASHCARD STICKY ARAMA CAKISMA FIX
+   ============================================================ */
+
+/* Flashcard arama bari normalde ustte kalir; fakat modal panellerin ustune cikmaz. */
+
+#memoryhub #memoryMatchingSection[hidden] {
+  display: none !important;
+}
+
+#memoryhub #memoryMatchingSection .memory-section-head,
+#memoryhub #memoryMatchingSection .matching-shell,
+#memoryhub #memoryMatchingSection .matching-toolbar,
+#memoryhub #memoryMatchingSection .matching-scroll,
+#memoryhub #memoryMatchingSection .matching-result {
+  width: 100%;
+  max-width: none !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+#memoryhub #memoryMatchingSection .matching-board {
+  width: 100%;
+  max-width: none !important;
+}
+
+/* ============================================================
+   FINAL MATCHING FULL-FIT FIX
+   Altın kural: sadece Ezber Merkezi > Eşleştirme bölümünü etkiler.
+   Eski arayüz korunur; bölüm bilgisayar/tablet/telefon ekranına tam oturur.
+   ============================================================ */
+
+#memoryhub #memoryMatchingSection {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 0 24px 0 !important;
+  margin-left: 0 !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
+#memoryhub #memoryMatchingSection[hidden],
+#memoryhub #memoryMatchingSection.is-hidden {
+  display: none !important;
+}
+
+#memoryhub #memoryMatchingSection .memory-section-head,
+#memoryhub #memoryMatchingSection .matching-shell,
+#memoryhub #memoryMatchingSection .matching-toolbar,
+#memoryhub #memoryMatchingSection .matching-scroll,
+#memoryhub #memoryMatchingSection .matching-board,
+#memoryhub #memoryMatchingSection .matching-result {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-scroll {
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  padding-bottom: 0 !important;
+}
+
+#memoryhub #memoryMatchingSection .matching-column {
+  min-width: 0 !important;
+  width: 100% !important;
+}

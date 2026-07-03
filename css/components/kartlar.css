@@ -1,0 +1,326 @@
+.search-bar input,
+.hub-search {
+  width: 100%;
+  border: 1.5px solid color-mix(in srgb, var(--card-border) 76%, var(--pink) 24%);
+  background: var(--input-bg);
+  color: var(--text);
+  border-radius: 18px;
+  min-height: 50px;
+  padding: 11px 16px 11px 44px;
+  outline: none;
+  transition: .2s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 10px 26px rgba(15,23,42,.04);
+}
+
+.search-bar input:focus,
+.hub-search:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(212,102,156,.12);
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 46px 44px;
+  border-radius: 30px;
+  margin-bottom: 26px;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 28px 60px rgba(24, 32, 62, .18);
+  background:
+    radial-gradient(circle at 92% 18%, rgba(255,255,255,.16), transparent 16%),
+    radial-gradient(circle at 14% 18%, rgba(255,255,255,.08), transparent 18%),
+    linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 55%, #513069 100%);
+}
+
+.progress-shell { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 22px; }
+
+.panel-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 22px; }
+
+.stat-card {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.progress-card { padding: 22px 24px; }
+
+.progress-bar-bg {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-border) 88%, transparent);
+  overflow: hidden;
+  margin-bottom: 10px;
+  box-shadow: inset 0 1px 2px rgba(15,23,42,.05);
+}
+
+.progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--pink), var(--pink-bright));
+  transition: width .4s ease;
+  box-shadow: 0 10px 20px rgba(124,58,237,.24);
+}
+
+.panel-badge,
+.unit-badge {
+  color: #fff;
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+}
+
+.panel-badge.quiz,
+.quiz-badge { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+.panel-badge.exam,
+.exam-badge { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+
+.panel-badge { margin-bottom: 10px; }
+
+/* ================= TOPIC CARDS ================= */
+
+/* ================= DETAIL / QUIZ SHELL ================= */
+
+.content-card,
+.side-card { padding: 22px; }
+
+.note-box { background: var(--pink-pale); }
+
+.warning-box {
+  border-left-color: var(--warning);
+  background: linear-gradient(135deg, rgba(245,158,11,.08), rgba(245,158,11,.04));
+  border: 1px solid rgba(245,158,11,.18);
+  color: #92400e;
+}
+
+.info-box {
+  border-left-color: #8b5cf6;
+  background: linear-gradient(135deg, rgba(124,58,237,.08), rgba(124,58,237,.04));
+  border: 1px solid rgba(124,58,237,.18);
+}
+
+.exam-meta-item {
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.result-stat {
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.topic-score-card { padding: 16px; }
+
+.empty-grid {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-light);
+  padding: 24px;
+  background: var(--input-bg);
+  border: 1px dashed var(--card-border);
+  border-radius: 18px;
+}
+
+/* ================= PREMIUM EXAM SHELL ================= */
+
+.result-score-circle {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pink-bright) 18%, white), color-mix(in srgb, var(--navy-light) 12%, white));
+  border: 1.5px solid color-mix(in srgb, var(--pink) 32%, var(--card-border));
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.result-insight-card {
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--input-bg) 84%, white 16%);
+  margin-bottom: 16px;
+}
+
+.review-card {
+  border-radius: 20px;
+  padding: 18px;
+  border: 1px solid var(--card-border);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.review-card-correct { border-color: rgba(16,185,129,.28); }
+
+.review-card-wrong { border-color: rgba(239,68,68,.24); }
+
+.review-card-empty { border-color: rgba(226,232,240,.95); }
+
+/* ================= EXAM MODE CARDS ================= */
+
+.exam-cancel-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(239, 68, 68, .35);
+}
+
+/* DAILY 10 CARD — kaldırıldı (display:none güvence) */
+
+.daily-ten-card,
+.daily-ten-head,
+.daily-ten-list,
+.daily-ten-pill,
+.daily-ten-tag,
+.daily-ten-title { display: none !important; }
+
+/* ==============================================================
+   ============== EZBER MERKEZİ — 4 ŞIKLI TEST REDESIGN ========
+   Mobile-first, premium, kompakt. Sekme paneli görünürlüğü
+   üstteki katmandan geliyor; bu blok sadece içeriği biçimlendirir.
+   ============================================================== */
+
+/* Panel genel */
+
+/* Practice card — kompakt, ortalı, premium */
+
+/* Question card */
+
+/* ============================================================
+   PRACTICE PANELİ — Mobile-first sıkılaştırma
+   ============================================================ */
+
+.exam-meta-box {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Tema paneli ve karartma katmani her zaman tum icerigin uzerinde kalir. */
+
+/* Tema paneli acikken sticky arama ve yukari cik butonu gizlenir.
+   Boylece panelin ustunden gecen arama kutusu gorunmez. */
+
+/* Mobilde tema paneli alttan gelen temiz bottom-sheet gibi otursun. */
+
+.exam-stat-card.purple .exam-stat-icon { background: #ede9fe; }
+
+.exam-stat-card.green .exam-stat-icon { background: #dcfce7; }
+
+.exam-stat-card.orange .exam-stat-icon { background: #ffedd5; }
+
+.exam-stat-card.blue .exam-stat-icon { background: #dbeafe; }
+
+.exam-stat-card.pink .exam-stat-icon { background: #fce7f3; }
+
+.exam-actions-panel,
+.exam-goals-panel { grid-column: 1; }
+
+.exam-category-card.violet .exam-category-visual { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+
+.exam-category-card.green .exam-category-visual { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #047857; }
+
+.exam-category-card.orange .exam-category-visual { background: linear-gradient(135deg, #ffedd5, #fed7aa); color: #ea580c; }
+
+.exam-category-card.blue .exam-category-visual { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #2563eb; }
+
+.exam-category-card.pink .exam-category-visual { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #db2777; }
+
+.result-option-review.is-selected-answer:not(.is-correct-answer) .result-option-letter,
+.selected-tag {
+  background: var(--pink-pale);
+  color: var(--navy);
+  border: 1px solid color-mix(in srgb, var(--pink) 35%, var(--card-border));
+}
+
+.result-explanation-box {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--pink-pale) 58%, var(--white));
+  border: 1px solid color-mix(in srgb, var(--pink) 24%, var(--card-border));
+}
+
+.result-explanation-box strong {
+  display: block;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.detailed-explanation-box {
+  background: color-mix(in srgb, var(--pink-pale) 62%, var(--white) 38%);
+  border-color: color-mix(in srgb, var(--pink) 28%, var(--card-border) 72%);
+}
+
+.history-question-detail {
+  border-color: color-mix(in srgb, var(--pink) 34%, var(--card-border));
+}
+
+.detailed-chart-box {
+  min-height: 370px;
+}
+
+.detailed-chart-box svg {
+  width: 100%;
+  min-height: 330px;
+  display: block;
+}
+
+.streak-main-card,
+.streak-week-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.94)), var(--white);
+  border: 1px solid color-mix(in srgb, var(--card-border) 82%, white 18%);
+  border-radius: 24px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.streak-days span.done {
+  background: linear-gradient(135deg, #ff9f43, #ff6b6b);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(255, 111, 80, .22);
+}
+
+/* Word Box başlığı sade, bar içinde tek satır */
+
+/* Sadece Asker Kokorec mantigindaki Word Box bar sticky kalsin */
+
+.device-detected-box small {
+  color: var(--text-light);
+  line-height: 1.55;
+}
+
+.device-select:focus,
+.device-custom-input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(212,102,156,.12);
+}
+
+.device-cookie-style .device-detected-box {
+  margin: 16px 0 0;
+}
+
+.mistake-card {
+  border-color: color-mix(in srgb, var(--warning) 34%, var(--card-border) 66%);
+  background: color-mix(in srgb, var(--warning) 10%, var(--input-bg) 90%);
+}
+
+.mini-summary-card {
+  border-color: color-mix(in srgb, var(--success) 34%, var(--card-border) 66%);
+  background: color-mix(in srgb, var(--success) 8%, var(--input-bg) 92%);
+}
+
+/* Host shell */
+
+/* Konfeti şeritleri (panel etrafında, QR'a değmez) */
+
+/* Beyaz QR paneli — premium glow */
+
+/* Touch: hover'sız cihazlarda panel kaymasın */
+
+/* --- Ana panel (glass container) --- */
+
+/* --- İç içerik elemanları: source-panel, example-card, warning-box, vb. --- */

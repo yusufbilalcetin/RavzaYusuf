@@ -1,0 +1,232 @@
+/* ================= SIDEBAR ================= */
+
+.sidebar::-webkit-scrollbar { width: 6px; }
+
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 999px; }
+
+.logo {
+  padding: 30px 24px 24px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), transparent 80%);
+}
+
+.nav-links { list-style: none; padding: 18px 12px; flex: 1; }
+
+.nav-links li button:hover,
+.nav-links li button.active {
+  background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 28px rgba(0,0,0,.12);
+}
+
+/* ---- Hazırlık dropdown ---- */
+
+.nav-group { margin: 4px 0; }
+
+.nav-dropdown-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #a0b4d6;
+  padding: 14px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 16px;
+  transition: .2s ease;
+  user-select: none;
+}
+
+.nav-dropdown-summary::-webkit-details-marker { display: none; }
+
+.nav-dropdown-summary:hover,
+.nav-dropdown.has-active > .nav-dropdown-summary {
+  background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 12px 28px rgba(0,0,0,.12);
+}
+
+.nav-dropdown-icon {
+  margin-left: auto;
+  font-size: 12px;
+  transition: transform .25s ease;
+}
+
+.nav-dropdown[open] .nav-dropdown-icon { transform: rotate(180deg); }
+
+.nav-sublinks {
+  list-style: none;
+  margin-left: 22px;
+  padding: 2px 0 4px 10px;
+  border-left: 1px solid rgba(255,255,255,.12);
+}
+
+.nav-sublinks li button { padding: 11px 14px; font-size: 13px; }
+
+.nav-dropdown[open] .nav-sublinks { animation: navDropdownOpen .22s ease; }
+
+@keyframes navDropdownOpen {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sidebar-footer span { color: var(--pink-bright); }
+
+.content-card ul,
+.side-card ul,
+.quiz-sidebar ul { padding-left: 18px; }
+
+.content-card li,
+.side-card li,
+.quiz-sidebar li { margin-bottom: 8px; }
+
+.content-card strong,
+.side-card strong,
+.quiz-sidebar strong { color: var(--navy); }
+
+@supports (height: 100svh) {
+  .sidebar { height: 100svh; }
+}
+
+/* 12) Sidebar mobil scroll — uzun menü yetmezse kayar */
+
+/* =========================================================
+   FINAL FULLSCREEN LAYOUT
+   - Topbar arama alanı siteden kaldırıldı.
+   - Sidebar her ekranda kapalı başlar.
+   - Sol üst menü butonu ile açılır.
+   - Sidebar kapalıyken bütün sayfalar tam ekran genişliğinde çalışır.
+   ========================================================= */
+
+.sidebar {
+  transform: translateX(-105%) !important;
+  transition: transform .28s ease, box-shadow .28s ease !important;
+  z-index: 1200 !important;
+}
+
+.sidebar.open {
+  transform: translateX(0) !important;
+  box-shadow: 28px 0 70px rgba(15, 23, 42, .30) !important;
+}
+
+/* Saydam sidebar, net menü butonları */
+.sidebar {
+  background:
+    linear-gradient(180deg, rgba(42, 9, 32, .24), rgba(7, 3, 20, .18)) !important;
+  border-right: 1px solid rgba(255, 190, 222, .24) !important;
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, .08),
+    24px 0 62px rgba(10, 3, 20, .24) !important;
+  backdrop-filter: blur(22px) saturate(1.28) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.28) !important;
+}
+
+.sidebar-backdrop {
+  background: rgba(8, 3, 20, .22) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+}
+
+.sidebar.open {
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, .08),
+    34px 0 78px rgba(8, 2, 18, .34) !important;
+}
+
+.logo {
+  background: linear-gradient(180deg, rgba(38, 8, 30, .38), rgba(17, 5, 30, .10)) !important;
+  border-bottom: 1px solid rgba(255, 190, 222, .20) !important;
+}
+
+.logo h2 {
+  color: #fff2d8 !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .34);
+}
+
+.logo p {
+  color: rgba(255, 232, 244, .78) !important;
+}
+
+.nav-links li button,
+.nav-dropdown-summary {
+  background: rgba(9, 4, 24, .58) !important;
+  border: 1px solid rgba(255, 196, 226, .18) !important;
+  color: rgba(255, 238, 247, .92) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .09),
+    0 10px 22px rgba(8, 2, 18, .18) !important;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .30);
+}
+
+.nav-links li button:hover,
+.nav-links li button.active,
+.nav-dropdown-summary:hover,
+.nav-dropdown.has-active > .nav-dropdown-summary {
+  background:
+    linear-gradient(135deg, rgba(156, 27, 74, .88), rgba(58, 16, 72, .82)) !important;
+  border-color: rgba(255, 218, 238, .38) !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .18),
+    0 14px 30px rgba(67, 10, 40, .34) !important;
+}
+
+.nav-icon {
+  filter: drop-shadow(0 1px 5px rgba(0, 0, 0, .32));
+}
+
+.nav-sublinks {
+  border-left-color: rgba(255, 196, 226, .24) !important;
+}
+
+.sidebar-theme,
+.sidebar-footer {
+  background: rgba(9, 4, 24, .28) !important;
+  border-top: 1px solid rgba(255, 190, 222, .18) !important;
+}
+
+.theme-switch-label,
+.sidebar-footer {
+  color: rgba(255, 232, 244, .74) !important;
+}
+
+/* ==========================================================
+   Yusuf ♥ Ravza üst başlık alanı
+   Kırmızı işaretlenen boş alan için romantik ve responsive logo
+   ========================================================== */
+
+/* Alt orta logo rozeti — K! */
+
+.kahoot-qr-logo-badge {
+  position: absolute;
+  bottom: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.45), transparent 38%),
+    conic-gradient(from 220deg, #7c2cff, #ec4899, #38bdf8, #a855f7, #7c2cff);
+  color: #ffffff;
+  border: 5px solid #ffffff;
+  box-shadow:
+    0 0 0 2px rgba(168, 85, 247, 0.62),
+    0 0 36px rgba(236, 72, 153, 0.70),
+    0 14px 28px rgba(0, 0, 0, 0.34);
+  animation: kahootLogoGlow 2.6s ease-in-out infinite;
+}
+
+.kahoot-qr-logo-confetti {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  opacity: .92;
+}
+
+.kahoot-qr-logo-confetti.lc2 { bottom: 10px; left: 8px; background: #67e8f9; }

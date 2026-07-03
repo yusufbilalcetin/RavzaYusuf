@@ -1,0 +1,137 @@
+/* iOS input zoom engeli */
+
+.search-bar {
+  flex: 1;
+  max-width: 620px;
+  position: relative;
+}
+
+.hub-search {
+  padding-left: 16px;
+}
+
+/* ================= HUB TOOLBAR ================= */
+
+::selection {
+  background: var(--pink-bright);
+  color: var(--white);
+}
+
+.hub-search::placeholder,
+.search-bar input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--text) 62%, transparent);
+  opacity: 1;
+}
+
+#examPerformanceSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.result-option-review.is-selected-answer:not(.is-correct-answer) {
+  background: rgba(239,68,68,.10);
+  border-color: rgba(239,68,68,.34);
+}
+
+.result-option-review.is-wrong-selected .selected-tag {
+  background: #ef4444;
+  color: #fff;
+  border-color: transparent;
+}
+
+.result-option-explanation-item.is-correct,
+.result-option-explanation-item.is-selected-correct {
+  background: rgba(16, 185, 129, .10);
+  border-color: rgba(16, 185, 129, .35);
+}
+
+.result-option-explanation-item.is-correct .option-explanation-letter,
+.result-option-explanation-item.is-selected-correct .option-explanation-letter {
+  background: #10b981;
+  color: #fff;
+  border-color: transparent;
+}
+
+.result-option-explanation-item.is-correct .option-explanation-head em,
+.result-option-explanation-item.is-selected-correct .option-explanation-head em {
+  background: rgba(16, 185, 129, .16);
+  color: #047857;
+  border-color: rgba(16, 185, 129, .25);
+}
+
+.result-option-explanation-item.is-selected-wrong {
+  background: rgba(239, 68, 68, .10);
+  border-color: rgba(239, 68, 68, .36);
+}
+
+.result-option-explanation-item.is-selected-wrong .option-explanation-letter {
+  background: #ef4444;
+  color: #fff;
+  border-color: transparent;
+}
+
+.result-option-explanation-item.is-selected-wrong .option-explanation-head em {
+  background: rgba(239, 68, 68, .14);
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, .24);
+}
+
+/* =========================================================
+   EXAM HISTORY DETAIL + THEME PERFORMANCE CHART PATCH
+   ========================================================= */
+
+#examPerformanceSvg {
+  min-height: 280px;
+  background: color-mix(in srgb, var(--white) 84%, transparent);
+  border-radius: 24px;
+}
+
+/* ============================================================
+   PERFORMANCE CHART THEME POLISH
+   Sadece Sınav Merkezi performans grafiği görünümünü iyileştirir.
+   ============================================================ */
+
+/* Grafik üstündeki otomatik "Tema uyumlu performans takibi" etiketi kaldırıldı. */
+
+#examPerformanceSvg {
+  width: 100%;
+  min-height: 310px;
+  height: auto;
+  display: block;
+  border-radius: 24px;
+  background: transparent;
+}
+
+/* =========================================================
+   PERFORMANCE CHART - DETAILED DROPDOWN MODES
+   Sadece Sınav Merkezi performans grafiğini geliştirir.
+   ========================================================= */
+
+/* ============================================================
+   PERFORMANCE CHART DARK/LIGHT READABILITY FINAL FIX
+   Sadece performans grafiği alanının tema modu okunabilirliğini düzeltir.
+   ============================================================ */
+
+/* ============================================================
+   PERFORMANCE CHART MOBILE RESPONSIVE FINAL
+   Sadece performans grafiği alanını telefon/tablet uyumlu yapar.
+   ============================================================ */
+
+/* ============================================================
+   EXAM CENTER PERFORMANCE CHART - DARK MODE SUCCESS AREA FIX
+   Sadece Sınav Merkezi > Performans Grafiği alanındaki
+   başarı oranı / başarı grafiği yazılarını dark modda okunur yapar.
+   ============================================================ */
+
+.device-select-label,
+.device-select,
+.device-custom-input {
+  display: none !important;
+}
+
+.search-bar {
+  display: none !important;
+}

@@ -1,0 +1,209 @@
+.top-resource-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.heart-lives,
+.coin-pill {
+  min-height: 44px;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, .09);
+  color: var(--ink);
+}
+
+.heart-lives small,
+.coin-pill small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.island-map {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 20px 0 80px;
+}
+
+.island-map::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  bottom: 90px;
+  left: 50%;
+  width: 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(112, 230, 255, .28), rgba(255, 224, 138, .34), rgba(243, 92, 154, .26));
+  transform: translateX(-50%);
+}
+
+.map-row {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+
+.world-banner {
+  z-index: 1;
+  margin: 12px 0 6px;
+  padding: 9px 14px;
+  border: 1px solid rgba(255, 224, 138, .24);
+  border-radius: 14px;
+  background: rgba(12, 6, 25, .82);
+  color: #fff3d0;
+  font-weight: 1000;
+}
+
+.island-map .level-node {
+  width: min(86vw, 330px);
+  min-height: 132px;
+  transform: translateX(var(--offset));
+}
+
+.level-node.completed {
+  border-color: rgba(101, 239, 184, .38);
+}
+
+.level-node.legendary {
+  box-shadow: 0 0 0 2px rgba(255, 224, 138, .14), 0 20px 54px rgba(255, 91, 146, .12);
+}
+
+.life-empty-panel,
+.level-start-card,
+.settings-card {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: clamp(22px, 5vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.life-actions,
+.level-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.level-start-card h1,
+.settings-card h1 {
+  margin: 12px 0;
+  font-size: clamp(46px, 9vw, 88px);
+  color: #fff3d0;
+  line-height: .9;
+}
+
+.level-start-card h2 {
+  max-width: 680px;
+  margin: 22px 0;
+  color: var(--ink);
+  font-size: clamp(24px, 4vw, 38px);
+  line-height: 1.08;
+}
+
+.level-meta-row span {
+  min-height: 38px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 12px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .09);
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.tutorial-callout,
+.no-lives-panel {
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 224, 138, .22);
+  border-radius: 18px;
+  background: rgba(255, 224, 138, .10);
+  color: #fff3d0;
+  font-weight: 800;
+}
+
+.pre-booster-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.pre-booster-card {
+  display: grid;
+  gap: 8px;
+}
+
+.booster-button.selected {
+  border-color: rgba(255, 224, 138, .72);
+  background: rgba(255, 224, 138, .16);
+}
+
+.mini-buy {
+  min-height: 34px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .07);
+  color: var(--muted);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.play-level-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.settings-row {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 0 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .08);
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.settings-row input {
+  width: 22px;
+  height: 22px;
+}
+
+@media (max-width: 720px) {
+  .top-resource-bar {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .top-resource-bar .ghost-action {
+    grid-column: 1 / -1;
+  }
+
+  .island-map .level-node {
+    transform: none;
+  }
+
+  .pre-booster-list {
+    grid-template-columns: 1fr;
+  }
+
+  .game-hud .heart-lives {
+    width: 100%;
+  }
+}

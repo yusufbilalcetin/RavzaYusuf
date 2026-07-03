@@ -1,0 +1,200 @@
+.dashboard-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+.stat-card,
+.progress-card,
+.feature-panel,
+.dashboard-card,
+.topic-card,
+.exam-mode-card,
+.exam-meta-box,
+.detail-shell,
+.quiz-shell,
+.review-card,
+.flashcard,
+.empty-state,
+.content-card,
+.side-card,
+.question-card,
+.topic-score-card,
+.detail-hero,
+.quiz-hero,
+.result-box,
+.exam-header {
+  background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.92)), var(--white);
+  border: 1px solid color-mix(in srgb, var(--card-border) 82%, white 18%);
+  border-radius: 24px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-panel,
+.dashboard-card,
+.topic-card,
+.exam-mode-card,
+.flashcard,
+.review-card,
+.content-card,
+.side-card,
+.question-card,
+.topic-score-card,
+.exam-meta-box {
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.feature-panel:hover,
+.dashboard-card:hover,
+.topic-card:hover,
+.exam-mode-card:hover,
+.flashcard:hover,
+.review-card:hover,
+.content-card:hover,
+.side-card:hover,
+.question-card:hover,
+.topic-score-card:hover,
+.exam-meta-box:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--pink) 32%, var(--card-border) 68%);
+}
+
+.feature-panel,
+.dashboard-card,
+.topic-card,
+.exam-mode-card,
+.flashcard,
+.empty-state,
+.exam-meta-box,
+.detail-shell,
+.quiz-shell,
+.review-card,
+.content-card,
+.side-card,
+.question-card,
+.topic-score-card {
+  padding: 24px;
+}
+
+.dashboard-steps {
+  padding-left: 18px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.dashboard-steps li { margin-bottom: 8px; }
+
+/* ============================================================
+   PROFESSIONAL EXAM CENTER DASHBOARD
+   Görseldeki 16:9 profesyonel dashboard hissi için sadece Sınav Merkezi.
+   ============================================================ */
+
+/* =========================================================
+   Dashboard final layout: reference screenshot proportions
+   ========================================================= */
+
+#dashboard.active {
+  display: flex !important;
+}
+
+#dashboard .hero,
+#dashboard .streak-module,
+#dashboard .panel-grid,
+#dashboard .dashboard-grid {
+  display: none !important;
+}
+
+#dashboard .quick-access-title strong,
+#dashboard .quick-access-item {
+  letter-spacing: 0 !important;
+}
+
+#dashboard .quick-access-item:hover {
+  background: rgba(255, 128, 190, .12) !important;
+  color: #fff !important;
+  transform: translateX(2px) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 160, 215, .16) !important;
+}
+
+#dashboard .quick-access-item:hover .quick-access-arrow {
+  color: rgba(255, 160, 215, .88) !important;
+  transform: translateX(2px) !important;
+}
+
+#dashboard .stat-card::before {
+  display: none !important;
+}
+
+#dashboard .progress-card::before {
+  display: none !important;
+}
+
+#dashboard .progress-bar-bg {
+  height: 8px !important;
+  margin: 0 0 10px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, .12) !important;
+}
+
+body:has(#dashboard.active) .content-wrapper {
+  padding: clamp(14px, 2vw, 30px) clamp(14px, 2.8vw, 46px) !important;
+}
+
+body:has(#dashboard.active) #dashboard.active {
+  display: block !important;
+}
+
+body:has(#dashboard.active) #dashboard .dash-right {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  overflow: visible !important;
+}
+
+body:has(#dashboard.active) #dashboard .dashboard-visual-stage {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 480px !important;
+  border: 1px solid rgba(255, 190, 222, .28) !important;
+  border-radius: clamp(20px, 2.4vw, 34px) !important;
+  background-image:
+    linear-gradient(180deg, rgba(9, 3, 21, .02), rgba(9, 3, 21, .18)),
+    url("../../assets/home-bg-desktop.png") !important;
+  background-size: cover, cover !important;
+  background-position: center center, center center !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .18),
+    inset 0 -34px 64px rgba(11, 4, 24, .28),
+    0 24px 70px rgba(37, 10, 36, .28) !important;
+  isolation: isolate !important;
+}
+
+body:has(#dashboard.active) #dashboard .dashboard-visual-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .08),
+    inset 0 0 90px rgba(11, 4, 24, .16);
+}
+
+@media (max-width: 768px) {
+  body:has(#dashboard.active) .content-wrapper {
+    padding: 10px !important;
+  }
+
+  body:has(#dashboard.active) #dashboard .dashboard-visual-stage {
+    height: calc(100svh - 88px) !important;
+    min-height: 430px !important;
+    border-radius: 22px !important;
+    background-image:
+      linear-gradient(180deg, rgba(9, 3, 21, .02), rgba(9, 3, 21, .16)),
+      url("../../assets/home-bg-mobile.png") !important;
+    background-position: center 58%, center 58% !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .18),
+      inset 0 -28px 54px rgba(11, 4, 24, .26),
+      0 18px 48px rgba(37, 10, 36, .24) !important;
+  }
+}

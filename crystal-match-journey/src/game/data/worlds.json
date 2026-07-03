@@ -1,0 +1,47 @@
+[
+  {
+    "id": "crystal_forest",
+    "name": "Kristal Ormani",
+    "range": [
+      1,
+      20
+    ],
+    "theme": "Isiltili agaclar, sisli kopruler ve yumusak yesil pariltilar."
+  },
+  {
+    "id": "frost_cave",
+    "name": "Buzlu Magara",
+    "range": [
+      21,
+      40
+    ],
+    "theme": "Buz tabakalari, mavi kristal duvarlar ve kirilgan zeminler."
+  },
+  {
+    "id": "lava_island",
+    "name": "Lav Adasi",
+    "range": [
+      41,
+      60
+    ],
+    "theme": "Lav yariklari, obsidyen yollar ve yayilan karanlik madde."
+  },
+  {
+    "id": "cloud_palace",
+    "name": "Bulut Sarayi",
+    "range": [
+      61,
+      80
+    ],
+    "theme": "Bos hucreli ozel tahtalar, ucusan adalar ve altin kapilar."
+  },
+  {
+    "id": "rainbow_temple",
+    "name": "Gokkusagi Tapinagi",
+    "range": [
+      81,
+      100
+    ],
+    "theme": "Ileri kombinasyonlar, kilitler, sandiklar ve efsanevi bolumler."
+  }
+]

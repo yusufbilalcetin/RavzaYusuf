@@ -1,0 +1,166 @@
+/* ================= BUTTONS ================= */
+
+.primary-btn,
+.check-btn {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff;
+  padding: 12px 20px;
+  box-shadow: 0 16px 30px rgba(49, 68, 156, .20);
+}
+
+.primary-btn.soft { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.ghost-btn:hover,
+.check-btn:hover,
+.mark-btn:hover {
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+.secondary-btn {
+  padding: 12px 20px;
+  background: var(--pink-pale);
+  color: var(--navy);
+}
+
+.ghost-btn {
+  padding: 12px 20px;
+  background: color-mix(in srgb, var(--input-bg) 78%, transparent);
+  color: var(--text);
+  border: 1.5px solid var(--card-border);
+}
+
+.mark-btn {
+  padding: 12px 20px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1.5px solid rgba(16,185,129,.22);
+}
+
+.mark-btn.done {
+  background: var(--success);
+  color: #fff;
+  border-color: var(--success);
+}
+
+.exam-nav-btn:hover { transform: translateY(-1px); }
+
+.exam-nav-btn.is-current {
+  box-shadow: 0 0 0 2px rgba(124,58,237,.26), var(--shadow-sm);
+  border-color: rgba(124,58,237,.4);
+}
+
+.exam-nav-btn.is-answered {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--navy-light) 14%, white), color-mix(in srgb, var(--pink-bright) 12%, white));
+  color: var(--navy);
+}
+
+.exam-nav-btn.is-correct {
+  background: rgba(16,185,129,.14);
+  border-color: rgba(16,185,129,.4);
+  color: #047857;
+}
+
+.exam-nav-btn.is-wrong {
+  background: rgba(239,68,68,.14);
+  border-color: rgba(239,68,68,.38);
+  color: #b91c1c;
+}
+
+.exam-nav-btn.is-empty {
+  background: #ffffff;
+  border-color: rgba(226,232,240,.95);
+  color: #475569;
+}
+
+.exam-prev-btn { justify-self: start; }
+
+.exam-next-btn,
+.exam-finish-btn { justify-self: end; }
+
+.exam-cancel-btn:hover {
+  background: rgba(239, 68, 68, .14);
+  border-color: rgba(239, 68, 68, .4);
+  transform: translateY(-1px);
+}
+
+/* Next button */
+
+.exam-category-card.green button { background: #16a34a; }
+
+.exam-category-card.orange button { background: #f97316; }
+
+.exam-category-card.blue button { background: #2563eb; }
+
+.exam-category-card.pink button { background: #ec4899; }
+
+.exam-result-actions.simple .exam-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(20, 20, 40, .10);
+  border-color: color-mix(in srgb, var(--pink) 44%, var(--card-border) 56%);
+}
+
+.exam-result-actions.simple .exam-action-btn.primary {
+  background: linear-gradient(135deg, #17bebb, #14a6a3);
+  color: #fff;
+  border-color: transparent;
+}
+
+.exam-result-actions.simple .exam-action-btn.secondary {
+  background: color-mix(in srgb, var(--pink) 14%, var(--white));
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--pink) 30%, var(--card-border));
+}
+
+.exam-result-actions.simple .exam-action-btn.ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--card-border) 82%, var(--pink) 18%);
+}
+
+.exam-result-actions.simple .exam-action-btn.ghost:hover {
+  background: color-mix(in srgb, var(--pink-pale) 62%, transparent);
+}
+
+.exam-nav-btn.is-focused-result {
+  box-shadow: 0 0 0 3px rgba(212, 102, 156, .28), var(--shadow-sm);
+  border-color: var(--pink) !important;
+  transform: translateY(-1px);
+}
+
+.device-btn:hover {
+  transform: translateY(-1px);
+}
+
+.device-btn-primary {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff;
+  box-shadow: 0 16px 30px rgba(49, 68, 156, .20);
+}
+
+.device-btn-ghost {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1.5px solid var(--card-border);
+}
+
+.device-cookie-style .device-btn-primary,
+.device-cookie-style .device-btn-ghost {
+  min-height: 50px;
+}
+
+.device-cookie-style .device-btn-ghost {
+  order: 1;
+}
+
+.device-cookie-style .device-btn-primary {
+  order: 2;
+}
+
+.detail-back-btn:hover {
+  background: rgba(255,255,255,0.12) !important;
+  border-color: rgba(255,130,180,0.55) !important;
+  transform: translateX(-2px) translateY(-1px);
+}

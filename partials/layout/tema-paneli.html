@@ -1,0 +1,67 @@
+<button class="theme-sheet-backdrop" id="theme-sheet-backdrop" aria-label="Tema panelini kapat" onclick="closeThemeSheet()"></button>
+    <aside class="theme-sheet" id="theme-sheet" aria-hidden="true">
+      <div class="theme-sheet-head">
+        <div>
+          <span class="unit-badge quiz-badge">TEMA</span>
+          <h3>Tema Seç</h3>
+          <p>Çalışma alanını tek dokunuşla değiştir.</p>
+        </div>
+        <button type="button" class="theme-sheet-close" onclick="closeThemeSheet()" aria-label="Kapat">✕</button>
+      </div>
+
+      <div class="theme-sheet-grid">
+        <button type="button" class="theme-choice-card" data-theme-id="noel-ask" onclick="selectTheme('noel-ask')">
+          <span class="theme-choice-preview preview-noel-ask"></span>
+          <span class="theme-choice-meta">
+            <strong>Noel Aşk Teması</strong>
+            <small>Sevgi dolu, sıcak ve romantik yeni yıl görünümü.</small>
+          </span>
+          <span class="theme-choice-check" aria-hidden="true">✓</span>
+        </button>
+
+        <button type="button" class="theme-choice-card" data-theme-id="gece-mavisi" onclick="selectTheme('gece-mavisi')">
+          <span class="theme-choice-preview preview-gece-mavisi"></span>
+          <span class="theme-choice-meta">
+            <strong>Gece Mavisi</strong>
+            <small>Odak artıran serin mavi ve sakin gece tonları.</small>
+          </span>
+          <span class="theme-choice-check" aria-hidden="true">✓</span>
+        </button>
+
+        <button type="button" class="theme-choice-card" data-theme-id="orman-yesili" onclick="selectTheme('orman-yesili')">
+          <span class="theme-choice-preview preview-orman-yesili"></span>
+          <span class="theme-choice-meta">
+            <strong>Orman Yeşili</strong>
+            <small>Doğadan ilham alan huzurlu ve derin tonlar.</small>
+          </span>
+          <span class="theme-choice-check" aria-hidden="true">✓</span>
+        </button>
+
+        <button type="button" class="theme-choice-card" data-theme-id="mor-isik" onclick="selectTheme('mor-isik')">
+          <span class="theme-choice-preview preview-mor-isik"></span>
+          <span class="theme-choice-meta">
+            <strong>Mor Işık</strong>
+            <small>Modern, enerjik ve parlak mor vurgu teması.</small>
+          </span>
+          <span class="theme-choice-check" aria-hidden="true">✓</span>
+        </button>
+
+        <button type="button" class="theme-choice-card" data-theme-id="klasik-koyu" onclick="selectTheme('klasik-koyu')">
+          <span class="theme-choice-preview preview-klasik-koyu"></span>
+          <span class="theme-choice-meta">
+            <strong>Klasik Koyu</strong>
+            <small>Zamansız, sade ve minimal koyu görünüm.</small>
+          </span>
+          <span class="theme-choice-check" aria-hidden="true">✓</span>
+        </button>
+
+        <button type="button" class="theme-choice-card" data-theme-id="pembe-tema" onclick="selectTheme('pembe-tema')">
+          <span class="theme-choice-preview preview-pembe-tema"></span>
+          <span class="theme-choice-meta">
+            <strong>Pembe Tema</strong>
+            <small>Yumuşak pembe tonları, net kontrast ve sade romantik görünüm.</small>
+          </span>
+          <span class="theme-choice-check" aria-hidden="true">✓</span>
+        </button>
+      </div>
+    </aside>

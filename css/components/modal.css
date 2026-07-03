@@ -1,0 +1,30 @@
+/* ================= CANCEL EXAM DIALOG ================= */
+
+.exam-cancel-dialog.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Modal açıkken arkayı kilitle */
+
+/* Mobilde dialog ve aksiyonlar */
+
+/* 8) Dynamic viewport: klavye açılınca 100vh kullanan modal/sheet'lerin patlamasını önle */
+
+/* =========================================================
+   DEVICE PERMISSION MODAL
+   Kullanıcıdan cihaz kaydı izni alma ekranı
+   ========================================================= */
+
+.device-permission-modal.closing {
+  animation: deviceModalFadeOut .18s ease both;
+}
+
+.device-permission-modal.device-cookie-style {
+  align-items: end;
+  justify-items: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, .34);
+}

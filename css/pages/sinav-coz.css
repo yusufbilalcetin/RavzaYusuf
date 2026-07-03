@@ -1,0 +1,51 @@
+.detail-hero,
+.quiz-hero,
+.result-box,
+.exam-header { padding: 28px; }
+
+.premium-exam-shell,
+.premium-result-box {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--white) 96%, transparent), var(--white));
+  border: 1px solid var(--card-border);
+  border-radius: 28px;
+  box-shadow: var(--shadow-lg);
+  padding: 22px;
+}
+
+.exam-focus-card {
+  border-radius: 24px;
+  border: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--input-bg) 84%, white 16%);
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.exam-option-btn:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--pink) 45%, var(--card-border));
+}
+
+.exam-option-btn.selected {
+  border-color: rgba(124,58,237,.42);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--navy-light) 10%, white), color-mix(in srgb, var(--pink-bright) 12%, white));
+  box-shadow: 0 0 0 2px rgba(124,58,237,.14), var(--shadow-sm);
+}
+
+.exam-option-btn.selected .exam-option-letter {
+  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff;
+}
+
+.exam-shell-actions > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.history-result-box .result-title {
+  color: var(--pink-bright);
+}
+
+.history-result-box .result-insight-card {
+  border: 1px solid color-mix(in srgb, var(--pink) 26%, var(--card-border));
+  background: color-mix(in srgb, var(--pink-pale) 42%, var(--white));
+}

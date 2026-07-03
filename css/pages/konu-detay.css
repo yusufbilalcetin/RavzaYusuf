@@ -1,0 +1,127 @@
+/* =========================================================
+   STUDY DETAIL — PREMIUM DARK LIBRARY DESIGN
+   Sadece #studydetail sayfası için. Diğer sayfaları etkilemez.
+   ========================================================= */
+
+#studydetail.active::after {
+  content: "";
+  position: fixed;
+  inset: 78px 0 0;
+  z-index: -2;
+  pointer-events: none;
+  /* Light mode: biraz daha koyu overlay (okunabilirlik) */
+  background: linear-gradient(180deg, rgba(5,4,12,0.30) 0%, rgba(5,4,12,0.44) 100%);
+}
+
+.study-detail-hero:hover {
+  border-color: rgba(255, 130, 180, 0.50);
+}
+
+.study-detail-content-card:hover {
+  border-color: rgba(255, 140, 190, 0.44);
+}
+
+/* İçerik kartı içindeki study-content grid */
+
+#studydetail .content-card {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 22px !important;
+  box-shadow: none !important;
+  transition: border-color .22s ease;
+}
+
+#studydetail .content-card:hover {
+  border-color: rgba(255, 140, 190, 0.44) !important;
+}
+
+#studydetail .content-card::before { display: none; }
+
+#studydetail .content-card strong {
+  color: #ffd6ea !important;
+}
+
+#studydetail .content-card ul,
+#studydetail .content-card ol {
+  padding-left: 20px;
+}
+
+#studydetail .source-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: rgba(255,255,255,0.88);
+  min-width: 480px;
+}
+
+#studydetail .source-table thead {
+  background: rgba(255, 120, 180, 0.14);
+}
+
+#studydetail .source-table tr:last-child td { border-bottom: none; }
+
+#studydetail .source-panel,
+#studydetail .example-card {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+  color: rgba(255, 238, 246, 0.88);
+}
+
+#studydetail .source-panel strong,
+#studydetail .example-card strong {
+  color: #ffd6ea !important;
+}
+
+#studydetail .warning-box,
+#studydetail .mistake-card {
+  background: transparent !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+  border-left-color: rgba(245, 158, 11, 0.60) !important;
+  box-shadow: none !important;
+  color: rgba(255, 238, 200, 0.90) !important;
+}
+
+#studydetail .warning-box strong,
+#studydetail .mistake-card strong {
+  color: #fcd34d !important;
+}
+
+#studydetail .note-box {
+  background: transparent !important;
+  border-color: rgba(255, 130, 180, 0.30) !important;
+  box-shadow: none !important;
+}
+
+#studydetail .info-box {
+  background: transparent !important;
+  border-color: rgba(124, 58, 237, 0.30) !important;
+  box-shadow: none !important;
+}
+
+#studydetail .visual-note,
+#studydetail .visual-note strong,
+#studydetail .formula-card strong,
+#studydetail .word-card strong {
+  color: #ffd6ea !important;
+}
+
+#studydetail .timeline-box {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 238, 246, 0.88) !important;
+  box-shadow: none !important;
+}
+
+#studydetail .study-content strong,
+#studydetail .study-content b {
+  color: #ffd6ea;
+}
+
+#studydetail .study-content em {
+  color: rgba(255, 220, 240, 0.80);
+}
+
+.study-detail-actionbar .detail-quiz-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(123,23,49,0.48);
+}

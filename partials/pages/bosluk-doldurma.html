@@ -1,0 +1,31 @@
+<section id="fillgaphub" class="page fill-gap-page">
+        <div class="page-header fill-gap-page-header">
+          <div class="page-header-left">
+            <span class="unit-badge fill-gap-badge">FILL IN THE GAPS</span>
+            <h2>Boşluk Doldurma Merkezi</h2>
+            <p class="subtitle">Kelimeleri ve grammar yapılarını cümle içinde doğru yere yerleştir. Masaüstünde sürükle-bırak, mobilde kelimeye dokunup boşluğa dokunarak çalış.</p>
+          </div>
+        </div>
+
+        <div class="fill-gap-hero">
+          <div>
+            <span class="fill-gap-kicker">Ravza için pratik çalışma</span>
+            <h3>Tüm konular için profesyonel alıştırma</h3>
+            <p>Bir kelime seç, istediğin boşluğa dokun ve cevabını yerleştir. Yanlışlarını tekrar çözerek konuları güçlendir.</p>
+          </div>
+          <div class="fill-gap-hero-stats" id="fillGapHeroStats">
+            <span><strong>20</strong> konu</span>
+            <span><strong>100+</strong> boşluk</span>
+            <span><strong>Mobil</strong> uyumlu</span>
+          </div>
+        </div>
+
+        <div class="fill-gap-toolbar">
+          <input type="text" id="fillGapSearch" class="hub-search fill-gap-search" placeholder="Boşluk doldurma ara… örn: present perfect, phrasal, passive" oninput="renderFillGapHub()">
+          <button type="button" class="ghost-btn fill-gap-wrong-btn" onclick="startFillGapWrongPractice()">Yanlışlarımı Tekrar Et</button>
+        </div>
+
+        <div id="fillGapFilters" class="fill-gap-filters" aria-label="Boşluk doldurma filtreleri"></div>
+        <div id="fillGapGrid" class="fill-gap-grid"></div>
+        <div id="fillGapWorkspace" class="fill-gap-workspace" hidden></div>
+      </section>
