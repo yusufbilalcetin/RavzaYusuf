@@ -1,6 +1,9 @@
-import { buildRegionMapAndOutline } from "../utils/pbn-grid.js";
+import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 
-const MERGE_DELTA_E = 12;
+// Kroma (a/b) hafif ağırlıklandırılır: ton farkları (cilt/gökyüzü/yeşillik)
+// salt parlaklık farklarına ezdirilmez. Sadece kümeleme uzayını etkiler;
+// palet RGB'si hücre ortalamalarından geldiği için çıkan renkler değişmez.
+const CHROMA_WEIGHT = 1.15;
 
 function reportProgress(stage, progress) {
   self.postMessage({ type: "progress", stage, progress });
@@ -53,13 +56,14 @@ function buildGridCells(pixels, width, height, cellSize) {
     const count = pxCount[i] || 1;
     const rgb = [sumR[i] / count, sumG[i] / count, sumB[i] / count];
     cellRgb.push(rgb);
-    cellLab.push(srgbToLab(rgb[0], rgb[1], rgb[2]));
+    const lab = srgbToLab(rgb[0], rgb[1], rgb[2]);
+    cellLab.push([lab[0], lab[1] * CHROMA_WEIGHT, lab[2] * CHROMA_WEIGHT]);
   }
 
   return { cols, rows, cellCount, cellRgb, cellLab, pxCount };
 }
 
-function kMeansLab(cellLab, k) {
+function kMeansLab(cellLab, k, iterations) {
   const n = cellLab.length;
   const effectiveK = Math.max(1, Math.min(k, n));
 
@@ -78,10 +82,10 @@ function kMeansLab(cellLab, k) {
     centroids.push((best || cellLab[Math.floor(Math.random() * n)]).slice());
   }
 
-  const assignment = new Int32Array(n);
-  const iterations = 10;
+  const assignment = new Int32Array(n).fill(-1);
   for (let iter = 0; iter < iterations; iter++) {
     const sums = centroids.map(() => [0, 0, 0, 0]);
+    let changed = 0;
     for (let i = 0; i < n; i++) {
       const lab = cellLab[i];
       let bestIdx = 0, bestDist = Infinity;
@@ -89,7 +93,7 @@ function kMeansLab(cellLab, k) {
         const d = deltaE(lab, centroids[c]);
         if (d < bestDist) { bestDist = d; bestIdx = c; }
       }
-      assignment[i] = bestIdx;
+      if (assignment[i] !== bestIdx) { assignment[i] = bestIdx; changed++; }
       const sum = sums[bestIdx];
       sum[0] += lab[0]; sum[1] += lab[1]; sum[2] += lab[2]; sum[3] += 1;
     }
@@ -97,13 +101,17 @@ function kMeansLab(cellLab, k) {
       const sum = sums[c];
       if (sum[3] > 0) centroids[c] = [sum[0] / sum[3], sum[1] / sum[3], sum[2] / sum[3]];
     }
+    if (changed === 0) {
+      reportProgress("colors", 100);
+      break;
+    }
     reportProgress("colors", Math.round(((iter + 1) / iterations) * 100));
   }
 
   return { centroids, assignment };
 }
 
-function mergeSimilarCentroids(centroids, assignment) {
+function mergeSimilarCentroids(centroids, assignment, mergeDeltaE) {
   const clusters = centroids.map((lab) => ({ lab: lab.slice(), count: 0 }));
   for (let i = 0; i < assignment.length; i++) clusters[assignment[i]].count++;
 
@@ -115,7 +123,7 @@ function mergeSimilarCentroids(centroids, assignment) {
     outer:
     for (let i = 0; i < live.length; i++) {
       for (let j = i + 1; j < live.length; j++) {
-        if (deltaE(live[i].lab, live[j].lab) < MERGE_DELTA_E) {
+        if (deltaE(live[i].lab, live[j].lab) < mergeDeltaE) {
           const a = live[i], b = live[j];
           const total = a.count + b.count;
           a.lab = [
@@ -136,7 +144,7 @@ function mergeSimilarCentroids(centroids, assignment) {
 }
 
 self.onmessage = (event) => {
-  const { data, width, height, k, cellSize } = event.data;
+  const { data, width, height, k, cellSize, mergeDeltaE = 12, iterations = 14 } = event.data;
 
   try {
     reportProgress("downscale", 100);
@@ -144,8 +152,8 @@ self.onmessage = (event) => {
     const rawPixels = new Uint8ClampedArray(data);
     const { cols, rows, cellCount, cellRgb, cellLab, pxCount } = buildGridCells(rawPixels, width, height, cellSize);
 
-    const { centroids, assignment } = kMeansLab(cellLab, k);
-    const mergedClusters = mergeSimilarCentroids(centroids, assignment);
+    const { centroids, assignment } = kMeansLab(cellLab, k, iterations);
+    const mergedClusters = mergeSimilarCentroids(centroids, assignment, mergeDeltaE);
 
     const finalAssignment = new Int32Array(cellCount);
     const rgbSums = mergedClusters.map(() => [0, 0, 0, 0]);

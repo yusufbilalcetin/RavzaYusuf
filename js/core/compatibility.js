@@ -1,5 +1,6 @@
 import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { loadTopicHtml } from "./html-loader.js";
+import { getAppScrollElement, getAppScrollTop } from "./app-shell-scroll.js";
 import { loadQuiz } from "../services/quiz-service.js";
 import { safeText } from "../utils/helpers.js";
 import { formatPercent } from "../utils/format.js";
@@ -297,6 +298,27 @@ function searchTopics(event) {
   else window.navigate("calisma-merkezi");
 }
 
+function installAppShellScrollTopButton() {
+  if (window.__APP_SHELL_SCROLL_TOP_INSTALLED__) return;
+  window.__APP_SHELL_SCROLL_TOP_INSTALLED__ = true;
+
+  const btn = document.getElementById("scrollTopBtn");
+  const scroller = getAppScrollElement();
+  if (!btn || !scroller) return;
+
+  const update = () => {
+    btn.classList.toggle("show", getAppScrollTop() > 300);
+  };
+
+  btn.addEventListener("click", () => {
+    window.__scrollAppToTop?.("smooth");
+  });
+
+  scroller.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+}
+
 export function installCompatibility() {
   const legacyToggleStudyDone = window.toggleStudyDone;
   const legacyToggleQuizDone = window.toggleQuizDone;
@@ -336,4 +358,6 @@ export function installCompatibility() {
   window.checkAnswer = window.submitTopicQuiz;
   window.nextQuestion = window.nextMemoryPracticeQuestion || (() => {});
   window.previousQuestion = window.previousQuestion || (() => {});
+
+  installAppShellScrollTopButton();
 }

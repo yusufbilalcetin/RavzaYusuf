@@ -1,10 +1,12 @@
 import { loadLayoutPartials } from "./partial-loader.js";
-import { initRouter, navigate } from "./router.js";
-import { installCompatibility } from "./compatibility.js";
+import { initRouter, navigate } from "./router.js?v=fit-visible-20260704";
+import { installCompatibility } from "./compatibility.js?v=fit-visible-20260704";
+import { installAppShellScrollBridge } from "./app-shell-scroll.js";
 
 export async function initApp() {
   try {
     await loadLayoutPartials();
+    installAppShellScrollBridge();
     await import("../legacy/legacy-app.js");
     initRouter();
     installCompatibility();

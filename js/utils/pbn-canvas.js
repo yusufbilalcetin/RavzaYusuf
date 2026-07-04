@@ -1,9 +1,19 @@
 const OUTLINE_RGB = [70, 70, 78];
 const OUTLINE_CSS = `rgb(${OUTLINE_RGB[0]},${OUTLINE_RGB[1]},${OUTLINE_RGB[2]})`;
 const MIN_SCALE = 0.5;
-const MAX_SCALE = 5;
 const TINT_MIX = 0.14;
 const HIGHLIGHT_MIX = 0.34;
+
+// Zoom üst sınırı gride göre dinamiktir: her presette hücre ekranda
+// ~56px'e ulaşabilsin diye hücre boyutundan türetilir.
+const MAX_CELL_SCREEN_PX = 56;
+
+// Overlay LOD eşikleri (ekrandaki hücre boyutu, px)
+const LOD_BOUNDARY_PX = 5;   // bölge sınırları bu boyuttan itibaren çizilir
+const LOD_NUMBER_PX = 12;    // numaralar bu boyuttan itibaren çizilir
+const LOD_NUMBER_BUDGET = 3500; // görünür boyanmamış hücre bütçesi
+const LOD_NUMBER_PX_BUSY = 16;  // bütçe aşılırsa numara eşiği
+const GESTURE_NUMBER_BUDGET = 2000; // jest sırasında numara çizim bütçesi
 
 function mixWithWhite(p, mix) {
   return [
@@ -21,26 +31,186 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   let outline = null;
   let regions = [];
   let regionById = new Map();
+  let regionsByNumber = new Map();
   let palette = [];
   let paletteByNumber = new Map();
   let totalPixels = 0;
   let cellSize = 0;
+  let gridCols = 0;
+  let gridRows = 0;
   let maxRegionId = 0;
   let regionNumberLut = null;
 
   const paintedSet = new Set();
-  let paintOrder = [];
+  let paintOrder = []; // fırça darbesi (stroke) dizileri: her eleman bir id dizisi
   let redoStack = [];
   let selectedNumber = null;
   let numberTotals = new Map();
   let numberPainted = new Map();
 
   let scale = 1, offsetX = 0, offsetY = 0, fitScale = 1;
-  let mode = "paint";
-  let dragState = null;
-  let pinchState = null;
-  let paintDragActive = false;
   let onChange = () => {};
+
+  /* ---------- overlay canvas (grid + numaralar, ekran uzayında) ---------- */
+
+  const overlay = document.createElement("canvas");
+  overlay.className = "pbn-overlay-canvas";
+  overlay.style.position = "absolute";
+  overlay.style.inset = "0";
+  overlay.style.width = "100%";
+  overlay.style.height = "100%";
+  overlay.style.pointerEvents = "none";
+  viewport.appendChild(overlay);
+  const octx = overlay.getContext("2d");
+
+  let overlayRafId = null;
+  let gestureActive = false;
+  let gestureSettleTimer = null;
+
+  function scheduleOverlayDraw() {
+    if (overlayRafId != null) return;
+    overlayRafId = requestAnimationFrame(() => {
+      overlayRafId = null;
+      drawOverlay();
+    });
+  }
+
+  function drawOverlay() {
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    if (!vw || !vh) return;
+    const dpr = window.devicePixelRatio || 1;
+    const bw = Math.round(vw * dpr);
+    const bh = Math.round(vh * dpr);
+    if (overlay.width !== bw || overlay.height !== bh) {
+      overlay.width = bw;
+      overlay.height = bh;
+    }
+    octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    octx.clearRect(0, 0, vw, vh);
+    if (!width || !height) return;
+
+    const imgLeft = offsetX;
+    const imgTop = offsetY;
+    const imgRight = offsetX + width * scale;
+    const imgBottom = offsetY + height * scale;
+
+    if (!cellSize || !gridCols || !gridRows) {
+      // Eski kayıt (cellSize yok): grid kompozite gömülü kalır, overlay yalnız numaraları çizer.
+      drawOverlayNumbersLegacy(vw, vh);
+      return;
+    }
+
+    const cellScreen = cellSize * scale;
+    if (cellScreen < LOD_BOUNDARY_PX) return; // fit görünümü: temiz mozaik
+
+    const col0 = Math.max(0, Math.floor((0 - offsetX) / cellScreen));
+    const row0 = Math.max(0, Math.floor((0 - offsetY) / cellScreen));
+    const col1 = Math.min(gridCols - 1, Math.floor((vw - offsetX) / cellScreen));
+    const row1 = Math.min(gridRows - 1, Math.floor((vh - offsetY) / cellScreen));
+    if (col1 < col0 || row1 < row0) return;
+
+    const fullGrid = cellScreen >= LOD_NUMBER_PX;
+
+    // Çizgiler: boyanmış alanlar temiz görünsün diye çizgi yalnız en az bir
+    // tarafı boyanmamış kenarlara çizilir. Numara farkı = bölge sınırı (koyu),
+    // aynı numara = ince grid çizgisi (yalnız fullGrid modunda).
+    const hairPath = new Path2D();
+    const boundPath = new Path2D();
+    let visibleUnpainted = 0;
+
+    for (let row = row0; row <= row1; row++) {
+      const yTop = offsetY + row * cellScreen;
+      const yBottom = Math.min(yTop + cellScreen, imgBottom);
+      for (let col = col0; col <= col1; col++) {
+        const id = row * gridCols + col;
+        const n0 = regionNumberLut[id];
+        const p0 = paintedSet.has(id);
+        if (!p0) visibleUnpainted++;
+
+        const xLeft = offsetX + col * cellScreen;
+        const xRight = Math.min(xLeft + cellScreen, imgRight);
+
+        if (col + 1 < gridCols) {
+          const id2 = id + 1;
+          const p1 = paintedSet.has(id2);
+          if (!p0 || !p1) {
+            if (n0 !== regionNumberLut[id2]) {
+              boundPath.moveTo(xRight, yTop);
+              boundPath.lineTo(xRight, yBottom);
+            } else if (fullGrid) {
+              hairPath.moveTo(xRight, yTop);
+              hairPath.lineTo(xRight, yBottom);
+            }
+          }
+        }
+        if (row + 1 < gridRows) {
+          const id2 = id + gridCols;
+          const p1 = paintedSet.has(id2);
+          if (!p0 || !p1) {
+            if (n0 !== regionNumberLut[id2]) {
+              boundPath.moveTo(xLeft, yBottom);
+              boundPath.lineTo(xRight, yBottom);
+            } else if (fullGrid) {
+              hairPath.moveTo(xLeft, yBottom);
+              hairPath.lineTo(xRight, yBottom);
+            }
+          }
+        }
+      }
+    }
+
+    octx.lineWidth = 1;
+    if (fullGrid) {
+      octx.strokeStyle = "rgba(70,70,78,0.16)";
+      octx.stroke(hairPath);
+      octx.strokeStyle = "rgba(70,70,78,0.45)";
+    } else {
+      octx.strokeStyle = "rgba(70,70,78,0.35)";
+    }
+    octx.stroke(boundPath);
+
+    /* numaralar */
+    const numberThreshold = visibleUnpainted > LOD_NUMBER_BUDGET ? LOD_NUMBER_PX_BUSY : LOD_NUMBER_PX;
+    if (cellScreen < numberThreshold) return;
+    if (gestureActive && visibleUnpainted > GESTURE_NUMBER_BUDGET) return;
+
+    const fontSize = Math.max(9, Math.min(Math.round(cellScreen * 0.42), 15));
+    octx.font = `600 ${fontSize}px 'Segoe UI', Arial, sans-serif`;
+    octx.textAlign = "center";
+    octx.textBaseline = "middle";
+    octx.fillStyle = "rgba(70,70,78,0.85)";
+
+    for (let row = row0; row <= row1; row++) {
+      for (let col = col0; col <= col1; col++) {
+        const id = row * gridCols + col;
+        if (paintedSet.has(id)) continue;
+        const n = regionNumberLut[id];
+        if (n < 0) continue;
+        const cx = offsetX + (col + 0.5) * cellScreen;
+        const cy = offsetY + (row + 0.5) * cellScreen;
+        if (cx > imgRight || cy > imgBottom) continue;
+        octx.fillText(String(n), cx, cy);
+      }
+    }
+  }
+
+  function drawOverlayNumbersLegacy(vw, vh) {
+    const fontSize = Math.max(9, Math.min(Math.round(24 * scale * 0.42), 15));
+    octx.font = `600 ${fontSize}px 'Segoe UI', Arial, sans-serif`;
+    octx.textAlign = "center";
+    octx.textBaseline = "middle";
+    octx.fillStyle = "rgba(70,70,78,0.85)";
+    for (const region of regions) {
+      if (paintedSet.has(region.id)) continue;
+      const cx = offsetX + region.labelX * scale;
+      const cy = offsetY + region.labelY * scale;
+      if (cx < -20 || cy < -20 || cx > vw + 20 || cy > vh + 20) continue;
+      octx.fillText(String(region.paletteNumber), cx, cy);
+    }
+  }
+
+  /* ---------- yeniden sığdırma ---------- */
 
   let resizeSettleTimer = null;
   const resizeObserver = new ResizeObserver(() => {
@@ -67,11 +237,20 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   function setData(payload) {
     ({ width, height, regionMap, outline, regions, palette } = payload);
     cellSize = payload.cellSize || 0;
+    gridCols = cellSize ? Math.ceil(width / cellSize) : 0;
+    gridRows = cellSize ? Math.ceil(height / cellSize) : 0;
     regionById = new Map(regions.map((r) => [r.id, r]));
     paletteByNumber = new Map(palette.map((p) => [p.number, p]));
     maxRegionId = regions.reduce((max, r) => Math.max(max, r.id), 0);
     regionNumberLut = new Int32Array(maxRegionId + 1).fill(-1);
     for (const r of regions) regionNumberLut[r.id] = r.paletteNumber;
+
+    regionsByNumber = new Map();
+    for (const r of regions) {
+      let list = regionsByNumber.get(r.paletteNumber);
+      if (!list) { list = []; regionsByNumber.set(r.paletteNumber, list); }
+      list.push(r);
+    }
 
     numberTotals = new Map();
     numberPainted = new Map();
@@ -81,10 +260,15 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     totalPixels = width * height;
     canvas.width = width;
     canvas.height = height;
+    // Overlay hizası, tuvalin 1:1 piksel boyutunda görüntülenmesine dayanır.
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
     paintedSet.clear();
     paintOrder = [];
     redoStack = [];
     selectedNumber = palette[0]?.number ?? null;
+    // Yeni veri = temiz giriş durumu: önceki ekrandan takılı jest kalmasın.
+    resetPointerState();
     fitToView();
     settleFit();
     render();
@@ -99,7 +283,8 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       const number = regionNumberLut[id];
       numberPainted.set(number, (numberPainted.get(number) || 0) + 1);
     }
-    paintOrder = ids.filter((id) => regionById.has(id));
+    // Devam edilen projede fırça geçmişi boş başlar.
+    paintOrder = [];
     redoStack = [];
     render();
   }
@@ -108,8 +293,15 @@ export function createPbnEngine({ canvas, viewport, stage }) {
 
   function snapScale(value, roundFn = Math.round) {
     if (!cellSize) return value;
-    const cellPx = Math.max(3, roundFn(value * cellSize));
+    const rawCellPx = value * cellSize;
+    if (rawCellPx < 3) return value;
+    const cellPx = Math.max(3, roundFn(rawCellPx));
     return cellPx / cellSize;
+  }
+
+  function maxZoom() {
+    if (!cellSize) return 5;
+    return Math.min(8, Math.max(2, MAX_CELL_SCREEN_PX / cellSize));
   }
 
   function fitToView() {
@@ -118,10 +310,31 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     const vh = viewport.clientHeight;
     if (!vw || !vh) return;
     fitScale = Math.min(vw / width, vh / height) * 0.96;
-    scale = snapScale(Math.min(fitScale, MAX_SCALE), Math.floor);
+    scale = Math.min(fitScale, maxZoom());
     offsetX = (vw - width * scale) / 2;
     offsetY = (vh - height * scale) / 2;
     applyTransform();
+  }
+
+  function constrainOffsets() {
+    if (!width || !height || !viewport) return;
+
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    const displayW = width * scale;
+    const displayH = height * scale;
+
+    if (displayW <= vw) {
+      offsetX = (vw - displayW) / 2;
+    } else {
+      offsetX = Math.min(0, Math.max(vw - displayW, offsetX));
+    }
+
+    if (displayH <= vh) {
+      offsetY = (vh - displayH) / 2;
+    } else {
+      offsetY = Math.min(0, Math.max(vh - displayH, offsetY));
+    }
   }
 
   function minZoom() {
@@ -129,7 +342,10 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   }
 
   function applyTransform() {
+    constrainOffsets();
     if (stage) stage.style.transform = `translate(${Math.round(offsetX)}px, ${Math.round(offsetY)}px) scale(${scale})`;
+    canvas.classList.toggle("pbn-canvas--crisp", scale >= 1);
+    scheduleOverlayDraw();
   }
 
   function zoomBy(factor, centerX, centerY) {
@@ -137,31 +353,71 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     const cx = centerX ?? vw / 2;
     const cy = centerY ?? vh / 2;
     const prevScale = scale;
-    scale = snapScale(Math.min(Math.max(scale * factor, minZoom()), MAX_SCALE));
+    scale = snapScale(Math.min(Math.max(scale * factor, minZoom()), maxZoom()));
     const ratio = scale / prevScale;
     offsetX = cx - (cx - offsetX) * ratio;
     offsetY = cy - (cy - offsetY) * ratio;
     applyTransform();
   }
 
-  /* ---------- selection / mode ---------- */
+  function zoomAtClientPoint(clientX, clientY, factor) {
+    const rect = viewport.getBoundingClientRect();
+    const cx = Math.max(0, Math.min(clientX - rect.left, rect.width || viewport.clientWidth));
+    const cy = Math.max(0, Math.min(clientY - rect.top, rect.height || viewport.clientHeight));
+    zoomBy(factor, cx, cy);
+  }
+
+  function normalizeWheelDelta(event) {
+    const modeScale = event.deltaMode === 1
+      ? 32
+      : event.deltaMode === 2
+        ? Math.max(1, viewport.clientHeight)
+        : 1;
+    return Math.max(-240, Math.min(240, event.deltaY * modeScale));
+  }
+
+  function handleWheelZoom(event) {
+    if (!width || !height) return;
+    if (event.target?.closest?.(".pbn-zoom-pill")) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const delta = normalizeWheelDelta(event);
+    if (!delta) return;
+
+    const factor = Math.exp(-delta * 0.002);
+    setGestureActive(true);
+    zoomAtClientPoint(event.clientX, event.clientY, factor);
+    setGestureActive(false);
+  }
+
+  /* ---------- selection ---------- */
+
+  function repaintNumberCells(number) {
+    if (number == null) return;
+    const list = regionsByNumber.get(number);
+    if (!list) return;
+    for (const region of list) {
+      if (!paintedSet.has(region.id)) paintCellVisual(region, false);
+    }
+  }
 
   function selectNumber(number) {
     if (number === selectedNumber) return;
+    const previous = selectedNumber;
     selectedNumber = number;
-    render();
+    if (cellSize) {
+      // Yalnız eski ve yeni numaranın hücreleri yeniden boyanır (tam render yerine).
+      repaintNumberCells(previous);
+      repaintNumberCells(number);
+    } else {
+      render();
+    }
   }
 
   function getSelectedNumber() {
     return selectedNumber;
-  }
-
-  function setMode(next) {
-    mode = next === "pan" ? "pan" : "paint";
-  }
-
-  function getMode() {
-    return mode;
   }
 
   /* ---------- hit testing / painting ---------- */
@@ -195,38 +451,66 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     numberPainted.set(number, Math.max(0, (numberPainted.get(number) || 0) - 1));
   }
 
-  function tryPaintAt(clientX, clientY, { silent = false } = {}) {
+  // Boyama olayları rAF başına tek sefer yayınlanır: hızlı sürüklemede
+  // ilerleme/palet/persist hücre başına değil kare başına güncellenir.
+  let pendingPaintCount = 0;
+  let paintEmitRafId = null;
+
+  function emitPaintBatched() {
+    pendingPaintCount++;
+    if (paintEmitRafId != null) return;
+    paintEmitRafId = requestAnimationFrame(flushPaintEvents);
+  }
+
+  function flushPaintEvents() {
+    paintEmitRafId = null;
+    if (!pendingPaintCount) return;
+    const count = pendingPaintCount;
+    pendingPaintCount = 0;
+    onChange({ type: "paint", count });
+  }
+
+  function paintRegionIntoStroke(region, stroke) {
+    markPainted(region.id);
+    stroke.push(region.id);
+    paintCellVisual(region, true);
+    emitPaintBatched();
+  }
+
+  function tryPaintAt(clientX, clientY) {
     const { imgX, imgY } = screenToImagePoint(clientX, clientY);
     const region = regionAtImagePoint(imgX, imgY);
     if (!region || paintedSet.has(region.id)) return false;
-
-    if (region.paletteNumber === selectedNumber) {
-      markPainted(region.id);
-      paintOrder.push(region.id);
-      redoStack = [];
-      paintCellVisual(region, true);
-      onChange({ type: "paint", region });
-      return true;
-    }
-    if (!silent) onChange({ type: "wrong", region });
-    return false;
+    if (region.paletteNumber !== selectedNumber) return false;
+    const stroke = [];
+    paintRegionIntoStroke(region, stroke);
+    paintOrder.push(stroke);
+    redoStack = [];
+    scheduleOverlayDraw();
+    return true;
   }
 
   function undo() {
     if (!paintOrder.length) return;
-    const id = paintOrder.pop();
-    markUnpainted(id);
-    redoStack.push(id);
-    paintCellVisual(regionById.get(id), false);
+    const stroke = paintOrder.pop();
+    for (const id of stroke) {
+      markUnpainted(id);
+      paintCellVisual(regionById.get(id), false);
+    }
+    redoStack.push(stroke);
+    scheduleOverlayDraw();
     onChange({ type: "undo" });
   }
 
   function redo() {
     if (!redoStack.length) return;
-    const id = redoStack.pop();
-    markPainted(id);
-    paintOrder.push(id);
-    paintCellVisual(regionById.get(id), true);
+    const stroke = redoStack.pop();
+    for (const id of stroke) {
+      markPainted(id);
+      paintCellVisual(regionById.get(id), true);
+    }
+    paintOrder.push(stroke);
+    scheduleOverlayDraw();
     onChange({ type: "redo" });
   }
 
@@ -267,20 +551,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     return Array.from(paintedSet);
   }
 
-  /* ---------- rendering ---------- */
-
-  function numberFont() {
-    const size = cellSize ? Math.max(8, Math.round(cellSize * 0.55)) : 13;
-    return `600 ${size}px 'Segoe UI', Arial, sans-serif`;
-  }
-
-  function drawCellNumber(region) {
-    ctx.font = numberFont();
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(70,70,78,0.85)";
-    ctx.fillText(String(region.paletteNumber), region.labelX, region.labelY);
-  }
+  /* ---------- rendering (temel tuval: yalnız renkler) ---------- */
 
   function paintCellVisual(region, painted) {
     if (!region) return;
@@ -298,18 +569,10 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       const c = p ? mixWithWhite(p, mix) : [255, 255, 255];
       ctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`;
     }
-    ctx.fillRect(x0, y0, cs, cs);
-
-    ctx.fillStyle = OUTLINE_CSS;
-    ctx.fillRect(x0, y0, cs, 1);
-    ctx.fillRect(x0, y0, 1, cs);
-    if (x0 + cs >= width) ctx.fillRect(width - 1, y0, 1, cs);
-    if (y0 + cs >= height) ctx.fillRect(x0, height - 1, cs, 1);
-
-    if (!painted) drawCellNumber(region);
+    ctx.fillRect(x0, y0, Math.min(cs, width - x0), Math.min(cs, height - y0));
   }
 
-  function buildComposite({ numbers = true, tint = true, highlight = true } = {}) {
+  function buildComposite({ tint = true, highlight = true } = {}) {
     const imageData = ctx.createImageData(width, height);
     const buf = imageData.data;
 
@@ -330,15 +593,18 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       }
     }
 
+    // Grid overlay katmanında çizilir; yalnız eski kayıtlarda (cellSize yok)
+    // outline kompozite gömülür.
+    const bakeOutline = !cellSize && outline;
+
     for (let i = 0; i < totalPixels; i++) {
       const px = i * 4;
-      let packed;
-      if (outline[i]) {
+      if (bakeOutline && outline[i]) {
         buf[px] = OUTLINE_RGB[0]; buf[px + 1] = OUTLINE_RGB[1]; buf[px + 2] = OUTLINE_RGB[2]; buf[px + 3] = 255;
         continue;
       }
       const id = regionMap[i];
-      packed = lutPaint[id];
+      let packed = lutPaint[id];
       if (packed < 0) packed = lutBase[id];
       buf[px] = (packed >> 16) & 0xff;
       buf[px + 1] = (packed >> 8) & 0xff;
@@ -347,54 +613,108 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     }
 
     ctx.putImageData(imageData, 0, 0);
-
-    if (numbers) {
-      ctx.font = numberFont();
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "rgba(70,70,78,0.85)";
-      for (const region of regions) {
-        if (paintedSet.has(region.id)) continue;
-        ctx.fillText(String(region.paletteNumber), region.labelX, region.labelY);
-      }
-    }
   }
 
   function render() {
     if (!width || !height) return;
-    buildComposite({ numbers: true, tint: true, highlight: true });
+    buildComposite({ tint: true, highlight: true });
+    scheduleOverlayDraw();
   }
 
   function exportPaintedDataUrl(mime = "image/png") {
-    buildComposite({ numbers: false, tint: false, highlight: false });
+    buildComposite({ tint: false, highlight: false });
     const url = canvas.toDataURL(mime, 0.95);
     render();
     return url;
   }
 
+  function exportPaintedBlob(mime = "image/png") {
+    buildComposite({ tint: false, highlight: false });
+    return new Promise((resolve) => {
+      // toBlob çağrı anındaki bitmap'i yakalar; render hemen geri alınabilir.
+      canvas.toBlob((blob) => resolve(blob), mime, 0.95);
+      render();
+    });
+  }
+
   function exportTemplateDataUrl(mime = "image/png") {
-    const saved = new Set(paintedSet);
-    paintedSet.clear();
-    buildComposite({ numbers: true, tint: false, highlight: false });
-    const url = canvas.toDataURL(mime, 0.95);
-    for (const id of saved) paintedSet.add(id);
-    render();
-    return url;
+    // Numaralı boş şablon tek seferlik geçici tuvale çizilir.
+    const tmp = document.createElement("canvas");
+    tmp.width = width;
+    tmp.height = height;
+    const tctx = tmp.getContext("2d");
+    tctx.fillStyle = "#ffffff";
+    tctx.fillRect(0, 0, width, height);
+
+    tctx.strokeStyle = OUTLINE_CSS;
+    tctx.lineWidth = 1;
+    if (cellSize) {
+      tctx.beginPath();
+      for (let x = 0; x <= width; x += cellSize) {
+        const lx = Math.min(x, width - 1) + 0.5;
+        tctx.moveTo(lx, 0); tctx.lineTo(lx, height);
+      }
+      for (let y = 0; y <= height; y += cellSize) {
+        const ly = Math.min(y, height - 1) + 0.5;
+        tctx.moveTo(0, ly); tctx.lineTo(width, ly);
+      }
+      tctx.stroke();
+    } else if (outline) {
+      for (let i = 0; i < totalPixels; i++) {
+        if (outline[i]) tctx.fillRect(i % width, Math.floor(i / width), 1, 1);
+      }
+    }
+
+    const fontSize = Math.max(9, Math.round((cellSize || 24) * 0.6));
+    tctx.font = `600 ${fontSize}px 'Segoe UI', Arial, sans-serif`;
+    tctx.textAlign = "center";
+    tctx.textBaseline = "middle";
+    tctx.fillStyle = "rgba(70,70,78,0.85)";
+    for (const region of regions) {
+      tctx.fillText(String(region.paletteNumber), region.labelX, region.labelY);
+    }
+    return tmp.toDataURL(mime, 0.95);
   }
 
   /* ---------- pointer interaction ---------- */
 
   const activePointers = new Map();
+  let pinchState = null;
+  // gesture: tek parmak jesti — "paint" (fırça) veya "pan" (kaydırma)
+  let gesture = null;
+  let lastPointerDownAt = 0;
 
   function pointerDistance(a, b) {
     return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
   }
 
-  let lastPointerDownAt = 0;
+  function setGestureActive(active) {
+    clearTimeout(gestureSettleTimer);
+    if (active) {
+      gestureActive = true;
+      return;
+    }
+    // Jest bitiminden kısa süre sonra numaralar geri çizilir.
+    gestureSettleTimer = setTimeout(() => {
+      gestureActive = false;
+      scheduleOverlayDraw();
+    }, 120);
+  }
+
+  function resetPointerState() {
+    activePointers.clear();
+    pinchState = null;
+    gesture = null;
+    clearTimeout(gestureSettleTimer);
+    gestureActive = false;
+  }
 
   function onPointerDown(event) {
+    // Viewport içindeki kontrol katmanları (zoom hapı vb.) boyama/pan başlatmaz.
+    if (event.target?.closest?.(".pbn-zoom-pill")) return;
     lastPointerDownAt = Date.now();
     activePointers.set(event.pointerId, event);
+    setGestureActive(true);
 
     if (activePointers.size === 2) {
       const rect = viewport.getBoundingClientRect();
@@ -407,17 +727,62 @@ export function createPbnEngine({ canvas, viewport, stage }) {
         startMidX: (a.clientX + b.clientX) / 2 - rect.left,
         startMidY: (a.clientY + b.clientY) / 2 - rect.top
       };
-      dragState = null;
-      paintDragActive = false;
+      // Pinch başlarsa tek parmak fırçası iptal olur; o ana kadarki boyama kalır.
+      if (gesture?.mode === "paint" && gesture.stroke.length) {
+        paintOrder.push(gesture.stroke);
+        redoStack = [];
+      }
+      gesture = null;
       return;
     }
 
-    if (mode === "pan") {
-      dragState = { startX: event.clientX, startY: event.clientY, startOffsetX: offsetX, startOffsetY: offsetY };
+    const { imgX, imgY } = screenToImagePoint(event.clientX, event.clientY);
+    const region = regionAtImagePoint(imgX, imgY);
+    const paintable = region && !paintedSet.has(region.id) && region.paletteNumber === selectedNumber;
+
+    if (paintable) {
+      gesture = {
+        mode: "paint",
+        stroke: [],
+        lastImgX: imgX,
+        lastImgY: imgY,
+        downTime: Date.now(),
+        downX: event.clientX,
+        downY: event.clientY,
+        maxMove: 0
+      };
+      paintRegionIntoStroke(region, gesture.stroke);
+      scheduleOverlayDraw();
     } else {
-      paintDragActive = true;
-      tryPaintAt(event.clientX, event.clientY, { silent: false });
+      gesture = {
+        mode: "pan",
+        lastX: event.clientX,
+        lastY: event.clientY,
+        downTime: Date.now(),
+        downX: event.clientX,
+        downY: event.clientY,
+        maxMove: 0,
+        downRegion: region
+      };
     }
+  }
+
+  function paintAlongSegment(x0, y0, x1, y1, stroke) {
+    // Görüntü uzayında yarım hücre adımlarla interpolasyon: hızlı
+    // kaydırmada arada hücre atlanmaz.
+    const step = Math.max(1, cellSize / 2 || 4);
+    const dist = Math.hypot(x1 - x0, y1 - y0);
+    const steps = Math.max(1, Math.ceil(dist / step));
+    let paintedAny = false;
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const region = regionAtImagePoint(Math.round(x0 + (x1 - x0) * t), Math.round(y0 + (y1 - y0) * t));
+      if (!region || paintedSet.has(region.id)) continue;
+      if (region.paletteNumber !== selectedNumber) continue;
+      paintRegionIntoStroke(region, stroke);
+      paintedAny = true;
+    }
+    return paintedAny;
   }
 
   function onPointerMove(event) {
@@ -430,7 +795,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       const dist = pointerDistance(a, b);
       const midX = (a.clientX + b.clientX) / 2 - rect.left;
       const midY = (a.clientY + b.clientY) / 2 - rect.top;
-      const newScale = snapScale(Math.min(Math.max(pinchState.startScale * (dist / pinchState.startDist), minZoom()), MAX_SCALE));
+      const newScale = snapScale(Math.min(Math.max(pinchState.startScale * (dist / pinchState.startDist), minZoom()), maxZoom()));
       const ratio = newScale / pinchState.startScale;
       offsetX = midX - (pinchState.startMidX - pinchState.startOffsetX) * ratio;
       offsetY = midY - (pinchState.startMidY - pinchState.startOffsetY) * ratio;
@@ -439,25 +804,48 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       return;
     }
 
-    if (dragState) {
-      offsetX = dragState.startOffsetX + (event.clientX - dragState.startX);
-      offsetY = dragState.startOffsetY + (event.clientY - dragState.startY);
-      applyTransform();
+    if (!gesture) return;
+    gesture.maxMove = Math.max(gesture.maxMove, Math.hypot(event.clientX - gesture.downX, event.clientY - gesture.downY));
+
+    if (gesture.mode === "paint") {
+      const { imgX, imgY } = screenToImagePoint(event.clientX, event.clientY);
+      if (imgX >= 0 && imgY >= 0) {
+        const paintedAny = paintAlongSegment(gesture.lastImgX, gesture.lastImgY, imgX, imgY, gesture.stroke);
+        gesture.lastImgX = imgX;
+        gesture.lastImgY = imgY;
+        if (paintedAny) scheduleOverlayDraw();
+      }
       return;
     }
 
-    if (paintDragActive && mode === "paint") {
-      tryPaintAt(event.clientX, event.clientY, { silent: true });
-    }
+    // pan
+    offsetX += event.clientX - gesture.lastX;
+    offsetY += event.clientY - gesture.lastY;
+    gesture.lastX = event.clientX;
+    gesture.lastY = event.clientY;
+    applyTransform();
   }
 
   function onPointerUp(event) {
     activePointers.delete(event.pointerId);
     if (activePointers.size < 2) pinchState = null;
-    if (activePointers.size === 0) {
-      dragState = null;
-      paintDragActive = false;
+    if (activePointers.size !== 0) return;
+
+    if (gesture) {
+      const isTap = Date.now() - gesture.downTime < 250 && gesture.maxMove < 6;
+      if (gesture.mode === "paint") {
+        if (gesture.stroke.length) {
+          paintOrder.push(gesture.stroke);
+          redoStack = [];
+        }
+        flushPaintEvents();
+      } else if (isTap && gesture.downRegion && !paintedSet.has(gesture.downRegion.id)
+        && gesture.downRegion.paletteNumber !== selectedNumber) {
+        onChange({ type: "wrong", region: gesture.downRegion });
+      }
+      gesture = null;
     }
+    setGestureActive(false);
   }
 
   viewport.addEventListener("pointerdown", (e) => {
@@ -465,21 +853,19 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     onPointerDown(e);
   });
   viewport.addEventListener("pointermove", onPointerMove);
-  viewport.addEventListener("pointerup", onPointerUp);
-  viewport.addEventListener("pointercancel", onPointerUp);
+  // pointerup pencere düzeyinde dinlenir: tamamlanma anında ekran değişip
+  // viewport gizlenirse bile jest güvenle kapanır (takılı fırça olmaz).
+  window.addEventListener("pointerup", onPointerUp);
+  window.addEventListener("pointercancel", onPointerUp);
   // Güvenlik ağı: pointer olayları (eklenti vb. nedeniyle) sayfaya ulaşmazsa
   // tıklama yine de boyasın. Normal akışta pointerdown zaten işlediği için atlanır.
   viewport.addEventListener("click", (event) => {
-    if (mode !== "paint") return;
+    if (!event.isTrusted) return;
+    if (event.target?.closest?.(".pbn-zoom-pill")) return;
     if (Date.now() - lastPointerDownAt < 400) return;
-    tryPaintAt(event.clientX, event.clientY, { silent: false });
+    tryPaintAt(event.clientX, event.clientY);
   });
-  viewport.addEventListener("wheel", (event) => {
-    event.preventDefault();
-    const rect = viewport.getBoundingClientRect();
-    const factor = event.deltaY < 0 ? 1.12 : 0.9;
-    zoomBy(factor, event.clientX - rect.left, event.clientY - rect.top);
-  }, { passive: false });
+  viewport.addEventListener("wheel", handleWheelZoom, { passive: false, capture: true });
 
   function showHintPing(region) {
     if (!stage) return;
@@ -487,6 +873,9 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     ping.className = "pbn-hint-ping";
     ping.style.left = `${region.labelX}px`;
     ping.style.top = `${region.labelY}px`;
+    // Stage ölçeklendiği için ping ters ölçeklenir; fit zoom'da da görünür kalır.
+    // (Animasyon transform'u ezdiğinden ters ölçek CSS değişkeniyle verilir.)
+    ping.style.setProperty("--ping-inv", String(1 / Math.max(scale, 0.01)));
     stage.appendChild(ping);
     setTimeout(() => ping.remove(), 2200);
   }
@@ -497,8 +886,6 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     setOnChange,
     selectNumber,
     getSelectedNumber,
-    setMode,
-    getMode,
     undo,
     redo,
     resetPainting,
@@ -508,16 +895,25 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     zoomIn: () => zoomBy(1.25),
     zoomOut: () => zoomBy(0.8),
     zoomReset: fitToView,
+    handleWheelZoom,
     getProgress,
     isComplete,
     getPaintedRegionIds,
     exportPaintedDataUrl,
+    exportPaintedBlob,
     exportTemplateDataUrl,
     render,
     destroy() {
       clearTimeout(resizeSettleTimer);
+      clearTimeout(gestureSettleTimer);
       settleTimers.forEach(clearTimeout);
+      if (overlayRafId != null) cancelAnimationFrame(overlayRafId);
+      if (paintEmitRafId != null) cancelAnimationFrame(paintEmitRafId);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+      viewport.removeEventListener("wheel", handleWheelZoom, true);
       resizeObserver.disconnect();
+      overlay.remove();
     }
   };
 }

@@ -1,0 +1,214 @@
+/* Fullscreen app shell: topbar stays fixed, pages scroll inside main-content. */
+
+:root {
+  --app-vh: 100vh;
+  --app-topbar-h: 78px;
+  --app-page-pad-x: clamp(14px, 2.8vw, 46px);
+  --app-page-pad-y: clamp(14px, 2vw, 30px);
+  --app-page-pad-block: clamp(28px, 4vw, 60px);
+  --app-stage-min-h: calc(var(--app-vh) - var(--app-topbar-h) - var(--app-page-pad-block));
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-vh: 100dvh;
+  }
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden !important;
+}
+
+body {
+  width: 100%;
+  height: var(--app-vh) !important;
+  min-height: var(--app-vh) !important;
+  max-width: 100%;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+#app {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: var(--app-vh) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  position: relative;
+}
+
+#sidebar-root,
+#tema-panel-root {
+  display: contents;
+}
+
+#topbar-root {
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  z-index: 90;
+}
+
+.topbar {
+  position: relative !important;
+  top: auto !important;
+  width: 100%;
+  z-index: 90;
+}
+
+.main-content {
+  grid-row: 2;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: stretch;
+  display: block !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-behavior: auto;
+  scrollbar-gutter: stable;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--app-page-pad-y) var(--app-page-pad-x) !important;
+  overflow: visible !important;
+}
+
+#page-root,
+#page-root > .page {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+#page-root > .page.active {
+  min-height: max(0px, var(--app-stage-min-h));
+}
+
+body:has(#dashboard.active) {
+  overflow: hidden !important;
+}
+
+body:has(#dashboard.active) .main-content {
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: stretch;
+  overflow-y: auto !important;
+}
+
+body:has(#dashboard.active) .content-wrapper {
+  padding: var(--app-page-pad-y) var(--app-page-pad-x) !important;
+  overflow: visible !important;
+}
+
+body:has(#dashboard.active) #dashboard,
+body:has(#dashboard.active) #dashboard.active,
+body:has(#dashboard.active) #dashboard .dash-right {
+  min-height: max(0px, var(--app-stage-min-h)) !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+body:has(#dashboard.active) #dashboard .dashboard-visual-stage {
+  width: 100% !important;
+  min-height: max(420px, var(--app-stage-min-h)) !important;
+  height: auto !important;
+}
+
+#examcenter,
+#examcenter.active,
+#examcenter .exam-pro-shell,
+#examcenter .exam-pro-main-grid,
+#examcenter .exam-pro-workspace,
+#examcenter .exam-workspace,
+#examcenter .exam-shell,
+#examcenter .premium-exam-shell,
+#examcenter .exam-focus-card {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+#examcenter .exam-pro-shell {
+  width: 100% !important;
+}
+
+#examcenter .exam-pro-panel,
+#examcenter .exam-category-card,
+#examcenter .exam-option-btn,
+#examcenter .exam-nav-btn {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+#examWorkspace,
+#examcenter .premium-exam-shell,
+#examcenter .exam-focus-card {
+  scroll-margin-top: 12px;
+}
+
+body.is-game-fullscreen #app,
+body.is-game-fullscreen .main-content,
+body.is-game-fullscreen .content-wrapper {
+  height: var(--app-vh) !important;
+  overflow: hidden !important;
+}
+
+.table-wrap,
+.source-table-wrap,
+.detailed-chart-box,
+.matching-scroll,
+.memory-tab-bar,
+.fill-gap-words {
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --app-topbar-h: 64px;
+    --app-page-pad-x: 12px;
+    --app-page-pad-y: 12px;
+    --app-page-pad-block: 24px;
+  }
+
+  body:has(#dashboard.active) {
+    --app-topbar-h: 64px;
+    --app-page-pad-x: 10px;
+    --app-page-pad-y: 10px;
+    --app-page-pad-block: 20px;
+  }
+
+  body:has(#dashboard.active) #dashboard .dashboard-visual-stage {
+    min-height: max(430px, var(--app-stage-min-h)) !important;
+    background-image:
+      linear-gradient(180deg, rgba(9, 3, 21, .02), rgba(9, 3, 21, .16)),
+      url("../../assets/home-bg-mobile.png") !important;
+    background-position: center 58%, center 58% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --app-topbar-h: 70px;
+  }
+
+  body:has(#dashboard.active) {
+    --app-topbar-h: 64px;
+  }
+}

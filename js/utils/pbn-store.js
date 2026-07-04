@@ -1,7 +1,9 @@
 const DB_NAME = "pbnStudio";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "projects";
+const GALLERY_STORE = "gallery";
 const INDEX_KEY = "pbnProjectsIndex";
+const GALLERY_MAX_ITEMS = 60;
 
 let dbPromise = null;
 
@@ -14,6 +16,12 @@ function openDb() {
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: "id" });
       }
+      if (!db.objectStoreNames.contains(GALLERY_STORE)) {
+        db.createObjectStore(GALLERY_STORE, { keyPath: "id" });
+      }
+    };
+    request.onblocked = () => {
+      console.warn("pbnStudio veritabanı yükseltmesi başka bir açık sekme tarafından bloklandı.");
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
@@ -85,4 +93,60 @@ export async function deleteProject(id) {
     tx.onerror = () => reject(tx.error);
   });
   removeIndexEntry(id);
+}
+
+/* ---------- galeri (tamamlanmış eserler) ---------- */
+
+export async function saveGalleryItem(record) {
+  const db = await openDb();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(GALLERY_STORE, "readwrite");
+    tx.objectStore(GALLERY_STORE).put(record);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+
+  // Kapasite aşımında en eski kayıtlar silinir.
+  const items = await listGalleryItems();
+  if (items.length > GALLERY_MAX_ITEMS) {
+    const excess = items.slice(GALLERY_MAX_ITEMS);
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(GALLERY_STORE, "readwrite");
+      const store = tx.objectStore(GALLERY_STORE);
+      for (const item of excess) store.delete(item.id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+}
+
+export async function listGalleryItems() {
+  const db = await openDb();
+  const items = await new Promise((resolve, reject) => {
+    const tx = db.transaction(GALLERY_STORE, "readonly");
+    const request = tx.objectStore(GALLERY_STORE).getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+  return items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+export async function getGalleryItem(id) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(GALLERY_STORE, "readonly");
+    const request = tx.objectStore(GALLERY_STORE).get(id);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function deleteGalleryItem(id) {
+  const db = await openDb();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction(GALLERY_STORE, "readwrite");
+    tx.objectStore(GALLERY_STORE).delete(id);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
 }

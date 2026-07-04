@@ -14,7 +14,8 @@ import { initSinavCoz } from "../pages/sinav-coz-page.js";
 import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
 import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
-import { initOyun } from "../pages/oyun-page.js";
+import { initOyun } from "../pages/oyun-page.js?v=fit-visible-20260704";
+import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
 
 export const routeAliases = {
   dashboard: "ana-sayfa",
@@ -50,6 +51,10 @@ const routes = {
 };
 
 let isNavigating = false;
+
+function scrollAppToTop(behavior = "smooth") {
+  scrollAppTo({ top: 0, left: 0, behavior });
+}
 
 function normalizeRoute(pageName) {
   return routeAliases[pageName] || pageName || "ana-sayfa";
@@ -88,6 +93,10 @@ function setActivePage(route) {
   document.documentElement.classList.toggle("is-ravzalingo-page", route.sectionId === "ravzalingo");
   document.body.classList.toggle("is-ravzalingo-page", route.sectionId === "ravzalingo");
   document.body.classList.toggle("rlz5-page-active", route.sectionId === "ravzalingo");
+  if (route.sectionId !== "ravzalingo") {
+    document.body.classList.remove("rlz5-show-goto", "rlz5-below-activity");
+    document.getElementById("scrollTopBtn")?.classList.remove("rlz5-up-green");
+  }
   document.documentElement.classList.toggle("is-kahoot-page", route.sectionId === "kahoot");
   document.body.classList.toggle("is-kahoot-page", route.sectionId === "kahoot");
 }
@@ -105,7 +114,7 @@ export async function navigate(pageName = "ana-sayfa") {
     appState.currentRoute = routeName;
     window.closeMobileMenu?.();
     const initResult = await route.init?.();
-    if (!initResult?.skipTopScroll) window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!initResult?.skipTopScroll) scrollAppToTop("auto");
   } catch (error) {
     console.error(error);
     const root = document.getElementById("page-root");
@@ -118,4 +127,6 @@ export async function navigate(pageName = "ana-sayfa") {
 export function initRouter() {
   window.__routerNavigate = navigate;
   window.navigate = navigate;
+  window.__getAppScrollElement = getAppScrollElement;
+  window.__scrollAppToTop = scrollAppToTop;
 }
