@@ -39,6 +39,7 @@ const TEMPLATE = `
   <div class="pbn-app">
     <div class="pbn-screen pbn-screen-home is-active" data-pbn-screen="home">
       <div class="pbn-hero">
+        <img class="pbn-brand-logo" src="./assets/game-icon-boyama.png" alt="Boyama logosu" loading="lazy" />
         <span class="unit-badge">YENİ NESİL</span>
         <h2>Numaraya Göre Boyama</h2>
         <p>Fotoğrafını yükle; sistem renklerini analiz edip resme özel numaralı bir palet çıkarsın, sen de piksel piksel boya.</p>
@@ -110,6 +111,9 @@ const TEMPLATE = `
     <div class="pbn-screen pbn-screen-paint" data-pbn-screen="paint">
       <div class="pbn-paint-header">
         <button type="button" class="pbn-tool-btn" id="pbnBackBtn" title="Ana ekrana dön">←</button>
+        <span class="pbn-paint-logo" aria-hidden="true">
+          <img src="./assets/game-icon-boyama.png" alt="" loading="lazy" />
+        </span>
         <div class="pbn-paint-progress">
           <div class="pbn-paint-progress-track">
             <div class="pbn-paint-progress-fill" id="pbnPaintProgressFill"></div>

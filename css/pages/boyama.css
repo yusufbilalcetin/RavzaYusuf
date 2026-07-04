@@ -63,6 +63,18 @@
   box-shadow: var(--pbn-shadow-soft);
 }
 
+.pbn-brand-logo {
+  display: block;
+  width: clamp(96px, 16vw, 146px);
+  aspect-ratio: 1;
+  margin: 0 auto 18px;
+  border-radius: 26%;
+  object-fit: cover;
+  box-shadow:
+    0 22px 54px rgba(6, 10, 31, .34),
+    0 4px 14px rgba(255, 255, 255, .16);
+}
+
 .pbn-hero h2 { font-size: 2.05rem; margin: 14px 0 8px; letter-spacing: -.02em; }
 .pbn-hero p { max-width: 540px; margin: 0 auto 28px; opacity: .86; line-height: 1.55; }
 
@@ -220,6 +232,21 @@
   display: flex; align-items: center; gap: 12px;
   background: var(--white); border: 1px solid var(--card-border);
   border-radius: 999px; padding: 6px 10px; box-shadow: var(--shadow-xs);
+}
+.pbn-paint-logo {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  overflow: hidden;
+  border-radius: 24%;
+  box-shadow: 0 8px 18px rgba(40, 20, 60, .18);
+}
+.pbn-paint-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .pbn-paint-progress { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
 .pbn-paint-progress-track { flex: 1; height: 6px; border-radius: 999px; background: var(--input-bg); overflow: hidden; }
@@ -511,6 +538,7 @@
   .pbn-app { gap: 14px; padding: 4px; overscroll-behavior: contain; }
 
   .pbn-hero { padding: 30px 20px; border-radius: 22px; }
+  .pbn-brand-logo { width: 104px; margin-bottom: 14px; }
   .pbn-hero h2 { font-size: 1.55rem; }
   .pbn-hero p { font-size: .92rem; margin-bottom: 22px; }
   .pbn-upload-btn { padding: 13px 26px; font-size: .96rem; }
@@ -529,6 +557,7 @@
   .pbn-screen-paint.is-active { height: calc(100svh - 92px); gap: 10px; }
 
   .pbn-paint-header { gap: 6px; padding: 5px 8px; }
+  .pbn-paint-logo { width: 34px; height: 34px; flex-basis: 34px; }
   .pbn-paint-progress { gap: 8px; }
   .pbn-paint-progress span { font-size: .8rem; min-width: 34px; }
   .pbn-tool-btn { width: 36px; height: 36px; font-size: .92rem; }

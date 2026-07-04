@@ -14,7 +14,7 @@ import { initSinavCoz } from "../pages/sinav-coz-page.js";
 import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
 import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
-import { initOyun } from "../pages/oyun-page.js?v=fit-visible-20260704";
+import { initOyun } from "../pages/oyun-page.js?v=boyama-logo-20260705";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
 
 export const routeAliases = {
