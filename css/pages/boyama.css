@@ -33,12 +33,19 @@
   height: 100%;
   max-height: none;
   margin: 0 auto;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 0;
 }
 
 .games-page.is-game-fullscreen.is-boyama .pbn-screen-paint.is-active {
   height: 100% !important;
+}
+
+.games-page.is-game-fullscreen.is-boyama .pbn-app:has(.pbn-screen-paint.is-active) {
+  overflow: hidden;
 }
 
 /* ---------- Ana Sayfa ---------- */
