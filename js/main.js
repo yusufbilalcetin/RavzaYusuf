@@ -1,3 +1,3 @@
-import { initApp } from "./core/app.js?v=boyama-logo-20260705";
+import { initApp } from "./core/app.js?v=boyama-home-v2-20260705";
 
 initApp();

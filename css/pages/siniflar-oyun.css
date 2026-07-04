@@ -139,12 +139,23 @@
   display: grid;
   justify-items: center;
   gap: 12px;
-  padding: 0;
+  padding: 8px 8px 10px;
+  border-radius: 22px;
   border: 0;
   background: none;
   color: var(--navy);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background .22s ease, transform .22s ease;
+}
+
+.game-tile:hover {
+  background: rgba(255, 255, 255, .46);
+}
+
+.game-tile:focus-visible {
+  outline: 3px solid rgba(232, 121, 160, .56);
+  outline-offset: 4px;
 }
 
 .game-tile:active .game-tile-art--icon {
@@ -163,11 +174,11 @@
   padding: 0;
   overflow: hidden;
   border-radius: 24%;
-  background: none;
+  background: var(--white);
   box-shadow:
     0 12px 28px rgba(40, 20, 60, .28),
     0 3px 8px rgba(40, 20, 60, .18);
-  transition: transform .18s ease, box-shadow .18s ease;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
 }
 
 .game-tile-art--icon svg,
@@ -199,6 +210,25 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+body.dark .game-tile {
+  color: var(--text);
+}
+
+body.dark .game-tile:hover {
+  background: rgba(255, 255, 255, .055);
+}
+
+body.dark .game-tile-art--icon {
+  background: #111722;
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, .42),
+    0 0 0 1px rgba(255, 190, 222, .12);
+}
+
+body.dark .game-tile-copy strong {
+  color: var(--text);
 }
 
 .game-stage {

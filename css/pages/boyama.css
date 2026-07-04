@@ -10,10 +10,38 @@
 }
 
 .pbn-app {
+  --pbn-panel: rgba(255, 255, 255, .88);
+  --pbn-panel-strong: #ffffff;
+  --pbn-panel-border: rgba(148, 42, 88, .15);
+  --pbn-control-bg: rgba(248, 249, 254, .86);
+  --pbn-control-border: rgba(218, 224, 240, .95);
+  --pbn-selected-bg: rgba(252, 231, 243, .96);
+  --pbn-floating: rgba(255, 255, 255, .78);
+  --pbn-canvas-bg: #f3f5fb;
+  --pbn-canvas-grid: radial-gradient(rgba(26, 40, 80, .075) 1px, transparent 1px);
+  --pbn-panel-shadow: 0 18px 46px rgba(69, 16, 46, .09);
+  --pbn-panel-shadow-hover: 0 24px 58px rgba(69, 16, 46, .14);
   display: flex; flex-direction: column; gap: 22px;
-  width: min(100%, 980px); max-height: 100%;
+  width: min(100%, 1040px); max-height: 100%;
   overflow-y: auto; overflow-x: hidden;
   padding: 6px;
+  color: var(--text);
+  scrollbar-color: rgba(212, 102, 156, .42) transparent;
+}
+
+body.dark .pbn-app {
+  --pbn-panel: rgba(23, 27, 37, .88);
+  --pbn-panel-strong: #171b25;
+  --pbn-panel-border: rgba(255, 190, 222, .13);
+  --pbn-control-bg: rgba(30, 36, 48, .82);
+  --pbn-control-border: rgba(74, 85, 111, .70);
+  --pbn-selected-bg: rgba(232, 121, 160, .16);
+  --pbn-floating: rgba(18, 22, 31, .78);
+  --pbn-canvas-bg: #111722;
+  --pbn-canvas-grid: radial-gradient(rgba(255, 255, 255, .075) 1px, transparent 1px);
+  --pbn-panel-shadow: 0 22px 58px rgba(0, 0, 0, .34);
+  --pbn-panel-shadow-hover: 0 28px 70px rgba(0, 0, 0, .44);
+  color-scheme: dark;
 }
 
 .pbn-screen { display: none; }
@@ -52,38 +80,96 @@
 
 .pbn-hero {
   position: relative; overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(28px, 5vw, 70px);
+  row-gap: 10px;
   background:
-    radial-gradient(120% 140% at 85% -20%, rgba(232, 121, 160, .45) 0%, transparent 55%),
-    radial-gradient(90% 120% at 10% 110%, rgba(124, 58, 237, .35) 0%, transparent 60%),
+    linear-gradient(110deg, rgba(255, 255, 255, .08), transparent 38%, rgba(255, 255, 255, .06)),
+    linear-gradient(90deg, rgba(255, 255, 255, .055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, .045) 1px, transparent 1px),
     linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #3d2b63 100%);
+  background-size: auto, 42px 42px, 42px 42px, auto;
+  border: 1px solid rgba(255, 255, 255, .14);
   border-radius: 30px;
-  padding: 48px 40px;
+  padding: clamp(36px, 5vw, 58px);
   color: #fff;
-  text-align: center;
-  box-shadow: var(--pbn-shadow-soft);
+  text-align: left;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .18),
+    var(--pbn-shadow-soft);
+}
+
+.pbn-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -18% -46% 42%;
+  height: 70%;
+  background: linear-gradient(110deg, transparent, rgba(255, 212, 232, .20), transparent);
+  transform: rotate(-8deg);
+  pointer-events: none;
+}
+
+.pbn-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pbn-hero .unit-badge {
+  justify-self: start;
+  width: fit-content;
 }
 
 .pbn-brand-logo {
   display: block;
-  width: clamp(96px, 16vw, 146px);
+  grid-column: 2;
+  grid-row: 1 / span 5;
+  width: clamp(118px, 17vw, 180px);
   aspect-ratio: 1;
-  margin: 0 auto 18px;
+  margin: 0;
   border-radius: 26%;
   object-fit: cover;
+  background: rgba(255, 255, 255, .16);
+  border: 1px solid rgba(255, 255, 255, .22);
   box-shadow:
-    0 22px 54px rgba(6, 10, 31, .34),
-    0 4px 14px rgba(255, 255, 255, .16);
+    0 30px 70px rgba(6, 10, 31, .38),
+    0 0 0 8px rgba(255, 255, 255, .055),
+    inset 0 1px 0 rgba(255, 255, 255, .26);
 }
 
-.pbn-hero h2 { font-size: 2.05rem; margin: 14px 0 8px; letter-spacing: -.02em; }
-.pbn-hero p { max-width: 540px; margin: 0 auto 28px; opacity: .86; line-height: 1.55; }
+.pbn-hero h2 {
+  max-width: 620px;
+  font-size: clamp(2rem, 4.6vw, 3.8rem);
+  line-height: .96;
+  margin: 14px 0 12px;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+}
+.pbn-hero p {
+  max-width: 580px;
+  margin: 0 0 28px;
+  opacity: .88;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.pbn-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
 .pbn-upload-btn {
   display: inline-flex; align-items: center; gap: 10px;
-  background: #fff; color: var(--navy);
+  background: linear-gradient(135deg, #ffffff, #fff7fb);
+  color: #211332;
   font-weight: 700; font-size: 1.02rem;
   padding: 15px 32px; border-radius: 999px; border: none; cursor: pointer;
-  box-shadow: 0 18px 44px -14px rgba(0, 0, 0, .45);
+  box-shadow:
+    0 18px 44px -14px rgba(0, 0, 0, .45),
+    inset 0 1px 0 rgba(255, 255, 255, .82);
   transition: transform .5s var(--pbn-ease), box-shadow .5s var(--pbn-ease);
 }
 .pbn-upload-btn:hover { transform: translateY(-3px); box-shadow: 0 26px 54px -16px rgba(0, 0, 0, .5); }
@@ -103,7 +189,22 @@
   border: 1px solid rgba(255, 255, 255, .32); cursor: pointer;
   transition: background .4s var(--pbn-ease), transform .4s var(--pbn-ease);
 }
+.pbn-hero-actions .pbn-secondary-btn { margin-left: 0; }
 .pbn-secondary-btn:hover { background: rgba(255, 255, 255, .22); transform: translateY(-2px); }
+
+.pbn-upload-btn:focus-visible,
+.pbn-secondary-btn:focus-visible,
+.pbn-text-btn:focus-visible,
+.pbn-diff-chip:focus-visible,
+.pbn-preset-item:focus-visible,
+.pbn-tool-btn:focus-visible,
+.pbn-zoom-btn:focus-visible,
+.pbn-swatch:focus-visible,
+.pbn-menu-item:focus-visible,
+.pbn-gallery-item:focus-visible {
+  outline: 3px solid rgba(232, 121, 160, .58);
+  outline-offset: 3px;
+}
 
 .pbn-text-btn {
   background: none; border: none; color: var(--text-light); font-weight: 600;
@@ -487,6 +588,160 @@
 .pbn-gallery-viewer-actions .pbn-secondary-btn:hover { background: var(--pink-pale); }
 .pbn-gallery-viewer-actions--secondary { margin-top: 8px; }
 
+/* ---------- Profesyonel yüzey ve dark mode katmanı ---------- */
+
+.pbn-diff-picker,
+.pbn-presets,
+.pbn-analysis-card,
+.pbn-result-card,
+.pbn-gallery-head,
+.pbn-gallery-empty,
+.pbn-gallery-viewer-card,
+.pbn-paint-header,
+.pbn-palette-dock {
+  background: var(--pbn-panel);
+  border-color: var(--pbn-panel-border);
+  box-shadow: var(--pbn-panel-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.pbn-diff-picker,
+.pbn-presets,
+.pbn-analysis-card,
+.pbn-result-card,
+.pbn-gallery-viewer-card {
+  position: relative;
+}
+
+.pbn-diff-picker::before,
+.pbn-presets::before,
+.pbn-analysis-card::before,
+.pbn-result-card::before,
+.pbn-gallery-viewer-card::before {
+  content: "";
+  position: absolute;
+  inset: 1px 1px auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .72), transparent);
+  opacity: .65;
+  pointer-events: none;
+}
+
+.pbn-diff-chip,
+.pbn-preset-item,
+.pbn-recent-item,
+.pbn-gallery-item,
+.pbn-analysis-preview,
+.pbn-result-preview {
+  background: var(--pbn-control-bg);
+  border-color: var(--pbn-control-border);
+}
+
+.pbn-diff-chip:hover,
+.pbn-preset-item:hover,
+.pbn-recent-item:hover,
+.pbn-gallery-item:hover {
+  box-shadow: var(--pbn-panel-shadow-hover);
+}
+
+.pbn-diff-chip.is-selected {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .34), transparent),
+    var(--pbn-selected-bg);
+  border-color: color-mix(in srgb, var(--pink-bright) 74%, var(--pbn-control-border));
+}
+
+.pbn-paint-logo {
+  background: var(--pbn-control-bg);
+  border: 1px solid var(--pbn-control-border);
+}
+
+.pbn-canvas-viewport {
+  background-color: var(--pbn-canvas-bg);
+  background-image: var(--pbn-canvas-grid);
+  border-color: var(--pbn-panel-border);
+}
+
+.pbn-zoom-pill,
+.pbn-paint-menu {
+  background: var(--pbn-floating);
+  border-color: var(--pbn-panel-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.pbn-tool-btn,
+.pbn-zoom-btn,
+.pbn-menu-item {
+  color: var(--text);
+}
+
+.pbn-tool-btn:hover,
+.pbn-zoom-btn:hover,
+.pbn-menu-item:hover,
+.pbn-result-actions .pbn-secondary-btn:hover,
+.pbn-gallery-viewer-actions .pbn-secondary-btn:hover {
+  background: var(--pbn-selected-bg);
+}
+
+.pbn-swatch-count {
+  background: color-mix(in srgb, var(--navy) 82%, #000);
+  border-color: var(--pbn-panel-strong);
+}
+
+.pbn-gallery-viewer {
+  background: rgba(11, 13, 20, .68);
+}
+
+body.dark .pbn-hero {
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, .065), transparent 36%, rgba(255, 255, 255, .05)),
+    linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, .035) 1px, transparent 1px),
+    linear-gradient(135deg, #120913 0%, #181225 54%, #102522 100%);
+  background-size: auto, 42px 42px, 42px 42px, auto;
+  border-color: rgba(255, 190, 222, .16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .12),
+    0 28px 80px rgba(0, 0, 0, .44);
+}
+
+body.dark .pbn-hero::after {
+  background: linear-gradient(110deg, transparent, rgba(232, 121, 160, .14), transparent);
+}
+
+body.dark .pbn-brand-logo {
+  border-color: rgba(255, 190, 222, .22);
+  box-shadow:
+    0 30px 74px rgba(0, 0, 0, .46),
+    0 0 0 8px rgba(255, 255, 255, .045),
+    inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+
+body.dark .pbn-upload-btn {
+  background: linear-gradient(135deg, #ffeaf4, #ffd2e5);
+  color: #331225;
+}
+
+body.dark .pbn-secondary-btn {
+  background: rgba(255, 255, 255, .10);
+  border-color: rgba(255, 255, 255, .24);
+  color: #fff7fb;
+}
+
+body.dark .pbn-secondary-btn:hover {
+  background: rgba(255, 255, 255, .16);
+}
+
+body.dark .pbn-canvas-stage canvas {
+  box-shadow: 0 22px 58px -18px rgba(0, 0, 0, .70);
+}
+
+body.dark .pbn-gallery-viewer {
+  background: rgba(2, 5, 12, .78);
+}
+
 /* ---------- Animasyonlar ---------- */
 
 @keyframes pbnScreenEnter {
@@ -537,12 +792,28 @@
 
   .pbn-app { gap: 14px; padding: 4px; overscroll-behavior: contain; }
 
-  .pbn-hero { padding: 30px 20px; border-radius: 22px; }
-  .pbn-brand-logo { width: 104px; margin-bottom: 14px; }
+  .pbn-hero {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 14px;
+    padding: 30px 20px;
+    border-radius: 22px;
+    text-align: center;
+  }
+  .pbn-brand-logo {
+    grid-column: 1;
+    grid-row: auto;
+    order: -1;
+    width: 104px;
+    margin: 0 0 2px;
+  }
+  .pbn-hero .unit-badge { justify-self: center; }
   .pbn-hero h2 { font-size: 1.55rem; }
-  .pbn-hero p { font-size: .92rem; margin-bottom: 22px; }
+  .pbn-hero p { font-size: .92rem; margin: 0 auto 8px; }
+  .pbn-hero-actions { justify-content: center; width: 100%; }
   .pbn-upload-btn { padding: 13px 26px; font-size: .96rem; }
   .pbn-secondary-btn { display: block; margin: 12px auto 0; width: fit-content; }
+  .pbn-hero-actions .pbn-secondary-btn { margin: 0; }
 
   .pbn-diff-picker, .pbn-presets { padding: 16px; border-radius: 20px; }
   .pbn-diff-options { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -588,4 +859,381 @@
   .pbn-screen-paint.is-active { height: calc(100svh - 84px); }
   .pbn-tool-btn { width: 34px; height: 34px; }
   .pbn-swatch { width: 42px; height: 42px; }
+}
+
+/* ---------- Ana sayfa v2: kompakt, sade, bütünlüklü ---------- */
+
+.pbn-screen-home.is-active {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pbn-screen-home .pbn-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 18px;
+  row-gap: 8px;
+  min-height: 116px;
+  padding: 16px 18px;
+  border-radius: 24px;
+}
+
+.pbn-screen-home .pbn-hero::after {
+  inset: auto -18% -88% 44%;
+  height: 120%;
+  opacity: .62;
+}
+
+.pbn-screen-home .pbn-brand-logo {
+  grid-column: 1;
+  grid-row: 1;
+  width: clamp(58px, 7vw, 78px);
+  margin: 0;
+  box-shadow:
+    0 16px 32px rgba(6, 10, 31, .26),
+    0 0 0 5px rgba(255, 255, 255, .055),
+    inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+
+.pbn-hero-copy {
+  grid-column: 2;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.pbn-screen-home .pbn-hero .unit-badge {
+  justify-self: start;
+  width: fit-content;
+  padding: 5px 9px;
+  font-size: 10px;
+  letter-spacing: .2px;
+}
+
+.pbn-screen-home .pbn-hero h2 {
+  max-width: none;
+  margin: 0;
+  font-size: clamp(1.45rem, 2.5vw, 2.35rem);
+  line-height: .98;
+  letter-spacing: -.02em;
+}
+
+.pbn-screen-home .pbn-hero p {
+  max-width: 58ch;
+  margin: 0;
+  font-size: .92rem;
+  line-height: 1.55;
+}
+
+.pbn-screen-home .pbn-hero-actions {
+  grid-column: 2;
+  justify-content: flex-start;
+  width: auto;
+  margin-top: 4px;
+}
+
+.pbn-screen-home .pbn-upload-btn {
+  min-height: 46px;
+  padding: 0 22px;
+  white-space: nowrap;
+}
+
+.pbn-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.pbn-section-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+
+.pbn-section-head p {
+  margin: 5px 0 0;
+  max-width: 54ch;
+  color: var(--text-light);
+  font-size: .88rem;
+  line-height: 1.5;
+}
+
+.pbn-section-head > span {
+  flex: 0 0 auto;
+  color: var(--text-light);
+  font-size: .76rem;
+  font-weight: 800;
+  padding: 7px 10px;
+  border: 1px solid var(--pbn-control-border);
+  border-radius: 999px;
+  background: var(--pbn-control-bg);
+}
+
+.pbn-screen-home .pbn-diff-picker,
+.pbn-screen-home .pbn-presets,
+.pbn-screen-home .pbn-recent {
+  padding: clamp(18px, 2.5vw, 24px);
+  border: 1px solid var(--pbn-panel-border);
+  border-radius: 24px;
+  background: var(--pbn-panel);
+  box-shadow: var(--pbn-panel-shadow);
+}
+
+.pbn-screen-home .pbn-diff-options {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pbn-screen-home .pbn-diff-chip {
+  align-items: flex-start;
+  min-height: 92px;
+  padding: 14px;
+  border-width: 1px;
+  border-radius: 18px;
+  text-align: left;
+  box-shadow: none;
+}
+
+.pbn-screen-home .pbn-diff-chip:hover {
+  transform: translateY(-2px);
+}
+
+.pbn-screen-home .pbn-diff-main {
+  display: grid;
+  gap: 3px;
+}
+
+.pbn-screen-home .pbn-diff-main strong {
+  color: var(--text);
+  font-size: .98rem;
+  line-height: 1.15;
+}
+
+.pbn-screen-home .pbn-diff-main small,
+.pbn-screen-home .pbn-diff-meta {
+  color: var(--text-light);
+  font-size: .78rem;
+  line-height: 1.35;
+}
+
+.pbn-screen-home .pbn-diff-meta {
+  margin-top: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.pbn-screen-home .pbn-diff-chip.is-selected {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pink-bright) 70%, transparent);
+}
+
+.pbn-screen-home .pbn-preset-grid {
+  grid-template-columns: repeat(auto-fill, minmax(188px, 1fr));
+  gap: 14px;
+}
+
+.pbn-screen-home .pbn-preset-item {
+  display: grid;
+  gap: 9px;
+  padding: 8px;
+  border-width: 1px;
+  border-radius: 20px;
+  text-align: left;
+  box-shadow: none;
+}
+
+.pbn-screen-home .pbn-preset-item img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  height: auto;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.pbn-screen-home .pbn-preset-copy {
+  display: grid;
+  gap: 3px;
+  padding: 0 4px;
+}
+
+.pbn-screen-home .pbn-preset-copy strong {
+  color: var(--text);
+  font-size: .94rem;
+  line-height: 1.2;
+}
+
+.pbn-screen-home .pbn-preset-copy small {
+  display: block;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: .76rem;
+  line-height: 1.35;
+}
+
+.pbn-screen-home .pbn-preset-tag {
+  display: block;
+  justify-self: start;
+  margin: 0 4px 3px;
+  color: var(--text-light);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+.pbn-screen-home .pbn-recent-grid {
+  grid-template-columns: repeat(auto-fill, minmax(142px, 1fr));
+  gap: 14px;
+}
+
+.pbn-screen-home .pbn-recent-item {
+  display: grid;
+  gap: 8px;
+  aspect-ratio: auto;
+  padding: 8px;
+  border-color: var(--pbn-control-border);
+  background: var(--pbn-control-bg);
+}
+
+.pbn-screen-home .pbn-recent-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.pbn-recent-copy {
+  display: grid;
+  gap: 2px;
+  padding: 0 4px 2px;
+}
+
+.pbn-recent-copy strong {
+  color: var(--text);
+  font-size: .84rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pbn-recent-copy small {
+  color: var(--text-light);
+  font-size: .72rem;
+  line-height: 1.25;
+}
+
+.pbn-screen-home .pbn-recent-delete {
+  top: 12px;
+  right: 12px;
+}
+
+@media (max-width: 860px) {
+  .pbn-screen-home .pbn-diff-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .pbn-screen-home.is-active {
+    gap: 14px;
+  }
+
+  .pbn-screen-home .pbn-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: stretch;
+    min-height: 0;
+    padding: 14px;
+    text-align: left;
+    border-radius: 22px;
+  }
+
+  .pbn-screen-home .pbn-brand-logo {
+    grid-column: 1;
+    width: 58px;
+  }
+
+  .pbn-hero-copy {
+    grid-column: 2;
+  }
+
+  .pbn-screen-home .pbn-hero .unit-badge {
+    justify-self: start;
+  }
+
+  .pbn-screen-home .pbn-hero h2 {
+    font-size: 1.28rem;
+  }
+
+  .pbn-screen-home .pbn-hero p {
+    font-size: .84rem;
+    line-height: 1.45;
+  }
+
+  .pbn-screen-home .pbn-hero-actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .pbn-screen-home .pbn-upload-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    margin: 0;
+  }
+
+  .pbn-section-head {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .pbn-section-head > span {
+    justify-self: start;
+  }
+
+  .pbn-screen-home .pbn-diff-picker,
+  .pbn-screen-home .pbn-presets,
+  .pbn-screen-home .pbn-recent {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .pbn-screen-home .pbn-diff-options,
+  .pbn-screen-home .pbn-preset-grid,
+  .pbn-screen-home .pbn-recent-grid {
+    gap: 10px;
+  }
+
+  .pbn-screen-home .pbn-diff-chip {
+    min-height: 84px;
+    padding: 12px;
+  }
+
+  .pbn-screen-home .pbn-preset-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pbn-preset-copy small,
+  .pbn-preset-tag {
+    display: none;
+  }
+
+  .games-page.is-game-fullscreen.is-boyama .pbn-screen-home .pbn-hero-copy {
+    padding-right: calc(88px + env(safe-area-inset-right, 0px));
+  }
+}
+
+@media (max-width: 420px) {
+  .pbn-screen-home .pbn-diff-options {
+    grid-template-columns: 1fr;
+  }
+
+  .pbn-screen-home .pbn-preset-grid,
+  .pbn-screen-home .pbn-recent-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }

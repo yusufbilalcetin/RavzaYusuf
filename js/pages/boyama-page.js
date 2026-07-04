@@ -3,7 +3,7 @@ import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-202
 import {
   readIndex, saveProject, loadProject, deleteProject,
   saveGalleryItem, listGalleryItems, getGalleryItem, deleteGalleryItem
-} from "../utils/pbn-store.js";
+} from "../utils/pbn-store.js?v=boyama-home-v2-20260705";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -23,10 +23,41 @@ const DIFFICULTY_PRESETS = {
 const KMEANS_ITERATIONS = 14;
 
 const PRESET_IMAGES = [
-  { src: "./assets/home-bg-desktop.png", name: "Orman Masalı" },
-  { src: "./assets/ravzalingo-background.png", name: "Yeşil Bahçe" },
-  { src: "./assets/study-hub-bg-desktop.png", name: "Çalışma Köşesi" },
-  { src: "./assets/quiz-hub-bg-desktop.png", name: "Bilgi Yarışı" }
+  {
+    src: "./assets/home-bg-desktop.png",
+    thumb: "./assets/pbn-preset-orman-masali.jpeg",
+    name: "Orman Masalı",
+    tag: "Masal",
+    note: "Sıcak ışık, yoğun detay"
+  },
+  {
+    src: "./assets/ravzalingo-background.png",
+    thumb: "./assets/pbn-preset-yesil-bahce.jpeg",
+    name: "Yeşil Bahçe",
+    tag: "Doğa",
+    note: "Yumuşak geçişler"
+  },
+  {
+    src: "./assets/study-hub-bg-desktop.png",
+    thumb: "./assets/pbn-preset-calisma-kosesi.jpeg",
+    name: "Çalışma Köşesi",
+    tag: "Sakin",
+    note: "Dengeli renk alanları"
+  },
+  {
+    src: "./assets/quiz-hub-bg-desktop.png",
+    thumb: "./assets/pbn-preset-bilgi-yarisi.jpeg",
+    name: "Bilgi Yarışı",
+    tag: "Canlı",
+    note: "Kontrast ve parlak tonlar"
+  },
+  {
+    src: "./assets/study-detail-bg-desktop.png",
+    thumb: "./assets/pbn-preset-sakin-vadi.jpeg",
+    name: "Sakin Vadi",
+    tag: "Manzara",
+    note: "Geniş gölge paleti"
+  }
 ];
 
 function escapeHtml(value) {
@@ -35,55 +66,99 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
 
+function sortByUpdatedAt(items) {
+  return [...items].sort((a, b) => {
+    const bTime = b.updatedAt || b.createdAt || 0;
+    const aTime = a.updatedAt || a.createdAt || 0;
+    return bTime - aTime;
+  });
+}
+
+function formatRecentTime(value) {
+  if (!value) return "Kaydedildi";
+  return new Date(value).toLocaleString("tr-TR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 const TEMPLATE = `
   <div class="pbn-app">
     <div class="pbn-screen pbn-screen-home is-active" data-pbn-screen="home">
       <div class="pbn-hero">
-        <img class="pbn-brand-logo" src="./assets/game-icon-boyama.png" alt="Boyama logosu" loading="lazy" />
-        <span class="unit-badge">YENİ NESİL</span>
-        <h2>Numaraya Göre Boyama</h2>
-        <p>Fotoğrafını yükle; sistem renklerini analiz edip resme özel numaralı bir palet çıkarsın, sen de piksel piksel boya.</p>
-        <label class="pbn-upload-btn" for="pbnFileInput">
-          <span class="pbn-upload-icon" aria-hidden="true">📷</span>
-          Fotoğraf Yükle
-        </label>
-        <button type="button" class="pbn-secondary-btn" id="pbnGalleryHomeBtn">🖼 Galerim</button>
+        <img class="pbn-brand-logo" src="./assets/game-icon-boyama.jpeg" alt="Boyama logosu" loading="eager" decoding="async" />
+        <div class="pbn-hero-copy">
+          <span class="unit-badge">Boyama stüdyosu</span>
+          <h2>Numaraya Göre Boyama</h2>
+          <p>Fotoğraf yükle veya hazır görsel seç. Sistem paleti çıkarır, sen piksel piksel boya.</p>
+        </div>
+        <div class="pbn-hero-actions">
+          <label class="pbn-upload-btn" for="pbnFileInput">
+            Fotoğraf Yükle
+          </label>
+        </div>
         <input type="file" id="pbnFileInput" accept="image/*" hidden />
       </div>
 
       <div class="pbn-diff-picker" id="pbnDiffPicker">
-        <p class="pbn-diff-label">Zorluk seç (detay seviyesi):</p>
+        <div class="pbn-section-head">
+          <div>
+            <h3>Detay seviyesi</h3>
+            <p>Hız ve ayrıntı dengesini seç.</p>
+          </div>
+          <span>Normal önerilir</span>
+        </div>
         <div class="pbn-diff-options">
           <button type="button" class="pbn-diff-chip" data-diff="kolay">
-            <strong>Kolay</strong><span>${DIFFICULTY_PRESETS.kolay.targetWidth}px detay · ~${DIFFICULTY_PRESETS.kolay.k} renk</span>
+            <span class="pbn-diff-main"><strong>Kolay</strong><small>Hızlı başlangıç</small></span>
+            <span class="pbn-diff-meta">${DIFFICULTY_PRESETS.kolay.targetWidth}px · ${DIFFICULTY_PRESETS.kolay.k} renk</span>
           </button>
           <button type="button" class="pbn-diff-chip is-selected" data-diff="normal">
-            <strong>Normal</strong><span>${DIFFICULTY_PRESETS.normal.targetWidth}px detay · ~${DIFFICULTY_PRESETS.normal.k} renk</span>
+            <span class="pbn-diff-main"><strong>Normal</strong><small>Dengeli seçim</small></span>
+            <span class="pbn-diff-meta">${DIFFICULTY_PRESETS.normal.targetWidth}px · ${DIFFICULTY_PRESETS.normal.k} renk</span>
           </button>
           <button type="button" class="pbn-diff-chip" data-diff="zor">
-            <strong>Zor</strong><span>${DIFFICULTY_PRESETS.zor.targetWidth}px detay · ~${DIFFICULTY_PRESETS.zor.k} renk</span>
+            <span class="pbn-diff-main"><strong>Zor</strong><small>Daha ince alanlar</small></span>
+            <span class="pbn-diff-meta">${DIFFICULTY_PRESETS.zor.targetWidth}px · ${DIFFICULTY_PRESETS.zor.k} renk</span>
           </button>
           <button type="button" class="pbn-diff-chip" data-diff="pro">
-            <strong>Profesyonel</strong><span>${DIFFICULTY_PRESETS.pro.targetWidth}px detay · ~${DIFFICULTY_PRESETS.pro.k} renk</span>
+            <span class="pbn-diff-main"><strong>Profesyonel</strong><small>Maksimum detay</small></span>
+            <span class="pbn-diff-meta">${DIFFICULTY_PRESETS.pro.targetWidth}px · ${DIFFICULTY_PRESETS.pro.k} renk</span>
           </button>
         </div>
       </div>
 
       <div class="pbn-presets">
-        <h3>Hazır Görseller</h3>
-        <p class="pbn-presets-hint">Her görsel kendi renklerine göre farklı bir palet üretir.</p>
+        <div class="pbn-section-head">
+          <div>
+            <h3>Hazır görseller</h3>
+            <p>Farklı ışık, kontrast ve renk dengeleri için seçilmiş örnekler.</p>
+          </div>
+          <span>${PRESET_IMAGES.length} seçenek</span>
+        </div>
         <div class="pbn-preset-grid" id="pbnPresetGrid">
           ${PRESET_IMAGES.map((item) => `
             <button type="button" class="pbn-preset-item" data-src="${item.src}" data-name="${item.name}">
-              <img src="${item.src}" alt="${item.name}" loading="lazy" />
-              <span>${item.name}</span>
+              <img src="${item.thumb}" alt="${item.name}" loading="lazy" />
+              <span class="pbn-preset-copy">
+                <strong>${item.name}</strong>
+                <small>${item.note}</small>
+              </span>
+              <span class="pbn-preset-tag">${item.tag}</span>
             </button>
           `).join("")}
         </div>
       </div>
 
       <div class="pbn-recent" id="pbnRecentSection" hidden>
-        <h3>Son Çalışmalarım</h3>
+        <div class="pbn-section-head">
+          <div>
+            <h3>Son çalışmalar</h3>
+            <p>En son düzenlediğin çalışma en başta görünür.</p>
+          </div>
+        </div>
         <div class="pbn-recent-grid" id="pbnRecentGrid"></div>
       </div>
     </div>
@@ -112,7 +187,7 @@ const TEMPLATE = `
       <div class="pbn-paint-header">
         <button type="button" class="pbn-tool-btn" id="pbnBackBtn" title="Ana ekrana dön">←</button>
         <span class="pbn-paint-logo" aria-hidden="true">
-          <img src="./assets/game-icon-boyama.png" alt="" loading="lazy" />
+          <img src="./assets/game-icon-boyama.jpeg" alt="" loading="eager" decoding="async" />
         </span>
         <div class="pbn-paint-progress">
           <div class="pbn-paint-progress-track">
@@ -152,15 +227,15 @@ const TEMPLATE = `
       <div class="pbn-result-card">
         <div class="pbn-confetti-layer" id="pbnConfettiLayer"></div>
         <span class="unit-badge">TAMAMLANDI</span>
-        <h2>Tebrikler, eserin hazır! 🎉</h2>
-        <p>Fotoğrafın artık gerçek bir sanat eserine dönüştü.</p>
+        <h2>Eser hazır</h2>
+        <p>Çalışman galeriye otomatik kaydedildi. İstersen cihazına da indirebilirsin.</p>
         <div class="pbn-result-preview">
           <img id="pbnResultImage" alt="Boyanmış sonuç" />
         </div>
         <p class="pbn-saved-chip" id="pbnGallerySavedChip" hidden>✓ Galerine kaydedildi</p>
         <div class="pbn-result-actions">
-          <button type="button" class="pbn-upload-btn" id="pbnViewGalleryBtn">Galeride Gör</button>
-          <button type="button" class="pbn-secondary-btn" id="pbnShareResultBtn">Paylaş / Cihaza Kaydet</button>
+          <button type="button" class="pbn-upload-btn" id="pbnShareResultBtn">Cihaza İndir</button>
+          <button type="button" class="pbn-secondary-btn" id="pbnViewGalleryBtn">Galeride Aç</button>
         </div>
         <div class="pbn-result-actions pbn-result-actions--secondary">
           <button type="button" class="pbn-text-btn" id="pbnDownloadTemplateBtn">Numaralı Şablonu İndir</button>
@@ -186,8 +261,8 @@ const TEMPLATE = `
       <div class="pbn-gallery-viewer-card">
         <img id="pbnViewerImage" alt="Boyama eseri" />
         <div class="pbn-gallery-viewer-actions">
-          <button type="button" class="pbn-upload-btn" id="pbnViewerShareBtn">Paylaş / Cihaza Kaydet</button>
-          <button type="button" class="pbn-secondary-btn" id="pbnViewerDownloadBtn">İndir</button>
+          <button type="button" class="pbn-upload-btn" id="pbnViewerDownloadBtn">Cihaza İndir</button>
+          <button type="button" class="pbn-secondary-btn" id="pbnViewerShareBtn">Paylaş</button>
         </div>
         <div class="pbn-gallery-viewer-actions pbn-gallery-viewer-actions--secondary">
           <button type="button" class="pbn-text-btn pbn-text-btn--danger" id="pbnViewerDeleteBtn">Sil</button>
@@ -265,16 +340,12 @@ export function renderBoyamaApp(target) {
       });
     });
 
-    root.querySelector("#pbnGalleryHomeBtn").addEventListener("click", () => {
-      showScreen("gallery");
-      renderGalleryGrid();
-    });
   }
 
   function renderRecentGrid() {
     const section = root.querySelector("#pbnRecentSection");
     const grid = root.querySelector("#pbnRecentGrid");
-    const items = readIndex();
+    const items = sortByUpdatedAt(readIndex());
     if (!items.length) {
       section.hidden = true;
       return;
@@ -283,6 +354,10 @@ export function renderBoyamaApp(target) {
     grid.innerHTML = items.map((item) => `
       <div class="pbn-recent-item" data-id="${item.id}">
         <img src="${item.thumbnail}" alt="${escapeHtml(item.name || "Çalışma")}" />
+        <span class="pbn-recent-copy">
+          <strong>${escapeHtml(item.name || "Boyama çalışması")}</strong>
+          <small>${formatRecentTime(item.updatedAt || item.createdAt)}</small>
+        </span>
         <button type="button" class="pbn-recent-delete" data-delete-id="${item.id}" aria-label="Sil">✕</button>
       </div>
     `).join("");

@@ -32,26 +32,31 @@ function openDb() {
 export function readIndex() {
   try {
     const raw = localStorage.getItem(INDEX_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? sortIndexEntries(JSON.parse(raw)) : [];
   } catch {
     return [];
   }
 }
 
+function sortIndexEntries(list) {
+  return [...(Array.isArray(list) ? list : [])].sort((a, b) => {
+    const bTime = b.updatedAt || b.createdAt || 0;
+    const aTime = a.updatedAt || a.createdAt || 0;
+    return bTime - aTime;
+  });
+}
+
 function writeIndex(list) {
   try {
-    localStorage.setItem(INDEX_KEY, JSON.stringify(list));
+    localStorage.setItem(INDEX_KEY, JSON.stringify(sortIndexEntries(list).slice(0, 24)));
   } catch {
     /* ignore quota errors */
   }
 }
 
 export function upsertIndexEntry(entry) {
-  const list = readIndex();
-  const existingPos = list.findIndex((item) => item.id === entry.id);
-  if (existingPos >= 0) list[existingPos] = entry;
-  else list.unshift(entry);
-  writeIndex(list.slice(0, 24));
+  const list = readIndex().filter((item) => item.id !== entry.id);
+  writeIndex([entry, ...list]);
 }
 
 export function removeIndexEntry(id) {
