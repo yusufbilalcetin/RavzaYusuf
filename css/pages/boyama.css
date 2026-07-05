@@ -394,18 +394,6 @@ body.dark .pbn-app {
 }
 .pbn-menu-item:disabled:hover { background: none; }
 .pbn-menu-item .pbn-menu-item-label { flex: 1; }
-.pbn-menu-note {
-  flex: 0 0 auto;
-  font-size: .68rem;
-  font-weight: 800;
-  letter-spacing: .2px;
-  color: var(--text-light);
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--pbn-control-border);
-  background: var(--pbn-control-bg);
-}
-.pbn-menu-note[hidden] { display: none; }
 .pbn-menu-item--danger { color: #dc2626; }
 .pbn-menu-item--danger:hover { background: rgba(239, 68, 68, .1); }
 

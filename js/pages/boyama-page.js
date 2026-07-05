@@ -1,8 +1,8 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-dl-btn-20260705";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-anytime-dl-20260705";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
   readIndex, saveProject, loadProject, deleteProject
-} from "../utils/pbn-store.js?v=boyama-dl-btn-20260705";
+} from "../utils/pbn-store.js?v=boyama-anytime-dl-20260705";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -202,9 +202,8 @@ const TEMPLATE = `
         </div>
         <div class="pbn-paint-menu" id="pbnPaintMenu" hidden>
           <button type="button" class="pbn-menu-item" id="pbnMenuZoomReset">⤢ Görünümü Sıfırla</button>
-          <button type="button" class="pbn-menu-item" id="pbnMenuDownloadArt" disabled>
+          <button type="button" class="pbn-menu-item" id="pbnMenuDownloadArt">
             <span class="pbn-menu-item-label">⬇ Eseri İndir</span>
-            <span class="pbn-menu-note" id="pbnMenuDownloadNote">%100 olunca</span>
           </button>
           <button type="button" class="pbn-menu-item" id="pbnMenuTemplate">🗒 Şablonu İndir</button>
           <button type="button" class="pbn-menu-item pbn-menu-item--danger" id="pbnMenuReset">⟲ Boyamayı Sıfırla</button>
@@ -594,20 +593,6 @@ export function renderBoyamaApp(target) {
     const progress = engine.getProgress();
     root.querySelector("#pbnPaintProgressFill").style.width = `${progress}%`;
     root.querySelector("#pbnPaintProgressText").textContent = `${progress}%`;
-    updateDownloadArtState();
-  }
-
-  // "Eseri İndir" yalnız ilerleme %100 olduğunda aktif olur.
-  function updateDownloadArtState() {
-    const btn = root.querySelector("#pbnMenuDownloadArt");
-    const note = root.querySelector("#pbnMenuDownloadNote");
-    if (!btn) return;
-    const complete = engine.isComplete();
-    btn.disabled = !complete;
-    btn.title = complete
-      ? "Tamamlanan eseri PNG olarak indir"
-      : "İndirme, boyama %100 tamamlanınca aktif olur";
-    if (note) note.hidden = complete;
   }
 
   function closePaintMenu() {
@@ -681,7 +666,7 @@ export function renderBoyamaApp(target) {
     });
     root.querySelector("#pbnMenuDownloadArt").addEventListener("click", async () => {
       closePaintMenu();
-      if (!engine.isComplete()) return; // yalnız %100 tamamlanmış eser indirilebilir
+      // İlerleme yüzdesi ne olursa olsun, o ana kadar boyanan hal indirilebilir.
       const blob = await engine.exportPaintedBlob();
       if (blob) downloadBlob(blob, `boyama-eser-${Date.now()}.png`);
     });

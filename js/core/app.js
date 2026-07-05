@@ -1,5 +1,5 @@
 import { loadLayoutPartials } from "./partial-loader.js";
-import { initRouter, navigate } from "./router.js?v=boyama-dl-btn-20260705";
+import { initRouter, navigate } from "./router.js?v=boyama-anytime-dl-20260705";
 import { installCompatibility } from "./compatibility.js?v=fit-visible-20260704";
 import { installAppShellScrollBridge } from "./app-shell-scroll.js";
 
