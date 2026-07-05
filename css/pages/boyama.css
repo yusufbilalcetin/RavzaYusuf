@@ -76,6 +76,11 @@ body.dark .pbn-app {
   overflow: hidden;
 }
 
+/* Masaüstünde yüzen "Kapat" butonu üst çubuğun sağ ucundaki butonlara binmesin */
+.games-page.is-game-fullscreen.is-boyama .pbn-paint-header {
+  margin-right: calc(92px + env(safe-area-inset-right, 0px));
+}
+
 /* ---------- Ana Sayfa ---------- */
 
 .pbn-hero {
@@ -321,9 +326,9 @@ body.dark .pbn-app {
 .pbn-screen-paint.is-active {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 12px;
+  gap: clamp(16px, 2.6vw, 26px);
   width: 100%;
-  height: min(76svh, 720px);
+  height: min(82svh, 780px);
   min-height: 0;
 }
 
@@ -788,7 +793,11 @@ body.dark .pbn-gallery-viewer {
 /* ---------- Mobil ---------- */
 
 @media (max-width: 720px) {
-  .games-page.is-game-fullscreen.is-boyama .game-stage-body { padding: 10px; }
+  /* Üst boşluk: yüzen "Kapat" butonu (fixed, sağ üst) içerikle çakışmasın.
+     !important şart: satır ~53'teki genel kural da !important kullanıyor. */
+  .games-page.is-game-fullscreen.is-boyama .game-stage-body {
+    padding: calc(58px + env(safe-area-inset-top, 0px)) 10px 10px !important;
+  }
 
   .pbn-app { gap: 14px; padding: 4px; overscroll-behavior: contain; }
 
@@ -825,12 +834,13 @@ body.dark .pbn-gallery-viewer {
   .pbn-analysis-preview img { height: 150px; }
 
   /* Boyama ekranı: mevcut yüksekliği doldur, tuvale maksimum alan */
-  .pbn-screen-paint.is-active { height: calc(100svh - 92px); gap: 10px; }
+  .pbn-screen-paint.is-active { height: calc(100svh - 78px); gap: 16px; }
 
-  .pbn-paint-header { gap: 6px; padding: 5px 8px; }
+  .pbn-paint-header { flex-wrap: nowrap; gap: 8px; padding: 5px 8px; }
   .pbn-paint-logo { width: 34px; height: 34px; flex-basis: 34px; }
-  .pbn-paint-progress { gap: 8px; }
+  .pbn-paint-progress { gap: 8px; min-width: 0; }
   .pbn-paint-progress span { font-size: .8rem; min-width: 34px; }
+  .pbn-paint-tools { gap: 4px; }
   .pbn-tool-btn { width: 36px; height: 36px; font-size: .92rem; }
   .pbn-paint-menu { right: 4px; min-width: 200px; }
 
@@ -856,7 +866,9 @@ body.dark .pbn-gallery-viewer {
 
 @media (max-width: 420px) {
   .pbn-hero h2 { font-size: 1.35rem; }
-  .pbn-screen-paint.is-active { height: calc(100svh - 84px); }
+  .pbn-screen-paint.is-active { height: calc(100svh - 70px); }
+  .pbn-paint-header { gap: 6px; }
+  .pbn-paint-progress span { min-width: 28px; }
   .pbn-tool-btn { width: 34px; height: 34px; }
   .pbn-swatch { width: 42px; height: 42px; }
 }
@@ -1222,8 +1234,9 @@ body.dark .pbn-gallery-viewer {
     display: none;
   }
 
-  .games-page.is-game-fullscreen.is-boyama .pbn-screen-home .pbn-hero-copy {
-    padding-right: calc(88px + env(safe-area-inset-right, 0px));
+  /* Mobilde üst boşluk çözümü devrede; masaüstü sağ payı sıfırla */
+  .games-page.is-game-fullscreen.is-boyama .pbn-paint-header {
+    margin-right: 0;
   }
 }
 

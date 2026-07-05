@@ -8,6 +8,10 @@ const HIGHLIGHT_MIX = 0.34;
 // ~56px'e ulaşabilsin diye hücre boyutundan türetilir.
 const MAX_CELL_SCREEN_PX = 56;
 
+// Zoom'da pan payı: görsel viewport kenarına kilitlenmesin, kenar/köşe
+// bölgeleri boyarken viewport'un ~%8'i kadar boş çalışma alanı kalsın.
+const PAN_MARGIN_RATIO = 0.08;
+
 // Overlay LOD eşikleri (ekrandaki hücre boyutu, px)
 const LOD_BOUNDARY_PX = 5;   // bölge sınırları bu boyuttan itibaren çizilir
 const LOD_NUMBER_PX = 12;    // numaralar bu boyuttan itibaren çizilir
@@ -309,7 +313,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     const vw = viewport.clientWidth;
     const vh = viewport.clientHeight;
     if (!vw || !vh) return;
-    fitScale = Math.min(vw / width, vh / height) * 0.96;
+    fitScale = Math.min(vw / width, vh / height) * 0.95;
     scale = Math.min(fitScale, maxZoom());
     offsetX = (vw - width * scale) / 2;
     offsetY = (vh - height * scale) / 2;
@@ -324,16 +328,19 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     const displayW = width * scale;
     const displayH = height * scale;
 
+    const marginX = vw * PAN_MARGIN_RATIO;
+    const marginY = vh * PAN_MARGIN_RATIO;
+
     if (displayW <= vw) {
       offsetX = (vw - displayW) / 2;
     } else {
-      offsetX = Math.min(0, Math.max(vw - displayW, offsetX));
+      offsetX = Math.min(marginX, Math.max(vw - displayW - marginX, offsetX));
     }
 
     if (displayH <= vh) {
       offsetY = (vh - displayH) / 2;
     } else {
-      offsetY = Math.min(0, Math.max(vh - displayH, offsetY));
+      offsetY = Math.min(marginY, Math.max(vh - displayH - marginY, offsetY));
     }
   }
 
@@ -524,10 +531,15 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   }
 
   function findHintRegion() {
+    // Önce paletten seçili rakamın boyanmamış bölgesi; seçili rakam
+    // bittiyse veya seçim yoksa ilk boyanmamış bölgeye düşülür.
+    let fallback = null;
     for (const region of regions) {
-      if (!paintedSet.has(region.id)) return region;
+      if (paintedSet.has(region.id)) continue;
+      if (selectedNumber != null && region.paletteNumber === selectedNumber) return region;
+      if (!fallback) fallback = region;
     }
-    return null;
+    return fallback;
   }
 
   function getNumberStats() {
@@ -869,6 +881,17 @@ export function createPbnEngine({ canvas, viewport, stage }) {
 
   function showHintPing(region) {
     if (!stage) return;
+    // İpucu noktası görünür alanın dışındaysa (zoom'da başka yere bakılıyorsa)
+    // viewport ipucuna ortalanır; ping her zaman ekranda görünür.
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    const sx = region.labelX * scale + offsetX;
+    const sy = region.labelY * scale + offsetY;
+    const pad = 28;
+    if (sx < pad || sx > vw - pad || sy < pad || sy > vh - pad) {
+      offsetX = vw / 2 - region.labelX * scale;
+      offsetY = vh / 2 - region.labelY * scale;
+      applyTransform();
+    }
     const ping = document.createElement("div");
     ping.className = "pbn-hint-ping";
     ping.style.left = `${region.labelX}px`;
