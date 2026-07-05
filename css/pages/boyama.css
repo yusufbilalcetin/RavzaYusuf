@@ -203,7 +203,6 @@ body.dark .pbn-app {
 .pbn-diff-chip:focus-visible,
 .pbn-preset-item:focus-visible,
 .pbn-tool-btn:focus-visible,
-.pbn-zoom-btn:focus-visible,
 .pbn-swatch:focus-visible,
 .pbn-menu-item:focus-visible {
   outline: 3px solid rgba(232, 121, 160, .58);
@@ -323,6 +322,7 @@ body.dark .pbn-app {
 /* ---------- Boyama Ekranı ---------- */
 
 .pbn-screen-paint.is-active {
+  position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(16px, 2.6vw, 26px);
@@ -334,6 +334,7 @@ body.dark .pbn-app {
 /* Üst bar: tek beyaz hap — geri, ilerleme, araç kümesi */
 .pbn-paint-header {
   position: relative;
+  z-index: 30;
   display: flex; align-items: center; gap: 12px;
   background: var(--white); border: 1px solid var(--card-border);
   border-radius: 999px; padding: 6px 10px; box-shadow: var(--shadow-xs);
@@ -373,7 +374,7 @@ body.dark .pbn-app {
 
 /* Taşma menüsü (popover) */
 .pbn-paint-menu {
-  position: absolute; top: calc(100% + 8px); right: 6px; z-index: 40;
+  position: absolute; top: calc(100% + 8px); right: 6px; z-index: 60;
   display: flex; flex-direction: column; min-width: 216px;
   background: var(--white); border: 1px solid var(--card-border);
   border-radius: 16px; padding: 6px; box-shadow: var(--pbn-shadow-float);
@@ -399,7 +400,7 @@ body.dark .pbn-app {
 
 /* Tuval — sakin noktalı zemin üzerinde yüzen çalışma alanı */
 .pbn-canvas-viewport {
-  position: relative; overflow: hidden;
+  position: relative; z-index: 1; overflow: hidden;
   min-width: 0;
   min-height: 0;
   width: 100%;
@@ -428,23 +429,6 @@ body.dark .pbn-app {
 .pbn-canvas-stage canvas.pbn-canvas--crisp { image-rendering: pixelated; }
 .pbn-overlay-canvas { z-index: 5; }
 
-/* Yüzen zoom hapı (masaüstü) */
-.pbn-zoom-pill {
-  position: absolute; right: 14px; bottom: 14px; z-index: 10;
-  display: flex; flex-direction: column; gap: 2px;
-  background: rgba(255, 255, 255, .74);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--card-border); border-radius: 999px; padding: 5px;
-  box-shadow: var(--pbn-shadow-float);
-}
-.pbn-zoom-btn {
-  width: 36px; height: 36px; border-radius: 999px; border: none;
-  background: transparent; cursor: pointer; font-size: .95rem;
-  transition: background .35s var(--pbn-ease), transform .35s var(--pbn-ease);
-}
-.pbn-zoom-btn:hover { background: var(--pink-pale); }
-.pbn-zoom-btn:active { transform: scale(.92); }
-
 .pbn-hint-ping {
   position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;
   border-radius: 50%; border: 3px solid var(--exam); pointer-events: none;
@@ -453,6 +437,8 @@ body.dark .pbn-app {
 
 /* Palet dock'u: numarası içinde dairesel renk sürüntüleri */
 .pbn-palette-dock {
+  position: relative;
+  z-index: 2;
   display: flex; gap: 12px; overflow-x: auto; padding: 12px 26px;
   min-width: 0;
   max-height: 88px;
@@ -604,7 +590,6 @@ body.dark .pbn-app {
   border-color: var(--pbn-panel-border);
 }
 
-.pbn-zoom-pill,
 .pbn-paint-menu {
   background: var(--pbn-floating);
   border-color: var(--pbn-panel-border);
@@ -613,13 +598,11 @@ body.dark .pbn-app {
 }
 
 .pbn-tool-btn,
-.pbn-zoom-btn,
 .pbn-menu-item {
   color: var(--text);
 }
 
 .pbn-tool-btn:hover,
-.pbn-zoom-btn:hover,
 .pbn-menu-item:hover,
 .pbn-result-actions .pbn-secondary-btn:hover {
   background: var(--pbn-selected-bg);
@@ -766,7 +749,6 @@ body.dark .pbn-canvas-stage canvas {
   .pbn-paint-menu { right: 4px; min-width: 200px; }
 
   .pbn-canvas-viewport { border-radius: 20px; }
-  .pbn-zoom-pill { display: none; } /* mobilde pinch zoom yeterli */
 
   .pbn-palette-dock { padding: 10px 20px; gap: 10px; border-radius: 18px; }
   .pbn-swatch { width: 46px; height: 46px; margin: 6px 2px; }
@@ -1149,9 +1131,9 @@ body.dark .pbn-canvas-stage canvas {
     display: none;
   }
 
-  /* Mobilde üst boşluk çözümü devrede; masaüstü sağ payı sıfırla */
+  /* Mobilde sagdaki oyun kapatma X'i icin arac cubugunda yer ayir. */
   .games-page.is-game-fullscreen.is-boyama .pbn-paint-header {
-    margin-right: 0;
+    margin-right: calc(48px + env(safe-area-inset-right, 0px));
   }
 }
 
@@ -1163,5 +1145,24 @@ body.dark .pbn-canvas-stage canvas {
   .pbn-screen-home .pbn-preset-grid,
   .pbn-screen-home .pbn-recent-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  .games-page.is-game-fullscreen.is-boyama .pbn-paint-header {
+    margin-right: calc(42px + env(safe-area-inset-right, 0px));
+  }
+
+  .pbn-paint-logo {
+    display: none;
+  }
+
+  .pbn-paint-tools {
+    gap: 3px;
+  }
+
+  .pbn-tool-btn {
+    width: 32px;
+    height: 32px;
   }
 }

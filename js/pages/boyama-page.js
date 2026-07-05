@@ -215,11 +215,6 @@ const TEMPLATE = `
         <div class="pbn-canvas-stage" id="pbnCanvasStage">
           <canvas id="pbnCanvas"></canvas>
         </div>
-        <div class="pbn-zoom-pill">
-          <button type="button" class="pbn-zoom-btn" id="pbnZoomInBtn" title="Yakınlaştır">＋</button>
-          <button type="button" class="pbn-zoom-btn" id="pbnZoomResetBtn" title="Görünümü sıfırla">⌂</button>
-          <button type="button" class="pbn-zoom-btn" id="pbnZoomOutBtn" title="Uzaklaştır">－</button>
-        </div>
       </div>
 
       <div class="pbn-palette-dock" id="pbnPaletteStrip"></div>
@@ -636,9 +631,6 @@ export function renderBoyamaApp(target) {
     });
     root.querySelector("#pbnUndoBtn").addEventListener("click", () => engine.undo());
     root.querySelector("#pbnRedoBtn").addEventListener("click", () => engine.redo());
-    root.querySelector("#pbnZoomInBtn").addEventListener("click", () => engine.zoomIn());
-    root.querySelector("#pbnZoomOutBtn").addEventListener("click", () => engine.zoomOut());
-    root.querySelector("#pbnZoomResetBtn").addEventListener("click", () => engine.zoomReset());
     root.querySelector(".pbn-screen-paint").addEventListener("wheel", (event) => {
       if (!root.querySelector(".pbn-screen-paint.is-active")) return;
       if (event.target?.closest?.(".pbn-canvas-viewport")) return;

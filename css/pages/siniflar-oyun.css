@@ -319,6 +319,7 @@ body.is-game-fullscreen .dash-right {
   z-index: 82;
   display: block;
   margin: 0;
+  pointer-events: none;
 }
 
 .games-page.is-game-fullscreen .game-stage-head > div {
@@ -326,12 +327,14 @@ body.is-game-fullscreen .dash-right {
 }
 
 .games-page.is-game-fullscreen .game-close-btn {
-  min-height: 42px;
-  padding: 0 16px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
   border-color: rgba(255, 255, 255, .22);
-  border-radius: 14px;
-  background: rgba(10, 4, 22, .72);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+  background: rgba(10, 4, 22, .58);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .24);
   backdrop-filter: blur(14px);
 }
 
@@ -383,7 +386,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .candy-crush-game-frame {
 }
 
 body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
-  z-index: 9010 !important;
+  z-index: 9020 !important;
 }
 
 .games-page.is-game-fullscreen .candy-game {
@@ -494,8 +497,54 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
 }
 
 .game-close-btn {
-  min-height: 42px;
-  padding: 0 16px;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0;
+  line-height: 0;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.game-close-btn span,
+.game-close-btn::before,
+.game-close-btn::after {
+  display: block;
+}
+
+.game-close-btn span {
+  width: 15px;
+  height: 15px;
+}
+
+.game-close-btn::before,
+.game-close-btn::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.game-close-btn::before {
+  transform: rotate(45deg);
+}
+
+.game-close-btn::after {
+  transform: rotate(-45deg);
+}
+
+.game-close-btn:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, .42);
+  outline-offset: 3px;
 }
 
 .game-close-btn:hover,
@@ -2704,7 +2753,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   }
 
   .game-close-btn {
-    justify-self: start;
+    justify-self: end;
   }
 
   .candy-stats {
