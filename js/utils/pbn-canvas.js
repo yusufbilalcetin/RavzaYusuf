@@ -18,6 +18,7 @@ const LOD_NUMBER_PX = 12;    // numaralar bu boyuttan itibaren çizilir
 const LOD_NUMBER_BUDGET = 3500; // görünür boyanmamış hücre bütçesi
 const LOD_NUMBER_PX_BUSY = 16;  // bütçe aşılırsa numara eşiği
 const GESTURE_NUMBER_BUDGET = 2000; // jest sırasında numara çizim bütçesi
+const HINT_DURATION_MS = 2400; // ipucu parlamasının ekranda kalma süresi
 
 function mixWithWhite(p, mix) {
   return [
@@ -54,6 +55,10 @@ export function createPbnEngine({ canvas, viewport, stage }) {
 
   let scale = 1, offsetX = 0, offsetY = 0, fitScale = 1;
   let onChange = () => {};
+
+  let hintIds = new Set();
+  let hintRafId = null;
+  let hintExpireAt = 0;
 
   /* ---------- overlay canvas (grid + numaralar, ekran uzayında) ---------- */
 
@@ -98,6 +103,8 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     const imgTop = offsetY;
     const imgRight = offsetX + width * scale;
     const imgBottom = offsetY + height * scale;
+
+    drawHintOverlay(vw, vh, imgLeft, imgTop, imgRight, imgBottom);
 
     if (!cellSize || !gridCols || !gridRows) {
       // Eski kayıt (cellSize yok): grid kompozite gömülü kalır, overlay yalnız numaraları çizer.
@@ -271,6 +278,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     paintOrder = [];
     redoStack = [];
     selectedNumber = palette[0]?.number ?? null;
+    clearColorHint();
     // Yeni veri = temiz giriş durumu: önceki ekrandan takılı jest kalmasın.
     resetPointerState();
     fitToView();
@@ -526,20 +534,9 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     for (const number of numberPainted.keys()) numberPainted.set(number, 0);
     paintOrder = [];
     redoStack = [];
+    clearColorHint();
     render();
     onChange({ type: "reset" });
-  }
-
-  function findHintRegion() {
-    // Önce paletten seçili rakamın boyanmamış bölgesi; seçili rakam
-    // bittiyse veya seçim yoksa ilk boyanmamış bölgeye düşülür.
-    let fallback = null;
-    for (const region of regions) {
-      if (paintedSet.has(region.id)) continue;
-      if (selectedNumber != null && region.paletteNumber === selectedNumber) return region;
-      if (!fallback) fallback = region;
-    }
-    return fallback;
   }
 
   function getNumberStats() {
@@ -882,28 +879,124 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   });
   viewport.addEventListener("wheel", handleWheelZoom, { passive: false, capture: true });
 
-  function showHintPing(region) {
-    if (!stage) return;
-    // İpucu noktası görünür alanın dışındaysa (zoom'da başka yere bakılıyorsa)
-    // viewport ipucuna ortalanır; ping her zaman ekranda görünür.
+  // Safari'nin native iki parmak pinch-zoom'u (gesturestart/gesturechange), stage'in
+  // kendi pointer-tabanli zoom'uyla çakışıp sayfayı zoomlayarak sabit konumlu oyun
+  // katmanının bozulmasına ("oyundan atılma" hissi) yol açabiliyor; burada bastırılır.
+  function preventNativeGesture(e) { e.preventDefault(); }
+  document.addEventListener("gesturestart", preventNativeGesture, { passive: false });
+  document.addEventListener("gesturechange", preventNativeGesture, { passive: false });
+
+  // Seçili renk numarasına ait, henüz boyanmamış tüm hücreleri bulup
+  // ekranda kısa süreliğine parlatır. Hedef hücrelerin hiçbiri görünür
+  // alanda değilse görünüm ilk hedefe ortalanır.
+  function showColorHint(number) {
+    if (number == null) return { ok: false, reason: "no-selection" };
+    const candidates = regionsByNumber.get(number) || [];
+    const targets = candidates.filter((r) => !paintedSet.has(r.id));
+    if (!targets.length) return { ok: false, reason: "complete" };
+
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
-    const sx = region.labelX * scale + offsetX;
-    const sy = region.labelY * scale + offsetY;
     const pad = 28;
-    if (sx < pad || sx > vw - pad || sy < pad || sy > vh - pad) {
-      offsetX = vw / 2 - region.labelX * scale;
-      offsetY = vh / 2 - region.labelY * scale;
+    const anyVisible = targets.some((r) => {
+      const sx = r.labelX * scale + offsetX;
+      const sy = r.labelY * scale + offsetY;
+      return sx >= pad && sx <= vw - pad && sy >= pad && sy <= vh - pad;
+    });
+    if (!anyVisible) {
+      const target = targets[0];
+      offsetX = vw / 2 - target.labelX * scale;
+      offsetY = vh / 2 - target.labelY * scale;
       applyTransform();
     }
-    const ping = document.createElement("div");
-    ping.className = "pbn-hint-ping";
-    ping.style.left = `${region.labelX}px`;
-    ping.style.top = `${region.labelY}px`;
-    // Stage ölçeklendiği için ping ters ölçeklenir; fit zoom'da da görünür kalır.
-    // (Animasyon transform'u ezdiğinden ters ölçek CSS değişkeniyle verilir.)
-    ping.style.setProperty("--ping-inv", String(1 / Math.max(scale, 0.01)));
-    stage.appendChild(ping);
-    setTimeout(() => ping.remove(), 2200);
+
+    hintIds = new Set(targets.map((r) => r.id));
+    hintExpireAt = performance.now() + HINT_DURATION_MS;
+    runHintLoop();
+    return { ok: true, count: hintIds.size };
+  }
+
+  function runHintLoop() {
+    if (hintRafId != null) return;
+    const step = () => {
+      drawOverlay();
+      if (performance.now() >= hintExpireAt) {
+        hintIds.clear();
+        hintRafId = null;
+        drawOverlay();
+        return;
+      }
+      hintRafId = requestAnimationFrame(step);
+    };
+    hintRafId = requestAnimationFrame(step);
+  }
+
+  function clearColorHint() {
+    hintIds.clear();
+    hintExpireAt = 0;
+    if (hintRafId != null) {
+      cancelAnimationFrame(hintRafId);
+      hintRafId = null;
+    }
+  }
+
+  function drawHintOverlay(vw, vh, imgLeft, imgTop, imgRight, imgBottom) {
+    if (!hintIds.size) return;
+
+    const shapes = [];
+    if (cellSize && gridCols && gridRows) {
+      const cellScreen = cellSize * scale;
+      for (const id of hintIds) {
+        if (paintedSet.has(id)) continue;
+        const row = Math.floor(id / gridCols);
+        const col = id % gridCols;
+        const x0 = offsetX + col * cellScreen;
+        const y0 = offsetY + row * cellScreen;
+        if (x0 + cellScreen < 0 || y0 + cellScreen < 0 || x0 > vw || y0 > vh) continue;
+        shapes.push({ x0, y0, w: cellScreen, h: cellScreen });
+      }
+    } else {
+      for (const id of hintIds) {
+        if (paintedSet.has(id)) continue;
+        const region = regionById.get(id);
+        if (!region) continue;
+        const cx = offsetX + region.labelX * scale;
+        const cy = offsetY + region.labelY * scale;
+        if (cx < -20 || cy < -20 || cx > vw + 20 || cy > vh + 20) continue;
+        const r = Math.max(6, 10 * scale);
+        shapes.push({ cx, cy, r, isCircle: true });
+      }
+    }
+    if (!shapes.length) return;
+
+    const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 170);
+
+    octx.save();
+    octx.fillStyle = "rgba(8, 10, 18, 0.34)";
+    const dimX = Math.max(0, imgLeft);
+    const dimY = Math.max(0, imgTop);
+    octx.fillRect(dimX, dimY, Math.min(vw, imgRight) - dimX, Math.min(vh, imgBottom) - dimY);
+    octx.restore();
+
+    const path = new Path2D();
+    for (const s of shapes) {
+      if (s.isCircle) {
+        path.moveTo(s.cx + s.r, s.cy);
+        path.arc(s.cx, s.cy, s.r, 0, Math.PI * 2);
+      } else {
+        path.rect(s.x0, s.y0, s.w, s.h);
+      }
+    }
+
+    octx.save();
+    octx.shadowColor = "rgba(255, 210, 60, 0.95)";
+    octx.shadowBlur = 10 + 10 * pulse;
+    octx.fillStyle = `rgba(255, 221, 90, ${0.5 + 0.35 * pulse})`;
+    octx.fill(path);
+    octx.shadowBlur = 0;
+    octx.lineWidth = Math.max(1.5, 2.5 * pulse);
+    octx.strokeStyle = `rgba(255,255,255,${0.65 + 0.35 * pulse})`;
+    octx.stroke(path);
+    octx.restore();
   }
 
   return {
@@ -915,8 +1008,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     undo,
     redo,
     resetPainting,
-    findHintRegion,
-    showHintPing,
+    showColorHint,
     getNumberStats,
     zoomIn: () => zoomBy(1.25),
     zoomOut: () => zoomBy(0.8),
@@ -935,9 +1027,12 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       settleTimers.forEach(clearTimeout);
       if (overlayRafId != null) cancelAnimationFrame(overlayRafId);
       if (paintEmitRafId != null) cancelAnimationFrame(paintEmitRafId);
+      if (hintRafId != null) cancelAnimationFrame(hintRafId);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
       viewport.removeEventListener("wheel", handleWheelZoom, true);
+      document.removeEventListener("gesturestart", preventNativeGesture);
+      document.removeEventListener("gesturechange", preventNativeGesture);
       resizeObserver.disconnect();
       overlay.remove();
     }

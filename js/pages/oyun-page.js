@@ -12,6 +12,11 @@ const GAME_META = {
     title: "Candy Crush",
     subtitle: "Yan yana iki sekeri degistir. Uclu veya daha fazla eslesme puan verir; hamle siniri yok."
   },
+  "fruit-match": {
+    badge: "100 BÖLÜM",
+    title: "Meyve Eşleştirme",
+    subtitle: "Açık meyve taşlarını eşleştir, tüm tahtayı temizle ve yıldızları topla."
+  },
   "flappy-bird": {
     badge: "SONSUZ",
     title: "Flappy Bird",
@@ -52,6 +57,7 @@ const GAME_META = {
 const CANDIES = ["\u{1F353}", "\u{1F34B}", "\u{1F347}", "\u{1F36C}", "\u{1F36D}", "\u{1F9C1}"];
 const BOARD_SIZE = 7;
 const CANDY_CRUSH_APP_URL = "./games/candy-crush/dist/index.html";
+const FRUIT_MATCH_APP_URL = "./games/meyve-eslestirme/dist/index.html";
 
 let candyState = null;
 let flappyState = null;
@@ -102,6 +108,11 @@ function openGame(root, gameId) {
     root.classList.add("is-candy-crush-app");
     root.classList.remove("is-sudoku", "is-boyama");
     renderCandyCrushApp(body);
+  } else if (gameId === "fruit-match") {
+    enterGameFullscreen(root);
+    root.classList.add("is-candy-crush-app");
+    root.classList.remove("is-sudoku", "is-boyama");
+    renderFruitMatchApp(body);
   } else if (gameId === "flappy-bird") {
     enterGameFullscreen(root);
     root.classList.remove("is-candy-crush-app", "is-sudoku", "is-boyama");
@@ -131,16 +142,24 @@ function openGame(root, gameId) {
 }
 
 function renderCandyCrushApp(target) {
+  renderIframeGame(target, CANDY_CRUSH_APP_URL, "Candy Crush");
+}
+
+function renderFruitMatchApp(target) {
+  renderIframeGame(target, FRUIT_MATCH_APP_URL, "Meyve Eşleştirme");
+}
+
+function renderIframeGame(target, url, title) {
   target.innerHTML = `
     <div class="candy-crush-game-shell">
       <iframe
         class="candy-crush-game-frame"
-        src="${CANDY_CRUSH_APP_URL}"
-        title="Candy Crush"
+        src="${url}"
+        title="${title}"
         loading="eager"
         allow="autoplay; fullscreen"
       ></iframe>
-      <a class="candy-crush-game-link" href="${CANDY_CRUSH_APP_URL}" target="_blank" rel="noopener">Tam ekranda ac</a>
+      <a class="candy-crush-game-link" href="${url}" target="_blank" rel="noopener">Tam ekranda ac</a>
     </div>
   `;
 }
@@ -170,9 +189,18 @@ function destroyActiveGame() {
   }
 }
 
+const GAME_FULLSCREEN_VIEWPORT = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
+let savedViewportContent = null;
+
 function enterGameFullscreen(root) {
   root.classList.add("is-game-fullscreen");
   document.body.classList.add("is-game-fullscreen");
+
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  if (viewportMeta && savedViewportContent === null) {
+    savedViewportContent = viewportMeta.getAttribute("content");
+    viewportMeta.setAttribute("content", GAME_FULLSCREEN_VIEWPORT);
+  }
 }
 
 function exitGameFullscreen(root) {
@@ -181,6 +209,12 @@ function exitGameFullscreen(root) {
   root.classList.remove("is-sudoku");
   root.classList.remove("is-boyama");
   document.body.classList.remove("is-game-fullscreen");
+
+  const viewportMeta = document.querySelector('meta[name="viewport"]');
+  if (viewportMeta && savedViewportContent !== null) {
+    viewportMeta.setAttribute("content", savedViewportContent);
+    savedViewportContent = null;
+  }
 }
 
 function renderCandyMatch(target) {

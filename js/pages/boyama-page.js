@@ -238,6 +238,7 @@ const TEMPLATE = `
         <div class="pbn-canvas-stage" id="pbnCanvasStage">
           <canvas id="pbnCanvas"></canvas>
         </div>
+        <div class="pbn-inline-toast" id="pbnInlineToast"></div>
       </div>
 
       <div class="pbn-palette-dock" id="pbnPaletteStrip"></div>
@@ -612,6 +613,16 @@ export function renderBoyamaApp(target) {
     root.querySelector("#pbnPaintProgressText").textContent = `${progress}%`;
   }
 
+  let inlineToastTimer = null;
+  function showInlinePaintToast(message) {
+    const toast = root.querySelector("#pbnInlineToast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(inlineToastTimer);
+    inlineToastTimer = setTimeout(() => toast.classList.remove("is-visible"), 1800);
+  }
+
   function closePaintMenu() {
     const menu = root.querySelector("#pbnPaintMenu");
     const btn = root.querySelector("#pbnMenuBtn");
@@ -660,11 +671,17 @@ export function renderBoyamaApp(target) {
       engine.handleWheelZoom(event);
     }, { passive: false, capture: true });
     root.querySelector("#pbnHintBtn").addEventListener("click", () => {
-      const region = engine.findHintRegion();
-      if (!region) return;
-      engine.selectNumber(region.paletteNumber);
-      highlightPaletteNumber(region.paletteNumber);
-      engine.showHintPing(region);
+      const selected = engine.getSelectedNumber();
+      if (selected == null) {
+        showInlinePaintToast("Önce bir renk seç");
+        return;
+      }
+      const result = engine.showColorHint(selected);
+      if (!result.ok) {
+        showInlinePaintToast(
+          result.reason === "complete" ? "Bu renk zaten tamamlandı" : "Önce bir renk seç"
+        );
+      }
     });
 
     const menuBtn = root.querySelector("#pbnMenuBtn");
@@ -805,6 +822,7 @@ export function renderBoyamaApp(target) {
       engine?.destroy();
       if (activeWorker) { activeWorker.terminate(); activeWorker = null; }
       clearTimeout(saveTimer);
+      clearTimeout(inlineToastTimer);
       document.removeEventListener("click", documentClickHandler);
     }
   };

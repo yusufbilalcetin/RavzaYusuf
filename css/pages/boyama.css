@@ -429,6 +429,35 @@ body.dark .pbn-app {
 .pbn-canvas-viewport:active { cursor: grabbing; }
 .pbn-canvas-viewport.is-shaking { animation: pbnShake .32s var(--pbn-ease); }
 
+.pbn-inline-toast {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  z-index: 8;
+  background: rgba(20, 16, 26, .88);
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 999px;
+  box-shadow: 0 10px 26px -10px rgba(0, 0, 0, .5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s ease, transform .2s ease;
+  white-space: nowrap;
+}
+.pbn-inline-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.pbn-tool-btn:disabled,
+.pbn-tool-btn[aria-disabled="true"] {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
 .pbn-canvas-stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
 .pbn-canvas-stage canvas {
   display: block; background: #fff;
@@ -439,12 +468,6 @@ body.dark .pbn-app {
 }
 .pbn-canvas-stage canvas.pbn-canvas--crisp { image-rendering: pixelated; }
 .pbn-overlay-canvas { z-index: 5; }
-
-.pbn-hint-ping {
-  position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;
-  border-radius: 50%; border: 3px solid var(--exam); pointer-events: none;
-  animation: pbnHintPulse 1.1s var(--pbn-ease) 2;
-}
 
 /* Palet dock'u: numarası içinde dairesel renk sürüntüleri */
 .pbn-palette-dock {
@@ -677,12 +700,6 @@ body.dark .pbn-canvas-stage canvas {
   40% { transform: translateX(7px); }
   60% { transform: translateX(-5px); }
   80% { transform: translateX(4px); }
-}
-
-/* --ping-inv: stage zoom'unun tersi; ping her zoom seviyesinde aynı boyutta görünür */
-@keyframes pbnHintPulse {
-  0% { transform: scale(calc(.6 * var(--ping-inv, 1))); opacity: 1; }
-  100% { transform: scale(calc(1.8 * var(--ping-inv, 1))); opacity: 0; }
 }
 
 @keyframes pbnMenuIn {
