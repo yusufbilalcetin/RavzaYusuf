@@ -236,7 +236,8 @@ const TEMPLATE = `
           <img id="pbnResultImage" alt="Boyanmış sonuç" />
         </div>
         <div class="pbn-result-actions">
-          <button type="button" class="pbn-upload-btn" id="pbnShareResultBtn">Cihaza İndir</button>
+          <button type="button" class="pbn-upload-btn" id="pbnDownloadResultBtn">İndir</button>
+          <button type="button" class="pbn-secondary-btn" id="pbnShareResultBtn">Paylaş / Fotoğraflara Kaydet</button>
         </div>
         <div class="pbn-result-actions pbn-result-actions--secondary">
           <button type="button" class="pbn-text-btn" id="pbnDownloadTemplateBtn">Numaralı Şablonu İndir</button>
@@ -775,6 +776,11 @@ export function renderBoyamaApp(target) {
   }
 
   function wireResultScreen() {
+    root.querySelector("#pbnDownloadResultBtn").addEventListener("click", () => {
+      // Doğrudan indirme: paylaşım sayfası açmadan, orijinal çözünürlükte
+      // kayıpsız PNG olarak cihaza iner.
+      if (resultBlob) downloadBlob(resultBlob, `boyama-eser-${Date.now()}.png`);
+    });
     root.querySelector("#pbnShareResultBtn").addEventListener("click", () => {
       shareOrDownloadBlob(resultBlob, `boyama-${Date.now()}.png`);
     });

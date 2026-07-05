@@ -634,9 +634,11 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     scheduleOverlayDraw();
   }
 
+  // PNG kayıpsızdır; quality parametresi yalnız jpeg/webp için geçerlidir,
+  // bu yüzden dışa aktarımda hiç verilmez — eser her zaman tam kalitede iner.
   function exportPaintedDataUrl(mime = "image/png") {
     buildComposite({ tint: false, highlight: false, lines: false });
-    const url = canvas.toDataURL(mime, 0.95);
+    const url = canvas.toDataURL(mime);
     render();
     return url;
   }
@@ -645,7 +647,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     buildComposite({ tint: false, highlight: false, lines: false });
     return new Promise((resolve) => {
       // toBlob çağrı anındaki bitmap'i yakalar; render hemen geri alınabilir.
-      canvas.toBlob((blob) => resolve(blob), mime, 0.95);
+      canvas.toBlob((blob) => resolve(blob), mime);
       render();
     });
   }
@@ -686,7 +688,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     for (const region of regions) {
       tctx.fillText(String(region.paletteNumber), region.labelX, region.labelY);
     }
-    return tmp.toDataURL(mime, 0.95);
+    return tmp.toDataURL(mime);
   }
 
   /* ---------- pointer interaction ---------- */
