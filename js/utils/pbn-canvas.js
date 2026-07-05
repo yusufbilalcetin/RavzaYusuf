@@ -584,7 +584,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     ctx.fillRect(x0, y0, Math.min(cs, width - x0), Math.min(cs, height - y0));
   }
 
-  function buildComposite({ tint = true, highlight = true } = {}) {
+  function buildComposite({ tint = true, highlight = true, lines = true } = {}) {
     const imageData = ctx.createImageData(width, height);
     const buf = imageData.data;
 
@@ -606,8 +606,9 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     }
 
     // Grid overlay katmanında çizilir; yalnız eski kayıtlarda (cellSize yok)
-    // outline kompozite gömülür.
-    const bakeOutline = !cellSize && outline;
+    // outline kompozite gömülür. Dışa aktarmada (lines: false) hiç gömülmez;
+    // final görselde çizgi veya numara bulunmaz.
+    const bakeOutline = lines && !cellSize && outline;
 
     for (let i = 0; i < totalPixels; i++) {
       const px = i * 4;
@@ -634,14 +635,14 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   }
 
   function exportPaintedDataUrl(mime = "image/png") {
-    buildComposite({ tint: false, highlight: false });
+    buildComposite({ tint: false, highlight: false, lines: false });
     const url = canvas.toDataURL(mime, 0.95);
     render();
     return url;
   }
 
   function exportPaintedBlob(mime = "image/png") {
-    buildComposite({ tint: false, highlight: false });
+    buildComposite({ tint: false, highlight: false, lines: false });
     return new Promise((resolve) => {
       // toBlob çağrı anındaki bitmap'i yakalar; render hemen geri alınabilir.
       canvas.toBlob((blob) => resolve(blob), mime, 0.95);

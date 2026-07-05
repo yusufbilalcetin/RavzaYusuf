@@ -1,9 +1,8 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=fit-visible-20260704";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-gallery-dl-20260705";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
-  readIndex, saveProject, loadProject, deleteProject,
-  saveGalleryItem, listGalleryItems, getGalleryItem, deleteGalleryItem
-} from "../utils/pbn-store.js?v=boyama-home-v2-20260705";
+  readIndex, saveProject, loadProject, deleteProject
+} from "../utils/pbn-store.js?v=boyama-gallery-dl-20260705";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -203,6 +202,10 @@ const TEMPLATE = `
         </div>
         <div class="pbn-paint-menu" id="pbnPaintMenu" hidden>
           <button type="button" class="pbn-menu-item" id="pbnMenuZoomReset">⤢ Görünümü Sıfırla</button>
+          <button type="button" class="pbn-menu-item" id="pbnMenuDownloadArt" disabled>
+            <span class="pbn-menu-item-label">⬇ Eseri İndir</span>
+            <span class="pbn-menu-note" id="pbnMenuDownloadNote">%100 olunca</span>
+          </button>
           <button type="button" class="pbn-menu-item" id="pbnMenuTemplate">🗒 Şablonu İndir</button>
           <button type="button" class="pbn-menu-item pbn-menu-item--danger" id="pbnMenuReset">⟲ Boyamayı Sıfırla</button>
           <button type="button" class="pbn-menu-item" id="pbnMenuNewPhoto">🖼 Yeni Fotoğraf</button>
@@ -228,45 +231,16 @@ const TEMPLATE = `
         <div class="pbn-confetti-layer" id="pbnConfettiLayer"></div>
         <span class="unit-badge">TAMAMLANDI</span>
         <h2>Eser hazır</h2>
-        <p>Çalışman galeriye otomatik kaydedildi. İstersen cihazına da indirebilirsin.</p>
+        <p>Eserin hazır. Cihazına fotoğraf olarak kaydedebilirsin.</p>
         <div class="pbn-result-preview">
           <img id="pbnResultImage" alt="Boyanmış sonuç" />
         </div>
-        <p class="pbn-saved-chip" id="pbnGallerySavedChip" hidden>✓ Galerine kaydedildi</p>
         <div class="pbn-result-actions">
           <button type="button" class="pbn-upload-btn" id="pbnShareResultBtn">Cihaza İndir</button>
-          <button type="button" class="pbn-secondary-btn" id="pbnViewGalleryBtn">Galeride Aç</button>
         </div>
         <div class="pbn-result-actions pbn-result-actions--secondary">
           <button type="button" class="pbn-text-btn" id="pbnDownloadTemplateBtn">Numaralı Şablonu İndir</button>
           <button type="button" class="pbn-text-btn" id="pbnNewFromResultBtn">Yeni Fotoğraf Yükle</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="pbn-screen pbn-screen-gallery" data-pbn-screen="gallery">
-      <div class="pbn-gallery-head">
-        <button type="button" class="pbn-tool-btn" id="pbnGalleryBackBtn" title="Ana ekrana dön">←</button>
-        <h3>Galerim</h3>
-        <span class="pbn-gallery-count" id="pbnGalleryCount"></span>
-      </div>
-      <div class="pbn-gallery-empty" id="pbnGalleryEmpty" hidden>
-        <p>Galerin şimdilik boş. Tamamladığın her boyama buraya otomatik kaydedilir.</p>
-        <button type="button" class="pbn-upload-btn" id="pbnGalleryEmptyCta">İlk boyamana başla</button>
-      </div>
-      <div class="pbn-gallery-grid" id="pbnGalleryGrid"></div>
-    </div>
-
-    <div class="pbn-gallery-viewer" id="pbnGalleryViewer" hidden>
-      <div class="pbn-gallery-viewer-card">
-        <img id="pbnViewerImage" alt="Boyama eseri" />
-        <div class="pbn-gallery-viewer-actions">
-          <button type="button" class="pbn-upload-btn" id="pbnViewerDownloadBtn">Cihaza İndir</button>
-          <button type="button" class="pbn-secondary-btn" id="pbnViewerShareBtn">Paylaş</button>
-        </div>
-        <div class="pbn-gallery-viewer-actions pbn-gallery-viewer-actions--secondary">
-          <button type="button" class="pbn-text-btn pbn-text-btn--danger" id="pbnViewerDeleteBtn">Sil</button>
-          <button type="button" class="pbn-text-btn" id="pbnViewerCloseBtn">Kapat</button>
         </div>
       </div>
     </div>
@@ -282,14 +256,7 @@ export function renderBoyamaApp(target) {
   let currentProject = null;
   let saveTimer = null;
   let activeWorker = null;
-
-  // Tamamlanan eserin galeri durumu
-  let gallerySavedForId = null;
   let resultBlob = null;
-
-  // Galeri görüntüleyici durumu
-  let viewerItem = null;
-  let viewerObjectUrl = null;
 
   const documentClickHandler = (event) => {
     const menu = root.querySelector("#pbnPaintMenu");
@@ -302,7 +269,6 @@ export function renderBoyamaApp(target) {
   wireHome();
   wirePaintScreen();
   wireResultScreen();
-  wireGalleryScreen();
   renderRecentGrid();
 
   function showScreen(name) {
@@ -339,7 +305,6 @@ export function renderBoyamaApp(target) {
         startAnalysisFromUrl(item.dataset.src, item.dataset.name, false);
       });
     });
-
   }
 
   function renderRecentGrid() {
@@ -550,8 +515,6 @@ export function renderBoyamaApp(target) {
 
   function persistProject(regenThumbnail) {
     if (!currentProject) return;
-    // Tamamlanıp galeriye taşınan proje yeniden kaydedilmez.
-    if (gallerySavedForId === currentProject.id) return;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async () => {
       currentProject.paintedRegionIds = engine.getPaintedRegionIds();
@@ -630,6 +593,20 @@ export function renderBoyamaApp(target) {
     const progress = engine.getProgress();
     root.querySelector("#pbnPaintProgressFill").style.width = `${progress}%`;
     root.querySelector("#pbnPaintProgressText").textContent = `${progress}%`;
+    updateDownloadArtState();
+  }
+
+  // "Eseri İndir" yalnız ilerleme %100 olduğunda aktif olur.
+  function updateDownloadArtState() {
+    const btn = root.querySelector("#pbnMenuDownloadArt");
+    const note = root.querySelector("#pbnMenuDownloadNote");
+    if (!btn) return;
+    const complete = engine.isComplete();
+    btn.disabled = !complete;
+    btn.title = complete
+      ? "Tamamlanan eseri PNG olarak indir"
+      : "İndirme, boyama %100 tamamlanınca aktif olur";
+    if (note) note.hidden = complete;
   }
 
   function closePaintMenu() {
@@ -701,6 +678,12 @@ export function renderBoyamaApp(target) {
       engine.zoomReset();
       closePaintMenu();
     });
+    root.querySelector("#pbnMenuDownloadArt").addEventListener("click", async () => {
+      closePaintMenu();
+      if (!engine.isComplete()) return; // yalnız %100 tamamlanmış eser indirilebilir
+      const blob = await engine.exportPaintedBlob();
+      if (blob) downloadBlob(blob, `boyama-eser-${Date.now()}.png`);
+    });
     root.querySelector("#pbnMenuTemplate").addEventListener("click", () => {
       downloadDataUrl(engine.exportTemplateDataUrl(), `boyama-sablon-${Date.now()}.png`);
       closePaintMenu();
@@ -718,39 +701,23 @@ export function renderBoyamaApp(target) {
   /* ---------- result ---------- */
 
   async function showResultScreen() {
-    clearTimeout(saveTimer); // bekleyen proje kaydı iptal — eser galeriye taşınıyor
+    clearTimeout(saveTimer); // bekleyen proje kaydı iptal — eser tamamlandı
     const resultImg = root.querySelector("#pbnResultImage");
     resultImg.src = engine.exportPaintedDataUrl();
     spawnConfetti();
     showScreen("result");
 
-    const chip = root.querySelector("#pbnGallerySavedChip");
-
     // Blob ekrana girerken hazırlanır: paylaş butonunda iOS'un kullanıcı
     // jesti süresi dolmadan navigator.share çağrılabilsin.
     resultBlob = await engine.exportPaintedBlob();
 
-    if (currentProject && gallerySavedForId !== currentProject.id && resultBlob) {
+    if (currentProject) {
       try {
-        await saveGalleryItem({
-          id: currentProject.id,
-          name: currentProject.name,
-          createdAt: Date.now(),
-          width: currentProject.width,
-          height: currentProject.height,
-          difficulty: currentProject.difficulty || currentDifficulty,
-          paletteSize: currentProject.palette?.length || 0,
-          imageBlob: resultBlob,
-          thumbnail: makeThumbnail(220)
-        });
-        gallerySavedForId = currentProject.id;
-        chip.hidden = false;
-        // Biten iş artık galeride; yarım işler listesinden çıkarılır.
+        // Tamamlanan iş artık yarım işler listesinde durmaz.
         await deleteProject(currentProject.id);
         renderRecentGrid();
       } catch (error) {
-        console.error("Eser galeriye kaydedilemedi:", error);
-        chip.hidden = true;
+        console.error("Tamamlanan çalışma kaydı temizlenemedi:", error);
       }
     }
   }
@@ -808,10 +775,6 @@ export function renderBoyamaApp(target) {
   }
 
   function wireResultScreen() {
-    root.querySelector("#pbnViewGalleryBtn").addEventListener("click", () => {
-      showScreen("gallery");
-      renderGalleryGrid();
-    });
     root.querySelector("#pbnShareResultBtn").addEventListener("click", () => {
       shareOrDownloadBlob(resultBlob, `boyama-${Date.now()}.png`);
     });
@@ -825,102 +788,12 @@ export function renderBoyamaApp(target) {
     });
   }
 
-  /* ---------- gallery ---------- */
-
-  async function renderGalleryGrid() {
-    const grid = root.querySelector("#pbnGalleryGrid");
-    const empty = root.querySelector("#pbnGalleryEmpty");
-    const count = root.querySelector("#pbnGalleryCount");
-
-    let items = [];
-    try {
-      items = await listGalleryItems();
-    } catch (error) {
-      console.error("Galeri okunamadı:", error);
-    }
-
-    count.textContent = items.length ? `${items.length} eser` : "";
-    empty.hidden = items.length > 0;
-    grid.hidden = !items.length;
-    grid.innerHTML = items.map((item) => `
-      <button type="button" class="pbn-gallery-item" data-id="${item.id}">
-        <img src="${item.thumbnail}" alt="${escapeHtml(item.name || "Boyama eseri")}" loading="lazy" />
-        <span>${new Date(item.createdAt || Date.now()).toLocaleDateString("tr-TR")}</span>
-      </button>
-    `).join("");
-
-    grid.querySelectorAll(".pbn-gallery-item").forEach((el) => {
-      el.addEventListener("click", () => openGalleryViewer(el.dataset.id));
-    });
-  }
-
-  async function openGalleryViewer(id) {
-    let item = null;
-    try {
-      item = await getGalleryItem(id);
-    } catch (error) {
-      console.error("Eser açılamadı:", error);
-    }
-    if (!item || !item.imageBlob) return;
-
-    viewerItem = item;
-    if (viewerObjectUrl) URL.revokeObjectURL(viewerObjectUrl);
-    viewerObjectUrl = URL.createObjectURL(item.imageBlob);
-    root.querySelector("#pbnViewerImage").src = viewerObjectUrl;
-    root.querySelector("#pbnGalleryViewer").hidden = false;
-  }
-
-  function closeGalleryViewer() {
-    root.querySelector("#pbnGalleryViewer").hidden = true;
-    root.querySelector("#pbnViewerImage").removeAttribute("src");
-    if (viewerObjectUrl) {
-      URL.revokeObjectURL(viewerObjectUrl);
-      viewerObjectUrl = null;
-    }
-    viewerItem = null;
-  }
-
-  function wireGalleryScreen() {
-    root.querySelector("#pbnGalleryBackBtn").addEventListener("click", () => {
-      showScreen("home");
-      renderRecentGrid();
-    });
-    root.querySelector("#pbnGalleryEmptyCta").addEventListener("click", () => {
-      showScreen("home");
-      root.querySelector("#pbnFileInput").click();
-    });
-
-    const viewer = root.querySelector("#pbnGalleryViewer");
-    viewer.addEventListener("click", (event) => {
-      if (event.target === viewer) closeGalleryViewer();
-    });
-    root.querySelector("#pbnViewerCloseBtn").addEventListener("click", closeGalleryViewer);
-    root.querySelector("#pbnViewerShareBtn").addEventListener("click", () => {
-      if (viewerItem) shareOrDownloadBlob(viewerItem.imageBlob, `boyama-${viewerItem.id}.png`);
-    });
-    root.querySelector("#pbnViewerDownloadBtn").addEventListener("click", () => {
-      if (viewerItem) downloadBlob(viewerItem.imageBlob, `boyama-${viewerItem.id}.png`);
-    });
-    root.querySelector("#pbnViewerDeleteBtn").addEventListener("click", async () => {
-      if (!viewerItem) return;
-      if (!confirm("Bu eser galeriden silinecek. Emin misin?")) return;
-      try {
-        await deleteGalleryItem(viewerItem.id);
-      } catch (error) {
-        console.error("Eser silinemedi:", error);
-      }
-      closeGalleryViewer();
-      renderGalleryGrid();
-    });
-  }
-
   return {
     cleanup() {
       engine?.destroy();
       if (activeWorker) { activeWorker.terminate(); activeWorker = null; }
       clearTimeout(saveTimer);
       document.removeEventListener("click", documentClickHandler);
-      if (viewerObjectUrl) URL.revokeObjectURL(viewerObjectUrl);
     }
   };
 }
