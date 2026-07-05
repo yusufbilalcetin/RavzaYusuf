@@ -83,6 +83,33 @@ function formatRecentTime(value) {
   });
 }
 
+function getPhoneSaveCopy() {
+  const ua = navigator.userAgent || "";
+  const platform = navigator.userAgentData?.platform || navigator.platform || "";
+  const isIos = /iPad|iPhone|iPod/i.test(ua)
+    || (/Mac/i.test(platform) && Number(navigator.maxTouchPoints || 0) > 1);
+  const isAndroid = /Android/i.test(ua) || /Android/i.test(platform);
+
+  if (isIos) {
+    return {
+      label: "Fotoğraflara Kaydet (PNG)",
+      fallbackMessage: "iPhone bu tarayıcıda paylaşım ekranını açamadı. PNG indirildi; Dosyalar veya İndirilenler içinden paylaş menüsünü açıp 'Görseli Kaydet' seçeneğiyle Fotoğraflar'a ekleyebilirsin."
+    };
+  }
+
+  if (isAndroid) {
+    return {
+      label: "Galeriye Kaydet (PNG)",
+      fallbackMessage: "Android bu tarayıcıda paylaşım ekranını açamadı. PNG indirildi; İndirilenler veya Dosyalar içinden Fotoğraflar/Galeri'ye taşıyabilirsin."
+    };
+  }
+
+  return {
+    label: "Telefona Kaydet (PNG)",
+    fallbackMessage: "Bu tarayıcı paylaşım ekranını açamadı. PNG indirildi; dosyayı cihazındaki galeri veya fotoğraf uygulamasına ekleyebilirsin."
+  };
+}
+
 const TEMPLATE = `
   <div class="pbn-app">
     <div class="pbn-screen pbn-screen-home is-active" data-pbn-screen="home">
@@ -201,12 +228,8 @@ const TEMPLATE = `
           <button type="button" class="pbn-tool-btn" id="pbnMenuBtn" title="Diğer seçenekler" aria-haspopup="true" aria-expanded="false">⋯</button>
         </div>
         <div class="pbn-paint-menu" id="pbnPaintMenu" hidden>
+          <button type="button" class="pbn-menu-item pbn-menu-item--primary" id="pbnMenuSaveGallery" data-phone-save-label>Telefona Kaydet (PNG)</button>
           <button type="button" class="pbn-menu-item" id="pbnMenuZoomReset">⤢ Görünümü Sıfırla</button>
-          <button type="button" class="pbn-menu-item" id="pbnMenuDownloadArt">
-            <span class="pbn-menu-item-label">⬇ Eseri İndir</span>
-          </button>
-          <button type="button" class="pbn-menu-item" id="pbnMenuTemplate">🗒 Şablonu İndir</button>
-          <button type="button" class="pbn-menu-item pbn-menu-item--danger" id="pbnMenuReset">⟲ Boyamayı Sıfırla</button>
           <button type="button" class="pbn-menu-item" id="pbnMenuNewPhoto">🖼 Yeni Fotoğraf</button>
         </div>
       </div>
@@ -225,16 +248,12 @@ const TEMPLATE = `
         <div class="pbn-confetti-layer" id="pbnConfettiLayer"></div>
         <span class="unit-badge">TAMAMLANDI</span>
         <h2>Eser hazır</h2>
-        <p>Eserin hazır. Cihazına fotoğraf olarak kaydedebilirsin.</p>
+        <p>Eserin PNG kalitesinde hazır. Telefonda paylaşım sayfasından Fotoğraflar veya Galeri'ye kaydedebilirsin.</p>
         <div class="pbn-result-preview">
           <img id="pbnResultImage" alt="Boyanmış sonuç" />
         </div>
         <div class="pbn-result-actions">
-          <button type="button" class="pbn-upload-btn" id="pbnDownloadResultBtn">İndir</button>
-          <button type="button" class="pbn-secondary-btn" id="pbnShareResultBtn">Paylaş / Fotoğraflara Kaydet</button>
-        </div>
-        <div class="pbn-result-actions pbn-result-actions--secondary">
-          <button type="button" class="pbn-text-btn" id="pbnDownloadTemplateBtn">Numaralı Şablonu İndir</button>
+          <button type="button" class="pbn-upload-btn" id="pbnShareResultBtn" data-phone-save-label>Telefona Kaydet (PNG)</button>
           <button type="button" class="pbn-text-btn" id="pbnNewFromResultBtn">Yeni Fotoğraf Yükle</button>
         </div>
       </div>
@@ -252,6 +271,8 @@ export function renderBoyamaApp(target) {
   let saveTimer = null;
   let activeWorker = null;
   let resultBlob = null;
+  let resultBlobPromise = null;
+  const phoneSaveCopy = getPhoneSaveCopy();
 
   const documentClickHandler = (event) => {
     const menu = root.querySelector("#pbnPaintMenu");
@@ -264,6 +285,7 @@ export function renderBoyamaApp(target) {
   wireHome();
   wirePaintScreen();
   wireResultScreen();
+  applyPhoneSaveLabels();
   renderRecentGrid();
 
   function showScreen(name) {
@@ -656,19 +678,11 @@ export function renderBoyamaApp(target) {
       engine.zoomReset();
       closePaintMenu();
     });
-    root.querySelector("#pbnMenuDownloadArt").addEventListener("click", async () => {
+    root.querySelector("#pbnMenuSaveGallery").addEventListener("click", async () => {
       closePaintMenu();
-      // İlerleme yüzdesi ne olursa olsun, o ana kadar boyanan hal indirilebilir.
+      // Mobil tarayıcılar galeriye doğrudan yazamaz; PNG dosyası sistem paylaşımına verilir.
       const blob = await engine.exportPaintedBlob();
-      if (blob) downloadBlob(blob, `boyama-eser-${Date.now()}.png`);
-    });
-    root.querySelector("#pbnMenuTemplate").addEventListener("click", () => {
-      downloadDataUrl(engine.exportTemplateDataUrl(), `boyama-sablon-${Date.now()}.png`);
-      closePaintMenu();
-    });
-    root.querySelector("#pbnMenuReset").addEventListener("click", () => {
-      closePaintMenu();
-      if (confirm("Tüm boyama ilerlemen sıfırlanacak. Emin misin?")) engine.resetPainting();
+      await shareOrDownloadBlob(blob, createPngFilename("boyama-galeri"), { galleryIntent: true });
     });
     root.querySelector("#pbnMenuNewPhoto").addEventListener("click", () => {
       closePaintMenu();
@@ -682,12 +696,24 @@ export function renderBoyamaApp(target) {
     clearTimeout(saveTimer); // bekleyen proje kaydı iptal — eser tamamlandı
     const resultImg = root.querySelector("#pbnResultImage");
     resultImg.src = engine.exportPaintedDataUrl();
+    resultBlob = null;
+    resultBlobPromise = null;
+    const shareBtn = root.querySelector("#pbnShareResultBtn");
+    if (shareBtn) {
+      shareBtn.disabled = true;
+      shareBtn.textContent = "PNG hazırlanıyor...";
+    }
     spawnConfetti();
     showScreen("result");
 
     // Blob ekrana girerken hazırlanır: paylaş butonunda iOS'un kullanıcı
     // jesti süresi dolmadan navigator.share çağrılabilsin.
-    resultBlob = await engine.exportPaintedBlob();
+    resultBlobPromise = engine.exportPaintedBlob();
+    resultBlob = await resultBlobPromise;
+    if (shareBtn) {
+      shareBtn.disabled = false;
+      shareBtn.textContent = phoneSaveCopy.label;
+    }
 
     if (currentProject) {
       try {
@@ -716,15 +742,6 @@ export function renderBoyamaApp(target) {
     setTimeout(() => { layer.innerHTML = ""; }, 3200);
   }
 
-  function downloadDataUrl(dataUrl, filename) {
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  }
-
   function downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -736,33 +753,45 @@ export function renderBoyamaApp(target) {
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
 
+  function createPngFilename(prefix) {
+    return `${prefix}-${Date.now()}.png`;
+  }
+
+  function applyPhoneSaveLabels() {
+    root.querySelectorAll("[data-phone-save-label]").forEach((item) => {
+      item.textContent = phoneSaveCopy.label;
+    });
+  }
+
   // Paylaşım zinciri: dosyalı navigator.share (mobil paylaşım sayfasından
   // "Fotoğraflara kaydet" çıkar) → desteklenmiyorsa indirme.
-  async function shareOrDownloadBlob(blob, filename) {
-    if (!blob) return;
+  async function shareOrDownloadBlob(blob, filename, options = {}) {
+    if (!blob) return false;
     const file = new File([blob], filename, { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: "Boyama Eserim" });
-        return;
+        await navigator.share({
+          files: [file],
+          title: "Boyama Eserim",
+          text: "PNG kalitesinde boyama eserim"
+        });
+        return true;
       } catch (error) {
-        if (error?.name === "AbortError") return; // kullanıcı vazgeçti
+        if (error?.name === "AbortError") return false; // kullanıcı vazgeçti
+        console.warn("PNG paylaşımı açılamadı, indirme fallback'i kullanılıyor:", error);
       }
     }
     downloadBlob(blob, filename);
+    if (options.galleryIntent) {
+      alert(phoneSaveCopy.fallbackMessage);
+    }
+    return false;
   }
 
   function wireResultScreen() {
-    root.querySelector("#pbnDownloadResultBtn").addEventListener("click", () => {
-      // Doğrudan indirme: paylaşım sayfası açmadan, orijinal çözünürlükte
-      // kayıpsız PNG olarak cihaza iner.
-      if (resultBlob) downloadBlob(resultBlob, `boyama-eser-${Date.now()}.png`);
-    });
-    root.querySelector("#pbnShareResultBtn").addEventListener("click", () => {
-      shareOrDownloadBlob(resultBlob, `boyama-${Date.now()}.png`);
-    });
-    root.querySelector("#pbnDownloadTemplateBtn").addEventListener("click", () => {
-      downloadDataUrl(engine.exportTemplateDataUrl(), `boyama-sablon-${Date.now()}.png`);
+    root.querySelector("#pbnShareResultBtn").addEventListener("click", async () => {
+      const blob = resultBlob || await resultBlobPromise;
+      await shareOrDownloadBlob(blob, createPngFilename("boyama-galeri"), { galleryIntent: true });
     });
     root.querySelector("#pbnNewFromResultBtn").addEventListener("click", () => {
       showScreen("home");
