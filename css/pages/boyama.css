@@ -107,13 +107,16 @@ body.dark .pbn-app {
    sayfa zoom'u tetikleyebiliyor; boyama ekranının tamamında native zoom/scroll
    jestleri kapatılıp yalnızca pbn-canvas'ın kendi zoom'u aktif kalır. */
 .games-page.is-game-fullscreen.is-boyama .pbn-app,
-.games-page.is-game-fullscreen.is-boyama .pbn-paint-header,
-.games-page.is-game-fullscreen.is-boyama .pbn-palette-dock {
+.games-page.is-game-fullscreen.is-boyama .pbn-paint-header {
   touch-action: pan-y;
 }
 
-.games-page.is-game-fullscreen.is-boyama .pbn-screen-paint.is-active {
-  touch-action: none;
+/* Palet yatay kaydırmalı (overflow-x: auto): pan-y burada yatay swipe'ı
+   engeller, bu yüzden ayrı olarak pan-x eklenir. touch-action kısıtlaması
+   ata zinciri kesişimiyle uygulandığından üst ekrana "none" koymak bu
+   elemanın kendi kaydırmasını da bloke eder — o yüzden ayrı tutulur. */
+.games-page.is-game-fullscreen.is-boyama .pbn-palette-dock {
+  touch-action: pan-x;
 }
 
 /* ---------- Ana Sayfa ---------- */
