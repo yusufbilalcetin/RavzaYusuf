@@ -1,4 +1,5 @@
 import { createGameAudio } from "../utils/game-audio.js";
+import { renderRenkSiralamaGame } from "../games/renk-siralama.js";
 import { renderBoyamaApp } from "./boyama-page.js?v=pbn-manual-resume-20260706-1";
 import { pbnLog } from "../utils/pbn-debug.js?v=pbn-manual-resume-20260706-1";
 
@@ -17,6 +18,11 @@ const GAME_META = {
     badge: "100 BÖLÜM",
     title: "Meyve Eşleştirme",
     subtitle: "Açık meyve taşlarını eşleştir, tüm tahtayı temizle ve yıldızları topla."
+  },
+  "renk-siralama": {
+    badge: "SONSUZ SEVİYE",
+    title: "Renk Sıralama",
+    subtitle: "Renkli sıvıları cam tüplerde tek renge ayır. Seviyeler sonsuz, her biri çözülebilir."
   },
   "flappy-bird": {
     badge: "SONSUZ",
@@ -64,6 +70,7 @@ let candyState = null;
 let flappyState = null;
 let sudokuState = null;
 let boyamaState = null;
+let renkSiralamaState = null;
 
 export function initOyun(options = {}) {
   const root = document.getElementById("games");
@@ -124,21 +131,26 @@ function openGame(root, gameId, options = {}) {
     renderFruitMatchApp(body);
   } else if (gameId === "flappy-bird") {
     enterGameFullscreen(root);
-    root.classList.remove("is-candy-crush-app", "is-sudoku", "is-boyama");
+    root.classList.remove("is-candy-crush-app", "is-sudoku", "is-boyama", "is-renk-siralama");
     renderFlappyBird(body);
+  } else if (gameId === "renk-siralama") {
+    enterGameFullscreen(root);
+    root.classList.remove("is-candy-crush-app", "is-sudoku", "is-boyama");
+    root.classList.add("is-renk-siralama");
+    renkSiralamaState = renderRenkSiralamaGame(body, { onExit: () => closeGame(root) });
   } else if (gameId === "sudoku") {
     enterGameFullscreen(root);
-    root.classList.remove("is-candy-crush-app", "is-boyama");
+    root.classList.remove("is-candy-crush-app", "is-boyama", "is-renk-siralama");
     root.classList.add("is-sudoku");
     renderSudoku(body);
   } else if (gameId === "boyama") {
     enterGameFullscreen(root);
-    root.classList.remove("is-candy-crush-app", "is-sudoku");
+    root.classList.remove("is-candy-crush-app", "is-sudoku", "is-renk-siralama");
     root.classList.add("is-boyama");
     boyamaState = renderBoyamaApp(body, { resumeProjectId: options.resumeProjectId });
   } else {
     exitGameFullscreen(root);
-    root.classList.remove("is-candy-crush-app");
+    root.classList.remove("is-candy-crush-app", "is-renk-siralama");
     body.innerHTML = `
       <div class="game-soon-box">
         <strong>Yakinda</strong>
@@ -198,6 +210,10 @@ function destroyActiveGame() {
     boyamaState.cleanup?.();
     boyamaState = null;
   }
+  if (renkSiralamaState) {
+    renkSiralamaState.cleanup?.();
+    renkSiralamaState = null;
+  }
 }
 
 const GAME_FULLSCREEN_VIEWPORT = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
@@ -220,6 +236,7 @@ function exitGameFullscreen(root) {
   root.classList.remove("is-candy-crush-app");
   root.classList.remove("is-sudoku");
   root.classList.remove("is-boyama");
+  root.classList.remove("is-renk-siralama");
   document.body.classList.remove("is-game-fullscreen");
 
   const viewportMeta = document.querySelector('meta[name="viewport"]');
