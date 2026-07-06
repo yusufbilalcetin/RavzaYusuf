@@ -388,8 +388,8 @@ const TEMPLATE = `
     <div class="pbn-modal-backdrop" id="pbnDeleteModal" hidden>
       <div class="pbn-modal" role="dialog" aria-modal="true" aria-labelledby="pbnDeleteTitle" aria-describedby="pbnDeleteDesc">
         <span class="pbn-modal-icon" aria-hidden="true">🗑️</span>
-        <h3 id="pbnDeleteTitle">Boyamayı Sil?</h3>
-        <p id="pbnDeleteDesc">Bu tamamlanan boyama kalıcı olarak silinecek. Bu işlem geri alınamaz.</p>
+        <h3 id="pbnDeleteTitle">G&ouml;rseli Sil?</h3>
+        <p id="pbnDeleteDesc">Bu g&ouml;rsel kalıcı olarak silinecek. Bu işlem geri alınamaz. Silmek istediğine emin misin?</p>
         <div class="pbn-modal-actions">
           <button type="button" class="pbn-modal-btn pbn-modal-btn--ghost" id="pbnDeleteCancel">İptal</button>
           <button type="button" class="pbn-modal-btn pbn-modal-btn--danger" id="pbnDeleteConfirm">Evet, Sil</button>
@@ -415,8 +415,10 @@ export function renderBoyamaApp(target, options = {}) {
   // Tamamlanan bir boyamayı "Görüntüle" ile açtığımızda true olur: bu modda
   // eser tekrar "Son çalışmalar" (yarım işler) listesine yazılmaz.
   let viewingCompleted = false;
-  // Silme onay pop-up'ında bekleyen tamamlanan boyama id'si.
+  // Delete confirmation state for recent and completed cards.
   let pendingDeleteId = null;
+  let pendingDeleteType = null;
+  let pendingDeleteName = "";
   // Silme modalı, oyun tam-ekran üst barının (.game-stage-head, z-index 9020)
   // arkasında kalmasın diye document.body'ye taşınır: böylece oyun sahnesinin
   // (.game-stage-body 9001) stacking context'inin dışına çıkar ve her şeyin
@@ -513,7 +515,7 @@ export function renderBoyamaApp(target, options = {}) {
           <span class="pbn-recent-progress">${progress}% tamamlandı</span>
         </span>
         <button type="button" class="pbn-recent-continue" data-continue-id="${item.id}">Devam Et</button>
-        <button type="button" class="pbn-recent-delete" data-delete-id="${item.id}" aria-label="Sil">✕</button>
+        <button type="button" class="pbn-recent-delete" data-delete-id="${item.id}" data-name="${escapeHtml(item.name || "Boyama çalışması")}" aria-label="Çalışmayı sil">✕</button>
       </div>
     `;
     }).join("");
@@ -531,13 +533,9 @@ export function renderBoyamaApp(target, options = {}) {
       });
     });
     grid.querySelectorAll("[data-delete-id]").forEach((btn) => {
-      btn.addEventListener("click", async (event) => {
+      btn.addEventListener("click", (event) => {
         event.stopPropagation();
-        const id = btn.dataset.deleteId;
-        clearEmergencySnapshot(id);
-        if (currentProject?.id === id) clearActiveProject();
-        await deleteProject(id);
-        renderRecentGrid();
+        openDeleteModal(btn.dataset.deleteId, "recent", btn.dataset.name);
       });
     });
   }
@@ -628,7 +626,7 @@ export function renderBoyamaApp(target, options = {}) {
       btn.addEventListener("click", () => downloadCompleted(btn.dataset.downloadId));
     });
     grid.querySelectorAll("[data-delete-id]").forEach((btn) => {
-      btn.addEventListener("click", () => openDeleteModal(btn.dataset.deleteId, btn.dataset.name));
+      btn.addEventListener("click", () => openDeleteModal(btn.dataset.deleteId, "completed", btn.dataset.name));
     });
   }
 
@@ -698,15 +696,42 @@ export function renderBoyamaApp(target, options = {}) {
     }
   };
 
-  function openDeleteModal(id, name) {
-    pendingDeleteId = id;
-    if (!deleteModalEl) return;
-    const desc = deleteModalEl.querySelector("#pbnDeleteDesc");
-    if (desc) {
-      desc.textContent = name
-        ? `"${name}" adlı tamamlanan boyama kalıcı olarak silinecek. Bu işlem geri alınamaz.`
-        : "Bu tamamlanan boyama kalıcı olarak silinecek. Bu işlem geri alınamaz.";
+  const deleteCopy = {
+    recent: {
+      title: "\u00c7al\u0131\u015fmay\u0131 Sil?",
+      desc: "Bu yar\u0131m kalan boyama kal\u0131c\u0131 olarak silinecek. Bu i\u015flem geri al\u0131namaz. Silmek istedi\u011fine emin misin?",
+      error: "G\u00f6rsel silinemedi. L\u00fctfen tekrar dene."
+    },
+    completed: {
+      title: "Tamamlanan Boyamay\u0131 Sil?",
+      desc: "Bu tamamlanan boyama kal\u0131c\u0131 olarak silinecek. Bu i\u015flem geri al\u0131namaz. Silmek istedi\u011fine emin misin?",
+      error: "G\u00f6rsel silinemedi. L\u00fctfen tekrar dene."
+    },
+    visual: {
+      title: "G\u00f6rseli Sil?",
+      desc: "Bu g\u00f6rsel kal\u0131c\u0131 olarak silinecek. Bu i\u015flem geri al\u0131namaz. Silmek istedi\u011fine emin misin?",
+      error: "G\u00f6rsel silinemedi. L\u00fctfen tekrar dene."
     }
+  };
+
+  function clearActiveProjectIfMatches(id) {
+    if (!id) return;
+    let activeId = null;
+    try { activeId = localStorage.getItem("pbnActiveProjectId"); } catch { /* private mode */ }
+    if (currentProject?.id === id || activeId === id) clearActiveProject();
+  }
+
+  function openDeleteModal(id, type = "visual", name = "") {
+    if (!id) return;
+    pendingDeleteId = id;
+    pendingDeleteType = deleteCopy[type] ? type : "visual";
+    pendingDeleteName = name || "";
+    if (!deleteModalEl) return;
+    const copy = deleteCopy[pendingDeleteType] || deleteCopy.visual;
+    const title = deleteModalEl.querySelector("#pbnDeleteTitle");
+    const desc = deleteModalEl.querySelector("#pbnDeleteDesc");
+    if (title) title.textContent = copy.title;
+    if (desc) desc.textContent = pendingDeleteName ? `"${pendingDeleteName}" - ${copy.desc}` : copy.desc;
     deleteModalEl.hidden = false;
     // Modal açıkken arka plan (tamamlananlar listesi) kaymasın.
     document.body.classList.add("pbn-modal-open");
@@ -717,6 +742,8 @@ export function renderBoyamaApp(target, options = {}) {
 
   function closeDeleteModal() {
     pendingDeleteId = null;
+    pendingDeleteType = null;
+    pendingDeleteName = "";
     if (deleteModalEl) deleteModalEl.hidden = true;
     document.body.classList.remove("pbn-modal-open");
     document.removeEventListener("keydown", deleteModalKeydownHandler);
@@ -724,17 +751,26 @@ export function renderBoyamaApp(target, options = {}) {
 
   async function confirmDelete() {
     const id = pendingDeleteId;
+    const type = pendingDeleteType;
+    const copy = deleteCopy[type] || deleteCopy.visual;
     closeDeleteModal();
     if (!id) return;
     try {
-      await deleteCompleted(id);
+      if (type === "recent") {
+        await deleteProject(id);
+      } else if (type === "completed") {
+        await deleteCompleted(id);
+      } else {
+        throw new Error(`Bilinmeyen silme tipi: ${type || "none"}`);
+      }
       clearEmergencySnapshot(id);
-      if (currentProject?.id === id) clearActiveProject();
+      clearActiveProjectIfMatches(id);
+      renderRecentGrid();
+      renderCompletedGrid();
     } catch (error) {
-      console.error("Tamamlanan boyama silinemedi:", error);
-      showAppError("Boyama silinemedi. Lütfen tekrar deneyin.");
+      console.error("Görsel silinemedi:", error);
+      showAppError(copy.error);
     }
-    renderCompletedGrid();
   }
 
   function wireDeleteModal() {

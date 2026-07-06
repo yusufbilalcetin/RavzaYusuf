@@ -321,8 +321,9 @@ body.dark .pbn-app {
 .pbn-recent-item:hover { transform: translateY(-4px); box-shadow: var(--pbn-shadow-float); }
 .pbn-recent-item img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 15px; }
 .pbn-recent-delete {
-  position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(15, 23, 42, .55); color: #fff; border: none; cursor: pointer; font-size: .78rem;
+  position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(15, 23, 42, .55); color: #fff; border: none; cursor: pointer; font-size: .84rem;
+  display: inline-grid; place-items: center;
   backdrop-filter: blur(6px);
   transition: background .35s var(--pbn-ease), transform .35s var(--pbn-ease);
 }
@@ -1530,6 +1531,7 @@ body.pbn-modal-open .game-stage-body { overflow: hidden; }
 
 .pbn-modal-btn:focus-visible,
 .pbn-completed-btn:focus-visible,
+.pbn-recent-delete:focus-visible,
 .pbn-recent-continue:focus-visible {
   outline: 3px solid rgba(232, 121, 160, .58);
   outline-offset: 3px;
