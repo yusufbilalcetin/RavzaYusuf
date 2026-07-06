@@ -250,6 +250,19 @@ body.dark .game-tile-copy strong {
 body.is-game-fullscreen {
   overflow: hidden;
   overscroll-behavior: none;
+  touch-action: none;
+}
+
+/* iOS Safari, pinch-zoom sırasında position:fixed katmanları geçici olarak
+   viewport'tan ayrıştırıp altındaki içeriği açığa çıkarabiliyor ("fixed
+   position" hatası). #dashboard'un arkaplan görseli (tipografi.css:
+   body:has(#dashboard.active)) normalde oyun katmanının arkasında gizli
+   kalır; bu güvenlik ağı, o sızıntı anında bile ekrana gelebilecek
+   içeriği tamamen kaldırır (koyu oyun arkaplanından başka bir şey görünmez). */
+body.is-game-fullscreen,
+body.is-game-fullscreen:has(#dashboard.active) {
+  background: #100719 !important;
+  background-image: none !important;
 }
 
 body.is-game-fullscreen #sidebar-root,

@@ -103,6 +103,19 @@ body.dark .pbn-app {
   margin-right: calc(92px + env(safe-area-inset-right, 0px));
 }
 
+/* iOS Safari'de pinch, kenardaki üst bar/palet üzerinden başlarsa tarayıcı
+   sayfa zoom'u tetikleyebiliyor; boyama ekranının tamamında native zoom/scroll
+   jestleri kapatılıp yalnızca pbn-canvas'ın kendi zoom'u aktif kalır. */
+.games-page.is-game-fullscreen.is-boyama .pbn-app,
+.games-page.is-game-fullscreen.is-boyama .pbn-paint-header,
+.games-page.is-game-fullscreen.is-boyama .pbn-palette-dock {
+  touch-action: pan-y;
+}
+
+.games-page.is-game-fullscreen.is-boyama .pbn-screen-paint.is-active {
+  touch-action: none;
+}
+
 /* ---------- Ana Sayfa ---------- */
 
 .pbn-hero {
@@ -446,9 +459,20 @@ body.dark .pbn-app {
     inset 0 2px 10px rgba(18, 29, 58, .06),
     var(--shadow-sm);
   touch-action: none;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   cursor: grab;
 }
 .pbn-canvas-viewport:active { cursor: grabbing; }
+.pbn-canvas-stage,
+.pbn-canvas-stage canvas {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
 .pbn-canvas-viewport.is-shaking { animation: pbnShake .32s var(--pbn-ease); }
 
 .pbn-inline-toast {

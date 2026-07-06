@@ -907,6 +907,15 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   document.addEventListener("gesturestart", preventNativeGesture, { passive: false });
   document.addEventListener("gesturechange", preventNativeGesture, { passive: false });
 
+  // Ek güvenlik ağı: bazı iOS Safari sürümlerinde gesturestart/gesturechange
+  // hiç tetiklenmeden çok dokunuşlu touchmove doğrudan sayfa zoom'u
+  // uygulayabiliyor. touch-action:none çoğu durumda yeterli olsa da, iki+
+  // parmaklı hareket viewport üzerindeyse burada da engellenir.
+  function preventMultiTouchScroll(e) {
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+  }
+  viewport.addEventListener("touchmove", preventMultiTouchScroll, { passive: false });
+
   // Seçili renk numarasına ait, henüz boyanmamış tüm hücreleri bulup
   // ekranda kısa süreliğine parlatır. Hedef hücrelerin hiçbiri görünür
   // alanda değilse görünüm ilk hedefe ortalanır.
@@ -1052,6 +1061,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
       viewport.removeEventListener("wheel", handleWheelZoom, true);
+      viewport.removeEventListener("touchmove", preventMultiTouchScroll);
       document.removeEventListener("gesturestart", preventNativeGesture);
       document.removeEventListener("gesturechange", preventNativeGesture);
       resizeObserver.disconnect();
