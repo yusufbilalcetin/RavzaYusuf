@@ -231,14 +231,34 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   resizeObserver.observe(viewport);
 
   // ResizeObserver bazı ortamlarda tetiklenmiyor; düzen oturana kadar
-  // kademeli yeniden sığdırma ile garantiye alınır.
+  // kademeli yeniden sığdırma ile garantiye alınır. Mobilde svh/dvh
+  // adres çubuğu animasyonuyla geç oturabildiği için viewport boyutu
+  // > 0 olana kadar rAF ile poll edilir (sabit checkpoint'ler yetmeyebilir).
   let settleTimers = [];
+  let settlePollId = null;
+  function pollUntilSized(deadline) {
+    if (settlePollId !== null) return;
+    const step = () => {
+      settlePollId = null;
+      const sized = fitToView();
+      if (!sized && performance.now() < deadline) {
+        settlePollId = requestAnimationFrame(step);
+      }
+    };
+    settlePollId = requestAnimationFrame(step);
+  }
   function settleFit() {
     settleTimers.forEach(clearTimeout);
     settleTimers = [];
+    if (settlePollId !== null) {
+      cancelAnimationFrame(settlePollId);
+      settlePollId = null;
+    }
     requestAnimationFrame(() => requestAnimationFrame(() => fitToView()));
     settleTimers.push(setTimeout(fitToView, 220));
     settleTimers.push(setTimeout(fitToView, 800));
+    // Ekstra güvence: 2sn boyunca viewport boyut alana dek denemeye devam et.
+    pollUntilSized(performance.now() + 2000);
   }
 
   function setOnChange(handler) {
@@ -317,15 +337,16 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   }
 
   function fitToView() {
-    if (!width || !height || !viewport) return;
+    if (!width || !height || !viewport) return true;
     const vw = viewport.clientWidth;
     const vh = viewport.clientHeight;
-    if (!vw || !vh) return;
+    if (!vw || !vh) return false;
     fitScale = Math.min(vw / width, vh / height) * 0.95;
     scale = Math.min(fitScale, maxZoom());
     offsetX = (vw - width * scale) / 2;
     offsetY = (vh - height * scale) / 2;
     applyTransform();
+    return true;
   }
 
   function constrainOffsets() {

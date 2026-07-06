@@ -1,8 +1,8 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-anytime-dl-20260705";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-anytime-dl-20260706";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
   readIndex, saveProject, loadProject, deleteProject
-} from "../utils/pbn-store.js?v=boyama-anytime-dl-20260705";
+} from "../utils/pbn-store.js?v=boyama-anytime-dl-20260706";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -112,6 +112,7 @@ function getPhoneSaveCopy() {
 
 const TEMPLATE = `
   <div class="pbn-app">
+    <div class="pbn-inline-toast pbn-app-error-toast" id="pbnAppErrorToast"></div>
     <div class="pbn-screen pbn-screen-home is-active" data-pbn-screen="home">
       <div class="pbn-hero">
         <img class="pbn-brand-logo" src="./assets/game-icon-boyama.jpeg" alt="Boyama logosu" loading="eager" decoding="async" />
@@ -275,6 +276,16 @@ export function renderBoyamaApp(target) {
   let resultBlobPromise = null;
   const phoneSaveCopy = getPhoneSaveCopy();
 
+  let appErrorTimer = null;
+  function showAppError(message) {
+    const toast = root.querySelector("#pbnAppErrorToast");
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(appErrorTimer);
+    appErrorTimer = setTimeout(() => toast.classList.remove("is-visible"), 3200);
+  }
+
   const documentClickHandler = (event) => {
     const menu = root.querySelector("#pbnPaintMenu");
     if (!menu || menu.hidden) return;
@@ -406,8 +417,8 @@ export function renderBoyamaApp(target) {
       if (revokeAfterLoad) URL.revokeObjectURL(url);
     };
     img.onerror = () => {
-      alert("Görsel yüklenemedi. Lütfen başka bir görsel deneyin.");
       showScreen("home");
+      showAppError("Görsel yüklenemedi. Lütfen başka bir görsel deneyin.");
       if (revokeAfterLoad) URL.revokeObjectURL(url);
     };
     img.src = url;
@@ -461,8 +472,8 @@ export function renderBoyamaApp(target) {
         if (activeWorker === worker) activeWorker = null;
       } else if (msg.type === "error") {
         console.error("PBN worker error:", msg.message);
-        alert("Fotoğraf işlenirken bir hata oluştu. Lütfen başka bir fotoğraf deneyin.");
         showScreen("home");
+        showAppError("Fotoğraf işlenirken bir hata oluştu. Lütfen başka bir fotoğraf deneyin.");
         worker.terminate();
         if (activeWorker === worker) activeWorker = null;
       }
@@ -531,20 +542,33 @@ export function renderBoyamaApp(target) {
     return tmp.toDataURL("image/jpeg", 0.72);
   }
 
+  function doPersist(regenThumbnail) {
+    currentProject.paintedRegionIds = engine.getPaintedRegionIds();
+    currentProject.updatedAt = Date.now();
+    if (regenThumbnail) currentProject.thumbnail = makeThumbnail();
+    return saveProject(currentProject).catch((error) => {
+      console.error("Boyama kaydedilemedi:", error);
+    });
+  }
+
+  // Her boya vuruşundan hemen sonra kaydedilir; setTimeout(0) sadece
+  // aynı senkron tik içindeki ardışık çağrıları tek kayda birleştirir.
   function persistProject(regenThumbnail) {
     if (!currentProject) return;
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(async () => {
-      currentProject.paintedRegionIds = engine.getPaintedRegionIds();
-      currentProject.updatedAt = Date.now();
-      if (regenThumbnail) currentProject.thumbnail = makeThumbnail();
-      try {
-        await saveProject(currentProject);
-      } catch (error) {
-        console.error("Boyama kaydedilemedi:", error);
-      }
-    }, 500);
+    saveTimer = setTimeout(() => doPersist(regenThumbnail), 0);
   }
+
+  function flushPersist() {
+    if (!currentProject || !saveTimer) return;
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    doPersist(false);
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushPersist();
+  });
+  window.addEventListener("pagehide", flushPersist);
 
   /* ---------- palette dock ---------- */
 
@@ -650,6 +674,15 @@ export function renderBoyamaApp(target) {
       } else if (event.type === "wrong") {
         viewport.classList.add("is-shaking");
         setTimeout(() => viewport.classList.remove("is-shaking"), 320);
+      } else if (event.type === "redo") {
+        updateProgressUi();
+        updatePaletteChips();
+        autoAdvanceIfComplete();
+        if (engine.isComplete()) {
+          showResultScreen();
+        } else {
+          persistProject(false);
+        }
       } else {
         updateProgressUi();
         updatePaletteChips();

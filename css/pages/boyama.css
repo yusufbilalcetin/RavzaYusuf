@@ -27,6 +27,20 @@
   padding: 6px;
   color: var(--text);
   scrollbar-color: rgba(212, 102, 156, .42) transparent;
+  position: relative;
+}
+
+/* Ana sayfa/analiz ekranlarında görsel yükleme hataları için engellemeyen banner.
+   #id kullanılıyor: .pbn-inline-toast'un temel kuralı dosyada daha sonra
+   tanımlı olduğundan aynı özgüllükte bir class geç kalıp position:absolute'a
+   dönebiliyor ve position:relative olan .pbn-app'in scrollHeight'ına sızıyordu. */
+#pbnAppErrorToast {
+  position: fixed;
+  top: 14px;
+  max-width: min(90vw, 420px);
+  text-align: center;
+  white-space: normal;
+  z-index: 40;
 }
 
 body.dark .pbn-app {
@@ -74,6 +88,14 @@ body.dark .pbn-app {
 
 .games-page.is-game-fullscreen.is-boyama .pbn-app:has(.pbn-screen-paint.is-active) {
   overflow: hidden;
+}
+
+/* :has() desteklemeyen tarayıcılar için düz fallback (fullscreen modda
+   zaten sadece boyama ekranı aktifken bu class uygulanıyor). */
+@supports not selector(:has(a)) {
+  .games-page.is-game-fullscreen.is-boyama .pbn-app {
+    overflow: hidden;
+  }
 }
 
 /* Masaüstünde yüzen "Kapat" butonu üst çubuğun sağ ucundaki butonlara binmesin */
@@ -792,6 +814,17 @@ body.dark .pbn-canvas-stage canvas {
   .pbn-paint-progress span { min-width: 28px; }
   .pbn-tool-btn { width: 34px; height: 34px; }
   .pbn-swatch { width: 42px; height: 42px; }
+}
+
+/* Yatay/kısa ekranlarda (telefon landscape) üst bar + palet dock birlikte
+   ekran yüksekliğini aşıp alt kısmı kırpabiliyordu; burada sıkıştırılıyor. */
+@media (max-height: 430px) {
+  .pbn-screen-paint.is-active { gap: 10px; }
+  .pbn-paint-header { padding: 4px 8px; }
+  .pbn-paint-logo { width: 30px; height: 30px; flex-basis: 30px; }
+  .pbn-tool-btn { width: 32px; height: 32px; }
+  .pbn-palette-dock { max-height: 62px; padding: 6px 20px; }
+  .pbn-swatch { width: 40px; height: 40px; margin: 4px 3px; }
 }
 
 /* ---------- Ana sayfa v2: kompakt, sade, bütünlüklü ---------- */
