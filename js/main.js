@@ -1,3 +1,3 @@
-import { initApp } from "./core/app.js?v=boyama-anytime-dl-20260706-2";
+import { initApp } from "./core/app.js?v=boyama-anytime-dl-20260706-3";
 
 initApp();

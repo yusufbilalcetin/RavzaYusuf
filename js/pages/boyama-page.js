@@ -1,8 +1,8 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-anytime-dl-20260706-2";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-anytime-dl-20260706-3";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
   readIndex, saveProject, loadProject, deleteProject
-} from "../utils/pbn-store.js?v=boyama-anytime-dl-20260706-2";
+} from "../utils/pbn-store.js?v=boyama-anytime-dl-20260706-3";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.

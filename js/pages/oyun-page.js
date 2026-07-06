@@ -1,5 +1,5 @@
 import { createGameAudio } from "../utils/game-audio.js";
-import { renderBoyamaApp } from "./boyama-page.js?v=boyama-anytime-dl-20260706-2";
+import { renderBoyamaApp } from "./boyama-page.js?v=boyama-anytime-dl-20260706-3";
 
 const GAME_META = {
   "boyama": {

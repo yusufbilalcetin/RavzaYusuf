@@ -910,11 +910,19 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   // Ek güvenlik ağı: bazı iOS Safari sürümlerinde gesturestart/gesturechange
   // hiç tetiklenmeden çok dokunuşlu touchmove doğrudan sayfa zoom'u
   // uygulayabiliyor. touch-action:none çoğu durumda yeterli olsa da, iki+
-  // parmaklı hareket viewport üzerindeyse burada da engellenir.
+  // parmaklı hareket viewport üzerindeyse burada da engellenir. touchstart'ta
+  // da aynısı yapılır ki pinch algılanmadan önce jest hiç başlamasın.
   function preventMultiTouchScroll(e) {
     if (e.touches && e.touches.length > 1) e.preventDefault();
   }
+  viewport.addEventListener("touchstart", preventMultiTouchScroll, { passive: false });
   viewport.addEventListener("touchmove", preventMultiTouchScroll, { passive: false });
+
+  // iOS Safari'de canvas/görsel üzerine uzun basma "Fotoğrafı Kaydet/Kopyala"
+  // bağlam menüsünü açabiliyor; bu, boyama tuvalini native image gibi
+  // davranışa sokup kullanıcıyı yanlışlıkla galeri/önizleme akışına sürükleyebilir.
+  function preventCanvasContextMenu(e) { e.preventDefault(); }
+  viewport.addEventListener("contextmenu", preventCanvasContextMenu);
 
   // Seçili renk numarasına ait, henüz boyanmamış tüm hücreleri bulup
   // ekranda kısa süreliğine parlatır. Hedef hücrelerin hiçbiri görünür
@@ -1061,7 +1069,9 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
       viewport.removeEventListener("wheel", handleWheelZoom, true);
+      viewport.removeEventListener("touchstart", preventMultiTouchScroll);
       viewport.removeEventListener("touchmove", preventMultiTouchScroll);
+      viewport.removeEventListener("contextmenu", preventCanvasContextMenu);
       document.removeEventListener("gesturestart", preventNativeGesture);
       document.removeEventListener("gesturechange", preventNativeGesture);
       resizeObserver.disconnect();
