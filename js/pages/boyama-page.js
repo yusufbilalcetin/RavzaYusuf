@@ -1,15 +1,39 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-anytime-dl-20260706-3";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-safari-autosave-20260706-4";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
   readIndex, saveProject, loadProject, deleteProject
-} from "../utils/pbn-store.js?v=boyama-anytime-dl-20260706-3";
+} from "../utils/pbn-store.js?v=boyama-safari-autosave-20260706-4";
+import { pbnLog } from "../utils/pbn-debug.js?v=boyama-safari-autosave-20260706-4";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
 const DETAIL_WIDTH_SCALE = 5000 / 128;
 
+// iOS Safari, çok büyük tuvalleri (özellikle pinch sırasında CSS scale ile
+// büyütülünce) bellek baskısıyla öldürüp sekmeyi reload edebiliyor. Bu yüzden
+// piksel tuvali güvenli bir tavana indirilir. DETAY (gridCols = width/cellSize)
+// DEĞİŞMEZ: yalnız her hücrenin piksel boyutu düşürülür, region/renk sayısı aynı.
+const MAX_CANVAS_DIM = 2560;       // en büyük kenar (px)
+const MAX_CANVAS_AREA = 4_000_000; // toplam alan (~4 MP)
+
 function scaledDetailWidth(baseCols) {
   return Math.round(baseCols * DETAIL_WIDTH_SCALE);
+}
+
+// pbnActiveProjectId/pbnActiveRoute: reload/çökme sonrası boot'ta otomatik devam
+// için "şu an boyama ekranındayız ve aktif proje şu" işareti.
+function markActiveProject(id) {
+  try {
+    localStorage.setItem("pbnActiveProjectId", id);
+    localStorage.setItem("pbnActiveRoute", "oyun:boyama");
+  } catch { /* private mode */ }
+}
+
+function clearActiveProject() {
+  try {
+    localStorage.removeItem("pbnActiveProjectId");
+    localStorage.removeItem("pbnActiveRoute");
+  } catch { /* private mode */ }
 }
 
 const DIFFICULTY_PRESETS = {
@@ -263,8 +287,9 @@ const TEMPLATE = `
   </div>
 `;
 
-export function renderBoyamaApp(target) {
+export function renderBoyamaApp(target, options = {}) {
   target.innerHTML = TEMPLATE;
+  pbnLog("boyama.render", { resume: options.resumeProjectId || null });
 
   const root = target;
   let engine = null;
@@ -300,10 +325,14 @@ export function renderBoyamaApp(target) {
   applyPhoneSaveLabels();
   renderRecentGrid();
 
-  function showScreen(name) {
+  function showScreen(name, reason = "") {
+    pbnLog("showScreen", name, "reason:", reason);
     closePaintMenu();
     root.querySelectorAll(".pbn-screen").forEach((el) => el.classList.remove("is-active"));
     root.querySelector(`[data-pbn-screen="${name}"]`)?.classList.add("is-active");
+    // Paint ekranındayken otomatik-devam işaretle; ayrılınca temizle.
+    if (name === "paint" && currentProject) markActiveProject(currentProject.id);
+    else if (name === "home" || name === "result") clearActiveProject();
   }
 
   /* ---------- home ---------- */
@@ -373,9 +402,14 @@ export function renderBoyamaApp(target) {
 
   async function resumeProject(id) {
     const record = await loadProject(id);
-    if (!record) return;
+    if (!record) {
+      pbnLog("resumeProject.missing", { id });
+      clearActiveProject();
+      return false;
+    }
     currentProject = record;
-    showScreen("paint");
+    showScreen("paint", "resume");
+    markActiveProject(record.id);
 
     let regionMap, outline;
     if (record.cellSize) {
@@ -399,12 +433,13 @@ export function renderBoyamaApp(target) {
     updatePaletteChips();
     updateProgressUi();
     requestAnimationFrame(() => requestAnimationFrame(() => engine.zoomReset()));
+    return true;
   }
 
   /* ---------- analysis pipeline ---------- */
 
   function startAnalysisFromUrl(url, name, revokeAfterLoad) {
-    showScreen("analysis");
+    showScreen("analysis", "start-analysis");
     const steps = root.querySelectorAll("#pbnAnalysisSteps li");
     steps.forEach((li) => li.classList.remove("is-done", "is-active"));
     root.querySelector("#pbnAnalysisFill").style.width = "0%";
@@ -417,7 +452,13 @@ export function renderBoyamaApp(target) {
       if (revokeAfterLoad) URL.revokeObjectURL(url);
     };
     img.onerror = () => {
-      showScreen("home");
+      pbnLog("img.onerror", { hasProject: Boolean(currentProject) });
+      // Aktif/kaydedilmiş bir proje varken kullanıcıyı ekrandan atma (istek #3).
+      if (currentProject) {
+        showScreen("paint", "img-error-stay");
+      } else {
+        showScreen("home", "img-error");
+      }
       showAppError("Görsel yüklenemedi. Lütfen başka bir görsel deneyin.");
       if (revokeAfterLoad) URL.revokeObjectURL(url);
     };
@@ -427,14 +468,31 @@ export function renderBoyamaApp(target) {
   function processImage(img, fileName) {
     const preset = DIFFICULTY_PRESETS[currentDifficulty] || DIFFICULTY_PRESETS.normal;
     const targetWidth = preset.targetWidth || Math.round((preset.baseCols || 56) * DETAIL_WIDTH_SCALE);
-    const cellSize = preset.cell;
+    let cellSize = preset.cell;
     const srcW = img.naturalWidth || 1;
     const srcH = img.naturalHeight || 1;
-    const w = targetWidth;
-    const h = Math.min(
+    let w = targetWidth;
+    let h = Math.min(
       Math.max(Math.round(targetWidth * (srcH / srcW)), cellSize * 8),
       Math.round(targetWidth * 1.5)
     );
+
+    // iOS-güvenli tavan: DETAY (grid hücre sayısı) sabit kalır; yalnız her
+    // hücrenin piksel boyutu (cellSize) küçültülür. Böylece region/renk sayısı
+    // aynı kalırken tuval belleği düşer ve Safari sekmeyi öldürmez.
+    const gridCols = Math.ceil(w / cellSize);
+    const gridRows = Math.ceil(h / cellSize);
+    const shrink = Math.min(
+      1,
+      MAX_CANVAS_DIM / Math.max(w, h),
+      Math.sqrt(MAX_CANVAS_AREA / (w * h))
+    );
+    if (shrink < 1) {
+      cellSize = Math.max(3, Math.floor(cellSize * shrink));
+      w = gridCols * cellSize;
+      h = gridRows * cellSize;
+      pbnLog("processImage.shrink", { difficulty: currentDifficulty, cellSize, w, h, gridCols, gridRows });
+    }
 
     const canvas = document.createElement("canvas");
     canvas.width = w; canvas.height = h;
@@ -472,7 +530,13 @@ export function renderBoyamaApp(target) {
         if (activeWorker === worker) activeWorker = null;
       } else if (msg.type === "error") {
         console.error("PBN worker error:", msg.message);
-        showScreen("home");
+        pbnLog("worker.error", msg.message, { hasProject: Boolean(currentProject) });
+        // Aktif proje varken ekrandan atma (istek #3).
+        if (currentProject) {
+          showScreen("paint", "worker-error-stay");
+        } else {
+          showScreen("home", "worker-error");
+        }
         showAppError("Fotoğraf işlenirken bir hata oluştu. Lütfen başka bir fotoğraf deneyin.");
         worker.terminate();
         if (activeWorker === worker) activeWorker = null;
@@ -499,7 +563,7 @@ export function renderBoyamaApp(target) {
     const regionMap = new Uint32Array(msg.regionMapBuffer);
     const outline = new Uint8Array(msg.outlineBuffer);
 
-    showScreen("paint");
+    showScreen("paint", "processing-done");
     engine.setData({
       width: msg.width, height: msg.height,
       regionMap, outline,
@@ -522,6 +586,7 @@ export function renderBoyamaApp(target) {
       thumbnail: makeThumbnail()
     };
 
+    markActiveProject(id);
     renderPalette(msg.palette);
     updatePaletteChips();
     updateProgressUi();
@@ -542,12 +607,21 @@ export function renderBoyamaApp(target) {
     return tmp.toDataURL("image/jpeg", 0.72);
   }
 
+  let saveErrorShown = false;
   function doPersist(regenThumbnail) {
     currentProject.paintedRegionIds = engine.getPaintedRegionIds();
     currentProject.updatedAt = Date.now();
     if (regenThumbnail) currentProject.thumbnail = makeThumbnail();
-    return saveProject(currentProject).catch((error) => {
+    return saveProject(currentProject).then(() => {
+      pbnLog("doPersist.ok", { id: currentProject.id, painted: currentProject.paintedRegionIds.length });
+    }).catch((error) => {
       console.error("Boyama kaydedilemedi:", error);
+      pbnLog("doPersist.error", error);
+      // Kayıt gerçekten başarısızsa kullanıcıyı bir kez uyar (sessiz veri kaybı olmasın).
+      if (!saveErrorShown) {
+        saveErrorShown = true;
+        showAppError("İlerleme kaydedilemedi. Depolama dolu veya kapalı olabilir.");
+      }
     });
   }
 
@@ -559,16 +633,27 @@ export function renderBoyamaApp(target) {
     saveTimer = setTimeout(() => doPersist(regenThumbnail), 0);
   }
 
+  // Koşulsuz son kayıt: bekleyen timer olmasa da güncel durumu yaz. iOS'ta
+  // pagehide/visibilitychange, sekme öldürülmeden önceki tek garanti fırsat.
   function flushPersist() {
-    if (!currentProject || !saveTimer) return;
+    if (!currentProject) return;
     clearTimeout(saveTimer);
     saveTimer = null;
+    pbnLog("flushPersist");
     doPersist(false);
   }
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") flushPersist();
-  });
-  window.addEventListener("pagehide", flushPersist);
+  const visibilityHandler = () => {
+    if (document.visibilityState === "hidden") {
+      pbnLog("visibilitychange", "hidden");
+      flushPersist();
+    }
+  };
+  const pageHideHandler = () => {
+    pbnLog("pagehide");
+    flushPersist();
+  };
+  document.addEventListener("visibilitychange", visibilityHandler);
+  window.addEventListener("pagehide", pageHideHandler);
 
   /* ---------- palette dock ---------- */
 
@@ -691,8 +776,12 @@ export function renderBoyamaApp(target) {
     });
 
     root.querySelector("#pbnBackBtn").addEventListener("click", () => {
-      persistProject(true);
-      showScreen("home");
+      // Küçük resmi tazeleyerek son durumu hemen (senkron) yaz.
+      clearTimeout(saveTimer);
+      saveTimer = null;
+      if (currentProject) doPersist(true);
+      clearActiveProject();
+      showScreen("home", "back-button");
       renderRecentGrid();
     });
     root.querySelector("#pbnUndoBtn").addEventListener("click", () => engine.undo());
@@ -754,7 +843,8 @@ export function renderBoyamaApp(target) {
       shareBtn.textContent = "PNG hazırlanıyor...";
     }
     spawnConfetti();
-    showScreen("result");
+    clearActiveProject();
+    showScreen("result", "complete");
 
     // Blob ekrana girerken hazırlanır: paylaş butonunda iOS'un kullanıcı
     // jesti süresi dolmadan navigator.share çağrılabilsin.
@@ -844,19 +934,38 @@ export function renderBoyamaApp(target) {
       await shareOrDownloadBlob(blob, createPngFilename("boyama-galeri"), { galleryIntent: true });
     });
     root.querySelector("#pbnNewFromResultBtn").addEventListener("click", () => {
-      showScreen("home");
+      showScreen("home", "new-from-result");
       renderRecentGrid();
       root.querySelector("#pbnFileInput").click();
     });
   }
 
+  // Boot'ta otomatik devam: app.js -> oyun-page -> renderBoyamaApp(options).
+  // resumeReady, resume tamamlandığında true döner (app.js bunu bekler).
+  let resolveResumeReady;
+  const resumeReady = new Promise((resolve) => { resolveResumeReady = resolve; });
+  if (options.resumeProjectId) {
+    resumeProject(options.resumeProjectId)
+      .then((ok) => { pbnLog("boyama.resumeDone", { id: options.resumeProjectId, ok }); resolveResumeReady(Boolean(ok)); })
+      .catch((error) => { pbnLog("boyama.resumeFail", error); resolveResumeReady(false); });
+  } else {
+    resolveResumeReady(false);
+  }
+  // app.js'in boot'ta doğrudan çağırabilmesi için (navigate sonrası).
+  window.__pbnResumeProject = (id) => resumeProject(id);
+
   return {
+    resumeReady,
     cleanup() {
+      pbnLog("boyama.cleanup");
       engine?.destroy();
       if (activeWorker) { activeWorker.terminate(); activeWorker = null; }
       clearTimeout(saveTimer);
       clearTimeout(inlineToastTimer);
       document.removeEventListener("click", documentClickHandler);
+      document.removeEventListener("visibilitychange", visibilityHandler);
+      window.removeEventListener("pagehide", pageHideHandler);
+      if (window.__pbnResumeProject) delete window.__pbnResumeProject;
     }
   };
 }

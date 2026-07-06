@@ -1,14 +1,37 @@
+import { pbnLog } from "./pbn-debug.js?v=boyama-safari-autosave-20260706-4";
+
 const DB_NAME = "pbnStudio";
 const DB_VERSION = 2;
 const STORE_NAME = "projects";
 const INDEX_KEY = "pbnProjectsIndex";
+const OPEN_TIMEOUT_MS = 8000;
 
 let dbPromise = null;
 
 function openDb() {
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    let settled = false;
+    const finish = (fn, arg) => { if (!settled) { settled = true; fn(arg); } };
+
+    let request;
+    try {
+      request = indexedDB.open(DB_NAME, DB_VERSION);
+    } catch (error) {
+      pbnLog("store.openThrow", error);
+      dbPromise = null; // tekrar denenebilsin
+      reject(error);
+      return;
+    }
+
+    // onblocked/askıda kalma: başka sekme upgrade'i bloklarsa promise sonsuza
+    // asılı kalıp kayıtları sessizce engellemesin.
+    const timer = setTimeout(() => {
+      pbnLog("store.openTimeout");
+      dbPromise = null;
+      finish(reject, new Error("IndexedDB açılışı zaman aşımına uğradı"));
+    }, OPEN_TIMEOUT_MS);
+
     request.onupgradeneeded = () => {
       const db = request.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
@@ -16,10 +39,16 @@ function openDb() {
       }
     };
     request.onblocked = () => {
+      pbnLog("store.openBlocked");
       console.warn("pbnStudio veritabanı yükseltmesi başka bir açık sekme tarafından bloklandı.");
     };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => { clearTimeout(timer); finish(resolve, request.result); };
+    request.onerror = () => {
+      clearTimeout(timer);
+      pbnLog("store.openError", request.error);
+      dbPromise = null;
+      finish(reject, request.error);
+    };
   });
   return dbPromise;
 }

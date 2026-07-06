@@ -1,3 +1,3 @@
-import { initApp } from "./core/app.js?v=boyama-anytime-dl-20260706-3";
+import { initApp } from "./core/app.js?v=boyama-safari-autosave-20260706-4";
 
 initApp();

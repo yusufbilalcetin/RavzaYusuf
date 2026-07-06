@@ -1,5 +1,6 @@
 import { createGameAudio } from "../utils/game-audio.js";
-import { renderBoyamaApp } from "./boyama-page.js?v=boyama-anytime-dl-20260706-3";
+import { renderBoyamaApp } from "./boyama-page.js?v=boyama-safari-autosave-20260706-4";
+import { pbnLog } from "../utils/pbn-debug.js?v=boyama-safari-autosave-20260706-4";
 
 const GAME_META = {
   "boyama": {
@@ -78,6 +79,13 @@ export function initOyun(options = {}) {
     root.querySelector("#gameCloseBtn")?.addEventListener("click", () => closeGame(root));
   }
 
+  // Boot'ta yarım boyama işini geri açmak için (app.js -> tryResumeBoyama).
+  window.__pbnOpenBoyamaResume = async (projectId) => {
+    pbnLog("oyun.openBoyamaResume", { projectId });
+    openGame(root, "boyama", { resumeProjectId: projectId });
+    try { return await boyamaState?.resumeReady; } catch { return false; }
+  };
+
   if (options.openGame) {
     openGame(root, options.openGame);
     return { skipTopScroll: true };
@@ -86,7 +94,8 @@ export function initOyun(options = {}) {
   return undefined;
 }
 
-function openGame(root, gameId) {
+function openGame(root, gameId, options = {}) {
+  pbnLog("oyun.openGame", { gameId });
   const meta = GAME_META[gameId] || GAME_META["candy-match"];
   const stage = root.querySelector("#gameStage");
   const badge = root.querySelector("#gameStageBadge");
@@ -126,7 +135,7 @@ function openGame(root, gameId) {
     enterGameFullscreen(root);
     root.classList.remove("is-candy-crush-app", "is-sudoku");
     root.classList.add("is-boyama");
-    boyamaState = renderBoyamaApp(body);
+    boyamaState = renderBoyamaApp(body, { resumeProjectId: options.resumeProjectId });
   } else {
     exitGameFullscreen(root);
     root.classList.remove("is-candy-crush-app");
@@ -165,6 +174,7 @@ function renderIframeGame(target, url, title) {
 }
 
 function closeGame(root) {
+  pbnLog("oyun.closeGame");
   const stage = root.querySelector("#gameStage");
   const body = root.querySelector("#gameStageBody");
   destroyActiveGame();
@@ -184,6 +194,7 @@ function destroyActiveGame() {
     sudokuState = null;
   }
   if (boyamaState) {
+    pbnLog("oyun.destroyBoyama");
     boyamaState.cleanup?.();
     boyamaState = null;
   }
@@ -200,6 +211,7 @@ function enterGameFullscreen(root) {
   if (viewportMeta && savedViewportContent === null) {
     savedViewportContent = viewportMeta.getAttribute("content");
     viewportMeta.setAttribute("content", GAME_FULLSCREEN_VIEWPORT);
+    pbnLog("oyun.viewportMeta", "fullscreen");
   }
 }
 
@@ -214,6 +226,7 @@ function exitGameFullscreen(root) {
   if (viewportMeta && savedViewportContent !== null) {
     viewportMeta.setAttribute("content", savedViewportContent);
     savedViewportContent = null;
+    pbnLog("oyun.viewportMeta", "restored");
   }
 }
 

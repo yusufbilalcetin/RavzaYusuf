@@ -14,7 +14,7 @@ import { initSinavCoz } from "../pages/sinav-coz-page.js";
 import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
 import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
-import { initOyun } from "../pages/oyun-page.js?v=boyama-anytime-dl-20260706-3";
+import { initOyun } from "../pages/oyun-page.js?v=boyama-safari-autosave-20260706-4";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
 
 export const routeAliases = {
@@ -47,7 +47,7 @@ const routes = {
   "hizli-tekrar": { partial: "./partials/pages/hizli-tekrar.html", sectionId: "recap", navId: "nav-recap", init: initHizliTekrar },
   "birinci-sinif": { partial: "./partials/pages/birinci-sinif.html", sectionId: "grade1", navId: "nav-grade1", init: initBirinciSinif },
   "ikinci-sinif": { partial: "./partials/pages/ikinci-sinif.html", sectionId: "grade2", navId: "nav-grade2", init: initIkinciSinif },
-  oyun: { partial: "./partials/pages/oyun.html?v=boyama-anytime-dl-20260706-3", sectionId: "games", navId: "nav-games", init: initOyun }
+  oyun: { partial: "./partials/pages/oyun.html?v=boyama-safari-autosave-20260706-4", sectionId: "games", navId: "nav-games", init: initOyun }
 };
 
 let isNavigating = false;

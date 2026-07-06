@@ -1,3 +1,5 @@
+import { pbnLog } from "./pbn-debug.js?v=boyama-safari-autosave-20260706-4";
+
 const OUTLINE_RGB = [70, 70, 78];
 const OUTLINE_CSS = `rgb(${OUTLINE_RGB[0]},${OUTLINE_RGB[1]},${OUTLINE_RGB[2]})`;
 const MIN_SCALE = 0.5;
@@ -289,6 +291,10 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     for (const r of regions) numberTotals.set(r.paletteNumber, (numberTotals.get(r.paletteNumber) || 0) + 1);
 
     totalPixels = width * height;
+    if (!width || !height || !ctx) {
+      pbnLog("setData.badCanvas", { width, height, hasCtx: Boolean(ctx) });
+      return;
+    }
     canvas.width = width;
     canvas.height = height;
     // Overlay hizası, tuvalin 1:1 piksel boyutunda görüntülenmesine dayanır.
@@ -309,12 +315,14 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   function setPaintedRegions(ids) {
     paintedSet.clear();
     for (const number of numberPainted.keys()) numberPainted.set(number, 0);
+    let dropped = 0;
     for (const id of ids) {
-      if (!regionById.has(id)) continue;
+      if (!regionById.has(id)) { dropped++; continue; }
       paintedSet.add(id);
       const number = regionNumberLut[id];
       numberPainted.set(number, (numberPainted.get(number) || 0) + 1);
     }
+    if (dropped) pbnLog("setPaintedRegions.dropped", { dropped, kept: paintedSet.size });
     // Devam edilen projede fırça geçmişi boş başlar.
     paintOrder = [];
     redoStack = [];
@@ -377,7 +385,21 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     return Math.min(MIN_SCALE, fitScale);
   }
 
+  // Son geçerli (sonlu) görünüm durumu — NaN/Infinity oluşursa buna dönülür.
+  let lastGoodView = { scale: 1, offsetX: 0, offsetY: 0 };
+
   function applyTransform() {
+    // Zoom/pan hesapları bir şekilde sonlu olmayan değer üretirse (ör. pinch
+    // sırasında iki dokunuşun üst üste gelmesi) görünümü bozup ekranı
+    // kaybetmek yerine son geçerli duruma geri dön.
+    if (!Number.isFinite(scale) || !Number.isFinite(offsetX) || !Number.isFinite(offsetY)) {
+      pbnLog("nonfinite-transform", { scale, offsetX, offsetY });
+      scale = lastGoodView.scale;
+      offsetX = lastGoodView.offsetX;
+      offsetY = lastGoodView.offsetY;
+    } else {
+      lastGoodView = { scale, offsetX, offsetY };
+    }
     constrainOffsets();
     if (stage) stage.style.transform = `translate(${Math.round(offsetX)}px, ${Math.round(offsetY)}px) scale(${scale})`;
     canvas.classList.toggle("pbn-canvas--crisp", scale >= 1);
@@ -826,9 +848,13 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       const rect = viewport.getBoundingClientRect();
       const [a, b] = Array.from(activePointers.values());
       const dist = pointerDistance(a, b);
+      // İki dokunuş üst üste gelirse startDist/dist 0 olabilir -> 0/0 = NaN.
+      // Bu kareyi atla; state bozulmasın.
+      if (!(pinchState.startDist > 0) || !(dist > 0)) return;
       const midX = (a.clientX + b.clientX) / 2 - rect.left;
       const midY = (a.clientY + b.clientY) / 2 - rect.top;
       const newScale = snapScale(Math.min(Math.max(pinchState.startScale * (dist / pinchState.startDist), minZoom()), maxZoom()));
+      if (!Number.isFinite(newScale)) return;
       const ratio = newScale / pinchState.startScale;
       offsetX = midX - (pinchState.startMidX - pinchState.startOffsetX) * ratio;
       offsetY = midY - (pinchState.startMidY - pinchState.startOffsetY) * ratio;
@@ -890,6 +916,14 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   // viewport gizlenirse bile jest güvenle kapanır (takılı fırça olmaz).
   window.addEventListener("pointerup", onPointerUp);
   window.addEventListener("pointercancel", onPointerUp);
+  // Teşhis: pointer/touch iptali ve native gesture olayları — reload/atılma
+  // anında hangi olayın tetiklendiğini görmek için (yalnız log).
+  const logPointerCancel = (e) => pbnLog("pointercancel", e.pointerType || "");
+  const logTouchCancel = () => pbnLog("touchcancel");
+  const logGestureEnd = () => pbnLog("gestureend");
+  window.addEventListener("pointercancel", logPointerCancel);
+  viewport.addEventListener("touchcancel", logTouchCancel);
+  document.addEventListener("gestureend", logGestureEnd, { passive: true });
   // Güvenlik ağı: pointer olayları (eklenti vb. nedeniyle) sayfaya ulaşmazsa
   // tıklama yine de boyasın. Normal akışta pointerdown zaten işlediği için atlanır.
   viewport.addEventListener("click", (event) => {
@@ -903,7 +937,9 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   // Safari'nin native iki parmak pinch-zoom'u (gesturestart/gesturechange), stage'in
   // kendi pointer-tabanli zoom'uyla çakışıp sayfayı zoomlayarak sabit konumlu oyun
   // katmanının bozulmasına ("oyundan atılma" hissi) yol açabiliyor; burada bastırılır.
-  function preventNativeGesture(e) { e.preventDefault(); }
+  // gesturechange saniyede onlarca kez tetiklenir; log seli olmasın diye
+  // yalnız gesturestart loglanır.
+  function preventNativeGesture(e) { if (e.type === "gesturestart") pbnLog("native-gesture", e.type); e.preventDefault(); }
   document.addEventListener("gesturestart", preventNativeGesture, { passive: false });
   document.addEventListener("gesturechange", preventNativeGesture, { passive: false });
 
@@ -1068,6 +1104,9 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       if (hintRafId != null) cancelAnimationFrame(hintRafId);
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
+      window.removeEventListener("pointercancel", logPointerCancel);
+      viewport.removeEventListener("touchcancel", logTouchCancel);
+      document.removeEventListener("gestureend", logGestureEnd);
       viewport.removeEventListener("wheel", handleWheelZoom, true);
       viewport.removeEventListener("touchstart", preventMultiTouchScroll);
       viewport.removeEventListener("touchmove", preventMultiTouchScroll);
