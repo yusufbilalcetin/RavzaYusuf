@@ -259,7 +259,14 @@ body.is-game-fullscreen {
    body:has(#dashboard.active)) normalde oyun katmanının arkasında gizli
    kalır; bu güvenlik ağı, o sızıntı anında bile ekrana gelebilecek
    içeriği tamamen kaldırır (koyu oyun arkaplanından başka bir şey görünmez). */
-body.is-game-fullscreen,
+body.is-game-fullscreen {
+  background: #100719 !important;
+  background-image: none !important;
+}
+
+/* :has() desteklemeyen eski tarayıcılarda geçersiz seçici tüm kural grubunu
+   düşürür (CSS seçici listesi kuralı); bu yüzden yukarıdaki temel kuraldan
+   ayrı, kendi başına bir kural olarak tutulur. */
 body.is-game-fullscreen:has(#dashboard.active) {
   background: #100719 !important;
   background-image: none !important;
