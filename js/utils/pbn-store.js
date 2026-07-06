@@ -1,4 +1,4 @@
-import { pbnLog } from "./pbn-debug.js?v=pbn-save-20260706-1";
+import { pbnLog } from "./pbn-debug.js?v=pbn-manual-resume-20260706-1";
 
 const DB_NAME = "pbnStudio";
 const DB_VERSION = 3;
@@ -106,7 +106,9 @@ export async function saveProject(record) {
     id: record.id,
     name: record.name,
     thumbnail: record.thumbnail,
-    updatedAt: record.updatedAt
+    updatedAt: record.updatedAt,
+    progress: record.progress ?? 0,
+    completed: record.completed === true
   });
 }
 

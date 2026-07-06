@@ -1,8 +1,8 @@
 import { loadLayoutPartials } from "./partial-loader.js";
-import { initRouter, navigate } from "./router.js?v=pbn-save-20260706-1";
+import { initRouter, navigate } from "./router.js?v=pbn-manual-resume-20260706-1";
 import { installCompatibility } from "./compatibility.js?v=fit-visible-20260704";
 import { installAppShellScrollBridge } from "./app-shell-scroll.js";
-import { pbnLog } from "../utils/pbn-debug.js?v=pbn-save-20260706-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=pbn-manual-resume-20260706-1";
 
 // Reload/çökme teşhisi: bu dinleyiciler YALNIZ loglar — hiçbir yönlendirme yapmaz.
 function installDiagnostics() {
@@ -29,7 +29,7 @@ async function tryResumeBoyama() {
   if (!projectId || route !== "oyun:boyama") return false;
 
   try {
-    const { loadProject } = await import("../utils/pbn-store.js?v=pbn-save-20260706-1");
+    const { loadProject } = await import("../utils/pbn-store.js?v=pbn-manual-resume-20260706-1");
     const record = await loadProject(projectId);
     if (!record) {
       try {
@@ -63,11 +63,10 @@ export async function initApp() {
     initRouter();
     installCompatibility();
     await window.__bootLegacyApp?.();
-    const resumed = await tryResumeBoyama();
-    if (!resumed) {
-      pbnLog("boot.navigate", "ana-sayfa");
-      await navigate("ana-sayfa");
-    }
+    // pbnActiveProjectId yalnÄ±zca kayÄ±t/snapshot baÄŸlamÄ± iÃ§indir.
+    // Site aÃ§Ä±lÄ±ÅŸÄ±nda boyama otomatik aÃ§Ä±lmaz; devam kullanÄ±cÄ± karttan seÃ§ince olur.
+    pbnLog("boot.navigate", "ana-sayfa");
+    await navigate("ana-sayfa");
   } catch (error) {
     console.error(error);
     const root = document.getElementById("page-root");

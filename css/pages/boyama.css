@@ -249,7 +249,8 @@ body.dark .pbn-app {
 .pbn-preset-item:focus-visible,
 .pbn-tool-btn:focus-visible,
 .pbn-swatch:focus-visible,
-.pbn-menu-item:focus-visible {
+.pbn-menu-item:focus-visible,
+.pbn-recent-continue:focus-visible {
   outline: 3px solid rgba(232, 121, 160, .58);
   outline-offset: 3px;
 }
@@ -1122,6 +1123,35 @@ body.dark .pbn-canvas-stage canvas {
   line-height: 1.25;
 }
 
+.pbn-recent-progress {
+  color: var(--success);
+  font-size: .72rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.pbn-recent-continue {
+  min-height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  color: #fff;
+  font-weight: 800;
+  font-size: .78rem;
+  cursor: pointer;
+  transition: transform .35s var(--pbn-ease), box-shadow .35s var(--pbn-ease);
+  box-shadow: 0 12px 26px -16px rgba(212, 102, 156, .9);
+}
+
+.pbn-recent-continue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px -16px rgba(212, 102, 156, 1);
+}
+
+.pbn-recent-continue:active {
+  transform: scale(.96);
+}
+
 .pbn-screen-home .pbn-recent-delete {
   top: 12px;
   right: 12px;
@@ -1499,7 +1529,8 @@ body.pbn-modal-open .game-stage-body { overflow: hidden; }
 }
 
 .pbn-modal-btn:focus-visible,
-.pbn-completed-btn:focus-visible {
+.pbn-completed-btn:focus-visible,
+.pbn-recent-continue:focus-visible {
   outline: 3px solid rgba(232, 121, 160, .58);
   outline-offset: 3px;
 }

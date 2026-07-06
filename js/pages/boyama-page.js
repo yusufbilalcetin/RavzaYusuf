@@ -1,10 +1,10 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=pbn-save-20260706-1";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=pbn-manual-resume-20260706-1";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
   readIndex, saveProject, loadProject, deleteProject,
   saveCompleted, readCompletedIndex, loadCompleted, deleteCompleted
-} from "../utils/pbn-store.js?v=pbn-save-20260706-1";
-import { pbnLog } from "../utils/pbn-debug.js?v=pbn-save-20260706-1";
+} from "../utils/pbn-store.js?v=pbn-manual-resume-20260706-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=pbn-manual-resume-20260706-1";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -495,27 +495,39 @@ export function renderBoyamaApp(target, options = {}) {
   function renderRecentGrid() {
     const section = root.querySelector("#pbnRecentSection");
     const grid = root.querySelector("#pbnRecentGrid");
-    const items = sortByUpdatedAt(readIndex());
+    const items = sortByUpdatedAt(readIndex()).filter((item) => item.completed !== true);
     if (!items.length) {
       section.hidden = true;
       return;
     }
     section.hidden = false;
-    grid.innerHTML = items.map((item) => `
+    grid.innerHTML = items.map((item) => {
+      const snapshot = readEmergencySnapshot(item.id);
+      const progress = Math.max(0, Math.min(100, Math.round(Number(item.progress ?? snapshot?.progress ?? 0))));
+      return `
       <div class="pbn-recent-item" data-id="${item.id}">
         <img src="${item.thumbnail}" alt="${escapeHtml(item.name || "Çalışma")}" />
         <span class="pbn-recent-copy">
           <strong>${escapeHtml(item.name || "Boyama çalışması")}</strong>
           <small>${formatRecentTime(item.updatedAt || item.createdAt)}</small>
+          <span class="pbn-recent-progress">${progress}% tamamlandı</span>
         </span>
+        <button type="button" class="pbn-recent-continue" data-continue-id="${item.id}">Devam Et</button>
         <button type="button" class="pbn-recent-delete" data-delete-id="${item.id}" aria-label="Sil">✕</button>
       </div>
-    `).join("");
+    `;
+    }).join("");
 
     grid.querySelectorAll(".pbn-recent-item").forEach((el) => {
       el.addEventListener("click", (event) => {
-        if (event.target.closest("[data-delete-id]")) return;
+        if (event.target.closest("[data-delete-id], [data-continue-id]")) return;
         resumeProject(el.dataset.id);
+      });
+    });
+    grid.querySelectorAll("[data-continue-id]").forEach((btn) => {
+      btn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        resumeProject(btn.dataset.continueId);
       });
     });
     grid.querySelectorAll("[data-delete-id]").forEach((btn) => {

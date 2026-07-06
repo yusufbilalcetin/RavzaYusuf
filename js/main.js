@@ -1,3 +1,3 @@
-import { initApp } from "./core/app.js?v=pbn-save-20260706-1";
+import { initApp } from "./core/app.js?v=pbn-manual-resume-20260706-1";
 
 initApp();
