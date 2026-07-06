@@ -1,4 +1,4 @@
-import { pbnLog } from "./pbn-debug.js?v=boyama-completed-20260706-1";
+import { pbnLog } from "./pbn-debug.js?v=pbn-save-20260706-1";
 
 const OUTLINE_RGB = [70, 70, 78];
 const OUTLINE_CSS = `rgb(${OUTLINE_RGB[0]},${OUTLINE_RGB[1]},${OUTLINE_RGB[2]})`;
@@ -517,6 +517,9 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   function emitPaintBatched() {
     pendingPaintCount++;
     if (paintEmitRafId != null) return;
+    const immediateCount = pendingPaintCount;
+    pendingPaintCount = 0;
+    onChange({ type: "paint", count: immediateCount });
     paintEmitRafId = requestAnimationFrame(flushPaintEvents);
   }
 

@@ -1,8 +1,8 @@
 import { loadLayoutPartials } from "./partial-loader.js";
-import { initRouter, navigate } from "./router.js?v=boyama-completed-20260706-1";
+import { initRouter, navigate } from "./router.js?v=pbn-save-20260706-1";
 import { installCompatibility } from "./compatibility.js?v=fit-visible-20260704";
 import { installAppShellScrollBridge } from "./app-shell-scroll.js";
-import { pbnLog } from "../utils/pbn-debug.js?v=boyama-completed-20260706-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=pbn-save-20260706-1";
 
 // Reload/çökme teşhisi: bu dinleyiciler YALNIZ loglar — hiçbir yönlendirme yapmaz.
 function installDiagnostics() {
@@ -29,9 +29,15 @@ async function tryResumeBoyama() {
   if (!projectId || route !== "oyun:boyama") return false;
 
   try {
-    const { loadProject } = await import("../utils/pbn-store.js?v=boyama-completed-20260706-1");
+    const { loadProject } = await import("../utils/pbn-store.js?v=pbn-save-20260706-1");
     const record = await loadProject(projectId);
-    if (!record) return false;
+    if (!record) {
+      try {
+        localStorage.removeItem("pbnActiveProjectId");
+        localStorage.removeItem("pbnActiveRoute");
+      } catch { /* private mode */ }
+      return false;
+    }
     pbnLog("boot.autoResume", { projectId });
     await navigate("oyun");
     // initOyun (navigate ile çalıştı) bu global'i tanımlar; boyama'yı açıp resume eder.

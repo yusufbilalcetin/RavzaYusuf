@@ -1,10 +1,10 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-completed-20260706-1";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=pbn-save-20260706-1";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
   readIndex, saveProject, loadProject, deleteProject,
   saveCompleted, readCompletedIndex, loadCompleted, deleteCompleted
-} from "../utils/pbn-store.js?v=boyama-completed-20260706-1";
-import { pbnLog } from "../utils/pbn-debug.js?v=boyama-completed-20260706-1";
+} from "../utils/pbn-store.js?v=pbn-save-20260706-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=pbn-save-20260706-1";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -35,6 +35,84 @@ function clearActiveProject() {
     localStorage.removeItem("pbnActiveProjectId");
     localStorage.removeItem("pbnActiveRoute");
   } catch { /* private mode */ }
+}
+
+const EMERGENCY_SNAPSHOT_PREFIX = "pbnEmergencySnapshot:";
+
+function emergencySnapshotKey(id) {
+  return `${EMERGENCY_SNAPSHOT_PREFIX}${id}`;
+}
+
+function clearEmergencySnapshot(id) {
+  if (!id) return;
+  try {
+    localStorage.removeItem(emergencySnapshotKey(id));
+  } catch { /* private mode */ }
+}
+
+function writeEmergencySnapshot(project) {
+  if (!project?.id || project.completed) return;
+  try {
+    localStorage.setItem(emergencySnapshotKey(project.id), JSON.stringify({
+      id: project.id,
+      paintedRegionIds: Array.isArray(project.paintedRegionIds) ? project.paintedRegionIds : [],
+      updatedAt: Number(project.updatedAt) || Date.now(),
+      progress: Number(project.progress ?? 0),
+      selectedNumber: project.selectedNumber ?? null,
+      activeRoute: localStorage.getItem("pbnActiveRoute") || "oyun:boyama"
+    }));
+  } catch (error) {
+    console.warn("[PBN SAVE] emergency snapshot failed", error);
+  }
+}
+
+function readEmergencySnapshot(id) {
+  if (!id) return null;
+  try {
+    const raw = localStorage.getItem(emergencySnapshotKey(id));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.id !== id || !Array.isArray(parsed.paintedRegionIds)) return null;
+    return {
+      id,
+      paintedRegionIds: [...new Set(parsed.paintedRegionIds
+        .map((value) => Number(value))
+        .filter((value) => Number.isInteger(value) && value >= 0))],
+      updatedAt: Number(parsed.updatedAt) || 0,
+      progress: Number(parsed.progress ?? 0),
+      selectedNumber: parsed.selectedNumber ?? null,
+      activeRoute: parsed.activeRoute || null
+    };
+  } catch (error) {
+    console.warn("[PBN SAVE] emergency snapshot ignored", error);
+    clearEmergencySnapshot(id);
+    return null;
+  }
+}
+
+function mergeEmergencySnapshot(record) {
+  if (!record?.id || record.completed) return { record, merged: false };
+  const snapshot = readEmergencySnapshot(record.id);
+  if (!snapshot) return { record, merged: false };
+
+  const snapshotCount = snapshot.paintedRegionIds?.length || 0;
+  const recordCount = record.paintedRegionIds?.length || 0;
+  const snapshotUpdatedAt = Number(snapshot.updatedAt) || 0;
+  const recordUpdatedAt = Number(record.updatedAt) || 0;
+  const shouldUseSnapshot = snapshotUpdatedAt > recordUpdatedAt || snapshotCount > recordCount;
+
+  if (!shouldUseSnapshot) return { record, merged: false };
+
+  return {
+    record: {
+      ...record,
+      paintedRegionIds: snapshot.paintedRegionIds,
+      updatedAt: snapshotUpdatedAt || record.updatedAt,
+      progress: Number.isFinite(snapshot.progress) ? snapshot.progress : record.progress,
+      selectedNumber: snapshot.selectedNumber ?? record.selectedNumber ?? null
+    },
+    merged: true
+  };
 }
 
 const DIFFICULTY_PRESETS = {
@@ -333,6 +411,7 @@ export function renderBoyamaApp(target, options = {}) {
   let activeWorker = null;
   let resultBlob = null;
   let resultBlobPromise = null;
+  let resultScreenOpening = false;
   // Tamamlanan bir boyamayı "Görüntüle" ile açtığımızda true olur: bu modda
   // eser tekrar "Son çalışmalar" (yarım işler) listesine yazılmaz.
   let viewingCompleted = false;
@@ -442,20 +521,29 @@ export function renderBoyamaApp(target, options = {}) {
     grid.querySelectorAll("[data-delete-id]").forEach((btn) => {
       btn.addEventListener("click", async (event) => {
         event.stopPropagation();
-        await deleteProject(btn.dataset.deleteId);
+        const id = btn.dataset.deleteId;
+        clearEmergencySnapshot(id);
+        if (currentProject?.id === id) clearActiveProject();
+        await deleteProject(id);
         renderRecentGrid();
       });
     });
   }
 
   async function resumeProject(id) {
-    const record = await loadProject(id);
-    if (!record) {
+    const loadedRecord = await loadProject(id);
+    if (!loadedRecord) {
       pbnLog("resumeProject.missing", { id });
       clearActiveProject();
       return false;
     }
+    const { record, merged } = mergeEmergencySnapshot(loadedRecord);
+    console.warn("[PBN SAVE DEBUG] resume loaded", {
+      projectId: record?.id,
+      paintedCount: record?.paintedRegionIds?.length
+    });
     currentProject = record;
+    resultScreenOpening = false;
     viewingCompleted = false;
     showScreen("paint", "resume");
     markActiveProject(record.id);
@@ -481,6 +569,7 @@ export function renderBoyamaApp(target, options = {}) {
     renderPalette(record.palette);
     updatePaletteChips();
     updateProgressUi();
+    if (merged) await saveProjectNow("resume-emergency-merge");
     requestAnimationFrame(() => requestAnimationFrame(() => engine.zoomReset()));
     return true;
   }
@@ -539,6 +628,7 @@ export function renderBoyamaApp(target, options = {}) {
       return false;
     }
     currentProject = record;
+    resultScreenOpening = false;
     viewingCompleted = true;
     showScreen("paint", "open-completed");
     // Tamamlanan eser bir "yarım iş" değildir: reload'da devam hedefi yapılmaz.
@@ -626,6 +716,8 @@ export function renderBoyamaApp(target, options = {}) {
     if (!id) return;
     try {
       await deleteCompleted(id);
+      clearEmergencySnapshot(id);
+      if (currentProject?.id === id) clearActiveProject();
     } catch (error) {
       console.error("Tamamlanan boyama silinemedi:", error);
       showAppError("Boyama silinemedi. Lütfen tekrar deneyin.");
@@ -790,15 +882,18 @@ export function renderBoyamaApp(target, options = {}) {
       palette: msg.palette,
       regions: msg.regions,
       paintedRegionIds: [],
+      progress: 0,
+      selectedNumber: msg.palette[0]?.number ?? null,
       thumbnail: makeThumbnail()
     };
+    resultScreenOpening = false;
     viewingCompleted = false;
 
     markActiveProject(id);
     renderPalette(msg.palette);
     updatePaletteChips();
     updateProgressUi();
-    persistProject(true);
+    persistProject(true, "initial-project");
     requestAnimationFrame(() => requestAnimationFrame(() => engine.zoomReset()));
   }
 
@@ -865,6 +960,133 @@ export function renderBoyamaApp(target, options = {}) {
   document.addEventListener("visibilitychange", visibilityHandler);
   window.addEventListener("pagehide", pageHideHandler);
 
+  let saveInFlight = false;
+  let saveAgainAfterCurrent = false;
+  let lastSavePromise = Promise.resolve(false);
+  let lastProjectUpdatedAt = 0;
+
+  function nextProjectUpdatedAt() {
+    const currentUpdatedAt = Number(currentProject?.updatedAt) || 0;
+    lastProjectUpdatedAt = Math.max(Date.now(), currentUpdatedAt, lastProjectUpdatedAt + 1);
+    return lastProjectUpdatedAt;
+  }
+
+  function getCurrentProgressPercent() {
+    return Number(engine?.getProgress?.() ?? currentProject?.progress ?? 0);
+  }
+
+  function buildProjectSaveRecord({ regenThumbnail = false } = {}) {
+    if (!currentProject || !engine || viewingCompleted || currentProject.completed) return null;
+    const paintedRegionIds = engine.getPaintedRegionIds();
+    currentProject.paintedRegionIds = paintedRegionIds;
+    currentProject.updatedAt = nextProjectUpdatedAt();
+    currentProject.progress = getCurrentProgressPercent();
+    currentProject.selectedNumber = engine.getSelectedNumber?.() ?? currentProject.selectedNumber ?? null;
+    if (regenThumbnail) currentProject.thumbnail = makeThumbnail();
+
+    return {
+      ...currentProject,
+      paintedRegionIds: [...paintedRegionIds]
+    };
+  }
+
+  async function verifyProjectSaved(record) {
+    const saved = await loadProject(record.id);
+    const savedCount = saved?.paintedRegionIds?.length || 0;
+    const expectedCount = record.paintedRegionIds?.length || 0;
+    if (!saved || saved.updatedAt !== record.updatedAt || savedCount !== expectedCount) {
+      throw new Error(`IndexedDB verification failed for ${record.id}`);
+    }
+  }
+
+  async function runSaveQueue(reason, firstRecord) {
+    let nextReason = reason;
+    let record = firstRecord;
+    try {
+      while (record) {
+        saveAgainAfterCurrent = false;
+        console.warn("[PBN SAVE DEBUG] save start", {
+          projectId: record?.id,
+          paintedCount: record?.paintedRegionIds?.length
+        });
+        await saveProject(record);
+        await verifyProjectSaved(record);
+        console.warn("[PBN SAVE DEBUG] save success", {
+          projectId: record?.id,
+          paintedCount: record?.paintedRegionIds?.length
+        });
+        pbnLog("saveProjectNow.ok", { reason: nextReason, id: record.id, painted: record.paintedRegionIds.length });
+
+        if (!saveAgainAfterCurrent) return true;
+        nextReason = "queued-after-current";
+        record = buildProjectSaveRecord({ regenThumbnail: false });
+        if (record) writeEmergencySnapshot(record);
+      }
+      return false;
+    } catch (error) {
+      console.error("[PBN SAVE] failed", nextReason, error);
+      pbnLog("saveProjectNow.error", { reason: nextReason, error });
+      if (!saveErrorShown) {
+        saveErrorShown = true;
+        showAppError("Ilerleme kaydedilemedi. Lutfen sayfayi kapatmadan tekrar deneyin.");
+      }
+      return false;
+    } finally {
+      saveInFlight = false;
+    }
+  }
+
+  function saveProjectNow(reason = "unknown", options = {}) {
+    if (!currentProject || !engine || viewingCompleted || currentProject.completed) return Promise.resolve(false);
+    clearTimeout(saveTimer);
+    saveTimer = null;
+
+    const record = buildProjectSaveRecord({ regenThumbnail: Boolean(options.regenThumbnail) });
+    if (!record) return Promise.resolve(false);
+    writeEmergencySnapshot(record);
+
+    if (saveInFlight) {
+      saveAgainAfterCurrent = true;
+      return lastSavePromise;
+    }
+
+    saveInFlight = true;
+    lastSavePromise = runSaveQueue(reason, record);
+    return lastSavePromise;
+  }
+
+  function persistProject(regenThumbnail, reason = "persist") {
+    return saveProjectNow(reason, { regenThumbnail });
+  }
+
+  function doPersist(regenThumbnail) {
+    return saveProjectNow("legacy-doPersist", { regenThumbnail });
+  }
+
+  function saveLight(reason = "light") {
+    return saveProjectNow(reason, { regenThumbnail: false });
+  }
+
+  function flushSaveImmediately(reason = "flush", options = {}) {
+    pbnLog("flushSaveImmediately", { reason });
+    return saveProjectNow(reason, options);
+  }
+
+  function flushPersist() {
+    return flushSaveImmediately("legacy-flush");
+  }
+
+  const beforeUnloadHandler = () => {
+    pbnLog("beforeunload");
+    flushSaveImmediately("beforeunload");
+  };
+  const blurHandler = () => {
+    pbnLog("blur");
+    flushSaveImmediately("blur");
+  };
+  window.addEventListener("beforeunload", beforeUnloadHandler);
+  window.addEventListener("blur", blurHandler);
+
   /* ---------- palette dock ---------- */
 
   function renderPalette(palette) {
@@ -882,13 +1104,23 @@ export function renderBoyamaApp(target, options = {}) {
 
     strip.querySelectorAll(".pbn-swatch").forEach((chip) => {
       chip.addEventListener("click", () => {
-        engine.selectNumber(Number(chip.dataset.number));
-        highlightPaletteNumber(Number(chip.dataset.number));
+        const selected = Number(chip.dataset.number);
+        engine.selectNumber(selected);
+        highlightPaletteNumber(selected);
+        if (currentProject && !viewingCompleted) {
+          currentProject.selectedNumber = selected;
+          saveLight("color-select");
+        }
       });
     });
 
     const firstNumber = palette[0]?.number;
-    if (firstNumber != null) highlightPaletteNumber(firstNumber);
+    const savedNumber = Number(currentProject?.selectedNumber);
+    const selectedNumber = palette.some((item) => item.number === savedNumber) ? savedNumber : firstNumber;
+    if (selectedNumber != null) {
+      engine.selectNumber(selectedNumber);
+      highlightPaletteNumber(selectedNumber);
+    }
   }
 
   function highlightPaletteNumber(number) {
@@ -958,13 +1190,17 @@ export function renderBoyamaApp(target, options = {}) {
     viewport.__pbnEngine = engine;
     engine.setOnChange((event) => {
       if (event.type === "paint") {
+        console.warn("[PBN SAVE DEBUG] paint event", {
+          projectId: currentProject?.id,
+          paintedCount: engine?.getPaintedRegionIds?.().length
+        });
         updateProgressUi();
         updatePaletteChips();
         autoAdvanceIfComplete();
         if (engine.isComplete()) {
           showResultScreen();
         } else {
-          persistProject(false);
+          persistProject(false, "paint");
         }
       } else if (event.type === "wrong") {
         viewport.classList.add("is-shaking");
@@ -976,12 +1212,12 @@ export function renderBoyamaApp(target, options = {}) {
         if (engine.isComplete()) {
           showResultScreen();
         } else {
-          persistProject(false);
+          persistProject(false, "redo");
         }
       } else {
         updateProgressUi();
         updatePaletteChips();
-        persistProject(false);
+        persistProject(false, event.type || "change");
       }
     });
 
@@ -1038,14 +1274,19 @@ export function renderBoyamaApp(target, options = {}) {
     });
     root.querySelector("#pbnMenuNewPhoto").addEventListener("click", () => {
       closePaintMenu();
+      flushSaveImmediately("new-photo", { regenThumbnail: true });
       root.querySelector("#pbnFileInput").click();
     });
   }
 
   /* ---------- result ---------- */
 
-  async function showResultScreen() {
+  async function showResultScreen(completionSavePromise = null) {
+    if (resultScreenOpening) return;
+    resultScreenOpening = true;
     clearTimeout(saveTimer); // bekleyen proje kaydı iptal — eser tamamlandı
+    saveTimer = null;
+    const completionSave = completionSavePromise || flushSaveImmediately("complete-before-result");
     const resultImg = root.querySelector("#pbnResultImage");
     resultImg.src = engine.exportPaintedDataUrl();
     resultBlob = null;
@@ -1071,6 +1312,8 @@ export function renderBoyamaApp(target, options = {}) {
     if (currentProject) {
       try {
         // Eser %100 bitti: "Tamamlanan Boyamalar" kategorisine arşivle.
+        await completionSave;
+        const completedProjectId = currentProject.id;
         currentProject.paintedRegionIds = engine.getPaintedRegionIds();
         currentProject.completed = true;
         currentProject.completedAt = Date.now();
@@ -1084,7 +1327,9 @@ export function renderBoyamaApp(target, options = {}) {
         };
         await saveCompleted(completedRecord);
         // Tamamlanan iş artık yarım işler (Son çalışmalar) listesinde durmaz.
-        await deleteProject(currentProject.id);
+        await deleteProject(completedProjectId);
+        clearEmergencySnapshot(completedProjectId);
+        currentProject = null;
         renderRecentGrid();
         renderCompletedGrid();
       } catch (error) {
@@ -1187,6 +1432,7 @@ export function renderBoyamaApp(target, options = {}) {
     resumeReady,
     cleanup() {
       pbnLog("boyama.cleanup");
+      const cleanupSave = flushSaveImmediately("cleanup-before-destroy", { regenThumbnail: true });
       engine?.destroy();
       if (activeWorker) { activeWorker.terminate(); activeWorker = null; }
       clearTimeout(saveTimer);
@@ -1198,7 +1444,10 @@ export function renderBoyamaApp(target, options = {}) {
       document.body.classList.remove("pbn-modal-open");
       deleteModalEl?.remove();
       window.removeEventListener("pagehide", pageHideHandler);
+      window.removeEventListener("beforeunload", beforeUnloadHandler);
+      window.removeEventListener("blur", blurHandler);
       if (window.__pbnResumeProject) delete window.__pbnResumeProject;
+      return cleanupSave;
     }
   };
 }

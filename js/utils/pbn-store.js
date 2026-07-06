@@ -1,4 +1,4 @@
-import { pbnLog } from "./pbn-debug.js?v=boyama-completed-20260706-1";
+import { pbnLog } from "./pbn-debug.js?v=pbn-save-20260706-1";
 
 const DB_NAME = "pbnStudio";
 const DB_VERSION = 3;

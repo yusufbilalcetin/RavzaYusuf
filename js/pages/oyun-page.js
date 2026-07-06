@@ -1,6 +1,6 @@
 import { createGameAudio } from "../utils/game-audio.js";
-import { renderBoyamaApp } from "./boyama-page.js?v=boyama-completed-20260706-1";
-import { pbnLog } from "../utils/pbn-debug.js?v=boyama-completed-20260706-1";
+import { renderBoyamaApp } from "./boyama-page.js?v=pbn-save-20260706-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=pbn-save-20260706-1";
 
 const GAME_META = {
   "boyama": {
