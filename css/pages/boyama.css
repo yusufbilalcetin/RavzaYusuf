@@ -1253,3 +1253,290 @@ body.dark .pbn-canvas-stage canvas {
     height: 32px;
   }
 }
+
+/* =========================================================
+   TAMAMLANAN BOYAMALAR — %100 galeri kartları
+   ========================================================= */
+
+.pbn-screen-home .pbn-completed {
+  padding: clamp(18px, 2.5vw, 24px);
+  border: 1px solid var(--pbn-panel-border);
+  border-radius: 24px;
+  background: var(--pbn-panel);
+  box-shadow: var(--pbn-panel-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.pbn-completed[hidden] { display: none; }
+
+.pbn-completed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+.pbn-completed-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--pbn-control-bg);
+  border: 1px solid var(--pbn-control-border);
+  border-radius: 20px;
+  box-shadow: none;
+  transition: transform .5s var(--pbn-ease), box-shadow .5s var(--pbn-ease), border-color .5s var(--pbn-ease);
+}
+.pbn-completed-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--pbn-panel-shadow-hover);
+  border-color: color-mix(in srgb, var(--pink-bright) 55%, var(--pbn-control-border));
+}
+
+.pbn-completed-thumb {
+  position: relative;
+  padding: 8px 8px 0;
+}
+.pbn-completed-thumb img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px;
+  background: var(--input-bg);
+}
+.pbn-completed-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--success, #10b981), #34d399);
+  box-shadow: 0 6px 16px -6px rgba(16, 185, 129, .7);
+}
+
+.pbn-completed-body {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px 6px;
+}
+.pbn-completed-name {
+  color: var(--text);
+  font-size: .95rem;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pbn-completed-meta {
+  color: var(--text-light);
+  font-size: .76rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pbn-completed-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  padding: 10px 14px 14px;
+}
+.pbn-completed-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: .82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .35s var(--pbn-ease), background .35s var(--pbn-ease), box-shadow .35s var(--pbn-ease), border-color .35s var(--pbn-ease), color .35s var(--pbn-ease);
+}
+.pbn-completed-btn:active { transform: scale(.96); }
+
+.pbn-completed-btn--view {
+  color: #fff;
+  background: linear-gradient(135deg, var(--pink-bright, #e879a0), var(--pink, #d4669c));
+  box-shadow: 0 12px 26px -14px rgba(212, 102, 156, .9);
+}
+.pbn-completed-btn--view:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -14px rgba(212, 102, 156, 1); }
+
+.pbn-completed-btn--download {
+  color: var(--text);
+  background: var(--pbn-selected-bg);
+  border-color: var(--pbn-control-border);
+}
+.pbn-completed-btn--download:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--pbn-selected-bg) 72%, var(--pink-bright));
+}
+
+.pbn-completed-btn--delete {
+  padding: 0 12px;
+  color: #e11d48;
+  background: color-mix(in srgb, #f43f5e 12%, transparent);
+  border-color: color-mix(in srgb, #f43f5e 34%, transparent);
+}
+.pbn-completed-btn--delete:hover {
+  transform: translateY(-2px);
+  color: #fff;
+  background: linear-gradient(135deg, #fb5c74, #e11d48);
+  border-color: transparent;
+}
+
+body.dark .pbn-completed-btn--delete { color: #ff8195; }
+body.dark .pbn-completed-btn--delete:hover { color: #fff; }
+
+/* =========================================================
+   SİLME ONAY POP-UP'I (temaya uygun premium modal)
+   ========================================================= */
+
+.pbn-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  /* Oyun tam-ekran üst barı (.game-stage-head) z-index 9020'de; modal body'ye
+     taşındığı için oyun sahnesinin (z 9000) de üstünde olmalı. */
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 12, 22, .55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: pbnModalFade .28s var(--pbn-ease) both;
+}
+.pbn-modal-backdrop[hidden] { display: none; }
+
+/* Modal açıkken arka plandaki oyun gövdesi kaymasın. */
+body.pbn-modal-open .game-stage-body { overflow: hidden; }
+
+.pbn-modal {
+  position: relative;
+  width: min(100%, 400px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  text-align: center;
+  padding: 30px 26px 24px;
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .06), transparent 40%),
+    var(--pbn-panel-strong, #fff);
+  border: 1px solid var(--pbn-panel-border);
+  box-shadow:
+    0 40px 90px -30px rgba(10, 8, 24, .7),
+    inset 0 1px 0 rgba(255, 255, 255, .18);
+  color: var(--text);
+  animation: pbnModalPop .34s var(--pbn-ease-pop) both;
+}
+
+.pbn-modal-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  background: color-mix(in srgb, #f43f5e 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f43f5e 32%, transparent);
+}
+.pbn-modal h3 {
+  margin: 0 0 8px;
+  font-size: 1.28rem;
+  letter-spacing: -.01em;
+  color: var(--text);
+}
+.pbn-modal p {
+  margin: 0 0 22px;
+  color: var(--text-light);
+  font-size: .92rem;
+  line-height: 1.55;
+}
+
+.pbn-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.pbn-modal-btn {
+  flex: 1 1 0;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: .96rem;
+  cursor: pointer;
+  transition: transform .35s var(--pbn-ease), background .35s var(--pbn-ease), box-shadow .35s var(--pbn-ease), border-color .35s var(--pbn-ease);
+}
+.pbn-modal-btn:active { transform: scale(.97); }
+
+.pbn-modal-btn--ghost {
+  color: var(--text);
+  background: var(--pbn-control-bg);
+  border-color: var(--pbn-control-border);
+}
+.pbn-modal-btn--ghost:hover {
+  transform: translateY(-2px);
+  background: var(--pbn-selected-bg);
+}
+
+.pbn-modal-btn--danger {
+  color: #fff;
+  background: linear-gradient(135deg, #fb5c74, #e11d48);
+  box-shadow: 0 16px 34px -14px rgba(225, 29, 72, .85);
+}
+.pbn-modal-btn--danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -14px rgba(225, 29, 72, 1);
+}
+
+.pbn-modal-btn:focus-visible,
+.pbn-completed-btn:focus-visible {
+  outline: 3px solid rgba(232, 121, 160, .58);
+  outline-offset: 3px;
+}
+
+@keyframes pbnModalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pbnModalPop {
+  from { opacity: 0; transform: translateY(14px) scale(.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pbn-modal-backdrop,
+  .pbn-modal { animation: none; }
+}
+
+@media (max-width: 720px) {
+  .pbn-screen-home .pbn-completed {
+    padding: 16px;
+    border-radius: 20px;
+  }
+  .pbn-completed-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .pbn-completed-thumb img { aspect-ratio: 16 / 9; }
+  .pbn-modal { padding: 26px 20px 20px; border-radius: 22px; }
+  .pbn-modal-actions { flex-direction: column-reverse; }
+  .pbn-modal-btn { width: 100%; }
+}
+
+@media (max-width: 420px) {
+  .pbn-completed-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pbn-completed-btn--delete {
+    grid-column: 1 / -1;
+  }
+}

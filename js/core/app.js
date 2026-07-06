@@ -1,8 +1,8 @@
 import { loadLayoutPartials } from "./partial-loader.js";
-import { initRouter, navigate } from "./router.js?v=boyama-safari-autosave-20260706-4";
+import { initRouter, navigate } from "./router.js?v=boyama-completed-20260706-1";
 import { installCompatibility } from "./compatibility.js?v=fit-visible-20260704";
 import { installAppShellScrollBridge } from "./app-shell-scroll.js";
-import { pbnLog } from "../utils/pbn-debug.js?v=boyama-safari-autosave-20260706-4";
+import { pbnLog } from "../utils/pbn-debug.js?v=boyama-completed-20260706-1";
 
 // Reload/çökme teşhisi: bu dinleyiciler YALNIZ loglar — hiçbir yönlendirme yapmaz.
 function installDiagnostics() {
@@ -29,7 +29,7 @@ async function tryResumeBoyama() {
   if (!projectId || route !== "oyun:boyama") return false;
 
   try {
-    const { loadProject } = await import("../utils/pbn-store.js?v=boyama-safari-autosave-20260706-4");
+    const { loadProject } = await import("../utils/pbn-store.js?v=boyama-completed-20260706-1");
     const record = await loadProject(projectId);
     if (!record) return false;
     pbnLog("boot.autoResume", { projectId });

@@ -1,4 +1,4 @@
-import { pbnLog } from "./pbn-debug.js?v=boyama-safari-autosave-20260706-4";
+import { pbnLog } from "./pbn-debug.js?v=boyama-completed-20260706-1";
 
 const OUTLINE_RGB = [70, 70, 78];
 const OUTLINE_CSS = `rgb(${OUTLINE_RGB[0]},${OUTLINE_RGB[1]},${OUTLINE_RGB[2]})`;

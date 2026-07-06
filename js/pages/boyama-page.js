@@ -1,9 +1,10 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-safari-autosave-20260706-4";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=boyama-completed-20260706-1";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
-  readIndex, saveProject, loadProject, deleteProject
-} from "../utils/pbn-store.js?v=boyama-safari-autosave-20260706-4";
-import { pbnLog } from "../utils/pbn-debug.js?v=boyama-safari-autosave-20260706-4";
+  readIndex, saveProject, loadProject, deleteProject,
+  saveCompleted, readCompletedIndex, loadCompleted, deleteCompleted
+} from "../utils/pbn-store.js?v=boyama-completed-20260706-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=boyama-completed-20260706-1";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -104,6 +105,16 @@ function formatRecentTime(value) {
     month: "short",
     hour: "2-digit",
     minute: "2-digit"
+  });
+}
+
+// Tamamlanma tarihi kartlarda "06.07.2026" biçiminde gösterilir.
+function formatCompletedDate(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleDateString("tr-TR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
   });
 }
 
@@ -212,6 +223,17 @@ const TEMPLATE = `
         </div>
         <div class="pbn-recent-grid" id="pbnRecentGrid"></div>
       </div>
+
+      <div class="pbn-completed" id="pbnCompletedSection" hidden>
+        <div class="pbn-section-head">
+          <div>
+            <h3>Tamamlanan Boyamalar</h3>
+            <p>%100 bitirdiğin eserler burada saklanır. İstediğin zaman görüntüle, indir veya sil.</p>
+          </div>
+          <span id="pbnCompletedCount"></span>
+        </div>
+        <div class="pbn-completed-grid" id="pbnCompletedGrid"></div>
+      </div>
     </div>
 
     <div class="pbn-screen pbn-screen-analysis" data-pbn-screen="analysis">
@@ -284,6 +306,18 @@ const TEMPLATE = `
         </div>
       </div>
     </div>
+
+    <div class="pbn-modal-backdrop" id="pbnDeleteModal" hidden>
+      <div class="pbn-modal" role="dialog" aria-modal="true" aria-labelledby="pbnDeleteTitle" aria-describedby="pbnDeleteDesc">
+        <span class="pbn-modal-icon" aria-hidden="true">🗑️</span>
+        <h3 id="pbnDeleteTitle">Boyamayı Sil?</h3>
+        <p id="pbnDeleteDesc">Bu tamamlanan boyama kalıcı olarak silinecek. Bu işlem geri alınamaz.</p>
+        <div class="pbn-modal-actions">
+          <button type="button" class="pbn-modal-btn pbn-modal-btn--ghost" id="pbnDeleteCancel">İptal</button>
+          <button type="button" class="pbn-modal-btn pbn-modal-btn--danger" id="pbnDeleteConfirm">Evet, Sil</button>
+        </div>
+      </div>
+    </div>
   </div>
 `;
 
@@ -299,6 +333,18 @@ export function renderBoyamaApp(target, options = {}) {
   let activeWorker = null;
   let resultBlob = null;
   let resultBlobPromise = null;
+  // Tamamlanan bir boyamayı "Görüntüle" ile açtığımızda true olur: bu modda
+  // eser tekrar "Son çalışmalar" (yarım işler) listesine yazılmaz.
+  let viewingCompleted = false;
+  // Silme onay pop-up'ında bekleyen tamamlanan boyama id'si.
+  let pendingDeleteId = null;
+  // Silme modalı, oyun tam-ekran üst barının (.game-stage-head, z-index 9020)
+  // arkasında kalmasın diye document.body'ye taşınır: böylece oyun sahnesinin
+  // (.game-stage-body 9001) stacking context'inin dışına çıkar ve her şeyin
+  // üstünde görünür. (Aksi hâlde modalın kendi z-index'i ne olursa olsun üst
+  // bar onu örter.)
+  const deleteModalEl = root.querySelector("#pbnDeleteModal");
+  if (deleteModalEl) document.body.appendChild(deleteModalEl);
   const phoneSaveCopy = getPhoneSaveCopy();
 
   let appErrorTimer = null;
@@ -322,8 +368,10 @@ export function renderBoyamaApp(target, options = {}) {
   wireHome();
   wirePaintScreen();
   wireResultScreen();
+  wireDeleteModal();
   applyPhoneSaveLabels();
   renderRecentGrid();
+  renderCompletedGrid();
 
   function showScreen(name, reason = "") {
     pbnLog("showScreen", name, "reason:", reason);
@@ -408,6 +456,7 @@ export function renderBoyamaApp(target, options = {}) {
       return false;
     }
     currentProject = record;
+    viewingCompleted = false;
     showScreen("paint", "resume");
     markActiveProject(record.id);
 
@@ -434,6 +483,164 @@ export function renderBoyamaApp(target, options = {}) {
     updateProgressUi();
     requestAnimationFrame(() => requestAnimationFrame(() => engine.zoomReset()));
     return true;
+  }
+
+  /* ---------- tamamlanan boyamalar ---------- */
+
+  function renderCompletedGrid() {
+    const section = root.querySelector("#pbnCompletedSection");
+    const grid = root.querySelector("#pbnCompletedGrid");
+    const count = root.querySelector("#pbnCompletedCount");
+    if (!section || !grid) return;
+    const items = readCompletedIndex();
+    if (!items.length) {
+      section.hidden = true;
+      grid.innerHTML = "";
+      return;
+    }
+    section.hidden = false;
+    if (count) count.textContent = `${items.length} eser`;
+    grid.innerHTML = items.map((item) => {
+      const name = escapeHtml(item.name || "Boyama çalışması");
+      return `
+      <article class="pbn-completed-card" data-id="${item.id}">
+        <div class="pbn-completed-thumb">
+          <img src="${item.thumbnail}" alt="${name}" loading="lazy" />
+          <span class="pbn-completed-badge">%100</span>
+        </div>
+        <div class="pbn-completed-body">
+          <strong class="pbn-completed-name">${name}</strong>
+          <span class="pbn-completed-meta">%100 tamamlandı · ${formatCompletedDate(item.completedAt)}</span>
+        </div>
+        <div class="pbn-completed-actions">
+          <button type="button" class="pbn-completed-btn pbn-completed-btn--view" data-view-id="${item.id}">Görüntüle</button>
+          <button type="button" class="pbn-completed-btn pbn-completed-btn--download" data-download-id="${item.id}">İndir</button>
+          <button type="button" class="pbn-completed-btn pbn-completed-btn--delete" data-delete-id="${item.id}" data-name="${name}">Sil</button>
+        </div>
+      </article>`;
+    }).join("");
+
+    grid.querySelectorAll("[data-view-id]").forEach((btn) => {
+      btn.addEventListener("click", () => openCompleted(btn.dataset.viewId));
+    });
+    grid.querySelectorAll("[data-download-id]").forEach((btn) => {
+      btn.addEventListener("click", () => downloadCompleted(btn.dataset.downloadId));
+    });
+    grid.querySelectorAll("[data-delete-id]").forEach((btn) => {
+      btn.addEventListener("click", () => openDeleteModal(btn.dataset.deleteId, btn.dataset.name));
+    });
+  }
+
+  async function openCompleted(id) {
+    const record = await loadCompleted(id);
+    if (!record) {
+      pbnLog("openCompleted.missing", { id });
+      renderCompletedGrid();
+      return false;
+    }
+    currentProject = record;
+    viewingCompleted = true;
+    showScreen("paint", "open-completed");
+    // Tamamlanan eser bir "yarım iş" değildir: reload'da devam hedefi yapılmaz.
+    clearActiveProject();
+
+    let regionMap, outline;
+    if (record.cellSize) {
+      ({ regionMap, outline } = buildRegionMapAndOutline(record.width, record.height, record.cellSize));
+    } else {
+      regionMap = new Uint32Array(record.regionMapBuffer);
+      outline = new Uint8Array(record.outlineBuffer);
+    }
+
+    engine.setData({
+      width: record.width,
+      height: record.height,
+      regionMap,
+      outline,
+      regions: record.regions,
+      palette: record.palette,
+      cellSize: record.cellSize || 0
+    });
+    engine.setPaintedRegions(record.paintedRegionIds || []);
+    renderPalette(record.palette);
+    updatePaletteChips();
+    updateProgressUi();
+    requestAnimationFrame(() => requestAnimationFrame(() => engine.zoomReset()));
+    return true;
+  }
+
+  async function downloadCompleted(id) {
+    const record = await loadCompleted(id);
+    if (!record) {
+      renderCompletedGrid();
+      return;
+    }
+    let blob = record.resultBlob || null;
+    if (!blob && record.thumbnail) {
+      // Eski/eksik kayıt için düşük çözünürlüklü thumbnail'den blob üret.
+      try { blob = await (await fetch(record.thumbnail)).blob(); } catch { blob = null; }
+    }
+    if (!blob) {
+      showAppError("Bu boyama indirilemedi.");
+      return;
+    }
+    await shareOrDownloadBlob(blob, createPngFilename("tamamlanan-boyama"), { galleryIntent: true });
+  }
+
+  /* ---------- silme onay pop-up'ı ---------- */
+
+  const deleteModalKeydownHandler = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeDeleteModal();
+    }
+  };
+
+  function openDeleteModal(id, name) {
+    pendingDeleteId = id;
+    if (!deleteModalEl) return;
+    const desc = deleteModalEl.querySelector("#pbnDeleteDesc");
+    if (desc) {
+      desc.textContent = name
+        ? `"${name}" adlı tamamlanan boyama kalıcı olarak silinecek. Bu işlem geri alınamaz.`
+        : "Bu tamamlanan boyama kalıcı olarak silinecek. Bu işlem geri alınamaz.";
+    }
+    deleteModalEl.hidden = false;
+    // Modal açıkken arka plan (tamamlananlar listesi) kaymasın.
+    document.body.classList.add("pbn-modal-open");
+    document.addEventListener("keydown", deleteModalKeydownHandler);
+    // Yanlışlıkla silmeyi zorlaştır: odak "İptal" butonunda başlar.
+    requestAnimationFrame(() => deleteModalEl.querySelector("#pbnDeleteCancel")?.focus());
+  }
+
+  function closeDeleteModal() {
+    pendingDeleteId = null;
+    if (deleteModalEl) deleteModalEl.hidden = true;
+    document.body.classList.remove("pbn-modal-open");
+    document.removeEventListener("keydown", deleteModalKeydownHandler);
+  }
+
+  async function confirmDelete() {
+    const id = pendingDeleteId;
+    closeDeleteModal();
+    if (!id) return;
+    try {
+      await deleteCompleted(id);
+    } catch (error) {
+      console.error("Tamamlanan boyama silinemedi:", error);
+      showAppError("Boyama silinemedi. Lütfen tekrar deneyin.");
+    }
+    renderCompletedGrid();
+  }
+
+  function wireDeleteModal() {
+    if (!deleteModalEl) return;
+    // Dışarı (backdrop) tıklama = iptal; yanlışlıkla silme yapmaz.
+    deleteModalEl.addEventListener("click", (event) => {
+      if (event.target === deleteModalEl) closeDeleteModal();
+    });
+    deleteModalEl.querySelector("#pbnDeleteCancel")?.addEventListener("click", closeDeleteModal);
+    deleteModalEl.querySelector("#pbnDeleteConfirm")?.addEventListener("click", confirmDelete);
   }
 
   /* ---------- analysis pipeline ---------- */
@@ -585,6 +792,7 @@ export function renderBoyamaApp(target, options = {}) {
       paintedRegionIds: [],
       thumbnail: makeThumbnail()
     };
+    viewingCompleted = false;
 
     markActiveProject(id);
     renderPalette(msg.palette);
@@ -609,6 +817,8 @@ export function renderBoyamaApp(target, options = {}) {
 
   let saveErrorShown = false;
   function doPersist(regenThumbnail) {
+    // Tamamlanan eseri "Görüntüle" ile izlerken yarım işler deposuna yazma.
+    if (!currentProject || viewingCompleted) return Promise.resolve();
     currentProject.paintedRegionIds = engine.getPaintedRegionIds();
     currentProject.updatedAt = Date.now();
     if (regenThumbnail) currentProject.thumbnail = makeThumbnail();
@@ -777,12 +987,15 @@ export function renderBoyamaApp(target, options = {}) {
 
     root.querySelector("#pbnBackBtn").addEventListener("click", () => {
       // Küçük resmi tazeleyerek son durumu hemen (senkron) yaz.
+      // (viewingCompleted iken doPersist erken döner, tekrar yazmaz.)
       clearTimeout(saveTimer);
       saveTimer = null;
       if (currentProject) doPersist(true);
       clearActiveProject();
+      viewingCompleted = false;
       showScreen("home", "back-button");
       renderRecentGrid();
+      renderCompletedGrid();
     });
     root.querySelector("#pbnUndoBtn").addEventListener("click", () => engine.undo());
     root.querySelector("#pbnRedoBtn").addEventListener("click", () => engine.redo());
@@ -857,11 +1070,25 @@ export function renderBoyamaApp(target, options = {}) {
 
     if (currentProject) {
       try {
-        // Tamamlanan iş artık yarım işler listesinde durmaz.
+        // Eser %100 bitti: "Tamamlanan Boyamalar" kategorisine arşivle.
+        currentProject.paintedRegionIds = engine.getPaintedRegionIds();
+        currentProject.completed = true;
+        currentProject.completedAt = Date.now();
+        currentProject.progress = 100;
+        const completedRecord = {
+          ...currentProject,
+          // Kart için boyanmış (bitmiş) küçük resim; tuval şu an tam boyalı.
+          thumbnail: makeThumbnail(),
+          // Doğrudan tekrar indirme için tam çözünürlüklü boyanmış PNG.
+          resultBlob: resultBlob || null
+        };
+        await saveCompleted(completedRecord);
+        // Tamamlanan iş artık yarım işler (Son çalışmalar) listesinde durmaz.
         await deleteProject(currentProject.id);
         renderRecentGrid();
+        renderCompletedGrid();
       } catch (error) {
-        console.error("Tamamlanan çalışma kaydı temizlenemedi:", error);
+        console.error("Tamamlanan çalışma arşivlenemedi:", error);
       }
     }
   }
@@ -934,8 +1161,10 @@ export function renderBoyamaApp(target, options = {}) {
       await shareOrDownloadBlob(blob, createPngFilename("boyama-galeri"), { galleryIntent: true });
     });
     root.querySelector("#pbnNewFromResultBtn").addEventListener("click", () => {
+      viewingCompleted = false;
       showScreen("home", "new-from-result");
       renderRecentGrid();
+      renderCompletedGrid();
       root.querySelector("#pbnFileInput").click();
     });
   }
@@ -964,6 +1193,10 @@ export function renderBoyamaApp(target, options = {}) {
       clearTimeout(inlineToastTimer);
       document.removeEventListener("click", documentClickHandler);
       document.removeEventListener("visibilitychange", visibilityHandler);
+      document.removeEventListener("keydown", deleteModalKeydownHandler);
+      // Body'ye taşınan modal düğümünü ve scroll-lock'u temizle (sızıntı olmasın).
+      document.body.classList.remove("pbn-modal-open");
+      deleteModalEl?.remove();
       window.removeEventListener("pagehide", pageHideHandler);
       if (window.__pbnResumeProject) delete window.__pbnResumeProject;
     }
