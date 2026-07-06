@@ -79,7 +79,7 @@ export function initOyun(options = {}) {
     root.querySelector("#gameCloseBtn")?.addEventListener("click", () => closeGame(root));
   }
 
-  // Boot'ta yarım boyama işini geri açmak için (app.js -> tryResumeBoyama).
+  // Manual resume entrypoint used by the Boyama "Son Calismalar" action.
   window.__pbnOpenBoyamaResume = async (projectId) => {
     pbnLog("oyun.openBoyamaResume", { projectId });
     openGame(root, "boyama", { resumeProjectId: projectId });

@@ -21,8 +21,8 @@ function scaledDetailWidth(baseCols) {
   return Math.round(baseCols * DETAIL_WIDTH_SCALE);
 }
 
-// pbnActiveProjectId/pbnActiveRoute: reload/çökme sonrası boot'ta otomatik devam
-// için "şu an boyama ekranındayız ve aktif proje şu" işareti.
+// pbnActiveProjectId/pbnActiveRoute are save/snapshot markers only.
+// They must not be used by boot code to reopen Boyama automatically.
 function markActiveProject(id) {
   try {
     localStorage.setItem("pbnActiveProjectId", id);
@@ -1426,8 +1426,8 @@ export function renderBoyamaApp(target, options = {}) {
     });
   }
 
-  // Boot'ta otomatik devam: app.js -> oyun-page -> renderBoyamaApp(options).
-  // resumeReady, resume tamamlandığında true döner (app.js bunu bekler).
+  // Manual resume: oyun-page passes resumeProjectId after the user clicks Devam Et.
+  // resumeReady resolves when that manual resume attempt finishes.
   let resolveResumeReady;
   const resumeReady = new Promise((resolve) => { resolveResumeReady = resolve; });
   if (options.resumeProjectId) {
@@ -1437,7 +1437,7 @@ export function renderBoyamaApp(target, options = {}) {
   } else {
     resolveResumeReady(false);
   }
-  // app.js'in boot'ta doğrudan çağırabilmesi için (navigate sonrası).
+  // Kept as a local page-level resume hook while the Boyama view is mounted.
   window.__pbnResumeProject = (id) => resumeProject(id);
 
   return {

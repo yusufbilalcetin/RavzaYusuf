@@ -4,49 +4,17 @@ import { installCompatibility } from "./compatibility.js?v=fit-visible-20260704"
 import { installAppShellScrollBridge } from "./app-shell-scroll.js";
 import { pbnLog } from "../utils/pbn-debug.js?v=pbn-manual-resume-20260706-1";
 
-// Reload/çökme teşhisi: bu dinleyiciler YALNIZ loglar — hiçbir yönlendirme yapmaz.
+// Reload/crash diagnostics only. These listeners must never route the user.
 function installDiagnostics() {
-  window.addEventListener("error", (e) => {
-    pbnLog("window.error", e.message || "", e.filename || "", e.lineno || "");
+  window.addEventListener("error", (event) => {
+    pbnLog("window.error", event.message || "", event.filename || "", event.lineno || "");
   });
-  window.addEventListener("unhandledrejection", (e) => {
-    pbnLog("unhandledrejection", e.reason || "");
+  window.addEventListener("unhandledrejection", (event) => {
+    pbnLog("unhandledrejection", event.reason || "");
   });
-  window.addEventListener("pageshow", (e) => {
-    pbnLog("pageshow", { persisted: e.persisted });
+  window.addEventListener("pageshow", (event) => {
+    pbnLog("pageshow", { persisted: event.persisted });
   });
-}
-
-// Boot'ta yarım boyama işini otomatik geri aç: reload/çökme sonrası kullanıcı
-// dashboard'da uyanmasın, kaldığı yerden devam etsin (istek #5, #6).
-async function tryResumeBoyama() {
-  let projectId = null;
-  let route = null;
-  try {
-    projectId = localStorage.getItem("pbnActiveProjectId");
-    route = localStorage.getItem("pbnActiveRoute");
-  } catch { /* private mode */ }
-  if (!projectId || route !== "oyun:boyama") return false;
-
-  try {
-    const { loadProject } = await import("../utils/pbn-store.js?v=pbn-manual-resume-20260706-1");
-    const record = await loadProject(projectId);
-    if (!record) {
-      try {
-        localStorage.removeItem("pbnActiveProjectId");
-        localStorage.removeItem("pbnActiveRoute");
-      } catch { /* private mode */ }
-      return false;
-    }
-    pbnLog("boot.autoResume", { projectId });
-    await navigate("oyun");
-    // initOyun (navigate ile çalıştı) bu global'i tanımlar; boyama'yı açıp resume eder.
-    const ok = await window.__pbnOpenBoyamaResume?.(projectId);
-    return Boolean(ok);
-  } catch (error) {
-    pbnLog("boot.autoResume.error", error);
-    return false;
-  }
 }
 
 export async function initApp() {
@@ -63,13 +31,14 @@ export async function initApp() {
     initRouter();
     installCompatibility();
     await window.__bootLegacyApp?.();
-    // pbnActiveProjectId yalnÄ±zca kayÄ±t/snapshot baÄŸlamÄ± iÃ§indir.
-    // Site aÃ§Ä±lÄ±ÅŸÄ±nda boyama otomatik aÃ§Ä±lmaz; devam kullanÄ±cÄ± karttan seÃ§ince olur.
+
+    // pbnActiveProjectId is save/snapshot context only. Opening a project is
+    // intentionally user-initiated from the Boyama "Son Calismalar" list.
     pbnLog("boot.navigate", "ana-sayfa");
     await navigate("ana-sayfa");
   } catch (error) {
     console.error(error);
     const root = document.getElementById("page-root");
-    if (root) root.innerHTML = '<div class="empty-grid">Sayfa yüklenemedi. Lütfen tekrar deneyin.</div>';
+    if (root) root.innerHTML = '<div class="empty-grid">Sayfa y&uuml;klenemedi. L&uuml;tfen tekrar deneyin.</div>';
   }
 }
