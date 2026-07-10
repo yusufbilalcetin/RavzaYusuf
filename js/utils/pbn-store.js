@@ -1,4 +1,4 @@
-import { pbnLog } from "./pbn-debug.js?v=pbn-manual-resume-20260706-1";
+import { pbnLog } from "./pbn-debug.js?v=alan-bulmacasi-20260710-1";
 
 const DB_NAME = "pbnStudio";
 const DB_VERSION = 3;

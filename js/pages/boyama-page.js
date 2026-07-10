@@ -1,10 +1,10 @@
-import { createPbnEngine } from "../utils/pbn-canvas.js?v=pbn-manual-resume-20260706-1";
+import { createPbnEngine } from "../utils/pbn-canvas.js?v=alan-bulmacasi-20260710-1";
 import { buildRegionMapAndOutline } from "../utils/pbn-grid.js?v=fit-visible-20260704";
 import {
   readIndex, saveProject, loadProject, deleteProject,
   saveCompleted, readCompletedIndex, loadCompleted, deleteCompleted
-} from "../utils/pbn-store.js?v=pbn-manual-resume-20260706-1";
-import { pbnLog } from "../utils/pbn-debug.js?v=pbn-manual-resume-20260706-1";
+} from "../utils/pbn-store.js?v=alan-bulmacasi-20260710-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.

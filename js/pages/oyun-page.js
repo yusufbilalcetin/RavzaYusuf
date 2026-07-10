@@ -1,7 +1,7 @@
 import { createGameAudio } from "../utils/game-audio.js";
 import { renderRenkSiralamaGame } from "../games/renk-siralama.js";
-import { renderBoyamaApp } from "./boyama-page.js?v=pbn-manual-resume-20260706-1";
-import { pbnLog } from "../utils/pbn-debug.js?v=pbn-manual-resume-20260706-1";
+import { renderBoyamaApp } from "./boyama-page.js?v=alan-bulmacasi-20260710-1";
+import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
 
 const GAME_META = {
   "boyama": {
