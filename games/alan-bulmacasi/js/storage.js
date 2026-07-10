@@ -1,3 +1,5 @@
+import { TOTAL_LEVELS } from "./level-meta.js";
+
 export const STORAGE_KEY = "ravza_shikaku_game_v1";
 const CURRENT_VERSION = 1;
 
@@ -27,8 +29,8 @@ function migrate(value) {
     soundEnabled: value.soundEnabled !== false,
     tutorialSeen: value.tutorialSeen === true
   };
-  migrated.currentLevel = Math.min(30, Math.max(1, migrated.currentLevel));
-  migrated.lastUnlocked = Math.min(30, Math.max(1, migrated.lastUnlocked));
+  migrated.currentLevel = Math.min(TOTAL_LEVELS, Math.max(1, migrated.currentLevel));
+  migrated.lastUnlocked = Math.min(TOTAL_LEVELS, Math.max(1, migrated.lastUnlocked));
   return migrated;
 }
 

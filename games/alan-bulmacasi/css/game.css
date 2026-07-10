@@ -726,11 +726,83 @@ a:focus-visible {
   font-size: 18px;
 }
 
+/* Dar ekranda 10 sekme tek satira sigmaz; kucultmek yerine alt satira kayar (dokunma hedefi >= 28px). */
+.chapter-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.chapter-tab {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(169, 63, 109, .16);
+  border-radius: 8px;
+  background: #fff5f8;
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.chapter-tab.is-active {
+  border-color: var(--accent-dark);
+  background: var(--accent-dark);
+  color: #fff;
+}
+
+.chapter-tab:disabled {
+  background: #f1edef;
+  color: #afa4aa;
+  cursor: not-allowed;
+}
+
+.chapter-caption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .level-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
-  margin-top: 18px;
+  margin-top: 10px;
+}
+
+/* Mevcut bolum vurgusu boss zeminini ezmeli; yoksa koyu zemin uzerinde beyaz yazi kaybolur. */
+.level-choice.is-boss:not(:disabled):not(.is-current) {
+  border-color: #b98720;
+  background: #fff6e4;
+}
+
+.level-choice.is-boss::before {
+  content: "◆";
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  color: #b98720;
+  font-size: 7px;
+}
+
+.board.is-boss {
+  box-shadow: 0 0 0 2px rgba(185, 135, 32, .55);
+}
+
+.board.is-final {
+  box-shadow: 0 0 0 3px #b98720, 0 12px 30px rgba(185, 135, 32, .28);
+}
+
+.modal-mark--final {
+  background: linear-gradient(135deg, #f7e2a8, #b98720);
+}
+
+/* Final ekraninda iki bolum istatistigi + uc toplam satiri gosterilir. */
+.result-stats--final {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .level-choice {

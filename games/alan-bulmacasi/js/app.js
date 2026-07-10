@@ -1,4 +1,5 @@
-import { LEVELS, getLevel } from "./levels.js";
+import { LEVELS, getLevel } from "./levels.js?v=2";
+import { CHAPTER_NAMES, TOTAL_LEVELS, chapterOf, chapterRange, isBossLevel } from "./level-meta.js";
 import {
   cellKey,
   containsCell,
@@ -9,7 +10,7 @@ import {
   rectKey,
   validateRectangle
 } from "./engine.js";
-import { loadGameStore, saveGameStore } from "./storage.js";
+import { loadGameStore, saveGameStore } from "./storage.js?v=2";
 import { GameSound, vibrate } from "./sound.js";
 
 const REGION_COLORS = 6;
@@ -186,7 +187,9 @@ function renderLevel() {
   }
 
   elements.levelLabel.textContent = `Bölüm ${level.id}`;
-  elements.difficultyLabel.textContent = level.difficulty;
+  elements.difficultyLabel.textContent = isBossLevel(level.id) ? `${level.difficulty} · Zor bölüm` : level.difficulty;
+  elements.board.classList.toggle("is-final", level.id === TOTAL_LEVELS);
+  elements.board.classList.toggle("is-boss", isBossLevel(level.id) && level.id !== TOTAL_LEVELS);
   hidePreview(elements.selectionPreview);
   hidePreview(elements.hintPreview);
   renderRegions();
@@ -500,15 +503,18 @@ function checkCompletion() {
   persist();
   sound.play("complete");
   vibrate([18, 30, 24]);
-  launchConfetti();
+  const id = state.level.id;
+  launchConfetti(id === TOTAL_LEVELS ? 70 : isBossLevel(id) ? 40 : 20);
   window.setTimeout(() => openSuccessModal(stars), 260);
   return true;
 }
 
-function launchConfetti() {
+function launchConfetti(pieces = 20) {
   elements.confetti.innerHTML = "";
   const symbols = ["♥", "✦", "❀"];
-  for (let index = 0; index < 20; index += 1) {
+  // Hareket azaltma acikken parcalar animasyonsuz durur; kalabalik yapmadan az sayida gosterilir.
+  const count = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? Math.min(pieces, 20) : pieces;
+  for (let index = 0; index < count; index += 1) {
     const piece = document.createElement("span");
     piece.textContent = symbols[index % symbols.length];
     piece.style.left = `${4 + Math.random() * 92}%`;
@@ -613,44 +619,111 @@ function openResetModal() {
   });
 }
 
-function openLevelPicker() {
-  const buttons = LEVELS.map((level) => {
-    const unlocked = level.id <= store.lastUnlocked;
-    const complete = Boolean(store.completed[level.id]);
-    const classes = ["level-choice", level.id === state.level.id ? "is-current" : "", complete ? "is-complete" : ""].filter(Boolean).join(" ");
-    const stars = complete ? `, ${store.completed[level.id].stars} yıldız` : "";
-    return `<button class="${classes}" type="button" data-level="${level.id}" ${unlocked ? "" : "disabled"} aria-label="Bölüm ${level.id}${unlocked ? stars : ", kilitli"}">${level.id}</button>`;
+function renderLevelPicker(chapter) {
+  const tabs = document.getElementById("chapterTabs");
+  const grid = document.getElementById("levelGrid");
+  const caption = document.getElementById("chapterCaption");
+  if (!tabs || !grid || !caption) return;
+
+  tabs.innerHTML = CHAPTER_NAMES.map((name, index) => {
+    const number = index + 1;
+    const locked = chapterRange(number).first > store.lastUnlocked;
+    const active = number === chapter;
+    return `<button class="chapter-tab${active ? " is-active" : ""}" type="button" role="tab" aria-selected="${active}" data-chapter="${number}" ${locked ? "disabled" : ""} aria-label="${number}. grup: ${name}${locked ? ", kilitli" : ""}">${number}</button>`;
   }).join("");
-  openModal(`
-    <div class="modal-mark" aria-hidden="true">▦</div>
-    <h2 id="modalTitle">Bölüm seç</h2>
-    <p>Tamamladıkça yeni bölümler açılır.</p>
-    <div class="level-grid">${buttons}</div>
-    <div class="modal-actions">
-      <button class="modal-button modal-button--primary" id="levelClose" type="button" aria-label="Bölüm seçiciyi kapat">Kapat</button>
-    </div>
-  `);
-  elements.modal.querySelectorAll("[data-level]").forEach((button) => {
+
+  const { first, last } = chapterRange(chapter);
+  caption.textContent = `${CHAPTER_NAMES[chapter - 1]} · ${first}-${last}`;
+
+  let buttons = "";
+  for (let id = first; id <= last; id += 1) {
+    const unlocked = id <= store.lastUnlocked;
+    const complete = Boolean(store.completed[id]);
+    const boss = isBossLevel(id);
+    const classes = [
+      "level-choice",
+      id === state.level.id ? "is-current" : "",
+      complete ? "is-complete" : "",
+      boss ? "is-boss" : ""
+    ].filter(Boolean).join(" ");
+    const stars = complete ? `, ${store.completed[id].stars} yıldız` : "";
+    const label = `Bölüm ${id}${boss ? ", zor bölüm" : ""}${unlocked ? stars : ", kilitli"}`;
+    buttons += `<button class="${classes}" type="button" data-level="${id}" ${unlocked ? "" : "disabled"} aria-label="${label}">${id}</button>`;
+  }
+  grid.innerHTML = buttons;
+
+  tabs.querySelectorAll("[data-chapter]").forEach((button) => {
+    button.addEventListener("click", () => renderLevelPicker(Number(button.dataset.chapter)));
+  });
+  grid.querySelectorAll("[data-level]").forEach((button) => {
     button.addEventListener("click", () => {
       const levelId = Number(button.dataset.level);
       closeModal(false);
       loadLevel(levelId);
     });
   });
+}
+
+function openLevelPicker() {
+  openModal(`
+    <div class="modal-mark" aria-hidden="true">▦</div>
+    <h2 id="modalTitle">Bölüm seç</h2>
+    <p>Tamamladıkça yeni bölümler açılır.</p>
+    <div class="chapter-tabs" id="chapterTabs" role="tablist" aria-label="Bölüm grupları"></div>
+    <p class="chapter-caption" id="chapterCaption"></p>
+    <div class="level-grid" id="levelGrid"></div>
+    <div class="modal-actions">
+      <button class="modal-button modal-button--primary" id="levelClose" type="button" aria-label="Bölüm seçiciyi kapat">Kapat</button>
+    </div>
+  `);
+  renderLevelPicker(chapterOf(state.level.id));
   document.getElementById("levelClose")?.addEventListener("click", () => closeModal());
 }
 
+function overallProgress() {
+  const records = Object.values(store.completed);
+  return {
+    levels: records.length,
+    stars: records.reduce((sum, record) => sum + numeric(record.stars), 0),
+    time: records.reduce((sum, record) => sum + numeric(record.bestTime), 0)
+  };
+}
+
 function openSuccessModal(stars) {
-  const message = SUCCESS_MESSAGES[(state.level.id - 1) % SUCCESS_MESSAGES.length];
-  const hasNext = state.level.id < LEVELS.length;
+  const id = state.level.id;
+  const isFinal = id === TOTAL_LEVELS;
+  const isCentury = id === 100;
+  const hasNext = id < LEVELS.length;
+
+  let mark = "♥";
+  let message = SUCCESS_MESSAGES[(id - 1) % SUCCESS_MESSAGES.length];
+  let subtitle = `Bölüm ${id} tamamlandı.`;
+  if (isCentury) {
+    mark = "🏅";
+    message = "100. Seviye Tamamlandı!";
+    subtitle = "Yolun yarısındasın. Rozetin senin.";
+  } else if (isFinal) {
+    mark = "👑";
+    message = "Tebrikler! 200 seviyenin tamamını bitirdin.";
+    subtitle = "Büyük finali de çözdün.";
+  }
+
+  const totals = overallProgress();
+  const totalRows = isFinal
+    ? `
+      <div><span>Tamamlanan</span><strong>${totals.levels} / ${TOTAL_LEVELS}</strong></div>
+      <div><span>Toplam yıldız</span><strong>${totals.stars} / ${TOTAL_LEVELS * 3}</strong></div>
+      <div><span>Toplam süre</span><strong>${formatTime(totals.time)}</strong></div>`
+    : "";
+
   openModal(`
-    <div class="modal-mark" aria-hidden="true">♥</div>
+    <div class="modal-mark${isFinal ? " modal-mark--final" : ""}" aria-hidden="true">${mark}</div>
     <h2 id="modalTitle">${message}</h2>
-    <p>Bölüm ${state.level.id} tamamlandı.</p>
+    <p>${subtitle}</p>
     <div class="stars-large" aria-label="${stars} yıldız">${"★".repeat(stars)}${"☆".repeat(3 - stars)}</div>
-    <div class="result-stats">
+    <div class="result-stats${isFinal ? " result-stats--final" : ""}">
       <div><span>Süre</span><strong>${formatTime(state.elapsed)}</strong></div>
-      <div><span>Hamle</span><strong>${state.moves}</strong></div>
+      <div><span>Hamle</span><strong>${state.moves}</strong></div>${totalRows}
     </div>
     <div class="modal-actions">
       <button class="modal-button" id="replayButton" type="button" aria-label="Bölümü tekrar oyna">Tekrar Oyna</button>
@@ -794,8 +867,9 @@ function startTimer() {
 
 function boot() {
   bindEvents();
+  // ?level yoksa Number(null) === 0 olur; 0 gecerli bir bolum degil, kayitli bolume donulmeli.
   const requested = Number(new URLSearchParams(location.search).get("level"));
-  const initial = Number.isInteger(requested) && requested <= store.lastUnlocked
+  const initial = Number.isInteger(requested) && requested >= 1 && requested <= store.lastUnlocked
     ? requested
     : Math.min(store.currentLevel, store.lastUnlocked);
   loadLevel(initial);
