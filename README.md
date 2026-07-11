@@ -125,3 +125,33 @@ npm run hero:install-hooks   # opt-in: commit öncesi otomatik hero:check (git c
    git add assets/ana-sayfa/optimized data/ana-sayfa-gorselleri.generated.js data/ana-sayfa-tema-ayarlari.json
    ```
    `assets/ana-sayfa/original/` Git tarafından yok sayılır — commit'e girmez.
+
+## Diğer Bölüm Görselleri (arka planlar, oyun ikonları, boyama preset'leri)
+
+Ana sayfa hero'su dışındaki tüm görseller basit bir pipeline'dan geçer: her bölüm klasöründe
+`original/` (kaynak, Git'e girmez) ve `optimized/` (WebP, deploy edilen) vardır.
+
+```
+assets/
+  ana-sayfa/       → kendi hero pipeline'ı (yukarıdaki bölüm)
+  calisma-bolumu/  → çalışma/quiz/RavzaLingo arka planları
+  oyun-bolumu/     → oyun kutucuğu ikonları (ikon-*) + oyun alanı arka planı
+  oyun-ici/boyama/ → boyama hazır görsel preset'leri (preset-*)
+```
+
+```bash
+npm run assets:optimize   # her original/ klasörünü tarar, kardeş optimized/ klasörüne WebP üretir
+```
+
+Adlandırma kuralları (script bunlara göre davranır):
+
+- Arka planlar: `<ad>-desktop.png` / `<ad>-mobile.png` — kendi çözünürlüğünde kalır.
+- İkonlar: `ikon-<oyun>.<ext>` — 512px'e küçültülür (kutucukta ~150px gösteriliyor).
+- Boyama preset'leri: `preset-<ad>.jpeg`.
+
+Yeni görsel eklerken: dosyayı ilgili `original/` klasörüne koy, `npm run assets:optimize` çalıştır,
+koda `assets/<bölüm>/optimized/<ad>.webp` yolunu yaz, `assets/<bölüm>/optimized/` klasörünü commit'le.
+
+> `assets/ana-sayfa/optimized/` içindeki dosyalar içerik-hash'li adlar taşır ve her üretimde değişir —
+> oraya sabit isimle link vermeyin, kalıcı 404 olur. Paylaşılan bir görsel gerekiyorsa kaynağını
+> ilgili bölümün `original/` klasörüne koyup bu pipeline'dan geçirin.

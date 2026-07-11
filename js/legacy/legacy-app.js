@@ -10504,8 +10504,8 @@ document.addEventListener("DOMContentLoaded", () => {
    FINAL FIX — RAVZALINGO DESKTOP + MOBILE BACKGROUND
    Sadece RavzaLingo aktifken çalışır.
    Dosya yolları:
-   - assets/ravzalingo-background.png
-   - assets/ravzalingo-bg-mobile.png
+   - assets/calisma-bolumu/optimized/ravzalingo-desktop.webp
+   - assets/calisma-bolumu/optimized/ravzalingo-mobile.webp
    ========================================================= */
 body.is-ravzalingo-page,
 body.rlz5-page-active {
@@ -10548,7 +10548,7 @@ body.rlz5-page-active .page.ravzalingo-page.active::before {
   bottom: 0 !important;
   z-index: 0 !important;
   pointer-events: none !important;
-  background-image: url("assets/ravzalingo-background.png") !important;
+  background-image: url("assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
@@ -10627,7 +10627,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
   body.rlz5-page-active .page.ravzalingo-page.active::before {
     top: 70px !important;
     left: 0 !important;
-    background-image: url("assets/ravzalingo-bg-mobile.png") !important;
+    background-image: url("assets/calisma-bolumu/optimized/ravzalingo-mobile.webp") !important;
     background-size: cover !important;
     background-position: center top !important;
     background-repeat: no-repeat !important;
@@ -10653,7 +10653,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
 @media (max-width: 900px) and (orientation: landscape) {
   body.is-ravzalingo-page .page.ravzalingo-page.active::before,
   body.rlz5-page-active .page.ravzalingo-page.active::before {
-    background-image: url("assets/ravzalingo-background.png") !important;
+    background-image: url("assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
     background-position: center center !important;
   }
 }

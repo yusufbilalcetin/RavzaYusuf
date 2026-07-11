@@ -603,7 +603,7 @@ body.dark[data-theme-style="noel-ask"] .memory-back {
   inset: 78px 0 0 0;
   z-index: -3;
   pointer-events: none;
-  background-image: url("../../assets/study-hub-bg-desktop.png");
+  background-image: url("../../assets/calisma-bolumu/optimized/calisma-merkezi-desktop.webp");
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -705,7 +705,7 @@ body.dark:has(#studyhub.active) .topbar {
   inset: 78px 0 0 0;
   z-index: -3;
   pointer-events: none;
-  background-image: url("../../assets/quiz-hub-bg-desktop.png");
+  background-image: url("../../assets/calisma-bolumu/optimized/bilgi-yarismasi-desktop.webp");
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -6295,7 +6295,7 @@ html.is-ravzalingo-page::after {
 
 html.is-ravzalingo-page::before {
   z-index: -2;
-  background-image: url("../../assets/ravzalingo-background.png") !important;
+  background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
@@ -6323,8 +6323,8 @@ body.is-ravzalingo-page .rlz5-lesson-shell {
    FINAL FIX â€” RAVZALINGO DESKTOP + MOBILE BACKGROUND
    Sadece RavzaLingo aktifken Ã§alÄ±ÅŸÄ±r.
    Dosya yollarÄ±:
-   - assets/ravzalingo-background.png
-   - assets/ravzalingo-bg-mobile.png
+   - assets/calisma-bolumu/optimized/ravzalingo-desktop.webp
+   - assets/calisma-bolumu/optimized/ravzalingo-mobile.webp
    ========================================================= */
 
 body.is-ravzalingo-page,
@@ -6368,7 +6368,7 @@ body.rlz5-page-active .page.ravzalingo-page.active::before {
   bottom: 0 !important;
   z-index: 0 !important;
   pointer-events: none !important;
-  background-image: url("../../assets/ravzalingo-background.png") !important;
+  background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
@@ -6431,8 +6431,8 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
    - Overlay azaltÄ±ldÄ±.
    - Arka plan katmanÄ±nda blur/filter kullanÄ±lmadÄ±.
    - Kartlarda arka planÄ± bulanÄ±klaÅŸtÄ±ran backdrop blur kaldÄ±rÄ±ldÄ±.
-   - Desktop: assets/ravzalingo-background.png
-   - Mobil: assets/ravzalingo-bg-mobile.png
+   - Desktop: assets/calisma-bolumu/optimized/ravzalingo-desktop.webp
+   - Mobil: assets/calisma-bolumu/optimized/ravzalingo-mobile.webp
    ========================================================= */
 
 html.is-ravzalingo-page::before,
@@ -6443,7 +6443,7 @@ html.is-ravzalingo-page::after {
 
 body.is-ravzalingo-page .page.ravzalingo-page.active::before,
 body.rlz5-page-active .page.ravzalingo-page.active::before {
-  background-image: url("../../assets/ravzalingo-background.png") !important;
+  background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
@@ -7478,7 +7478,7 @@ body:not(.dark) .kahoot-qr-link {
   inset: 78px 0 0;
   z-index: -3;
   pointer-events: none;
-  background-image: url("../../assets/study-detail-bg-desktop.png");
+  background-image: url("../../assets/calisma-bolumu/optimized/calisma-detay-desktop.webp");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -7747,13 +7747,11 @@ body.dark #studydetail .word-card {
 
 body:has(#dashboard.active) {
   background-color: #050112 !important;
-  background-image:
-    linear-gradient(180deg, rgba(8, 3, 20, .20) 0%, rgba(13, 3, 22, .54) 100%),
-    url("../../assets/home-bg-desktop.png") !important;
-  background-repeat: no-repeat, no-repeat !important;
-  background-size: cover, cover !important;
-  background-position: center center, center center !important;
-  background-attachment: fixed, fixed !important;
+  background-image: linear-gradient(180deg, rgba(8, 3, 20, .20) 0%, rgba(13, 3, 22, .54) 100%) !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-attachment: fixed !important;
 }
 
 body:has(#dashboard.active)::before,
@@ -8004,12 +8002,8 @@ body:has(#dashboard.active) .content-wrapper {
   border-top: 0 !important;
   border-bottom: 0 !important;
   border-radius: 0 !important;
-  background-image:
-    linear-gradient(180deg, rgba(8, 3, 19, .16), rgba(8, 3, 19, .32)),
-    url("../../assets/home-bg-desktop.png") !important;
-  background-size: cover, cover !important;
-  background-position: center center, center center !important;
-  background-repeat: no-repeat, no-repeat !important;
+  background-color: #17103d !important;
+  background-image: var(--home-hero-placeholder, none) !important;
   box-shadow:
     inset 0 20px 36px rgba(0, 0, 0, .16),
     inset 0 -22px 42px rgba(0, 0, 0, .20) !important;

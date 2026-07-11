@@ -126,36 +126,36 @@ const KMEANS_ITERATIONS = 14;
 
 const PRESET_IMAGES = [
   {
-    src: "./assets/home-bg-desktop.png",
-    thumb: "./assets/pbn-preset-orman-masali.jpeg",
+    src: "./assets/oyun-bolumu/optimized/oyun-merkezi-desktop.webp",
+    thumb: "./assets/oyun-ici/boyama/optimized/preset-orman-masali.webp",
     name: "Orman Masalı",
     tag: "Masal",
     note: "Sıcak ışık, yoğun detay"
   },
   {
-    src: "./assets/ravzalingo-background.png",
-    thumb: "./assets/pbn-preset-yesil-bahce.jpeg",
+    src: "./assets/calisma-bolumu/optimized/ravzalingo-desktop.webp",
+    thumb: "./assets/oyun-ici/boyama/optimized/preset-yesil-bahce.webp",
     name: "Yeşil Bahçe",
     tag: "Doğa",
     note: "Yumuşak geçişler"
   },
   {
-    src: "./assets/study-hub-bg-desktop.png",
-    thumb: "./assets/pbn-preset-calisma-kosesi.jpeg",
+    src: "./assets/calisma-bolumu/optimized/calisma-merkezi-desktop.webp",
+    thumb: "./assets/oyun-ici/boyama/optimized/preset-calisma-kosesi.webp",
     name: "Çalışma Köşesi",
     tag: "Sakin",
     note: "Dengeli renk alanları"
   },
   {
-    src: "./assets/quiz-hub-bg-desktop.png",
-    thumb: "./assets/pbn-preset-bilgi-yarisi.jpeg",
+    src: "./assets/calisma-bolumu/optimized/bilgi-yarismasi-desktop.webp",
+    thumb: "./assets/oyun-ici/boyama/optimized/preset-bilgi-yarisi.webp",
     name: "Bilgi Yarışı",
     tag: "Canlı",
     note: "Kontrast ve parlak tonlar"
   },
   {
-    src: "./assets/study-detail-bg-desktop.png",
-    thumb: "./assets/pbn-preset-sakin-vadi.jpeg",
+    src: "./assets/calisma-bolumu/optimized/calisma-detay-desktop.webp",
+    thumb: "./assets/oyun-ici/boyama/optimized/preset-sakin-vadi.webp",
     name: "Sakin Vadi",
     tag: "Manzara",
     note: "Geniş gölge paleti"
@@ -228,7 +228,7 @@ const TEMPLATE = `
     <div class="pbn-inline-toast pbn-app-error-toast" id="pbnAppErrorToast"></div>
     <div class="pbn-screen pbn-screen-home is-active" data-pbn-screen="home">
       <div class="pbn-hero">
-        <img class="pbn-brand-logo" src="./assets/game-icon-boyama.jpeg" alt="Boyama logosu" loading="eager" decoding="async" />
+        <img class="pbn-brand-logo" src="./assets/oyun-bolumu/optimized/ikon-boyama.webp" alt="Boyama logosu" loading="eager" decoding="async" />
         <div class="pbn-hero-copy">
           <span class="unit-badge">Boyama stüdyosu</span>
           <h2>Numaraya Göre Boyama</h2>
@@ -338,7 +338,7 @@ const TEMPLATE = `
       <div class="pbn-paint-header">
         <button type="button" class="pbn-tool-btn" id="pbnBackBtn" title="Ana ekrana dön">←</button>
         <span class="pbn-paint-logo" aria-hidden="true">
-          <img src="./assets/game-icon-boyama.jpeg" alt="" loading="eager" decoding="async" />
+          <img src="./assets/oyun-bolumu/optimized/ikon-boyama.webp" alt="" loading="eager" decoding="async" />
         </span>
         <div class="pbn-paint-progress">
           <div class="pbn-paint-progress-track">

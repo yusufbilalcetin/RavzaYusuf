@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "assets:optimize": "node ./scripts/optimize-assets.mjs",
     "optimize:home-images": "node ./scripts/optimize-home-images.mjs",
     "hero:optimize": "node ./scripts/optimize-home-images.mjs",
     "hero:watch": "node ./scripts/watch-home-images.mjs",

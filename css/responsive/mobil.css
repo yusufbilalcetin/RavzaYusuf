@@ -6,7 +6,7 @@
 
   #studyhub.active::before {
     inset: 70px 0 0 0;
-    background-image: url("../../assets/study-hub-bg-mobile.png");
+    background-image: url("../../assets/calisma-bolumu/optimized/calisma-merkezi-mobile.webp");
     background-position: center top;
     background-attachment: scroll;
   }
@@ -84,7 +84,7 @@
 
   #quizhub.active::before {
     inset: 70px 0 0 0;
-    background-image: url("../../assets/quiz-hub-bg-mobile.png");
+    background-image: url("../../assets/calisma-bolumu/optimized/bilgi-yarismasi-mobile.webp");
     background-position: center top;
     background-attachment: scroll;
   }
@@ -1436,7 +1436,7 @@
 
   #studydetail.active::before {
     inset: 64px 0 0;
-    background-image: url("../../assets/study-detail-bg-mobile.png");
+    background-image: url("../../assets/calisma-bolumu/optimized/calisma-detay-mobile.webp");
     background-position: center top;
     background-attachment: scroll;
   }
@@ -1479,11 +1479,9 @@
 
 @media (max-width: 768px) {
   body:has(#dashboard.active) {
-    background-image:
-      linear-gradient(180deg, rgba(8, 3, 20, .22) 0%, rgba(13, 3, 22, .62) 100%),
-      url("../../assets/home-bg-mobile.png") !important;
-    background-position: center top, center top !important;
-    background-attachment: scroll, scroll !important;
+    background-image: linear-gradient(180deg, rgba(8, 3, 20, .22) 0%, rgba(13, 3, 22, .62) 100%) !important;
+    background-position: center top !important;
+    background-attachment: scroll !important;
   }
 
   body:has(#dashboard.active) .topbar {
@@ -1586,11 +1584,7 @@
     min-height: clamp(420px, 66svh, 680px) !important;
     border: 1px solid rgba(255, 152, 214, .18) !important;
     border-radius: 18px !important;
-    background-image:
-      linear-gradient(180deg, rgba(8, 3, 19, .12), rgba(8, 3, 19, .24)),
-      url("../../assets/home-bg-mobile.png") !important;
-    background-position: center 58%, center 58% !important;
-    background-size: cover, cover !important;
+    background-image: var(--home-hero-placeholder, none) !important;
   }
 
   #dashboard .progress-shell {

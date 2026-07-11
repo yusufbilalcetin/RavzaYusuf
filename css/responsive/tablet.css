@@ -939,7 +939,7 @@
   }
 
   html.is-ravzalingo-page::before {
-    background-image: url("../../assets/ravzalingo-bg-mobile.png") !important;
+    background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-mobile.webp") !important;
     background-position: center top !important;
     background-attachment: scroll !important;
   }
@@ -951,7 +951,7 @@
 
 @media (max-width: 900px) and (orientation: landscape) {
   html.is-ravzalingo-page::before {
-    background-image: url("../../assets/ravzalingo-background.png");
+    background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-desktop.webp");
     background-position: center center;
     background-size: cover;
     background-attachment: scroll;
@@ -985,7 +985,7 @@
   body.rlz5-page-active .page.ravzalingo-page.active::before {
     top: 70px !important;
     left: 0 !important;
-    background-image: url("../../assets/ravzalingo-bg-mobile.png") !important;
+    background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-mobile.webp") !important;
     background-size: cover !important;
     background-position: center top !important;
     background-repeat: no-repeat !important;
@@ -1011,7 +1011,7 @@
 @media (max-width: 900px) and (orientation: landscape) {
   body.is-ravzalingo-page .page.ravzalingo-page.active::before,
   body.rlz5-page-active .page.ravzalingo-page.active::before {
-    background-image: url("../../assets/ravzalingo-background.png") !important;
+    background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
     background-position: center center !important;
   }
 }
@@ -1019,7 +1019,7 @@
 @media (max-width: 900px) {
   body.is-ravzalingo-page .page.ravzalingo-page.active::before,
   body.rlz5-page-active .page.ravzalingo-page.active::before {
-    background-image: url("../../assets/ravzalingo-bg-mobile.png") !important;
+    background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-mobile.webp") !important;
     background-size: cover !important;
     background-position: center top !important;
     background-repeat: no-repeat !important;
@@ -1042,7 +1042,7 @@
 @media (min-width: 901px) {
   body.is-ravzalingo-page .page.ravzalingo-page.active::before,
   body.rlz5-page-active .page.ravzalingo-page.active::before {
-    background-image: url("../../assets/ravzalingo-background.png") !important;
+    background-image: url("../../assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
