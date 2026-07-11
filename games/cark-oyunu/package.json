@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node ./tests/wheel.test.mjs",
-    "check": "node --check ./js/model.js && node --check ./js/storage.js && node --check ./js/app.js && node --check ./tests/browser-smoke.mjs",
-    "test:browser": "node ./tests/browser-smoke.mjs"
+    "test": "node ./tests/wheel.test.mjs && node ./tests/couples.test.mjs",
+    "check": "node --check ./js/model.js && node --check ./js/storage.js && node --check ./js/app.js && node --check ./js/pin.js && node --check ./js/couples.js && node --check ./js/couples-config.js && node --check ./tests/browser-smoke.mjs && node --check ./tests/couples-browser.test.mjs",
+    "test:browser": "node ./tests/browser-smoke.mjs",
+    "test:couples:browser": "node ./tests/couples-browser.test.mjs"
   }
 }

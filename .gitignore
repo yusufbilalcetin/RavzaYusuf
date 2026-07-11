@@ -8,3 +8,6 @@ assets/**/original/
 
 # Hero pipeline kaynak-hash cache'i (yerel; silinirse güvenle yeniden üretilir)
 .cache/
+
+# Ozel cark kaynak katalog sayfalari: yalnizca kirpma scripti icin, dagitima girmez
+assets/ciftler-carki/sources/

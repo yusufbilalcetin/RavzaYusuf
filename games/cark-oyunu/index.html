@@ -3,24 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f3f4f6" />
+  <meta name="theme-color" content="#f4f5f7" />
   <meta name="color-scheme" content="light" />
   <title>Şans Çarkı</title>
   <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Font bloklamadan yüklensin: çevrimdışı/yavaş bağlantıda sayfa Inter'i beklemek yerine
+       sistem fontuyla hemen açılır (render-blocking stylesheet modül script'ini de geciktiriyordu). -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" /></noscript>
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
+  <header class="app-bar">
+    <div class="brand">
+      <h1>Şans Çarkı</h1>
+      <p>Seçenekleri ekle, çarkı çevir.</p>
+    </div>
+    <button class="lock-button" id="lockButton" type="button" aria-label="Özel alanı aç" aria-pressed="false">
+      <svg class="icon icon-locked" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
+        <rect x="5" y="10" width="14" height="10" rx="2.5" />
+      </svg>
+      <svg class="icon icon-unlocked" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 10V7.5a4 4 0 0 1 7.7-1.5" />
+        <rect x="5" y="10" width="14" height="10" rx="2.5" />
+      </svg>
+    </button>
+  </header>
+
   <main class="wheel-app">
+    <!-- Özel alan buraya monte edilir. Kilitliyken yalnızca nötr metin; PIN doğrulanınca
+         couples.js dinamik yüklenip panel ve görseller eklenir. -->
+    <div id="privateHost" hidden></div>
+
     <section class="option-panel" aria-labelledby="optionCountLabel">
       <div class="winner-banner" id="winnerBanner" role="status" aria-live="polite">
-        <strong>KAZANAN:</strong>
+        <strong>KAZANAN</strong>
         <span id="winnerBannerText">Henüz seçim yok</span>
       </div>
 
-      <p class="option-count" id="optionCountLabel">Seçenek sayısı: <strong id="optionCount">1</strong></p>
+      <p class="option-count" id="optionCountLabel">Seçenek sayısı <strong id="optionCount">1</strong></p>
 
       <label class="bulk-toggle">
-        <span>Toplu Seçenek Gir</span>
+        <span>Toplu seçenek gir</span>
         <input id="bulkToggle" type="checkbox" />
         <i aria-hidden="true"></i>
       </label>
@@ -49,7 +77,35 @@
     <div class="confetti" id="confetti" aria-hidden="true"></div>
     <section class="result-modal" role="dialog" aria-modal="true" aria-labelledby="resultText">
       <button class="modal-close" id="modalClose" type="button" aria-label="Sonuç penceresini kapat">×</button>
-      <p id="resultText"><strong>KAZANAN:</strong> <span id="modalWinner">Seçenek 1</span></p>
+      <p class="result-kicker">Kazanan</p>
+      <p id="resultText"><span id="modalWinner">Seçenek 1</span></p>
+    </section>
+  </div>
+
+  <div class="lock-overlay" id="lockOverlay" hidden>
+    <section class="lock-modal" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+      <button class="modal-close" id="lockClose" type="button" aria-label="Pencereyi kapat">×</button>
+      <h2 id="lockTitle">Özel alan</h2>
+      <p class="lock-sub" id="lockSub">Devam etmek için şifreyi girin.</p>
+      <form class="lock-form" id="lockForm">
+        <input id="lockCurrent" type="password" inputmode="numeric" autocomplete="off"
+               placeholder="Mevcut şifre" aria-label="Mevcut şifre" hidden />
+        <input id="lockInput" type="password" inputmode="numeric" autocomplete="off"
+               placeholder="Şifre" aria-label="Şifre" />
+        <p class="lock-error" id="lockError" role="alert"></p>
+        <label class="lock-persist">
+          <span>Kilit davranışı</span>
+          <select id="lockPersist">
+            <option value="memory">Sayfa yenilenince kilitle</option>
+            <option value="session">Sekme kapanınca kilitle</option>
+            <option value="device">Bu cihazda açık tut</option>
+          </select>
+        </label>
+        <button class="primary-button" id="lockSubmit" type="submit">Aç</button>
+      </form>
+      <div class="lock-manage" id="lockManage" hidden>
+        <button class="link-button" id="pinChange" type="button">Şifreyi değiştir</button>
+      </div>
     </section>
   </div>
 

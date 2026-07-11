@@ -1,16 +1,24 @@
 import {
   addOptions,
+  clearWheel,
   deleteOption,
   parseOptionText,
   resetResults,
   selectOption
 } from "./model.js";
 import { loadStore, saveStore } from "./storage.js";
+import * as lock from "./pin.js";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 
+// Özel alanı görmek istediğinin işareti (gizli bilgi değil): kilitliyken nötr ekranı,
+// açıkken özel çarkı gösterelim diye tutulur.
+const INTENT_KEY = "ravza-couples-intent-v1";
+
 const elements = {
+  app: $(".wheel-app"),
   bannerText: $("#winnerBannerText"),
+  banner: $("#winnerBanner"),
   optionCount: $("#optionCount"),
   bulkToggle: $("#bulkToggle"),
   optionEntry: $("#optionEntry"),
@@ -18,26 +26,57 @@ const elements = {
   addButton: $("#addButton"),
   inputHelp: $("#inputHelp"),
   optionList: $("#optionList"),
+  optionPanel: $(".option-panel"),
+  wheelPanel: $(".wheel-panel"),
+  privateHost: $("#privateHost"),
   wheelWrap: $("#wheelWrap"),
   canvas: $("#wheelCanvas"),
   spinButton: $("#spinButton"),
   overlay: $("#resultOverlay"),
   modalWinner: $("#modalWinner"),
   modalClose: $("#modalClose"),
-  confetti: $("#confetti")
+  confetti: $("#confetti"),
+  lockButton: $("#lockButton"),
+  lockOverlay: $("#lockOverlay"),
+  lockTitle: $("#lockTitle"),
+  lockSub: $("#lockSub"),
+  lockForm: $("#lockForm"),
+  lockCurrent: $("#lockCurrent"),
+  lockInput: $("#lockInput"),
+  lockError: $("#lockError"),
+  lockPersist: $("#lockPersist"),
+  lockSubmit: $("#lockSubmit"),
+  lockManage: $("#lockManage"),
+  pinChange: $("#pinChange"),
+  lockClose: $("#lockClose")
 };
 
 const context = elements.canvas.getContext("2d");
 const store = loadStore();
-let wheel = store.wheels.find((item) => item.id === store.activeWheelId) || store.wheels[0];
+const normalWheel = store.wheels.find((item) => item.id === store.activeWheelId) || store.wheels[0];
+
+let wheel = normalWheel;
 let visualOptions = availableOptions();
 let rotation = 0;
 let isSpinning = false;
 let animationFrame = 0;
 let selectedVisualId = null;
 
+// "normal" · "locked" (özel alan kilitli, nötr ekran) · "private" (özel çark açık)
+let mode = "normal";
+let couples = null;        // PIN doğrulanınca dinamik yüklenen modül
+let couplesState = null;
+let privateUI = null;
+let formMode = "enter";    // "enter" | "set" | "change" | "remove"
+
 const POINTER_ANGLE = -Math.PI * .75;
-const COLORS = ["#9d0038", "#5b2a91", "#0d7180", "#d88b00", "#315f91", "#6d8f2f", "#c54972", "#4c4190"];
+const COLORS = ["#9d0038", "#5f2b6b", "#0f6d78", "#c1861d", "#2f5480", "#5f7f34", "#b8446b", "#464090"];
+
+const wantsPrivate = () => globalThis.localStorage?.getItem(INTENT_KEY) === "1";
+const setIntent = (value) => {
+  if (value) globalThis.localStorage?.setItem(INTENT_KEY, "1");
+  else globalThis.localStorage?.removeItem(INTENT_KEY);
+};
 
 function optionById(id) {
   return wheel.allOptions.find((option) => option.id === id);
@@ -48,7 +87,8 @@ function availableOptions() {
 }
 
 function persist() {
-  saveStore(store);
+  if (mode === "private") couples?.saveCouplesState(couplesState);
+  else saveStore(store);
 }
 
 function fitText(value, maxLength) {
@@ -73,7 +113,7 @@ function drawEmptyWheel(size, center, radius) {
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.font = `600 ${Math.max(14, size * .03)}px "Segoe UI", sans-serif`;
-  context.fillText("Seçenek ekleyin", center, center + radius * .34);
+  context.fillText(mode === "private" ? "Tüm seçenekler tamamlandı" : "Seçenek ekleyin", center, center + radius * .34);
 }
 
 function drawWheel(options = visualOptions, angle = rotation) {
@@ -107,7 +147,10 @@ function drawWheel(options = visualOptions, angle = rotation) {
 
     if (options.length > 80 && index % Math.ceil(options.length / 40) !== 0) return;
     const middle = start + slice / 2;
-    const label = options.length > 50 ? String(index + 1) : fitText(option.label, options.length <= 12 ? 24 : options.length <= 24 ? 13 : 7);
+    // Özel modda dilimde yalnızca kısa kod yazar (A-01, B-52); kaynak görsel çarka çizilmez.
+    const label = mode !== "private" && options.length > 50
+      ? String(index + 1)
+      : fitText(option.label, options.length <= 12 ? 24 : options.length <= 24 ? 13 : 7);
     const fontSize = options.length <= 8 ? size * .038 : options.length <= 20 ? size * .027 : size * .018;
     context.save();
     context.translate(center, center);
@@ -137,10 +180,20 @@ function createOptionRow(option) {
 }
 
 function render() {
-  elements.optionCount.textContent = String(wheel.allOptions.length);
-  elements.optionList.replaceChildren(...wheel.allOptions.map(createOptionRow));
-  elements.spinButton.disabled = isSpinning || !wheel.allOptions.length;
-  elements.bannerText.textContent = wheel.currentResult?.value || "Henüz seçim yok";
+  const isPrivate = mode === "private";
+  elements.optionPanel.hidden = mode !== "normal";
+  elements.wheelPanel.hidden = mode === "locked";
+  elements.privateHost.hidden = mode === "normal";
+  elements.app.classList.toggle("is-locked", mode === "locked");
+
+  if (mode === "normal") {
+    elements.optionCount.textContent = String(wheel.allOptions.length);
+    elements.optionList.replaceChildren(...wheel.allOptions.map(createOptionRow));
+    elements.bannerText.textContent = wheel.currentResult?.value || "Henüz seçim yok";
+  }
+  if (isPrivate) privateUI?.update();
+
+  elements.spinButton.disabled = isSpinning || !wheel.allOptions.length || (isPrivate && !wheel.availableOptions.length);
   elements.canvas.setAttribute("aria-label", wheel.allOptions.length
     ? `${wheel.allOptions.length} seçenekli şans çarkı`
     : "Boş şans çarkı");
@@ -169,7 +222,7 @@ function showInputMessage(message) {
 }
 
 function addEnteredOptions() {
-  if (isSpinning) return;
+  if (isSpinning || mode !== "normal") return;
   const labels = parseOptionText(elements.input.value);
   if (!labels.length) {
     showInputMessage("Önce bir seçenek yazın.");
@@ -201,6 +254,160 @@ function bindInputKeyboard() {
     }
   });
 }
+
+// —— Kilit ————————————————————————————————————————————————————————————
+
+function lockIconState(unlocked) {
+  elements.lockButton.classList.toggle("is-open", unlocked);
+  elements.lockButton.setAttribute("aria-pressed", String(unlocked));
+  elements.lockButton.setAttribute("aria-label", unlocked ? "Özel alanı kilitle" : "Özel alanı aç");
+}
+
+function setFormMode(next) {
+  formMode = next;
+  const texts = {
+    enter: ["Özel alan", "Devam etmek için şifreyi girin.", "Aç"],
+    change: ["Şifreyi değiştir", "Mevcut şifreyi ve yeni şifreyi girin.", "Değiştir"]
+  }[next];
+  elements.lockTitle.textContent = texts[0];
+  elements.lockSub.textContent = texts[1];
+  elements.lockSubmit.textContent = texts[2];
+  elements.lockCurrent.hidden = next !== "change";
+  elements.lockInput.placeholder = next === "change" ? "Yeni şifre" : "Şifre";
+  elements.lockManage.hidden = next !== "enter" || !lock.hasPin();
+  elements.lockCurrent.value = "";
+  elements.lockInput.value = "";
+  elements.lockError.textContent = "";
+}
+
+/** Şifre Firestore'da: modal açılırken kaydı bir kez çekeriz. */
+async function openLock(next = "enter") {
+  elements.lockPersist.value = lock.getPersistMode();
+  setFormMode(next);
+  elements.lockOverlay.hidden = false;
+  elements.lockInput.focus();
+  try {
+    await lock.loadPinRecord();
+    elements.lockManage.hidden = next !== "enter";
+  } catch (error) {
+    elements.lockError.textContent = error.message;
+  }
+}
+
+function closeLock() {
+  elements.lockOverlay.hidden = true;
+  elements.lockCurrent.value = "";
+  elements.lockInput.value = "";
+  elements.lockButton.focus();
+}
+
+function rejectPin(message) {
+  elements.lockError.textContent = message;
+  elements.lockInput.classList.remove("is-shaking");
+  void elements.lockInput.offsetWidth; // sınıfı yeniden ekleyince animasyon baştan başlasın
+  elements.lockInput.classList.add("is-shaking");
+  elements.lockInput.select?.();
+}
+
+/** Özel alanı yalnızca doğru PIN'den sonra yükler (kod ve görseller lazy-load). */
+async function enterPrivate() {
+  if (!couples) couples = await import("./couples.js");
+  couplesState = couples.loadCouplesState();
+  const couplesWheel = couples.buildCouplesWheel(couplesState);
+  privateUI = couples.createPrivateUI({
+    wheel: couplesWheel,
+    state: couplesState,
+    onSpin: () => spin(),
+    onChange: () => { couples.saveCouplesState(couplesState); render(); }
+  });
+  elements.privateHost.replaceChildren(privateUI.panel);
+  document.body.append(privateUI.overlay);
+
+  wheel = couplesWheel;
+  visualOptions = availableOptions();
+  selectedVisualId = null;
+  rotation = 0;
+  mode = "private";
+  setIntent(true);
+  lockIconState(true);
+  render();
+  resizeCanvas();
+}
+
+/** Kilitle: özel bileşenler DOM'dan kaldırılır, görsel referansları temizlenir. */
+function lockPrivate() {
+  privateUI?.destroy();
+  privateUI = null;
+  couplesState = null;
+  lock.lock();
+  wheel = normalWheel;
+  visualOptions = availableOptions();
+  selectedVisualId = null;
+  rotation = 0;
+  mode = "locked";
+  lockIconState(false);
+  renderLockedScreen();
+  render();
+}
+
+function exitPrivate() {
+  setIntent(false);
+  mode = "normal";
+  elements.privateHost.replaceChildren();
+  lockIconState(false);
+  render();
+}
+
+/** Kilitliyken gösterilen nötr ekran: gizli hiçbir içerik yok. */
+function renderLockedScreen() {
+  const card = document.createElement("section");
+  card.className = "locked-card";
+  const title = document.createElement("h2");
+  title.textContent = "Özel Alan Kilitli";
+  const text = document.createElement("p");
+  text.textContent = "Devam etmek için sağ üstteki kilit simgesine dokun.";
+  const open = document.createElement("button");
+  open.className = "primary-button";
+  open.type = "button";
+  open.textContent = "Kilidi Aç";
+  open.addEventListener("click", () => openLock());
+  const back = document.createElement("button");
+  back.className = "link-button";
+  back.type = "button";
+  back.textContent = "Normal çarka dön";
+  back.addEventListener("click", exitPrivate);
+  card.append(title, text, open, back);
+  elements.privateHost.replaceChildren(card);
+}
+
+async function submitLock(event) {
+  event.preventDefault();
+  const current = elements.lockCurrent.value;
+  const value = elements.lockInput.value;
+  elements.lockSubmit.disabled = true;
+  try {
+    await lock.loadPinRecord();
+    if (formMode === "change") {
+      await lock.changePin(current, value);
+      setFormMode("enter");
+      elements.lockError.textContent = "Şifre değiştirildi.";
+      return;
+    }
+    if (!(await lock.verifyPin(value))) {
+      rejectPin("Hatalı şifre");
+      return;
+    }
+    lock.markUnlocked();
+    closeLock();
+    await enterPrivate();
+  } catch (error) {
+    rejectPin(error.message);
+  } finally {
+    elements.lockSubmit.disabled = false;
+  }
+}
+
+// —— Çevirme ——————————————————————————————————————————————————————————
 
 function normalizeAngle(value) {
   const circle = Math.PI * 2;
@@ -242,14 +449,30 @@ function finishSpin(selection) {
   isSpinning = false;
   selectedVisualId = selection.option.id;
   elements.wheelWrap.classList.remove("is-spinning");
+
+  if (mode === "private") {
+    couples.recordSpin(couplesState, selection.option.label);
+    persist();
+    render();
+    privateUI.showResult(selection.option.label);
+    return;
+  }
+
   persist();
   render();
+  elements.banner.classList.remove("is-new");
+  void elements.banner.offsetWidth; // her kazananda parlama animasyonu baştan oynasın
+  elements.banner.classList.add("is-new");
   showResult(selection.option.label);
 }
 
 function spin() {
   if (isSpinning || !wheel.allOptions.length) return;
-  if (!wheel.availableOptions.length) resetResults(wheel);
+  // Özel modda tur kendiliğinden sıfırlanmaz: kullanıcı "Yeni tur başlat" demeli.
+  if (!wheel.availableOptions.length) {
+    if (mode === "private") return;
+    resetResults(wheel);
+  }
 
   visualOptions = availableOptions();
   selectedVisualId = null;
@@ -289,7 +512,7 @@ function bindEvents() {
 
   elements.optionList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-option-id]");
-    if (!button || isSpinning) return;
+    if (!button || isSpinning || mode !== "normal") return;
     deleteOption(wheel, button.dataset.optionId);
     visualOptions = availableOptions();
     selectedVisualId = null;
@@ -303,8 +526,25 @@ function bindEvents() {
   elements.overlay.addEventListener("click", (event) => {
     if (event.target === elements.overlay) closeResult();
   });
+
+  elements.lockButton.addEventListener("click", () => {
+    if (isSpinning) return;
+    if (mode === "private") lockPrivate();
+    else openLock();
+  });
+  elements.lockForm.addEventListener("submit", submitLock);
+  elements.lockClose.addEventListener("click", closeLock);
+  elements.lockOverlay.addEventListener("click", (event) => {
+    if (event.target === elements.lockOverlay) closeLock();
+  });
+  elements.lockPersist.addEventListener("change", () => lock.setPersistMode(elements.lockPersist.value));
+  elements.pinChange.addEventListener("click", () => setFormMode("change"));
+
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !elements.overlay.hidden) closeResult();
+    if (event.key !== "Escape") return;
+    if (privateUI?.isResultOpen()) privateUI.closeResult();
+    else if (!elements.overlay.hidden) closeResult();
+    else if (!elements.lockOverlay.hidden) closeLock();
   });
 
   const observer = new ResizeObserver(resizeCanvas);
@@ -315,7 +555,21 @@ function bindEvents() {
   }, { once: true });
 }
 
-persist();
-bindEvents();
-render();
-resizeCanvas();
+async function start() {
+  saveStore(store);
+  bindEvents();
+
+  if (wantsPrivate() && lock.isUnlocked()) {
+    await enterPrivate();
+    return;
+  }
+  if (wantsPrivate()) {
+    mode = "locked";
+    lockIconState(false);
+    renderLockedScreen();
+  }
+  render();
+  resizeCanvas();
+}
+
+start();

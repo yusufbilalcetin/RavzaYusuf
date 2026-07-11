@@ -4,7 +4,12 @@ export const STORAGE_KEY = "ravza-wheel-game-v1";
 
 export function createDefaultStore() {
   const wheel = createWheel("Şans Çarkı", ["Seçenek 1"]);
-  return { version: 1, wheels: [wheel], activeWheelId: wheel.id, updatedAt: new Date().toISOString() };
+  return {
+    version: 1,
+    wheels: [wheel],
+    activeWheelId: wheel.id,
+    updatedAt: new Date().toISOString()
+  };
 }
 
 export function loadStore(storage = globalThis.localStorage) {
