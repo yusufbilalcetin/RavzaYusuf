@@ -80,6 +80,38 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   font-weight: 400;
 }
 
+/* Geri butonu: oyun alanına döner. Kilit butonuyla aynı kutuda — simetrik dursun. */
+.back-button {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .18s var(--ease), border-color .18s var(--ease),
+    background .18s var(--ease), transform .18s var(--ease);
+}
+
+.back-button:hover { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+.back-button:active { transform: scale(.94); }
+
+.back-button .icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Marka boşluğu yer: geri butonu solda, kilit sağda kalsın. */
+.brand { margin-right: auto; }
+
 .lock-button {
   flex: 0 0 auto;
   display: grid;
