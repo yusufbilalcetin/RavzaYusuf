@@ -1,0 +1,20 @@
+{
+  "fantastik": {
+    "name": "Fantastik",
+    "alt": "Ravza ve Yusuf fantastik bir öğrenme dünyasında",
+    "desktopPosition": "center center",
+    "mobilePosition": "center 58%"
+  },
+  "yunanistan": {
+    "name": "Yunanistan",
+    "alt": "Ravza ve Yusuf Yunanistan manzarasında",
+    "desktopPosition": "center center",
+    "mobilePosition": "center center"
+  },
+  "paris": {
+    "name": "Paris",
+    "alt": "Ravza ve Yusuf Paris manzarasında",
+    "desktopPosition": "center center",
+    "mobilePosition": "center center"
+  }
+}

@@ -13,7 +13,11 @@ RavzaYusuf/
 ├── admin.html              # Yönetim paneli girişi
 ├── vercel.json             # SPA rewrite kuralı
 │
-├── assets/                 # Görseller (sayfa arka planları, oyun ikonları)
+├── assets/                 # Kategorilere ayrılmış görseller
+│   ├── ana-sayfa/          # Ana sayfa masaüstü ve mobil arka planları
+│   ├── calisma-bolumu/     # Çalışma, quiz ve RavzaLingo arka planları
+│   ├── oyun-bolumu/        # Oyun Alanı kart ikonları ve logoları
+│   └── oyun-ici/           # Oyunların kendi içinde kullandığı görseller
 │
 ├── css/
 │   ├── style.css           # Ana stil girişi — alttaki tüm dosyaları @import eder
@@ -82,3 +86,42 @@ npm run build    # dist/ çıktısını üretir (repoya commit edilir)
 > **Not:** `dist/` klasörü ana site tarafından iframe ile kullanıldığı için
 > repoya dahildir. Oyunda değişiklik yaptıktan sonra `npm run build` çalıştırıp
 > yeni `dist/` çıktısını commit etmeyi unutma.
+
+## Ana Sayfa Hero Görselleri
+
+Ana sayfadaki hero görseli, her yenilemede rastgele bir tema (Fantastik / Paris /
+Yunanistan …) arasından seçilir. Görseller otomatik bir pipeline ile optimize edilir:
+kaynak bir `desktop`+`mobile` çifti eklediğinde sistem içerik-hash'li WebP/AVIF varyantları,
+bir placeholder ve `data/ana-sayfa-gorselleri.generated.js` manifestini otomatik üretir.
+
+- Kaynaklar: `assets/ana-sayfa/original/` — **Git'e eklenmez** (`.gitignore`).
+- Çıktılar: `assets/ana-sayfa/optimized/` — hash'li, immutable cache ile deploy edilir (**Git'e eklenir**).
+- Manifest: `data/ana-sayfa-gorselleri.generated.js` — otomatik üretilir, elle düzenlenmez (**Git'e eklenir**).
+- Tema adı/alt-metni/konumu: `data/ana-sayfa-tema-ayarlari.json` (isteğe bağlı; yoksa güvenli varsayılan).
+
+> ⚠️ **Veri kaybı riski:** `assets/ana-sayfa/original/` klasörü yalnızca senin bilgisayarında
+> durur, repoya gitmez. Orijinal görselleri Google Drive vb. harici bir yerde **yedekle** —
+> bilgisayar kaybında yeniden optimize edecek kaynak kalmaz.
+
+### Komutlar
+
+```bash
+npm run hero:optimize        # eksik/değişmiş temaları optimize et + manifesti güncelle
+npm run hero:watch           # original/ klasörünü izle, ekleme/değişiklikte otomatik üret
+npm run hero:check           # değişiklik yapmadan bütünlük doğrula (CI/hook için, exit 0/1)
+npm run hero:install-hooks   # opt-in: commit öncesi otomatik hero:check (git config core.hooksPath)
+```
+
+### Yeni Ana Sayfa Görseli Ekleme
+
+1. Dosyaları `ulke-desktop.png` ve `ulke-mobile.png` biçiminde hazırla (jpg/webp/avif de olur;
+   Türkçe karakter ve boşluklar otomatik güvenli ada çevrilir).
+2. İkisini birden `assets/ana-sayfa/original/` klasörüne koy.
+3. `npm run hero:watch` çalışıyorsa otomatik üretilir; değilse: `npm run hero:optimize`.
+4. Doğrula: `npm run hero:check` (exit 0 olmalı).
+5. (İsteğe bağlı) `data/ana-sayfa-tema-ayarlari.json` içine doğru `name`/`alt`/konum ekle.
+6. Git'e ekle:
+   ```bash
+   git add assets/ana-sayfa/optimized data/ana-sayfa-gorselleri.generated.js data/ana-sayfa-tema-ayarlari.json
+   ```
+   `assets/ana-sayfa/original/` Git tarafından yok sayılır — commit'e girmez.

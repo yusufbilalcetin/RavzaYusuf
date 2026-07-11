@@ -1,0 +1,8 @@
+#!/bin/sh
+# Ana sayfa hero görsel bütünlüğü — commit öncesi doğrulama.
+# Etkinleştirmek için: npm run hero:install-hooks
+npm run hero:check || {
+  echo "[hero] pre-commit: hero:check başarısız — commit durduruldu."
+  echo "[hero] Düzeltmek için: npm run hero:optimize"
+  exit 1
+}

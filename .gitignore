@@ -2,3 +2,9 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# Ana sayfa hero kaynak PNG'leri (yalnızca yerelde; optimize WebP/AVIF deploy edilir)
+assets/ana-sayfa/original/
+
+# Hero pipeline kaynak-hash cache'i (yerel; silinirse güvenle yeniden üretilir)
+.cache/

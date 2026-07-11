@@ -1,0 +1,17 @@
+{
+  "name": "ravza-yusuf-study-system",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "optimize:home-images": "node ./scripts/optimize-home-images.mjs",
+    "hero:optimize": "node ./scripts/optimize-home-images.mjs",
+    "hero:watch": "node ./scripts/watch-home-images.mjs",
+    "hero:check": "node ./scripts/check-home-images.mjs",
+    "hero:install-hooks": "node ./scripts/install-hooks.mjs",
+    "test:home-hero": "node ./js/pages/ana-sayfa-rastgele-gorsel.test.mjs",
+    "test:home-hero:browser": "node ./js/pages/ana-sayfa-rastgele-gorsel.browser.test.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
+}
