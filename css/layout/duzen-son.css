@@ -1,0 +1,314 @@
+/* =========================================================================
+   DÜZEN — SON KATMAN
+   En son import edilir: hizalama, simetri ve responsive davranışta son sözü
+   bu dosya söyler. Amaç mevcut 22k satırı yeniden yazmak değil, tutarsız
+   kalan yerleri tek bir ölçeğe oturtmak.
+
+   Buradaki !important'lar keyfi değil: alttaki dosyalar (tipografi.css,
+   ana-yerlesim.css, tablet/mobil) aynı kuralları zaten !important ile
+   veriyor; ezmenin başka yolu yok.
+   ========================================================================= */
+
+:root {
+  /* 4'lük boşluk ölçeği — rastgele margin/padding yerine bunlar kullanılır. */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+
+  /* Bileşen ölçeği: aynı tür öğe her yerde aynı görünsün. */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 22px;
+  --r-pill: 999px;
+
+  --ring: 0 0 0 3px rgba(236, 72, 153, .28);
+  --ease-ui: cubic-bezier(.16, 1, .3, 1);
+  --t-fast: .16s var(--ease-ui);
+  --t-base: .24s var(--ease-ui);
+
+  --tap: 44px;          /* dokunmatik minimum hedef */
+  --grid-gap: var(--s-5);
+  --dock-w: var(--sidebar-w);
+}
+
+/* =========================================================================
+   1) SIDEBAR
+   Masaüstünde (>=1024px) sidebar SABİT bir kolon: içeriğin üstüne binmez,
+   karartma yok, hamburger yok. Altında ise çekmece + arka plan perdesi.
+   ========================================================================= */
+
+@media (min-width: 1024px) {
+  /* #app zaten grid; sol boşluk vererek topbar da dahil her şeyi sağa alır. */
+  #app {
+    padding-left: var(--dock-w);
+  }
+
+  .sidebar {
+    transform: none !important;          /* çekmece davranışı iptal */
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, .08) !important;
+  }
+
+  /* Sabit kolonda bunların işi yok. */
+  .menu-toggle,
+  .sidebar-backdrop {
+    display: none !important;
+  }
+
+  /* Sidebar açıkken gövde kaydırması kilitlenmesin. */
+  body.nav-open {
+    overflow: hidden;
+  }
+
+  /* Oyun tam ekrana geçtiğinde sabit kolon oyunu daraltmasın: gerçekten tam ekran olsun. */
+  body.is-game-fullscreen #app {
+    padding-left: 0;
+  }
+
+  body.is-game-fullscreen .sidebar {
+    transform: translateX(-105%) !important;
+  }
+}
+
+@media (max-width: 1023.98px) {
+  /* Çekmece açıkken arkadaki içerik kaydırılmasın ve perde tıklanabilir olsun. */
+  body.nav-open .sidebar-backdrop {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 1150 !important;
+  }
+}
+
+/* Menü öğeleri: eşit yükseklik, ikon + metin dikeyde ortalı, aynı hizada başlar. */
+.nav-links {
+  padding: var(--s-4) var(--s-3) !important;
+  gap: var(--s-2) !important;
+}
+
+.nav-links li button,
+.nav-dropdown-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--s-3) var(--s-4) !important;
+  border-radius: var(--r-md) !important;
+  font-size: 14px;
+  text-align: left;
+  transition: background var(--t-base), border-color var(--t-base), color var(--t-base);
+}
+
+.nav-links li button .nav-icon,
+.nav-dropdown-summary .nav-icon {
+  flex: 0 0 20px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+}
+
+.nav-sublinks {
+  margin: var(--s-2) 0 var(--s-1) var(--s-5) !important;
+  padding-left: var(--s-3) !important;
+  gap: var(--s-2) !important;
+}
+
+.nav-sublinks li button {
+  min-height: 40px;
+  padding: var(--s-2) var(--s-3) !important;
+  font-size: 13.5px;
+}
+
+/* Bölüm başlıkları: her ikisi de aynı görünsün (önceden yalnızca birinde ayraç vardı). */
+.nav-section-label {
+  margin: var(--s-4) var(--s-2) var(--s-1);
+  padding-top: var(--s-4);
+  border-top: 1px solid rgba(255, 255, 255, .10);
+  color: rgba(255, 232, 244, .58);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+/* Tema satırı: sol etiket · sağ ay ikonu · ortada anahtar — dengeli ve hizalı. */
+.sidebar-theme {
+  display: grid !important;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5) !important;
+}
+
+.sidebar-theme .theme-switch-label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.theme-switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 52px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, .12);
+  cursor: pointer;
+  transition: background var(--t-base);
+}
+
+/* Topuz zaten .theme-switch::before ile çiziliyor (tipografi.css) — ikinci bir
+   topuz eklemiyoruz, sadece rayın ölçüsüne oturtuyoruz. */
+.theme-switch::before {
+  width: 22px !important;
+  height: 22px !important;
+  top: 3px !important;
+  left: 3px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .28);
+}
+
+body.dark .theme-switch::before { transform: translateX(22px) !important; }
+
+.sidebar-footer {
+  padding: var(--s-4) var(--s-5) !important;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Topbar: başlık gerçekten ortada dursun.
+   `1fr auto 1fr` idi; yan kolonlar içeriklerinin min genişliğinden küçülemediği
+   için sağdaki buton grubu kolonu şişiriyor, ortadaki başlığı sola kaydırıyordu. */
+.topbar {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+  gap: var(--s-3) !important;
+  padding-inline: clamp(var(--s-3), 2.5vw, var(--s-6)) !important;
+}
+
+/* Kolonlar açıkça atanır: hamburger `display:none` olunca grid'den düşüyor ve
+   marka + sağ blok birer kolon sola kayıyordu (başlık ortada durmuyordu). */
+.menu-toggle { grid-column: 1; }
+
+.topbar-love-brand {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.topbar-right {
+  grid-column: 3;
+  justify-self: end;
+}
+
+/* =========================================================================
+   2) IZGARALAR VE KARTLAR
+   Aynı satırdaki kartlar eşit yükseklikte, butonlar aynı hizada bitsin.
+   ========================================================================= */
+
+.hub-grid,
+.panel-grid,
+.progress-shell {
+  display: grid;
+  align-items: stretch;
+  gap: var(--grid-gap);
+}
+
+/* Kart genişliği ekrana göre: dar ekranda tek kolon, geniş ekranda otomatik.
+   #studyhub/#quizhub seçicileri alt dosyalarda 300-340px min veriyordu; sidebar
+   sabit kolona dönünce içerik daralıp kolon sayısı 3'ten 2'ye düşüyordu. */
+.hub-grid,
+#studyhub .hub-grid,
+#quizhub .hub-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)) !important;
+}
+
+.topic-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  height: 100%;
+  padding: var(--s-5) !important;
+  border-radius: var(--r-lg);
+}
+
+/* Metin bloğu boşluğu yer: böylece buton satırı her kartta EN ALTA yapışır. */
+.topic-card > :not(.topic-card-top):not(.topic-actions) {
+  flex: 1 1 auto;
+}
+
+/* Rozet satırı: rozet içeriği kadar geniş olsun ve ortalansın.
+   Kart flex kolona çevrilince rozet kart genişliğine yayılıyordu. */
+.topic-card-top {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 26px;
+}
+
+.topic-card-top > * {
+  flex: 0 0 auto;
+  width: auto !important;
+}
+
+/* Butonlar: eşit genişlik, eşit yükseklik, sabit dizilim.
+   Önceden flex-wrap vardı: etiket uzunluğuna göre bazı kartlarda yan yana,
+   bazılarında alt alta diziliyor ve alt kenarlar hizasını kaybediyordu. */
+.topic-actions {
+  display: grid !important;
+  grid-template-columns: 1fr;
+  gap: var(--s-2);
+  margin-top: auto;
+  flex-wrap: nowrap !important;
+}
+
+.topic-actions > button {
+  width: 100%;
+  min-height: var(--tap);
+  border-radius: var(--r-pill);
+  transition: transform var(--t-fast), box-shadow var(--t-base), background var(--t-base);
+}
+
+.topic-actions > button:active {
+  transform: translateY(1px);
+}
+
+/* =========================================================================
+   3) DOKUNMATİK HEDEFLER VE TİPOGRAFİ
+   ========================================================================= */
+
+@media (max-width: 768px) {
+  .topic-actions > button,
+  .primary-btn,
+  .mark-btn,
+  .hub-search,
+  .search-bar input {
+    min-height: var(--tap);
+  }
+
+  /* Mobilde başlık ölçeği: okunur ama taşmaz. */
+  .page h1,
+  .hub-title {
+    font-size: clamp(22px, 6vw, 30px);
+    line-height: 1.25;
+  }
+
+  .topic-title {
+    font-size: clamp(15px, 4.2vw, 19px);
+  }
+}
+
+/* Uzun içerik hiçbir ekranda yatay taşma yapmasın. */
+.page,
+.topic-card,
+.content-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

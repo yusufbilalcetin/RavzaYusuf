@@ -8196,7 +8196,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .rlz5-banner-text{display:grid;gap:2px;color:#fff;min-width:0}
       .rlz5-banner-kicker{display:block;font-size:10px;font-weight:900;letter-spacing:.14em;color:rgba(255,255,255,.85)}
       .rlz5-banner-text strong{display:block;font-size:18px;font-weight:900;line-height:1.2;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      .rlz5-banner-guide{flex-shrink:0;width:42px;height:42px;border:0;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+      .rlz5-banner-guide{flex-shrink:0;width:44px;height:44px;border:0;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:18px;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 0 rgba(0,0,0,.18)}
       .rlz5-banner-guide:hover{background:rgba(255,255,255,.28)}
 
       .rlz5-path-row{display:flex;justify-content:center;padding:10px 0;position:relative}
@@ -8362,7 +8362,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .rlz5-unit-banner{padding:11px 12px;border-radius:14px;top:calc(124px + env(safe-area-inset-top,0px));gap:8px}
         .rlz5-banner-text strong{font-size:14px}
         .rlz5-banner-kicker{font-size:9px}
-        .rlz5-banner-guide{width:38px;height:38px;font-size:15px}
+        .rlz5-banner-guide{width:44px;height:44px;font-size:15px}
 
         /* PATH NODE'LARI — viewport-relative offset (taşma yok) */
         .rlz5-path-track{padding:6px 0 24px}
@@ -8433,7 +8433,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .rlz5-section-divider>div{padding:8px 18px}
         .rlz5-unit-banner{padding:10px 12px}
         .rlz5-banner-text strong{font-size:13px;white-space:normal;line-height:1.25}
-        .rlz5-banner-guide{width:36px;height:36px;font-size:14px}
+        .rlz5-banner-guide{width:44px;height:44px;font-size:14px}
 
         .rlz5-prompt{font-size:18px}
         .rlz5-speech{font-size:15px;padding:12px}

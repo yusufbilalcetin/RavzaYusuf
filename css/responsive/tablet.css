@@ -1242,7 +1242,8 @@
 }
 
 @media (min-width: 769px) {
-  #page-root,
+  /* #page-root listeden çıkarıldı: ortalanmış konteyner olarak kalması gerekiyor
+     (bkz. viewport-fixes.css). İçindeki sayfalar tam genişlikte kalmaya devam ediyor. */
   #page-root > .page,
   #dashboard,
   #ravzalingo,

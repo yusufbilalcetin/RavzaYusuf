@@ -80,17 +80,27 @@ body {
   isolation: isolate;
 }
 
+/* Ortalanmış konteyner: geniş ekranda içerik kenarlara yapışmasın.
+   1640px altındaki her ekranda tam genişlik — yani mevcut davranış değişmez. */
 .content-wrapper {
   width: 100% !important;
-  max-width: none !important;
+  max-width: min(100%, 1640px) !important;
   min-height: 100% !important;
   height: auto !important;
-  margin: 0 !important;
+  margin-block: 0 !important;
+  margin-inline: auto !important;
   padding: var(--app-page-pad-y) var(--app-page-pad-x) !important;
   overflow: visible !important;
 }
 
-#page-root,
+/* #page-root, .content-wrapper ile aynı elemandır; ID seçici sınıfı ezdiği için
+   ortalanmış max-width'i burada da vermek gerekiyor. İç sayfalar tam genişlikte kalır. */
+#page-root {
+  width: 100% !important;
+  max-width: min(100%, 1640px) !important;
+  margin-inline: auto !important;
+}
+
 #page-root > .page {
   width: 100% !important;
   max-width: none !important;

@@ -2861,7 +2861,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
 }
 
 .nav-section-label {
-  margin: 16px 12px 6px;
+  margin: 10px 12px 2px;
   color: rgba(255, 232, 244, .58);
   font-size: 11px;
   font-weight: 800;
@@ -2869,8 +2869,10 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   text-transform: uppercase;
 }
 
+/* margin-top:auto idi — "OYUN"u menü kutusunun dibine itip üstündeki açılır panelin
+   taşmasına yol açıyordu. Artık akışta sırayla geliyor, ayrımı üst çizgi veriyor. */
 .nav-section-label-game {
-  margin-top: auto;
+  margin-top: 14px;
   padding-top: 18px;
   border-top: 1px solid rgba(255, 196, 226, .18);
 }

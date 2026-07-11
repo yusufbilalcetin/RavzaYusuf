@@ -70,8 +70,8 @@
 
   #studyhub .primary-btn,
   #studyhub .mark-btn {
-    min-height: 38px;
-    padding: 9px 10px;
+    min-height: 44px;
+    padding: 10px;
     font-size: 12px;
   }
 }
@@ -148,8 +148,8 @@
 
   #quizhub .primary-btn,
   #quizhub .mark-btn {
-    min-height: 38px;
-    padding: 9px 10px;
+    min-height: 44px;
+    padding: 10px;
     font-size: 12px;
   }
 }
@@ -597,7 +597,8 @@
   input[type="submit"],
   input[type="button"],
   select {
-    min-height: 40px;
+    /* Dokunmatik hedef alt sınırı: parmakla rahat basılabilmesi için 44px. */
+    min-height: 44px;
   }
 }
 

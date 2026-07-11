@@ -348,9 +348,12 @@ iframe { border: 0; }
   max-width: none !important;
 }
 
+/* Tam ekran yerleşim, ama sonsuz değil: çok geniş ekranda içerik ortalanır,
+   kenarlara yapışmaz. 1640px altındaki ekranlarda davranış değişmez. */
 .content-wrapper {
   width: 100% !important;
-  max-width: none !important;
+  max-width: min(100%, 1640px) !important;
+  margin-inline: auto !important;
 }
 
 /* Kartlar okunabilir kalsın; arka plan tamamen kapanmasın */
