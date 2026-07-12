@@ -1,6 +1,7 @@
 import { db } from "../config/firebase-config.js";
 import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { loadAllQuizzes } from "../services/quiz-service.js";
+import { withTimeout } from "../utils/helpers.js";
 import {
   doc,
   getDoc,
@@ -1211,10 +1212,15 @@ function searchTopics(event) {
   navigate("studyhub");
 }
 
+// Firestore isteği askıda kalırsa (zayıf/kesik mobil bağlantı) ana sayfa
+// içeriğini sonsuza dek bekletmemek için sınırlı süre sonra vazgeçilir;
+// veri gelmemiş sayılır, kullanıcı yerel varsayılanlarla devam eder.
+const PROGRESS_LOAD_TIMEOUT_MS = 8000;
+
 async function loadProgressFromFirebase() {
   try {
-    const snap = await getDoc(progressRef);
-    if (!snap.exists()) return;
+    const snap = await withTimeout(getDoc(progressRef), PROGRESS_LOAD_TIMEOUT_MS, null);
+    if (!snap || !snap.exists()) return;
 
     const data = snap.data();
 

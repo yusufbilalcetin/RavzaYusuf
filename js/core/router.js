@@ -51,6 +51,10 @@ const routes = {
 };
 
 let isNavigating = false;
+// Yavaş bir navigate() (ör. geciken partial fetch) daha sonra başlayan ve
+// daha hızlı biten bir navigate()'i geride bırakırsa, geç gelen eski cevap
+// güncel rotanın DOM'unu ezmesin diye artan bir jeton kullanılır.
+let navigationToken = 0;
 
 function scrollAppToTop(behavior = "smooth") {
   scrollAppTo({ top: 0, left: 0, behavior });
@@ -107,20 +111,31 @@ export async function navigate(pageName = "ana-sayfa") {
   if (!route) return navigate("ana-sayfa");
   if (isNavigating && appState.currentRoute === routeName) return;
 
+  const myToken = ++navigationToken;
   isNavigating = true;
   try {
     await ensureRouteMounted(routeName);
+    // Bu bekleme sırasında daha yeni bir navigate() başladıysa, bu eski
+    // çağrı artık güncel değildir; DOM'a yazmadan sessizce çekilir.
+    if (myToken !== navigationToken) return;
+    document.querySelector("#page-root .startup-fallback")?.remove();
     setActivePage(route);
     appState.currentRoute = routeName;
     window.closeMobileMenu?.();
     const initResult = await route.init?.();
+    if (myToken !== navigationToken) return;
     if (!initResult?.skipTopScroll) scrollAppToTop("auto");
   } catch (error) {
     console.error(error);
+    if (myToken !== navigationToken) return;
     const root = document.getElementById("page-root");
-    if (root) root.insertAdjacentHTML("beforeend", `<div class="empty-grid">Sayfa yüklenemedi. Lütfen tekrar deneyin.</div>`);
+    if (root) {
+      root.querySelector(".startup-fallback")?.remove();
+      root.querySelectorAll(".startup-error").forEach((el) => el.remove());
+      root.insertAdjacentHTML("beforeend", `<div class="empty-grid startup-error">Sayfa yüklenemedi. <button type="button" onclick="window.navigate('${routeName}')">Tekrar dene</button></div>`);
+    }
   } finally {
-    isNavigating = false;
+    if (myToken === navigationToken) isNavigating = false;
   }
 }
 

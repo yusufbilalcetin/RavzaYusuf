@@ -6,6 +6,17 @@ import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ANA_SAYFA_GORSELLERI } from "../../data/ana-sayfa-gorselleri.js";
+import { validThemes } from "./ana-sayfa-rastgele-gorsel.js";
+
+// Gerçek üretim havuzundan türetilir; yeni tema eklendiğinde test kırılmaz.
+const HERO_THEME_POOL = validThemes(ANA_SAYFA_GORSELLERI);
+assert.ok(HERO_THEME_POOL.length > 0, "En az bir geçerli tema bulunmalı");
+const HERO_THEME_IDS = HERO_THEME_POOL.map((theme) => theme.id);
+assert.equal(new Set(HERO_THEME_IDS).size, HERO_THEME_IDS.length, "Tema havuzunda duplicate id var");
+for (const theme of HERO_THEME_POOL) {
+  assert.ok(theme.desktop.fallback && theme.mobile.fallback && theme.placeholder, `${theme.id}: boş görsel URL'i`);
+}
 
 const projectRoot = resolve(fileURLToPath(new URL("../../", import.meta.url)));
 const edge = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
@@ -195,8 +206,9 @@ try {
   await command("Page.navigate", { url: `http://127.0.0.1:${serverPort}/index.html` });
   await waitForValue("document.querySelector('#anaSayfaHeroStage')?.classList.contains('is-home-hero-loaded')");
   const desktop = await getHeroState();
-  assert.ok(["fantastik", "yunanistan", "paris"].includes(desktop.theme));
+  assert.ok(HERO_THEME_IDS.includes(desktop.theme), `Seçilen tema (${desktop.theme}) üretim havuzunda yok: ${HERO_THEME_IDS.join(", ")}`);
   assert.match(desktop.currentSrc, new RegExp(`${desktop.theme}-desktop-\\d+-[0-9a-f]{8}\\.(avif|webp)$`));
+  assert.ok(desktop.currentSrc && !desktop.currentSrc.endsWith("undefined"), "currentSrc boş/geçersiz");
   assert.ok(desktop.naturalWidth > 0);
   assert.equal(desktop.scrollWidth, desktop.innerWidth);
   assert.match(desktop.placeholder, new RegExp(`${desktop.theme}-placeholder-[0-9a-f]{8}\\.webp`));

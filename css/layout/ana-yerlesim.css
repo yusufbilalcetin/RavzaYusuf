@@ -48,6 +48,15 @@ img, video, canvas, svg, iframe { max-width: 100%; height: auto; }
 
 .page.active { display: block; }
 
+.startup-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  color: var(--text-muted, inherit);
+  text-align: center;
+}
+
 /* Çalışma Merkezi: yalnızca ana liste sayfası görünümü */
 
 /* Study Hub kartları — arka plan her zaman koyu resim, metin her zaman açık */
