@@ -128,6 +128,24 @@ export const ANA_SAYFA_GORSELLERI = Object.freeze([
     "mobilePosition": "center center"
   },
   {
+    "id": "restaurant",
+    "name": "Restaurant",
+    "alt": "Yusuf ve Ravza Restaurant manzarasında",
+    "desktop": {
+      "fallback": "./assets/ana-sayfa/optimized/restaurant-desktop-1280-88d226c5.webp",
+      "webpSrcSet": "./assets/ana-sayfa/optimized/restaurant-desktop-960-a036d51e.webp 960w, ./assets/ana-sayfa/optimized/restaurant-desktop-1280-88d226c5.webp 1280w, ./assets/ana-sayfa/optimized/restaurant-desktop-1600-7da54fc2.webp 1600w",
+      "avifSrcSet": "./assets/ana-sayfa/optimized/restaurant-desktop-960-b509f21e.avif 960w, ./assets/ana-sayfa/optimized/restaurant-desktop-1280-8414de3f.avif 1280w, ./assets/ana-sayfa/optimized/restaurant-desktop-1600-4e04a0e5.avif 1600w"
+    },
+    "mobile": {
+      "fallback": "./assets/ana-sayfa/optimized/restaurant-mobile-480-175305e3.webp",
+      "webpSrcSet": "./assets/ana-sayfa/optimized/restaurant-mobile-360-7624e7b9.webp 360w, ./assets/ana-sayfa/optimized/restaurant-mobile-480-175305e3.webp 480w, ./assets/ana-sayfa/optimized/restaurant-mobile-720-c601eb15.webp 720w",
+      "avifSrcSet": "./assets/ana-sayfa/optimized/restaurant-mobile-360-d57c8e02.avif 360w, ./assets/ana-sayfa/optimized/restaurant-mobile-480-3dea46cc.avif 480w, ./assets/ana-sayfa/optimized/restaurant-mobile-720-78c61c08.avif 720w"
+    },
+    "placeholder": "./assets/ana-sayfa/optimized/restaurant-placeholder-27712122.webp",
+    "desktopPosition": "center center",
+    "mobilePosition": "center center"
+  },
+  {
     "id": "troll",
     "name": "Troll",
     "alt": "Yusuf ve Ravza Troll manzarasında",
@@ -142,6 +160,24 @@ export const ANA_SAYFA_GORSELLERI = Object.freeze([
       "avifSrcSet": "./assets/ana-sayfa/optimized/troll-mobile-360-160256f3.avif 360w, ./assets/ana-sayfa/optimized/troll-mobile-480-6bcf2b12.avif 480w, ./assets/ana-sayfa/optimized/troll-mobile-720-da23db1d.avif 720w"
     },
     "placeholder": "./assets/ana-sayfa/optimized/troll-placeholder-d8d5e94c.webp",
+    "desktopPosition": "center center",
+    "mobilePosition": "center center"
+  },
+  {
+    "id": "troll2",
+    "name": "Troll2",
+    "alt": "Yusuf ve Ravza Troll2 manzarasında",
+    "desktop": {
+      "fallback": "./assets/ana-sayfa/optimized/troll2-desktop-1280-79a09298.webp",
+      "webpSrcSet": "./assets/ana-sayfa/optimized/troll2-desktop-960-c70c5a02.webp 960w, ./assets/ana-sayfa/optimized/troll2-desktop-1280-79a09298.webp 1280w, ./assets/ana-sayfa/optimized/troll2-desktop-1600-a55498ff.webp 1600w",
+      "avifSrcSet": "./assets/ana-sayfa/optimized/troll2-desktop-960-dcd6e1b5.avif 960w, ./assets/ana-sayfa/optimized/troll2-desktop-1280-0d014847.avif 1280w, ./assets/ana-sayfa/optimized/troll2-desktop-1600-91e43d4c.avif 1600w"
+    },
+    "mobile": {
+      "fallback": "./assets/ana-sayfa/optimized/troll2-mobile-480-9d34cce2.webp",
+      "webpSrcSet": "./assets/ana-sayfa/optimized/troll2-mobile-360-7783eb46.webp 360w, ./assets/ana-sayfa/optimized/troll2-mobile-480-9d34cce2.webp 480w, ./assets/ana-sayfa/optimized/troll2-mobile-720-0da39d62.webp 720w",
+      "avifSrcSet": "./assets/ana-sayfa/optimized/troll2-mobile-360-709c3064.avif 360w, ./assets/ana-sayfa/optimized/troll2-mobile-480-06ebd135.avif 480w, ./assets/ana-sayfa/optimized/troll2-mobile-720-4396321e.avif 720w"
+    },
+    "placeholder": "./assets/ana-sayfa/optimized/troll2-placeholder-8a14729a.webp",
     "desktopPosition": "center center",
     "mobilePosition": "center center"
   },
