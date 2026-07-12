@@ -14,7 +14,7 @@ import {
   verifyPin
 } from "./private-pin.js";
 import { createLockReveal } from "./lock-reveal.js";
-import { POINTER_ANGLE, targetRotationFor } from "./wheel-math.js";
+import { POINTER_ANGLE, targetRotationFor, indexAtPointer, sliceAngle } from "./wheel-math.js";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 
@@ -32,6 +32,7 @@ const elements = {
   inputHelp: $("#inputHelp"),
   optionList: $("#optionList"),
   optionPanel: $(".option-panel"),
+  optionColumn: $(".option-column"),
   wheelPanel: $(".wheel-panel"),
   privateHost: $("#privateHost"),
   wheelWrap: $("#wheelWrap"),
@@ -46,7 +47,13 @@ const elements = {
   lockInput: $("#lockInput"),
   lockError: $("#lockError"),
   lockSubmit: $("#lockSubmit"),
-  lockClose: $("#lockClose")
+  lockClose: $("#lockClose"),
+  themeToggle: $("#themeToggle"),
+  statTotal: $("#statTotal"),
+  statRemaining: $("#statRemaining"),
+  restartButton: $("#restartButton"),
+  wheelPegs: $("#wheelPegs"),
+  pointer: $(".wheel-pointer")
 };
 
 const context = elements.canvas.getContext("2d");
@@ -68,8 +75,48 @@ let privateUI = null;
 let lockReveal = null;     // gizli kilit butonu (başlığa üç kez dokununca üretilir)
 
 // Dilim renkleri: beyaz metinle WCAG AA sağlayan koyu tonlar (kontrast oranı ≥ 4.5:1).
-// Komşu dilimler kolayca ayrılsın diye ton/parlaklık dönüşümlü; neon yok.
-const COLORS = ["#9d0038", "#5f2b6b", "#0f6272", "#8a5a10", "#2f5480", "#4a6b28", "#a03356", "#403a80"];
+// Komşu dilimler kolayca ayrılsın diye ton/parlaklık dönüşümlü; neon yok. Bu 7 renk
+// css/style.css'teki --wheel-1..7 değişkenleriyle birebir eşleşir (canvas fill string'i
+// CSS custom property okuyamadığı için burada ayrıca sabit tutulur, bkz. plan notu).
+const COLORS = ["#8e0e3f", "#5b2a86", "#1c3f6e", "#0e6e6a", "#3f7d3a", "#b8860a", "#b0416b"];
+
+// >60 seçenekte pegler gösterilmez (etiket kesme eşiğiyle tutarlı bir görsel gürültü sınırı).
+const MAX_PEGS = 60;
+let lastPegCount = -1;
+let lastPointerIndex = null;
+let audioCtx = null;
+
+// —— Tema (koyu/açık) ————————————————————————————————————————————————
+
+const THEME_KEY = "ravza-wheel-theme-v1";
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  elements.themeToggle.setAttribute("aria-pressed", String(theme === "dark"));
+  elements.themeToggle.setAttribute("aria-label", theme === "dark" ? "Açık temaya geç" : "Koyu temaya geç");
+  elements.themeToggle.querySelector(".icon-sun").hidden = theme === "dark";
+  elements.themeToggle.querySelector(".icon-moon").hidden = theme !== "dark";
+}
+
+function initTheme() {
+  let saved = null;
+  try {
+    saved = localStorage.getItem(THEME_KEY);
+  } catch {
+    saved = null;
+  }
+  applyTheme(saved === "dark" ? "dark" : "light");
+}
+
+function toggleTheme() {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch {
+    // Depolama kapalıysa tema yalnızca bu oturumda uygulanır.
+  }
+  applyTheme(next);
+}
 
 function optionById(id) {
   return wheel.allOptions.find((option) => option.id === id);
@@ -198,6 +245,32 @@ function drawWheel(options = visualOptions, angle = rotation) {
   });
 }
 
+/**
+ * Segment sınırlarındaki gümüş pegleri üretir. Açı hesabı drawWheel'in kullandığı
+ * `POINTER_ANGLE + index*slice` modeliyle birebir aynıdır (wheel-math.js'ten salt-okunur
+ * `sliceAngle`); pegler tek tek değil, `#wheelPegs` konteyneri toptan `rotation` ile
+ * döndürülerek çarkla senkron tutulur (bkz. animate()/settle()). Yalnızca seçenek sayısı
+ * değiştiğinde yeniden üretilir — resize'da JS'siz, CSS yüzdeleriyle otomatik ölçeklenir.
+ */
+function renderPegs(count) {
+  if (count === lastPegCount) return;
+  lastPegCount = count;
+  if (!count || count > MAX_PEGS) {
+    elements.wheelPegs.replaceChildren();
+    return;
+  }
+  const slice = sliceAngle(count);
+  const pegs = Array.from({ length: count }, (_, index) => {
+    const angle = POINTER_ANGLE + index * slice;
+    const peg = document.createElement("i");
+    peg.className = "wheel-peg";
+    peg.style.left = `${50 + 48.5 * Math.cos(angle)}%`;
+    peg.style.top = `${50 + 48.5 * Math.sin(angle)}%`;
+    return peg;
+  });
+  elements.wheelPegs.replaceChildren(...pegs);
+}
+
 function createOptionRow(option) {
   const row = document.createElement("div");
   row.className = "option-row";
@@ -216,12 +289,18 @@ function createOptionRow(option) {
 function render() {
   const isPrivate = mode === "private";
   elements.optionPanel.hidden = mode !== "normal";
+  // .option-panel'in sarmalayıcısı: özel/kilitli modda bu sütun tamamen kalksın, yoksa
+  // içindeki not metni boş bir grid hücresi olarak kalıp #privateHost'un yerleşimini bozar.
+  elements.optionColumn.hidden = mode !== "normal";
   elements.wheelPanel.hidden = mode === "locked";
   elements.privateHost.hidden = mode === "normal";
   elements.app.classList.toggle("is-locked", mode === "locked");
 
   if (mode === "normal") {
     elements.optionCount.textContent = String(wheel.allOptions.length);
+    elements.statTotal.textContent = String(wheel.allOptions.length);
+    elements.statRemaining.textContent = String(wheel.availableOptions.length);
+    elements.restartButton.hidden = !wheel.usedOptions.length;
     elements.optionList.replaceChildren(...wheel.allOptions.map(createOptionRow));
     elements.bannerText.textContent = wheel.currentResult?.value || "Henüz seçim yok";
   }
@@ -232,6 +311,7 @@ function render() {
     ? `${wheel.allOptions.length} seçenekli şans çarkı`
     : "Boş şans çarkı");
   drawWheel();
+  renderPegs(visualOptions.length);
 }
 
 function replaceEntryField(isBulk) {
@@ -459,6 +539,50 @@ function closeResult() {
   elements.spinButton.focus();
 }
 
+// —— İbre "tık" tepkisi —————————————————————————————————————————————
+// wheel-math.js'in indexAtPointer'ı ile hangi dilimin ibrenin altından geçtiğini algılar;
+// kendi açı hesaplamasını yapmaz, drawWheel'in kullandığı aynı modeli salt-okunur tüketir.
+
+function tickPointerIfCrossed(progress) {
+  const currentIndex = indexAtPointer(rotation, visualOptions.length);
+  if (lastPointerIndex !== null && currentIndex !== lastPointerIndex) {
+    const strong = progress > .85;
+    elements.pointer.classList.remove("is-tick", "is-tick-strong");
+    void elements.pointer.offsetWidth; // reflow: animasyon baştan oynasın (bannerGlow/shake ile aynı idiom)
+    elements.pointer.classList.add(strong ? "is-tick-strong" : "is-tick");
+    playTickSound();
+  }
+  lastPointerIndex = currentIndex;
+}
+
+/**
+ * Opsiyonel kısa "tık" sesi (WebAudio, dosya yok). yalnızca spin() (kullanıcı jesti) sırasında
+ * çağrılır, bu yüzden AudioContext her zaman bir jest çağrı yığınının içinde oluşturulur.
+ * Tüm hatalar sessizce yutulur — konsola hiçbir şey yazılmaz (tests/wheel-browser.test.mjs
+ * konsolun tamamen temiz kalmasını doğruluyor).
+ */
+function playTickSound() {
+  try {
+    if (wheel.settings?.sound === false) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      audioCtx = new Ctx();
+    }
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = 1200;
+    gain.gain.setValueAtTime(.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + .05);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + .05);
+  } catch {
+    // Ses her zaman opsiyoneldir: herhangi bir tarayıcı/ortam kısıtı sessizce yok sayılır.
+  }
+}
+
 function finishSpin(selection) {
   isSpinning = false;
   selectedVisualId = selection.option.id;
@@ -490,6 +614,7 @@ function spin() {
 
   visualOptions = availableOptions();
   selectedVisualId = null;
+  lastPointerIndex = null;
   const selection = selectOption(wheel);
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -511,6 +636,7 @@ function spin() {
     document.removeEventListener("visibilitychange", onVisibility);
     rotation = target; // kayan nokta birikimi kalmasın: son kare tam hedefe otursun
     drawWheel(visualOptions, rotation);
+    elements.wheelPegs.style.transform = `rotate(${rotation}rad)`;
     finishSpin(selection);
   }
 
@@ -530,6 +656,8 @@ function spin() {
     }
     rotation = startRotation + totalRotation * easeOutQuint(progress);
     drawWheel(visualOptions, rotation);
+    elements.wheelPegs.style.transform = `rotate(${rotation}rad)`;
+    tickPointerIfCrossed(progress);
     animationFrame = requestAnimationFrame(animate);
   }
 
@@ -560,6 +688,18 @@ function bindEvents() {
   elements.modalClose.addEventListener("click", closeResult);
   elements.overlay.addEventListener("click", (event) => {
     if (event.target === elements.overlay) closeResult();
+  });
+
+  elements.themeToggle.addEventListener("click", toggleTheme);
+
+  elements.restartButton.addEventListener("click", () => {
+    if (isSpinning || mode !== "normal" || !wheel.allOptions.length) return;
+    resetResults(wheel);
+    visualOptions = availableOptions();
+    selectedVisualId = null;
+    rotation = 0;
+    persist();
+    render();
   });
 
   // Kilit butonu DOM'da yok: başlığa 650 ms içinde üç kez dokununca üretilir, 10 sn sonra kaldırılır.
@@ -606,6 +746,7 @@ function bindEvents() {
 
 function start() {
   saveStore(store);
+  initTheme();
   bindEvents();
   render();
   resizeCanvas();

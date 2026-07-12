@@ -238,16 +238,20 @@ try {
   await delay(1200);
 
   // 10 · Doğru PIN ile özel çark açılır.
+  // .private-counts tek paragraftan iki stat-card'a bölündü (görsel yenileme); aynı alttaki
+  // sayı test ediliyor, yalnızca DOM şekli değişti — bkz. js/couples.js data-stat öznitelikleri.
   const unlocked = await evaluate(`({
     panel: document.querySelectorAll('.private-panel').length,
-    counts: document.querySelector('.private-counts')?.textContent,
+    statTotal: document.querySelector('[data-stat=total]')?.textContent,
+    statRemaining: document.querySelector('[data-stat=remaining]')?.textContent,
     optionPanelHidden: document.querySelector('.option-panel')?.hidden,
     lockButton: document.querySelectorAll('#lockButton').length,
     optionPanelDisplay: getComputedStyle(document.querySelector('.option-panel')).display,
     resultDisplay: getComputedStyle(document.querySelector('.couples-overlay')).display
   })`);
   assert.equal(unlocked.panel, 1);
-  assert.equal(unlocked.counts, "Toplam seçenek 28 · Kalan seçenek 28");
+  assert.equal(unlocked.statTotal, "28");
+  assert.equal(unlocked.statRemaining, "28");
   assert.equal(unlocked.optionPanelHidden, true, "özel moddayken normal seçenek paneli gizlenmeli");
   assert.equal(unlocked.optionPanelDisplay, "none", "gizlenen normal panel gerçekten görünmemeli");
   assert.equal(unlocked.resultDisplay, "none", "sonuç modalı çevirmeden önce görünmemeli");
@@ -259,6 +263,28 @@ try {
   assert.equal(await evaluate(`document.querySelector('#lockButton').getAttribute('aria-label')`), "Özel alanı kilitle");
   ok("doğru şifre ile özel çark açılıyor, 28 seçenekle başlıyor (10)");
 
+  assert.equal(await evaluate("document.querySelectorAll('.wheel-peg').length"), 28,
+    "Özel Çark'ta peg sayısı sabit 28 pozisyonla eşleşmeli");
+  ok("Özel Çark'ta peg sayısı 28");
+
+  // Favoriler/Geçmiş başlıkları katlanıp açılabiliyor.
+  const collapsible = await evaluate(`({
+    favExpanded: document.querySelectorAll('.private-heading')[0]?.getAttribute('aria-expanded'),
+    historyExpanded: document.querySelectorAll('.private-heading')[1]?.getAttribute('aria-expanded')
+  })`);
+  assert.equal(collapsible.favExpanded, "true", "Favoriler başlangıçta açık olmalı");
+  assert.equal(collapsible.historyExpanded, "true", "Geçmiş başlangıçta açık olmalı");
+  await evaluate("document.querySelectorAll('.private-heading')[0].click()");
+  await delay(100);
+  assert.equal(await evaluate("document.querySelectorAll('.private-heading')[0].getAttribute('aria-expanded')"), "false",
+    "Favoriler başlığına tıklayınca kapanmalı");
+  assert.equal(await evaluate("document.querySelectorAll('.private-section')[0].hidden"), true,
+    "Favoriler içeriği kapanınca gizlenmeli");
+  await evaluate("document.querySelectorAll('.private-heading')[0].click()"); // geri aç
+  await delay(100);
+  assert.equal(await evaluate("document.querySelectorAll('.private-section')[0].hidden"), false);
+  ok("Favoriler/Geçmiş başlıkları katlanıp açılabiliyor");
+
   // Sonuç: pozisyon numarası + görsel (kaynak dosya değil).
   await evaluate("document.querySelector('#spinButton').click()");
   await delay(900);
@@ -267,12 +293,14 @@ try {
     code: document.querySelector('.couples-code')?.textContent,
     caption: document.querySelector('.couples-caption')?.textContent,
     image: document.querySelector('.couples-figure img')?.getAttribute('src'),
-    counts: document.querySelector('.private-counts')?.textContent
+    statTotal: document.querySelector('[data-stat=total]')?.textContent,
+    statRemaining: document.querySelector('[data-stat=remaining]')?.textContent
   })`);
   assert.match(result.code, /^\d{2}$/, "sonuçta pozisyon numarası gösterilmeli");
   assert.match(result.caption, /^\d+\. pozisyon$/);
   assert.match(result.image, /^data:image\/webp;base64,/, "Firestore'dan gelen WebP Data URL gösterilmeli");
-  assert.equal(result.counts, "Toplam seçenek 28 · Kalan seçenek 27");
+  assert.equal(result.statTotal, "28");
+  assert.equal(result.statRemaining, "27");
   assert.equal(await evaluate(`performance.getEntriesByType('resource').some((entry) => /ciftler-carki\\/sources\\//.test(entry.name))`), false,
     "kaynak görseller hiçbir zaman yüklenmemeli");
   ok("sonuç modalı numara + pozisyon görseli gösteriyor, kaynak dosya yüklenmiyor");
@@ -288,7 +316,8 @@ try {
     await evaluate("document.querySelector('.couples-actions .primary-button').click()");
   }
   assert.equal(new Set(seen).size, seen.length, `aynı tur içinde tekrar eden kod: ${seen.join(", ")}`);
-  assert.equal(await evaluate("document.querySelector('.private-counts').textContent"), "Toplam seçenek 28 · Kalan seçenek 24");
+  assert.equal(await evaluate("document.querySelector('[data-stat=total]').textContent"), "28");
+  assert.equal(await evaluate("document.querySelector('[data-stat=remaining]').textContent"), "24");
   ok("çekilen kod aynı turda tekrar gelmiyor (12)");
 
   // 11 · Manuel kilitleme: özel içerik DOM'dan kalkar.
@@ -324,7 +353,8 @@ try {
   await typePin(TEST_PIN);
   await submitLock();
   await delay(1200);
-  assert.equal(await evaluate("document.querySelector('.private-counts').textContent"), "Toplam seçenek 28 · Kalan seçenek 24");
+  assert.equal(await evaluate("document.querySelector('[data-stat=total]').textContent"), "28");
+  assert.equal(await evaluate("document.querySelector('[data-stat=remaining]').textContent"), "24");
   ok("yeniden açılınca tur durumu korunuyor");
 
   // 14 · Geçmiş numarasına tıklayınca pozisyon pop-up olarak açılır.
@@ -338,7 +368,8 @@ try {
     image: document.querySelector('.couples-figure img').getAttribute('src'),
     passHidden: document.querySelector('.couples-actions button:nth-child(2)').hidden,
     respinHidden: document.querySelector('.couples-actions button:nth-child(3)').hidden,
-    counts: document.querySelector('.private-counts').textContent
+    statTotal: document.querySelector('[data-stat=total]').textContent,
+    statRemaining: document.querySelector('[data-stat=remaining]').textContent
   })`);
   assert.equal(browsed.open, true, "geçmiş numarasına tıklayınca pop-up açılmalı");
   assert.match(browsed.code, /^\d{2}$/);
@@ -346,7 +377,8 @@ try {
   assert.match(browsed.image, /^data:image\/webp;base64,/, "pop-up'ta Firestore görseli olmalı");
   assert.equal(browsed.passHidden, true, "geçmişten açılınca 'Pas geç' gizli olmalı");
   assert.equal(browsed.respinHidden, true, "geçmişten açılınca 'Yeniden çevir' gizli olmalı");
-  assert.equal(browsed.counts, "Toplam seçenek 28 · Kalan seçenek 24", "geçmişe bakmak havuzu değiştirmemeli");
+  assert.equal(browsed.statTotal, "28", "geçmişe bakmak havuzu değiştirmemeli");
+  assert.equal(browsed.statRemaining, "24", "geçmişe bakmak havuzu değiştirmemeli");
   ok("geçmiş numarasına tıklayınca pozisyon pop-up olarak açılıyor (14)");
 
   // Favori numarası da aynı pop-up'ı açar; favoriden çıkarma pop-up içinden yapılır.

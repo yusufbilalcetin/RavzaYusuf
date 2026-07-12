@@ -117,23 +117,93 @@ const el = (tag, className, text) => {
   return node;
 };
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function svgIcon(className, innerPaths) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("class", className);
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  for (const d of innerPaths) {
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("d", d);
+    svg.append(path);
+  }
+  return svg;
+}
+
+function chevronIcon() {
+  return svgIcon("chevron", ["M6 9l6 6 6-6"]);
+}
+
+function heartIcon(className = "icon-heart") {
+  return svgIcon(className, ["M12 21s-7-4.6-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6C19 16.4 12 21 12 21z"]);
+}
+
 /**
  * Özel alanın DOM'unu kurar. Kilit açılmadan çağrılmaz; kilitlenince destroy() ile
  * tüm düğümler ve görsel URL referansları kaldırılır.
  */
 export function createPrivateUI({ wheel, state, onSpin, onChange }) {
   const panel = el("section", "private-panel");
-  const summary = el("div", "private-summary");
-  const counts = el("p", "private-counts");
-  const round = el("button", "ghost-button", "Yeni tur başlat");
-  round.type = "button";
-  summary.append(counts, round);
 
-  const favTitle = el("h2", "private-heading", "Favoriler");
+  // İstatistik kartları — js/app.js'in normal-mod kartlarıyla aynı sınıfları paylaşır (DRY),
+  // `data-stat` özniteliği testlerin kararlı biçimde seçebilmesi için eklenir.
+  const statRow = el("div", "stat-row");
+  const totalValue = el("p", "stat-value", "0");
+  totalValue.dataset.stat = "total";
+  const totalIcon = el("span", "stat-icon");
+  totalIcon.setAttribute("aria-hidden", "true");
+  totalIcon.append(svgIcon("", ["M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"]));
+  const totalBody = el("div", "stat-body");
+  totalBody.append(el("p", "stat-label", "Toplam seçenek"), totalValue);
+  const totalCard = el("div", "stat-card");
+  totalCard.append(totalIcon, totalBody);
+
+  const remainValue = el("p", "stat-value", "0");
+  remainValue.dataset.stat = "remaining";
+  const remainIcon = el("span", "stat-icon stat-icon-remain");
+  remainIcon.setAttribute("aria-hidden", "true");
+  remainIcon.append(svgIcon("", ["M12 4a8 8 0 100 16 8 8 0 000-16zM12 11a1 1 0 100 2 1 1 0 000-2z"]));
+  const remainBody = el("div", "stat-body");
+  remainBody.append(el("p", "stat-label", "Kalan seçenek"), remainValue);
+  const remainCard = el("div", "stat-card");
+  remainCard.append(remainIcon, remainBody);
+
+  statRow.append(totalCard, remainCard);
+
+  const round = el("button", "restart-button", "Yeni tur başlat");
+  round.type = "button";
+
+  // "Tüm pozisyonlar tamamlandı." mesajı — sayı kartlarının altında, yalnızca bittiğinde görünür.
+  const counts = el("p", "private-counts");
+  counts.hidden = true;
+
+  const favTitle = el("button", "private-heading", "Favoriler");
+  favTitle.type = "button";
+  favTitle.setAttribute("aria-expanded", "true");
+  favTitle.append(chevronIcon());
   const favList = el("div", "chip-list");
-  const historyTitle = el("h2", "private-heading", "Geçmiş");
+  const favSection = el("div", "private-section");
+  favSection.append(favList);
+
+  const historyTitle = el("button", "private-heading", "Geçmiş");
+  historyTitle.type = "button";
+  historyTitle.setAttribute("aria-expanded", "true");
+  historyTitle.append(chevronIcon());
   const historyList = el("div", "chip-list");
-  panel.append(summary, favTitle, favList, historyTitle, historyList);
+  const historySection = el("div", "private-section");
+  historySection.append(historyList);
+
+  function toggleSection(button, section) {
+    const expanded = button.getAttribute("aria-expanded") !== "false";
+    button.setAttribute("aria-expanded", String(!expanded));
+    section.hidden = expanded;
+  }
+  favTitle.addEventListener("click", () => toggleSection(favTitle, favSection));
+  historyTitle.addEventListener("click", () => toggleSection(historyTitle, historySection));
+
+  panel.append(statRow, round, counts, favTitle, favSection, historyTitle, historySection);
 
   // Sonuç modalı — hem çevirme sonucu hem de geçmiş/favori numarasına tıklanınca açılır.
   const overlay = el("div", "couples-overlay");
@@ -166,9 +236,10 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
 
   function update() {
     const pool = poolCounts(wheel);
-    counts.textContent = pool.finished
-      ? "Tüm pozisyonlar tamamlandı."
-      : `Toplam seçenek ${pool.active} · Kalan seçenek ${pool.remaining}`;
+    totalValue.textContent = String(pool.active);
+    remainValue.textContent = String(pool.finished ? 0 : pool.remaining);
+    counts.textContent = pool.finished ? "Tüm pozisyonlar tamamlandı." : "";
+    counts.hidden = !pool.finished;
     counts.classList.toggle("is-finished", pool.finished);
     round.hidden = !pool.used;
 
@@ -179,7 +250,13 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
       chip.addEventListener("click", () => showResult(value, true));
       return chip;
     }));
-    if (!state.favorites.length) favList.append(el("p", "empty-note", "Henüz favori yok."));
+    if (!state.favorites.length) {
+      const empty = el("p", "empty-note");
+      const text = document.createElement("span");
+      text.textContent = "Henüz favori yok.";
+      empty.append(heartIcon(), text);
+      favList.append(empty);
+    }
 
     historyList.replaceChildren(...state.history.slice(0, 20).map((entry) => {
       const chip = el("button", `chip is-${entry.status}`, entry.code);

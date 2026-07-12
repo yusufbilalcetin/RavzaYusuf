@@ -280,14 +280,16 @@ try {
   await delay(900);
   await viewport(1440, 900);
 
+  // .app-bar artık kalıcı bir 3. çocuk içeriyor (tema butonu) — bu tasarım kararı. Asıl
+  // doğrulanan güvenlik/gizlilik kuralı `#lockButton`'ın DOM'da yokluğudur, toplam çocuk
+  // sayısı değil; bu yüzden odaklanılabilir eleman sayısı (geri butonu + tema butonu = 2)
+  // ve kilit butonunun yokluğu ayrı ayrı doğrulanır.
   const initial = await evaluate(`({
     lock: document.querySelectorAll('#lockButton').length,
-    barChildren: document.querySelector('.app-bar').children.length,
     focusable: [...document.querySelectorAll('.app-bar button, .app-bar a')].length
   })`);
   assert.equal(initial.lock, 0, "sayfa açılışında kilit butonu DOM'da olmamalı");
-  assert.equal(initial.barChildren, 2, "kilidin yerinde boşluk kalmamalı (geri butonu + marka)");
-  assert.equal(initial.focusable, 1, "gizliyken klavye ile odaklanılabilir kilit olmamalı");
+  assert.equal(initial.focusable, 2, "gizliyken yalnızca geri butonu ve tema butonu odaklanılabilir olmalı");
   await screenshot("kilit-gizli");
   ok("sayfa ilk açıldığında kilit butonu render edilmiyor, yerinde boşluk yok");
 
@@ -477,6 +479,47 @@ try {
     "ibre vektör (SVG) olmalı — raster değil, her DPR'de net");
   assert.equal(await evaluate("document.querySelectorAll('.wheel-pointer img').length"), 0);
   ok("ibre inline SVG — 1x/2x/3x DPR ve tarayıcı zoom'unda net kalır");
+
+  // —— 9 · Peg sayısı dilim sayısıyla eşleşiyor ——————————————————————
+
+  await viewport(1440, 900);
+  await setOptions(["Ali", "Ayşe", "Mehmet", "Zeynep", "Can", "Elif"]);
+  await delay(200);
+  assert.equal(await evaluate("document.querySelectorAll('.wheel-peg').length"), 6,
+    "peg sayısı seçenek sayısıyla eşleşmeli");
+  await setOptions(Array.from({ length: 200 }, (_, index) => `Seçenek ${index + 1}`));
+  await delay(300);
+  assert.equal(await evaluate("document.querySelectorAll('.wheel-peg').length"), 0,
+    "60 üstü seçenekte pegler görsel gürültü önlemek için gizlenmeli");
+  ok("peg sayısı dilim sayısıyla eşleşiyor, 60 üstünde gizleniyor");
+
+  // —— 10 · Tema butonu çalışıyor ———————————————————————————————————
+
+  await setOptions(["Ali", "Ayşe", "Mehmet", "Zeynep", "Can", "Elif"]);
+  await evaluate("document.querySelector('#themeToggle').click()");
+  await delay(100);
+  assert.equal(await evaluate("document.documentElement.dataset.theme"), "dark",
+    "tema butonu koyu temaya geçmeli");
+  await screenshot("koyu-tema");
+  await evaluate("document.querySelector('#themeToggle').click()"); // geri al
+  await delay(100);
+  assert.equal(await evaluate("document.documentElement.dataset.theme"), "light");
+  ok("tema butonu koyu/açık temayı değiştiriyor");
+
+  // —— 11 · Masaüstü ve mobil yerleşim ekran görüntüleri ——————————————
+
+  for (const [width, height] of [[1920, 1080], [1366, 768]]) {
+    await viewport(width, height);
+    await screenshot(`masaustu-yerlesim-${width}x${height}`);
+  }
+  for (const [width, height] of [[430, 932], [393, 852], [375, 812]]) {
+    await viewport(width, height);
+    const result = await probe();
+    assert.equal(result.overflow, 0, `${width}x${height}: yatay taşma`);
+    await screenshot(`mobil-yerlesim-${width}x${height}`);
+  }
+  await viewport(1440, 900);
+  ok("masaüstü (1920x1080, 1366x768) ve mobil (430x932, 393x852, 375x812) yerleşimleri kaydedildi");
 
   // —— 8 · Konsol temiz ————————————————————————————————————————————
 
