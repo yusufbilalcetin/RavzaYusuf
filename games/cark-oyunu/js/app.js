@@ -7,16 +7,21 @@ import {
   selectOption
 } from "./model.js";
 import { loadStore, saveStore } from "./storage.js";
-import * as lock from "./pin.js";
+import {
+  clearPinInput,
+  loadPinConfig,
+  resetPrivateAccess,
+  verifyPin
+} from "./private-pin.js";
+import { createLockReveal } from "./lock-reveal.js";
+import { POINTER_ANGLE, targetRotationFor } from "./wheel-math.js";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 
-// Özel alanı görmek istediğinin işareti (gizli bilgi değil): kilitliyken nötr ekranı,
-// açıkken özel çarkı gösterelim diye tutulur.
-const INTENT_KEY = "ravza-couples-intent-v1";
-
 const elements = {
   app: $(".wheel-app"),
+  appBar: $(".app-bar"),
+  brandTitle: $("#brandTitle"),
   bannerText: $("#winnerBannerText"),
   banner: $("#winnerBanner"),
   optionCount: $("#optionCount"),
@@ -36,18 +41,11 @@ const elements = {
   modalWinner: $("#modalWinner"),
   modalClose: $("#modalClose"),
   confetti: $("#confetti"),
-  lockButton: $("#lockButton"),
   lockOverlay: $("#lockOverlay"),
-  lockTitle: $("#lockTitle"),
-  lockSub: $("#lockSub"),
   lockForm: $("#lockForm"),
-  lockCurrent: $("#lockCurrent"),
   lockInput: $("#lockInput"),
   lockError: $("#lockError"),
-  lockPersist: $("#lockPersist"),
   lockSubmit: $("#lockSubmit"),
-  lockManage: $("#lockManage"),
-  pinChange: $("#pinChange"),
   lockClose: $("#lockClose")
 };
 
@@ -67,16 +65,11 @@ let mode = "normal";
 let couples = null;        // PIN doğrulanınca dinamik yüklenen modül
 let couplesState = null;
 let privateUI = null;
-let formMode = "enter";    // "enter" | "set" | "change" | "remove"
+let lockReveal = null;     // gizli kilit butonu (başlığa üç kez dokununca üretilir)
 
-const POINTER_ANGLE = -Math.PI * .75;
-const COLORS = ["#9d0038", "#5f2b6b", "#0f6d78", "#c1861d", "#2f5480", "#5f7f34", "#b8446b", "#464090"];
-
-const wantsPrivate = () => globalThis.localStorage?.getItem(INTENT_KEY) === "1";
-const setIntent = (value) => {
-  if (value) globalThis.localStorage?.setItem(INTENT_KEY, "1");
-  else globalThis.localStorage?.removeItem(INTENT_KEY);
-};
+// Dilim renkleri: beyaz metinle WCAG AA sağlayan koyu tonlar (kontrast oranı ≥ 4.5:1).
+// Komşu dilimler kolayca ayrılsın diye ton/parlaklık dönüşümlü; neon yok.
+const COLORS = ["#9d0038", "#5f2b6b", "#0f6272", "#8a5a10", "#2f5480", "#4a6b28", "#a03356", "#403a80"];
 
 function optionById(id) {
   return wheel.allOptions.find((option) => option.id === id);
@@ -89,10 +82,6 @@ function availableOptions() {
 function persist() {
   if (mode === "private") couples?.saveCouplesState(couplesState);
   else saveStore(store);
-}
-
-function fitText(value, maxLength) {
-  return value.length > maxLength ? `${value.slice(0, Math.max(1, maxLength - 1))}…` : value;
 }
 
 function resizeCanvas() {
@@ -116,6 +105,45 @@ function drawEmptyWheel(size, center, radius) {
   context.fillText(mode === "private" ? "Tüm seçenekler tamamlandı" : "Seçenek ekleyin", center, center + radius * .34);
 }
 
+const FONT_STACK = 'Inter, "Segoe UI", sans-serif';
+
+/** Dilim rengine göre okunabilir yazı rengi (WCAG: açık zeminde koyu, koyu zeminde açık metin). */
+function inkOn(background) {
+  const channel = (offset) => {
+    const value = parseInt(background.slice(offset, offset + 2), 16) / 255;
+    return value <= .03928 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
+  };
+  const luminance = .2126 * channel(1) + .7152 * channel(3) + .0722 * channel(5);
+  return luminance > .32 ? "#16181d" : "#f7f7f8";
+}
+
+/**
+ * Etiketi dilime sığdırır: önce font küçültülür, tabana rağmen sığmıyorsa kısaltılır.
+ * `fillText`'in maxWidth parametresi harfleri sıkıştırıp çirkinleştirdiği için kullanılmaz.
+ */
+function fitLabel(label, baseSize, maxWidth) {
+  context.font = `700 ${baseSize}px ${FONT_STACK}`;
+  let width = context.measureText(label).width;
+  if (width <= maxWidth) return label;
+
+  const scaled = Math.max(10, Math.floor(baseSize * maxWidth / width));
+  context.font = `700 ${scaled}px ${FONT_STACK}`;
+  width = context.measureText(label).width;
+  if (width <= maxWidth) return label;
+
+  let text = label;
+  while (text.length > 1 && context.measureText(`${text}…`).width > maxWidth) text = text.slice(0, -1);
+  return `${text}…`;
+}
+
+/** Seçenek sayısına göre taban font boyutu; 50'nin üstünde çarka hiç yazı çizilmez. */
+function labelFontSize(count, size) {
+  if (count > 50) return 0;
+  if (count <= 12) return size * .038;
+  if (count <= 24) return size * .027;
+  return size * .018;
+}
+
 function drawWheel(options = visualOptions, angle = rotation) {
   const size = elements.canvas.width;
   const center = size / 2;
@@ -128,38 +156,44 @@ function drawWheel(options = visualOptions, angle = rotation) {
   }
 
   const slice = Math.PI * 2 / options.length;
+  const baseSize = labelFontSize(options.length, size);
+  const maxWidth = radius * .62;
+
   options.forEach((option, index) => {
     const start = POINTER_ANGLE + angle + index * slice;
     const end = start + slice;
+    const background = option.id === selectedVisualId
+      ? "#7f8792"
+      : options.length === 1 ? "#9d0038" : COLORS[index % COLORS.length];
+
     context.beginPath();
     context.moveTo(center, center);
     context.arc(center, center, radius, start, end);
     context.closePath();
-    context.fillStyle = option.id === selectedVisualId
-      ? "#7f8792"
-      : options.length === 1 ? "#9d0038" : COLORS[index % COLORS.length];
+    context.fillStyle = background;
     context.fill();
     if (options.length > 1) {
-      context.strokeStyle = "rgba(244,244,245,.38)";
-      context.lineWidth = Math.max(1, size * .002);
+      context.strokeStyle = "rgba(255,255,255,.30)";
+      context.lineWidth = Math.max(1, size * .0015);
       context.stroke();
     }
 
-    if (options.length > 80 && index % Math.ceil(options.length / 40) !== 0) return;
+    // 50'den fazla seçenekte dilim yazısı okunamayacak kadar küçülür ve yüzlerce metin
+    // ölçümü boşuna maliyet olur — kazanan sonuç kartında tam isimle gösterilir.
+    if (!baseSize) return;
+
     const middle = start + slice / 2;
-    // Özel modda dilimde yalnızca kısa kod yazar (A-01, B-52); kaynak görsel çarka çizilmez.
-    const label = mode !== "private" && options.length > 50
-      ? String(index + 1)
-      : fitText(option.label, options.length <= 12 ? 24 : options.length <= 24 ? 13 : 7);
-    const fontSize = options.length <= 8 ? size * .038 : options.length <= 20 ? size * .027 : size * .018;
+    // Sol yarıdaki dilimlerde metin baş aşağı düşer: eksen π kadar çevrilip hizalama tersine alınır.
+    const flipped = Math.cos(middle) < 0;
+    const text = fitLabel(option.label, baseSize, maxWidth); // context.font'u da ayarlar
+
     context.save();
     context.translate(center, center);
-    context.rotate(middle);
-    context.textAlign = "right";
+    context.rotate(flipped ? middle + Math.PI : middle);
+    context.textAlign = flipped ? "left" : "right";
     context.textBaseline = "middle";
-    context.fillStyle = "#f4f4f5";
-    context.font = `700 ${Math.max(9, fontSize)}px "Segoe UI", sans-serif`;
-    context.fillText(label, radius * .86, 0, radius * .66);
+    context.fillStyle = inkOn(background);
+    context.fillText(text, (flipped ? -1 : 1) * radius * .86, 0);
     context.restore();
   });
 }
@@ -258,37 +292,18 @@ function bindInputKeyboard() {
 // —— Kilit ————————————————————————————————————————————————————————————
 
 function lockIconState(unlocked) {
-  elements.lockButton.classList.toggle("is-open", unlocked);
-  elements.lockButton.setAttribute("aria-pressed", String(unlocked));
-  elements.lockButton.setAttribute("aria-label", unlocked ? "Özel alanı kilitle" : "Özel alanı aç");
+  lockReveal?.setOpen(unlocked);
 }
 
-function setFormMode(next) {
-  formMode = next;
-  const texts = {
-    enter: ["Özel alan", "Devam etmek için şifreyi girin.", "Aç"],
-    change: ["Şifreyi değiştir", "Mevcut şifreyi ve yeni şifreyi girin.", "Değiştir"]
-  }[next];
-  elements.lockTitle.textContent = texts[0];
-  elements.lockSub.textContent = texts[1];
-  elements.lockSubmit.textContent = texts[2];
-  elements.lockCurrent.hidden = next !== "change";
-  elements.lockInput.placeholder = next === "change" ? "Yeni şifre" : "Şifre";
-  elements.lockManage.hidden = next !== "enter" || !lock.hasPin();
-  elements.lockCurrent.value = "";
-  elements.lockInput.value = "";
+/** PIN hash/salt yapılandırmasını modal açılırken Firestore'dan getirir. */
+async function openLock() {
+  resetPrivateAccess();
+  clearPinInput(elements.lockInput);
   elements.lockError.textContent = "";
-}
-
-/** Şifre Firestore'da: modal açılırken kaydı bir kez çekeriz. */
-async function openLock(next = "enter") {
-  elements.lockPersist.value = lock.getPersistMode();
-  setFormMode(next);
   elements.lockOverlay.hidden = false;
   elements.lockInput.focus();
   try {
-    await lock.loadPinRecord();
-    elements.lockManage.hidden = next !== "enter";
+    await loadPinConfig();
   } catch (error) {
     elements.lockError.textContent = error.message;
   }
@@ -296,9 +311,13 @@ async function openLock(next = "enter") {
 
 function closeLock() {
   elements.lockOverlay.hidden = true;
-  elements.lockCurrent.value = "";
-  elements.lockInput.value = "";
-  elements.lockButton.focus();
+  clearPinInput(elements.lockInput);
+  elements.lockError.textContent = "";
+  resetPrivateAccess();
+  // Kilit butonu geçici bir gösterim: modal kapanınca yeniden gizlenir. Odak, onu doğuran
+  // gizli tetikleyiciye (başlık) döner ki klavye kullanıcısı boşlukta kalmasın.
+  lockReveal?.hide();
+  elements.brandTitle.focus();
 }
 
 function rejectPin(message) {
@@ -328,7 +347,6 @@ async function enterPrivate() {
   selectedVisualId = null;
   rotation = 0;
   mode = "private";
-  setIntent(true);
   lockIconState(true);
   render();
   resizeCanvas();
@@ -336,10 +354,17 @@ async function enterPrivate() {
 
 /** Kilitle: özel bileşenler DOM'dan kaldırılır, görsel referansları temizlenir. */
 function lockPrivate() {
+  cancelAnimationFrame(animationFrame);
+  animationFrame = 0;
+  isSpinning = false;
+  elements.wheelWrap.classList.remove("is-spinning");
   privateUI?.destroy();
   privateUI = null;
   couplesState = null;
-  lock.lock();
+  elements.lockOverlay.hidden = true;
+  clearPinInput(elements.lockInput);
+  elements.lockError.textContent = "";
+  resetPrivateAccess();
   wheel = normalWheel;
   visualOptions = availableOptions();
   selectedVisualId = null;
@@ -351,7 +376,7 @@ function lockPrivate() {
 }
 
 function exitPrivate() {
-  setIntent(false);
+  resetPrivateAccess();
   mode = "normal";
   elements.privateHost.replaceChildren();
   lockIconState(false);
@@ -365,7 +390,7 @@ function renderLockedScreen() {
   const title = document.createElement("h2");
   title.textContent = "Özel Alan Kilitli";
   const text = document.createElement("p");
-  text.textContent = "Devam etmek için sağ üstteki kilit simgesine dokun.";
+  text.textContent = "Devam etmek için aşağıdaki düğmeye dokun.";
   const open = document.createElement("button");
   open.className = "primary-button";
   open.type = "button";
@@ -382,37 +407,26 @@ function renderLockedScreen() {
 
 async function submitLock(event) {
   event.preventDefault();
-  const current = elements.lockCurrent.value;
   const value = elements.lockInput.value;
   elements.lockSubmit.disabled = true;
   try {
-    await lock.loadPinRecord();
-    if (formMode === "change") {
-      await lock.changePin(current, value);
-      setFormMode("enter");
-      elements.lockError.textContent = "Şifre değiştirildi.";
+    await loadPinConfig();
+    if (!(await verifyPin(value))) {
+      rejectPin("Hatalı PIN");
       return;
     }
-    if (!(await lock.verifyPin(value))) {
-      rejectPin("Hatalı şifre");
-      return;
-    }
-    lock.markUnlocked();
+    resetPrivateAccess();
     closeLock();
     await enterPrivate();
   } catch (error) {
     rejectPin(error.message);
   } finally {
+    clearPinInput(elements.lockInput);
     elements.lockSubmit.disabled = false;
   }
 }
 
 // —— Çevirme ——————————————————————————————————————————————————————————
-
-function normalizeAngle(value) {
-  const circle = Math.PI * 2;
-  return ((value % circle) + circle) % circle;
-}
 
 function easeOutQuint(value) {
   return 1 - (1 - value) ** 5;
@@ -477,31 +491,52 @@ function spin() {
   visualOptions = availableOptions();
   selectedVisualId = null;
   const selection = selectOption(wheel);
-  const slice = Math.PI * 2 / visualOptions.length;
-  const desired = normalizeAngle(-(selection.selectedIndex + .5) * slice);
-  const current = normalizeAngle(rotation);
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const totalRotation = normalizeAngle(desired - current) + (reduceMotion ? 1 : 6) * Math.PI * 2;
+
+  // Bitiş açısı kazanan dilimin ORTASINA oturur (sınırına değil) — ibrenin gösterdiği dilim
+  // ile duyurulan kazanan matematiksel olarak aynıdır (tests/wheel-math.test.mjs).
   const startRotation = rotation;
+  const target = targetRotationFor(selection.selectedIndex, visualOptions.length, startRotation, reduceMotion ? 1 : 6);
+  const totalRotation = target - startRotation;
   const startTime = performance.now();
-  const duration = reduceMotion ? 550 : 3600;
+  const duration = reduceMotion ? 550 : 4800;
 
   isSpinning = true;
   elements.spinButton.disabled = true;
   elements.wheelWrap.classList.add("is-spinning");
 
-  function animate(now) {
-    const progress = Math.min(1, (now - startTime) / duration);
-    rotation = startRotation + totalRotation * easeOutQuint(progress);
-    drawWheel(visualOptions, rotation);
-    if (progress < 1) {
-      animationFrame = requestAnimationFrame(animate);
-      return;
-    }
+  function settle() {
+    cancelAnimationFrame(animationFrame);
     animationFrame = 0;
+    document.removeEventListener("visibilitychange", onVisibility);
+    rotation = target; // kayan nokta birikimi kalmasın: son kare tam hedefe otursun
+    drawWheel(visualOptions, rotation);
     finishSpin(selection);
   }
 
+  // Sekme arka plana alınınca requestAnimationFrame durur; animasyon asla bitmez ve çark
+  // "dönüyor" durumunda kilitli kalırdı. Gizlenince dönüşü hemen sonuçlandırıyoruz:
+  // kazanan zaten seçilmişti, kullanıcı geri döndüğünde tutarlı bir sonuç bulur.
+  function onVisibility() {
+    if (document.hidden && isSpinning) settle();
+  }
+  document.addEventListener("visibilitychange", onVisibility);
+
+  function animate(now) {
+    const progress = Math.min(1, (now - startTime) / duration);
+    if (progress >= 1) {
+      settle();
+      return;
+    }
+    rotation = startRotation + totalRotation * easeOutQuint(progress);
+    drawWheel(visualOptions, rotation);
+    animationFrame = requestAnimationFrame(animate);
+  }
+
+  if (document.hidden) {
+    settle(); // zaten arka plandayız: dönecek kare yok
+    return;
+  }
   animationFrame = requestAnimationFrame(animate);
 }
 
@@ -527,19 +562,28 @@ function bindEvents() {
     if (event.target === elements.overlay) closeResult();
   });
 
-  elements.lockButton.addEventListener("click", () => {
-    if (isSpinning) return;
-    if (mode === "private") lockPrivate();
-    else openLock();
+  // Kilit butonu DOM'da yok: başlığa 650 ms içinde üç kez dokununca üretilir, 10 sn sonra kaldırılır.
+  // Bu yalnızca arayüz kolaylığıdır — yetki sınırı değildir.
+  lockReveal = createLockReveal({
+    title: elements.brandTitle,
+    host: elements.appBar,
+    onActivate: () => {
+      if (isSpinning) return;
+      if (mode === "private") {
+        lockPrivate();
+        lockReveal.show(); // kilitlendi: ikon durumu görünsün, sonra yine kendiliğinden kaybolsun
+        return;
+      }
+      openLock();
+    }
   });
+  lockReveal.setOpen(mode === "private");
+
   elements.lockForm.addEventListener("submit", submitLock);
   elements.lockClose.addEventListener("click", closeLock);
   elements.lockOverlay.addEventListener("click", (event) => {
     if (event.target === elements.lockOverlay) closeLock();
   });
-  elements.lockPersist.addEventListener("change", () => lock.setPersistMode(elements.lockPersist.value));
-  elements.pinChange.addEventListener("click", () => setFormMode("change"));
-
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (privateUI?.isResultOpen()) privateUI.closeResult();
@@ -552,22 +596,17 @@ function bindEvents() {
   window.addEventListener("pagehide", () => {
     cancelAnimationFrame(animationFrame);
     observer.disconnect();
+    privateUI?.destroy();
+    privateUI = null;
+    clearPinInput(elements.lockInput);
+    resetPrivateAccess();
+    lockReveal?.destroy(); // listener ve gizleme sayacı geride kalmasın
   }, { once: true });
 }
 
-async function start() {
+function start() {
   saveStore(store);
   bindEvents();
-
-  if (wantsPrivate() && lock.isUnlocked()) {
-    await enterPrivate();
-    return;
-  }
-  if (wantsPrivate()) {
-    mode = "locked";
-    lockIconState(false);
-    renderLockedScreen();
-  }
   render();
   resizeCanvas();
 }

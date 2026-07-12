@@ -1,26 +1,26 @@
-// Bizim Çarkımız — havuz yalnızca couples-config.js'teki (kırmızı ile işaretli) 62 koddan kurulur.
+// Bizim Çarkımız — havuz yalnızca couples-config.js'teki 28 pozisyon kodundan kurulur.
 // Bu dosya PIN doğrulanmadan yüklenmez (app.js dinamik import eder).
 import { createWheel, resetResults, setOptionStatus } from "./model.js";
 import {
   TOTAL_OPTIONS,
   allowedCodes,
-  catalogOf,
-  couplesWheelCatalogs,
   filterAllowed,
-  imagePathFor,
   isAllowedCode,
   numberOf
 } from "./couples-config.js";
+import {
+  cancelPendingImageRequest,
+  clearPrivateImageCache,
+  fetchPrivateImage
+} from "./private-images.js";
 
 export const STATE_KEY = "ravza-couples-state-v1";
 
-const CATALOG_IDS = new Set(couplesWheelCatalogs.map((catalog) => catalog.id));
-
 export function defaultCouplesState() {
-  return { used: [], history: [], favorites: [], offCatalogs: [] };
+  return { used: [], history: [], favorites: [] };
 }
 
-/** Depodaki her kod config'e göre süzülür: kırmızı işaretsiz numara asla geri dönemez. */
+/** Depodaki her kod config'e göre süzülür: tanımsız numara asla geri dönemez. */
 export function loadCouplesState(storage = globalThis.localStorage) {
   let parsed = null;
   try {
@@ -32,7 +32,6 @@ export function loadCouplesState(storage = globalThis.localStorage) {
   return {
     used: filterAllowed(parsed.used),
     favorites: filterAllowed(parsed.favorites),
-    offCatalogs: [...new Set(Array.isArray(parsed.offCatalogs) ? parsed.offCatalogs : [])].filter((id) => CATALOG_IDS.has(id)),
     history: (Array.isArray(parsed.history) ? parsed.history : [])
       .filter((entry) => entry && isAllowedCode(entry.code))
       .map((entry) => ({ code: entry.code, at: entry.at || null, status: entry.status === "passed" ? "passed" : "accepted" }))
@@ -44,7 +43,6 @@ export function saveCouplesState(state, storage = globalThis.localStorage) {
     storage?.setItem(STATE_KEY, JSON.stringify({
       used: filterAllowed(state.used),
       favorites: filterAllowed(state.favorites),
-      offCatalogs: state.offCatalogs.filter((id) => CATALOG_IDS.has(id)),
       history: state.history.filter((entry) => isAllowedCode(entry.code))
     }));
     return true;
@@ -53,39 +51,19 @@ export function saveCouplesState(state, storage = globalThis.localStorage) {
   }
 }
 
-/** Çarkı config'ten kurar; kullanılmışları "used", kapalı katalogları "disabled" yapar. */
+/** Çarkı config'ten kurar; kullanılmışları "used" yapar. */
 export function buildCouplesWheel(state = defaultCouplesState()) {
   const wheel = createWheel("Bizim Çarkımız", allowedCodes());
-  const off = new Set(state.offCatalogs);
   const used = new Set(filterAllowed(state.used));
   wheel.allOptions.forEach((option) => {
-    const catalog = catalogOf(option.label);
-    if (off.has(catalog.id)) setOptionStatus(wheel, option.id, "disabled");
-    else if (used.has(option.label)) setOptionStatus(wheel, option.id, "used");
+    if (used.has(option.label)) setOptionStatus(wheel, option.id, "used");
   });
   return wheel;
 }
 
-export function toggleCatalog(wheel, state, catalogId, enabled) {
-  if (!CATALOG_IDS.has(catalogId)) return false;
-  const off = new Set(state.offCatalogs);
-  if (enabled) off.delete(catalogId);
-  else off.add(catalogId);
-  state.offCatalogs = [...off];
-
-  const used = new Set(filterAllowed(state.used));
-  wheel.allOptions
-    .filter((option) => catalogOf(option.label).id === catalogId)
-    .forEach((option) => {
-      const status = !enabled ? "disabled" : used.has(option.label) ? "used" : "available";
-      setOptionStatus(wheel, option.id, status);
-    });
-  return true;
-}
-
 export function startNewRound(wheel, state) {
   state.used = [];
-  resetResults(wheel); // kapalı kataloglar "disabled" kalır, yalnızca kullanılmışlar havuza döner
+  resetResults(wheel);
   return wheel;
 }
 
@@ -105,31 +83,27 @@ export function toggleFavorite(state, code) {
   return state.favorites.includes(code);
 }
 
-export function poolCounts(wheel, state) {
-  const activeTotal = wheel.allOptions.filter((option) => option.status !== "disabled").length;
+export function poolCounts(wheel) {
   return {
     total: TOTAL_OPTIONS,
-    active: activeTotal,
+    active: TOTAL_OPTIONS,
     remaining: wheel.availableOptions.length,
-    used: activeTotal - wheel.availableOptions.length,
-    finished: activeTotal > 0 && wheel.availableOptions.length === 0
+    used: TOTAL_OPTIONS - wheel.availableOptions.length,
+    finished: wheel.availableOptions.length === 0
   };
 }
 
 export function describe(code) {
-  const catalog = catalogOf(code);
   const number = numberOf(code);
   return {
     code,
-    catalogName: catalog?.name || "",
     number,
-    caption: catalog ? `${catalog.name} · ${number}. pozisyon` : "",
-    image: imagePathFor(code)
+    caption: number ? `${number}. pozisyon` : ""
   };
 }
 
 // —— Görünüm ————————————————————————————————————————————————————————————
-// Nötr yer tutucu: kırpılmış görsel yoksa bunu göster (kaynak sayfa asla gösterilmez).
+// Nötr yer tutucu: görsel yoksa bunu göster.
 const PLACEHOLDER = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
      <rect width="320" height="240" fill="#eceef2"/>
@@ -155,25 +129,13 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
   round.type = "button";
   summary.append(counts, round);
 
-  const filters = el("div", "catalog-filters");
-  const filterInputs = couplesWheelCatalogs.map((catalog) => {
-    const label = el("label", "catalog-filter");
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.checked = !state.offCatalogs.includes(catalog.id);
-    input.dataset.catalogId = catalog.id;
-    label.append(input, el("span", null, `${catalog.name} — ${catalog.selectedNumbers.length} seçenek`));
-    filters.append(label);
-    return input;
-  });
-
   const favTitle = el("h2", "private-heading", "Favoriler");
   const favList = el("div", "chip-list");
   const historyTitle = el("h2", "private-heading", "Geçmiş");
   const historyList = el("div", "chip-list");
-  panel.append(summary, filters, favTitle, favList, historyTitle, historyList);
+  panel.append(summary, favTitle, favList, historyTitle, historyList);
 
-  // Sonuç modalı
+  // Sonuç modalı — hem çevirme sonucu hem de geçmiş/favori numarasına tıklanınca açılır.
   const overlay = el("div", "couples-overlay");
   overlay.hidden = true;
   const modal = el("section", "couples-modal");
@@ -186,7 +148,9 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
   const image = document.createElement("img");
   image.alt = "";
   image.decoding = "async";
-  figure.append(image);
+  const imageStatus = el("p", "couples-image-status", "");
+  imageStatus.hidden = true;
+  figure.append(image, imageStatus);
   const actions = el("div", "couples-actions");
   const favorite = el("button", "ghost-button", "Favoriye ekle");
   const pass = el("button", "ghost-button", "Pas geç");
@@ -198,11 +162,12 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
   overlay.append(modal);
 
   let currentCode = null;
+  let imageRequest = 0;
 
   function update() {
-    const pool = poolCounts(wheel, state);
+    const pool = poolCounts(wheel);
     counts.textContent = pool.finished
-      ? "Tüm seçili pozisyonlar tamamlandı."
+      ? "Tüm pozisyonlar tamamlandı."
       : `Toplam seçenek ${pool.active} · Kalan seçenek ${pool.remaining}`;
     counts.classList.toggle("is-finished", pool.finished);
     round.hidden = !pool.used;
@@ -210,39 +175,77 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
     favList.replaceChildren(...state.favorites.map((value) => {
       const chip = el("button", "chip", value);
       chip.type = "button";
-      chip.title = describe(value).caption;
-      chip.addEventListener("click", () => {
-        toggleFavorite(state, value);
-        onChange();
-      });
+      chip.title = `${describe(value).caption} · görmek için tıkla`;
+      chip.addEventListener("click", () => showResult(value, true));
       return chip;
     }));
     if (!state.favorites.length) favList.append(el("p", "empty-note", "Henüz favori yok."));
 
     historyList.replaceChildren(...state.history.slice(0, 20).map((entry) => {
-      const chip = el("span", `chip is-${entry.status}`, entry.code);
-      chip.title = `${describe(entry.code).caption}${entry.status === "passed" ? " · pas geçildi" : ""}`;
+      const chip = el("button", `chip is-${entry.status}`, entry.code);
+      chip.type = "button";
+      chip.title = `${describe(entry.code).caption}${entry.status === "passed" ? " · pas geçildi" : ""} · görmek için tıkla`;
+      chip.addEventListener("click", () => showResult(entry.code, true));
       return chip;
     }));
     if (!state.history.length) historyList.append(el("p", "empty-note", "Henüz seçim yok."));
   }
 
-  function showResult(value) {
+  function clearImage() {
+    imageRequest += 1;
+    cancelPendingImageRequest();
+    image.removeAttribute("src");
+    image.onerror = null;
+    figure.classList.remove("is-loading");
+    imageStatus.hidden = true;
+    imageStatus.textContent = "";
+  }
+
+  /** browse: geçmiş/favori listesinden açıldı — pas geçme ve yeniden çevirme anlamsız. */
+  function showResult(value, browse = false) {
     currentCode = value;
     const info = describe(value);
+    kicker.textContent = browse ? "Pozisyon" : "Seçiminiz";
     code.textContent = info.code;
     caption.textContent = info.caption;
     image.alt = `${info.code} pozisyon görseli`;
-    image.onerror = () => { image.onerror = null; image.src = PLACEHOLDER; };
-    image.src = info.image || PLACEHOLDER;
     favorite.textContent = state.favorites.includes(value) ? "Favoriden çıkar" : "Favoriye ekle";
+    pass.hidden = browse;
+    respin.hidden = browse;
     overlay.hidden = false;
     ok.focus();
+
+    clearImage();
+    const request = imageRequest;
+    image.src = PLACEHOLDER;
+    figure.classList.add("is-loading");
+    imageStatus.textContent = "Görsel yükleniyor…";
+    imageStatus.hidden = false;
+    fetchPrivateImage(value)
+      .then((dataUrl) => {
+        if (!dataUrl || request !== imageRequest || currentCode !== value) return;
+        image.onerror = () => {
+          image.onerror = null;
+          image.src = PLACEHOLDER;
+          imageStatus.textContent = "Görsel yüklenemedi.";
+          imageStatus.hidden = false;
+        };
+        image.src = dataUrl;
+        figure.classList.remove("is-loading");
+        imageStatus.hidden = true;
+      })
+      .catch(() => {
+        if (request !== imageRequest || currentCode !== value) return;
+        figure.classList.remove("is-loading");
+        image.src = PLACEHOLDER;
+        imageStatus.textContent = "Görsel yüklenemedi.";
+        imageStatus.hidden = false;
+      });
   }
 
   function closeResult() {
     overlay.hidden = true;
-    image.removeAttribute("src"); // kilitlenince/kapanınca görsel referansı kalmasın
+    clearImage(); // kilitlenince/kapanınca özel görsel referansı kalmasın
     currentCode = null;
   }
 
@@ -265,12 +268,6 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
   overlay.addEventListener("click", (event) => { if (event.target === overlay) closeResult(); });
 
   round.addEventListener("click", () => { startNewRound(wheel, state); onChange(); });
-  filters.addEventListener("change", (event) => {
-    const input = event.target.closest("input[data-catalog-id]");
-    if (!input) return;
-    toggleCatalog(wheel, state, input.dataset.catalogId, input.checked);
-    onChange();
-  });
 
   return {
     panel,
@@ -281,7 +278,7 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
     isResultOpen: () => !overlay.hidden,
     destroy() {
       closeResult();
-      filterInputs.length = 0;
+      clearPrivateImageCache();
       overlay.remove();
       panel.remove();
     }

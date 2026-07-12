@@ -25,19 +25,11 @@
     </a>
 
     <div class="brand">
-      <h1>Şans Çarkı</h1>
+      <!-- Gizli tetikleyici: bu başlığa 650 ms içinde üç kez dokununca kilit butonu üretilir (js/lock-reveal.js).
+           Buton başlangıçta DOM'da yoktur; yerinde boşluk da bırakmaz. -->
+      <h1 id="brandTitle" tabindex="-1">Şans Çarkı</h1>
       <p>Seçenekleri ekle, çarkı çevir.</p>
     </div>
-    <button class="lock-button" id="lockButton" type="button" aria-label="Özel alanı aç" aria-pressed="false">
-      <svg class="icon icon-locked" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
-        <rect x="5" y="10" width="14" height="10" rx="2.5" />
-      </svg>
-      <svg class="icon icon-unlocked" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M8 10V7.5a4 4 0 0 1 7.7-1.5" />
-        <rect x="5" y="10" width="14" height="10" rx="2.5" />
-      </svg>
-    </button>
   </header>
 
   <main class="wheel-app">
@@ -70,7 +62,28 @@
 
     <section class="wheel-panel" aria-label="Şans çarkı">
       <div class="wheel-wrap" id="wheelWrap">
-        <div class="wheel-pointer" aria-hidden="true"><span></span></div>
+        <!-- İbre saat 12'de sabit durur; dönen çarktır. Ucu, POINTER_ANGLE (-90°) yönünde
+             kazanan dilimin ortasına oturur — bkz. js/wheel-math.js -->
+        <div class="wheel-pointer" aria-hidden="true">
+          <svg viewBox="0 0 48 64" shape-rendering="geometricPrecision" focusable="false">
+            <defs>
+              <radialGradient id="pointerCap" cx="36%" cy="28%" r="78%">
+                <stop offset="0" stop-color="#c2185b" />
+                <stop offset=".55" stop-color="#9d0038" />
+                <stop offset="1" stop-color="#7d002c" />
+              </radialGradient>
+              <linearGradient id="pointerTip" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#9d0038" />
+                <stop offset="1" stop-color="#7d002c" />
+              </linearGradient>
+            </defs>
+            <ellipse cx="24" cy="63" rx="8" ry="2.5" fill="rgba(16,18,23,.16)" />
+            <path d="M24 64 L12 32 L36 32 Z" fill="url(#pointerTip)" />
+            <circle cx="24" cy="22" r="18" fill="url(#pointerCap)" />
+            <circle cx="24" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.34)" stroke-width="1" />
+            <circle cx="24" cy="22" r="11" fill="none" stroke="rgba(255,255,255,.42)" stroke-width="1.5" />
+          </svg>
+        </div>
         <canvas id="wheelCanvas" width="900" height="900" role="img" aria-label="Şans çarkı"></canvas>
         <button class="spin-button" id="spinButton" type="button" aria-label="Çarkı çevir">
           <span aria-hidden="true"></span>
@@ -92,26 +105,12 @@
     <section class="lock-modal" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
       <button class="modal-close" id="lockClose" type="button" aria-label="Pencereyi kapat">×</button>
       <h2 id="lockTitle">Özel alan</h2>
-      <p class="lock-sub" id="lockSub">Devam etmek için şifreyi girin.</p>
       <form class="lock-form" id="lockForm">
-        <input id="lockCurrent" type="password" inputmode="numeric" autocomplete="off"
-               placeholder="Mevcut şifre" aria-label="Mevcut şifre" hidden />
         <input id="lockInput" type="password" inputmode="numeric" autocomplete="off"
-               placeholder="Şifre" aria-label="Şifre" />
+               placeholder="PIN" aria-label="PIN" />
         <p class="lock-error" id="lockError" role="alert"></p>
-        <label class="lock-persist">
-          <span>Kilit davranışı</span>
-          <select id="lockPersist">
-            <option value="memory">Sayfa yenilenince kilitle</option>
-            <option value="session">Sekme kapanınca kilitle</option>
-            <option value="device">Bu cihazda açık tut</option>
-          </select>
-        </label>
-        <button class="primary-button" id="lockSubmit" type="submit">Aç</button>
+        <button class="primary-button" id="lockSubmit" type="submit">Giriş</button>
       </form>
-      <div class="lock-manage" id="lockManage" hidden>
-        <button class="link-button" id="pinChange" type="button">Şifreyi değiştir</button>
-      </div>
     </section>
   </div>
 

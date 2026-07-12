@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node ./tests/wheel.test.mjs && node ./tests/couples.test.mjs",
-    "check": "node --check ./js/model.js && node --check ./js/storage.js && node --check ./js/app.js && node --check ./js/pin.js && node --check ./js/couples.js && node --check ./js/couples-config.js && node --check ./tests/browser-smoke.mjs && node --check ./tests/couples-browser.test.mjs",
+    "test": "node ./tests/wheel.test.mjs && node ./tests/wheel-math.test.mjs && node ./tests/lock-reveal.test.mjs && node ./tests/private-pin.test.mjs && node ./tests/private-images.test.mjs && node ./tests/couples.test.mjs",
+    "check": "node --check ./js/model.js && node --check ./js/storage.js && node --check ./js/app.js && node --check ./js/private-pin.js && node --check ./js/private-images.js && node --check ./js/couples.js && node --check ./js/couples-config.js && node --check ./js/wheel-math.js && node --check ./js/lock-reveal.js && node --check ./tests/private-pin.test.mjs && node --check ./tests/private-images.test.mjs && node --check ./tests/browser-smoke.mjs && node --check ./tests/couples-browser.test.mjs && node --check ./tests/wheel-browser.test.mjs",
     "test:browser": "node ./tests/browser-smoke.mjs",
+    "test:wheel:browser": "node ./tests/wheel-browser.test.mjs",
     "test:couples:browser": "node ./tests/couples-browser.test.mjs"
   }
 }
