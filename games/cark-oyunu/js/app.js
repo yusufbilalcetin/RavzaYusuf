@@ -53,6 +53,7 @@ const elements = {
   statRemaining: $("#statRemaining"),
   restartButton: $("#restartButton"),
   wheelPegs: $("#wheelPegs"),
+  wheelPegsRotator: $("#wheelPegsRotator"),
   pointer: $(".wheel-pointer")
 };
 
@@ -66,6 +67,7 @@ let rotation = 0;
 let isSpinning = false;
 let animationFrame = 0;
 let selectedVisualId = null;
+let frozenWheelViewportWidth = null;
 
 // "normal" · "locked" (özel alan kilitli, nötr ekran) · "private" (özel çark açık)
 let mode = "normal";
@@ -138,6 +140,31 @@ function resizeCanvas() {
     elements.canvas.height = size;
   }
   drawWheel();
+}
+
+function releaseWheelSize() {
+  elements.wheelWrap.classList.remove("is-size-frozen");
+  elements.wheelWrap.style.removeProperty("--wheel-frozen-size");
+  frozenWheelViewportWidth = null;
+}
+
+/**
+ * CSS ölçüsünü spin başında piksele sabitler. Safari'nin yalnız yükseklik değiştiren adres
+ * çubuğu hareketi sahneyi yeniden boyutlandıramaz; gerçek yatay alan değişirse kilit çözülür.
+ */
+function freezeWheelSize() {
+  const size = elements.wheelWrap.getBoundingClientRect().width;
+  elements.wheelWrap.style.setProperty("--wheel-frozen-size", `${size}px`);
+  elements.wheelWrap.classList.add("is-size-frozen");
+  frozenWheelViewportWidth = window.innerWidth;
+}
+
+function handleViewportResize() {
+  if (frozenWheelViewportWidth === null) return;
+  const widthChanged = Math.abs(window.innerWidth - frozenWheelViewportWidth) > .5;
+  if (!widthChanged || isSpinning) return;
+  releaseWheelSize();
+  requestAnimationFrame(resizeCanvas);
 }
 
 function drawEmptyWheel(size, center, radius) {
@@ -248,7 +275,7 @@ function drawWheel(options = visualOptions, angle = rotation) {
 /**
  * Segment sınırlarındaki gümüş pegleri üretir. Açı hesabı drawWheel'in kullandığı
  * `POINTER_ANGLE + index*slice` modeliyle birebir aynıdır (wheel-math.js'ten salt-okunur
- * `sliceAngle`); pegler tek tek değil, `#wheelPegs` konteyneri toptan `rotation` ile
+ * `sliceAngle`); pegler tek tek değil, `#wheelPegsRotator` konteyneri toptan `rotation` ile
  * döndürülerek çarkla senkron tutulur (bkz. animate()/settle()). Yalnızca seçenek sayısı
  * değiştiğinde yeniden üretilir — resize'da JS'siz, CSS yüzdeleriyle otomatik ölçeklenir.
  */
@@ -256,7 +283,7 @@ function renderPegs(count) {
   if (count === lastPegCount) return;
   lastPegCount = count;
   if (!count || count > MAX_PEGS) {
-    elements.wheelPegs.replaceChildren();
+    elements.wheelPegsRotator.replaceChildren();
     return;
   }
   const slice = sliceAngle(count);
@@ -268,7 +295,7 @@ function renderPegs(count) {
     peg.style.top = `${50 + 48.5 * Math.sin(angle)}%`;
     return peg;
   });
-  elements.wheelPegs.replaceChildren(...pegs);
+  elements.wheelPegsRotator.replaceChildren(...pegs);
 }
 
 function createOptionRow(option) {
@@ -422,6 +449,7 @@ async function enterPrivate() {
   elements.privateHost.replaceChildren(privateUI.panel);
   document.body.append(privateUI.overlay);
 
+  releaseWheelSize();
   wheel = couplesWheel;
   visualOptions = availableOptions();
   selectedVisualId = null;
@@ -438,6 +466,7 @@ function lockPrivate() {
   animationFrame = 0;
   isSpinning = false;
   elements.wheelWrap.classList.remove("is-spinning");
+  releaseWheelSize();
   privateUI?.destroy();
   privateUI = null;
   couplesState = null;
@@ -457,6 +486,7 @@ function lockPrivate() {
 
 function exitPrivate() {
   resetPrivateAccess();
+  releaseWheelSize();
   mode = "normal";
   elements.privateHost.replaceChildren();
   lockIconState(false);
@@ -585,6 +615,7 @@ function playTickSound() {
 
 function finishSpin(selection) {
   isSpinning = false;
+  handleViewportResize();
   selectedVisualId = selection.option.id;
   elements.wheelWrap.classList.remove("is-spinning");
 
@@ -627,6 +658,7 @@ function spin() {
   const duration = reduceMotion ? 550 : 4800;
 
   isSpinning = true;
+  freezeWheelSize();
   elements.spinButton.disabled = true;
   elements.wheelWrap.classList.add("is-spinning");
 
@@ -636,7 +668,7 @@ function spin() {
     document.removeEventListener("visibilitychange", onVisibility);
     rotation = target; // kayan nokta birikimi kalmasın: son kare tam hedefe otursun
     drawWheel(visualOptions, rotation);
-    elements.wheelPegs.style.transform = `rotate(${rotation}rad)`;
+    elements.wheelPegsRotator.style.transform = `rotate(${rotation}rad)`;
     finishSpin(selection);
   }
 
@@ -656,7 +688,7 @@ function spin() {
     }
     rotation = startRotation + totalRotation * easeOutQuint(progress);
     drawWheel(visualOptions, rotation);
-    elements.wheelPegs.style.transform = `rotate(${rotation}rad)`;
+    elements.wheelPegsRotator.style.transform = `rotate(${rotation}rad)`;
     tickPointerIfCrossed(progress);
     animationFrame = requestAnimationFrame(animate);
   }
@@ -733,9 +765,11 @@ function bindEvents() {
 
   const observer = new ResizeObserver(resizeCanvas);
   observer.observe(elements.canvas);
+  window.addEventListener("resize", handleViewportResize, { passive: true });
   window.addEventListener("pagehide", () => {
     cancelAnimationFrame(animationFrame);
     observer.disconnect();
+    window.removeEventListener("resize", handleViewportResize);
     privateUI?.destroy();
     privateUI = null;
     clearPinInput(elements.lockInput);

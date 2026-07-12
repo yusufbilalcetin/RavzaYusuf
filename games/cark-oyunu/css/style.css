@@ -48,7 +48,7 @@
   --stat-b-bg: #eef4ff;
   --stat-b-fg: #1c3f6e;
 
-  --header-h: clamp(88px, 10vh, 108px);
+  --header-h: clamp(88px, 6vw, 108px);
 
   font-family: Inter, "Segoe UI", Arial, sans-serif;
   font-feature-settings: "cv02", "cv03", "cv04";
@@ -80,7 +80,16 @@ html[data-theme="dark"] {
 /* hidden özniteliği, display tanımlayan sınıf seçicilerine karşı da kazanmalı. */
 [hidden] { display: none !important; }
 
-html, body { min-width: 320px; min-height: 100%; }
+html, body {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100%;
+  overflow-x: clip;
+}
+
+/* Geçmiş uzadığında dikey scrollbar'ın gelip gitmesi grid genişliğini değiştirmesin. */
+html { scrollbar-gutter: stable; }
 
 body {
   margin: 0;
@@ -89,7 +98,7 @@ body {
   flex-direction: column;
   color: var(--ink);
   background: var(--page);
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -104,6 +113,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 .app-bar {
   flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: var(--header-h);
   display: flex;
   align-items: center;
@@ -264,6 +276,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 .wheel-app {
   flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(360px, 460px) minmax(500px, 1fr);
   /* Sol panelin yüksekliği değiştiğinde çarkı yeniden dikey ortalama. */
@@ -272,7 +287,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   padding: clamp(20px, 3vw, 44px);
 }
 
-.option-column { display: flex; flex-direction: column; gap: 12px; min-width: 0; align-self: start; width: 100%; }
+.wheel-app > *,
+.option-column { min-width: 0; }
+
+.option-column { display: flex; flex-direction: column; gap: 12px; align-self: start; width: 100%; max-width: 100%; }
 
 .option-column-note {
   margin: 0;
@@ -284,6 +302,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 .option-panel {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   max-height: calc(100svh - var(--bar) - clamp(40px, 6vw, 88px));
   display: flex;
   flex-direction: column;
@@ -597,15 +617,26 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 /* ——— Çark ——————————————————————————————————————————————————————— */
 
-.wheel-panel { min-width: 0; display: grid; place-items: center; }
+.wheel-panel {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+}
 
 .wheel-wrap {
   position: relative;
-  width: var(--wheel-size);
+  width: min(var(--wheel-size), 100%);
   aspect-ratio: 1;          /* daima tam daire — hiçbir viewport'ta ovalleşmez */
   display: grid;
   place-items: center;
 }
+
+/* Spin boyunca Safari araç çubuğu/viewport yüksekliği değişse bile sahne aynı piksel
+   boyutunda kalır. Yalnız gerçek yatay alan değişirse JS bu kilidi kaldırır. */
+.wheel-wrap.is-size-frozen { width: min(var(--wheel-frozen-size), 100%); }
 
 #wheelCanvas {
   display: block;
@@ -623,11 +654,19 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 /* Dönüş sırasında canvas'ı kendi katmanına al; bitince kaldır (kalıcı will-change bellek yer). */
 .wheel-wrap.is-spinning #wheelCanvas { will-change: contents; }
 
-/* Segment sınırlarını işaretleyen gümüş pegler: çarkla birlikte döner (js/app.js
-   animate() her karede #wheelPegs'e rotate(rotation) uygular — canvas'ın kullandığı
-   aynı rotation değişkeni, ayrı bir açı hesaplaması değil). Tıklamayı engellemesin diye
-   pointer-events kapalı; canvas'ın (z-index yok, doğal 0) üstünde, ibre/spin-button'ın altında. */
-.wheel-pegs { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+/* Segment peglerinin statik kırpma katmanı: içteki rotator canvas ile aynı açıyla döner.
+   Dış katman, dönen karenin büyüyen sınır kutusunun scrollWidth'e eklenmesini engeller. */
+.wheel-pegs {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: clip;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Konumlandırma/kırpma dış katmanda, rotation yalnız bu iç katmanda. */
+.wheel-pegs-rotator { position: absolute; inset: 0; transform-origin: 50% 50%; }
 
 .wheel-peg {
   position: absolute;
@@ -806,6 +845,7 @@ html[data-theme="dark"] .bg-ambient {
   position: relative;
   z-index: 2;
   width: min(460px, 100%);
+  max-width: 100%;
   padding: 40px 44px 34px;
   border-radius: var(--r-lg);
   background: var(--surface);
@@ -946,6 +986,9 @@ html[data-theme="dark"] .bg-ambient {
 .private-panel {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   gap: 10px;
   max-height: calc(100svh - var(--bar) - clamp(40px, 6vw, 88px));
   padding: 28px;
@@ -1054,6 +1097,7 @@ button.chip:hover { border-color: var(--accent-ring); background: var(--accent-s
 .couples-modal {
   position: relative;
   width: min(440px, 100%);
+  max-width: 100%;
   padding: 26px 24px 22px;
   border-radius: var(--r-lg);
   background: var(--surface);
@@ -1143,8 +1187,8 @@ button.chip:hover { border-color: var(--accent-ring); background: var(--accent-s
   .private-panel { padding: 18px; }
   .option-list { max-height: 300px; }
   .wheel-panel { order: -1; }
-  /* Sağ ve solda en az 16px güvenli boşluk; ibre ve dış gölge viewport dışına taşmaz. */
-  :root { --wheel-size: min(100vw - 48px, 60svh, 520px); }
+  /* Mobilde yalnız genişlik belirleyicidir; Safari araç çubuğu yüksekliği çarkı değiştirmez. */
+  :root { --wheel-size: clamp(280px, 88vw, 560px); }
   .spin-button { width: 88px; height: 88px; }
   .spin-button::before { width: 66px; height: 66px; }
   .spin-button::after {
@@ -1165,7 +1209,6 @@ button.chip:hover { border-color: var(--accent-ring); background: var(--accent-s
   .app-bar { padding-inline: 14px; }
   .brand p { display: none; }
   .wheel-app { padding-inline: 12px; }
-  :root { --wheel-size: min(100vw - 44px, 60svh, 420px); }
   .option-panel { padding: 14px; }
   .winner-banner span { font-size: 17px; }
   .option-entry button { padding-inline: 16px; }
