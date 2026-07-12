@@ -25,20 +25,35 @@ export function validThemes(themes) {
   ));
 }
 
-function readLastTheme(storage) {
+function readQueue(storage) {
   try {
-    return storage?.getItem(HOME_HERO_STORAGE_KEY) || null;
+    const raw = storage?.getItem(HOME_HERO_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return null;
+    return [];
   }
 }
 
-function saveLastTheme(storage, themeId) {
+function saveQueue(storage, queue) {
   try {
-    storage?.setItem(HOME_HERO_STORAGE_KEY, themeId);
+    storage?.setItem(HOME_HERO_STORAGE_KEY, JSON.stringify(queue));
   } catch {
     // Depolama kapalı olsa da görsel seçimi çalışmaya devam eder.
   }
+}
+
+function shuffle(array, random) {
+  const result = array.slice();
+  for (let i = result.length - 1; i > 0; i--) {
+    const randomValue = Number(random());
+    const normalizedRandom = Number.isFinite(randomValue)
+      ? Math.min(Math.max(randomValue, 0), .999999999)
+      : 0;
+    const j = Math.floor(normalizedRandom * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
 }
 
 export function rastgeleTemaSec(themes, options = {}) {
@@ -49,19 +64,14 @@ export function rastgeleTemaSec(themes, options = {}) {
     ? options.storage
     : getDefaultStorage();
   const random = typeof options.random === "function" ? options.random : Math.random;
-  const lastThemeId = options.excludeId || readLastTheme(storage);
-  const candidates = pool.length > 1
-    ? pool.filter((theme) => theme.id !== lastThemeId)
-    : pool;
-  const safeCandidates = candidates.length ? candidates : pool;
-  const randomValue = Number(random());
-  const normalizedRandom = Number.isFinite(randomValue)
-    ? Math.min(Math.max(randomValue, 0), .999999999)
-    : 0;
-  const selected = safeCandidates[Math.floor(normalizedRandom * safeCandidates.length)] || pool[0];
+  const poolIds = pool.map((theme) => theme.id);
 
-  saveLastTheme(storage, selected.id);
-  return selected;
+  let queue = readQueue(storage).filter((id) => poolIds.includes(id));
+  if (!queue.length) queue = shuffle(poolIds, random);
+
+  const [selectedId, ...remainingQueue] = queue;
+  saveQueue(storage, remainingQueue);
+  return pool.find((theme) => theme.id === selectedId) || pool[0];
 }
 
 function setSource(source, srcset) {
@@ -142,7 +152,7 @@ export function initAnaSayfaRastgeleGorsel(themes = ANA_SAYFA_GORSELLERI) {
     const fallbackPool = pool.filter((theme) => theme.id !== selectedTheme?.id);
     if (!fallbackAttempted && fallbackPool.length) {
       fallbackAttempted = true;
-      const fallback = rastgeleTemaSec(fallbackPool, { excludeId: selectedTheme?.id });
+      const fallback = rastgeleTemaSec(fallbackPool);
       if (fallback) {
         applyTheme(fallback);
         return;

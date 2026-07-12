@@ -28,16 +28,30 @@ test("tek temalı havuz her zaman aynı temayı kullanır", () => {
   const storage = memoryStorage();
   const selected = rastgeleTemaSec([ANA_SAYFA_GORSELLERI[0]], { storage, random: () => .9 });
   assert.equal(selected.id, ANA_SAYFA_GORSELLERI[0].id);
-  assert.equal(storage.value(), selected.id);
+  assert.deepEqual(JSON.parse(storage.value()), []);
 });
 
-test("son gösterilen tema tekrar seçilmez", () => {
-  const firstTheme = ANA_SAYFA_GORSELLERI[0];
-  const secondTheme = ANA_SAYFA_GORSELLERI[1];
-  const storage = memoryStorage(firstTheme.id);
-  const selected = rastgeleTemaSec(ANA_SAYFA_GORSELLERI, { storage, random: () => 0 });
-  assert.equal(selected.id, secondTheme.id);
-  assert.equal(storage.value(), secondTheme.id);
+test("bir tur içinde her görsel yalnızca bir kez gösterilir", () => {
+  const storage = memoryStorage();
+  const seenIds = new Set();
+  for (let i = 0; i < ANA_SAYFA_GORSELLERI.length; i++) {
+    const selected = rastgeleTemaSec(ANA_SAYFA_GORSELLERI, { storage, random: Math.random });
+    assert.equal(seenIds.has(selected.id), false);
+    seenIds.add(selected.id);
+  }
+  assert.equal(seenIds.size, ANA_SAYFA_GORSELLERI.length);
+});
+
+test("tur bitince yeni bir rastgele turla devam eder", () => {
+  const storage = memoryStorage();
+  for (let i = 0; i < ANA_SAYFA_GORSELLERI.length; i++) {
+    rastgeleTemaSec(ANA_SAYFA_GORSELLERI, { storage, random: Math.random });
+  }
+  assert.deepEqual(JSON.parse(storage.value()), []);
+
+  const nextTheme = rastgeleTemaSec(ANA_SAYFA_GORSELLERI, { storage, random: Math.random });
+  assert.ok(ANA_SAYFA_GORSELLERI.some((theme) => theme.id === nextTheme.id));
+  assert.equal(JSON.parse(storage.value()).length, ANA_SAYFA_GORSELLERI.length - 1);
 });
 
 test("localStorage engellendiğinde seçim çalışmaya devam eder", () => {
