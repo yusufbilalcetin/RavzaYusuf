@@ -9,5 +9,17 @@ assets/**/original/
 # Hero pipeline kaynak-hash cache'i (yerel; silinirse güvenle yeniden üretilir)
 .cache/
 
-# Ozel cark kaynak katalog sayfalari: yalnizca kirpma scripti icin, dagitima girmez
+# Test ekran goruntuleri (yerel gorsel regresyon; repoya girmez)
+test-artifacts/
+
+# Ozel cark kaynak katalog sayfalari: artik hicbir script tarafindan kullanilmiyor
+# (build-couples-images.mjs kaldirildi), silme onayi bekleniyor - bkz. son rapor.
 assets/ciftler-carki/sources/
+
+# Firebase servis hesabı / kimlik bilgisi dosyaları (asla repoya girmemeli)
+*firebase-adminsdk*.json
+*service-account*.json
+firebase-keys/
+.env
+.env.*
+!.env.example
