@@ -110,7 +110,8 @@ const ICONS = {
   bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor" stroke="none"/>',
   sudoku: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>',
   wheel: '<circle cx="12" cy="13" r="8"/><path d="m12 5 2.2 3.8 4.3.2-2.1 3.8 2 3.8-4.3.1L12 20l-2.1-3.3-4.3-.1 2-3.8L5.5 9l4.3-.2Z"/><path d="m12 2 1.5 3h-3Z" fill="currentColor" stroke="none"/>',
-  grid: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>'
+  grid: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
+  arrows: '<path d="M12 3v8M12 3l-3.5 3.5M12 3l3.5 3.5"/><path d="M12 21v-8M12 21l-3.5-3.5M12 21l3.5-3.5"/><path d="M3 12h8M3 12l3.5-3.5M3 12l3.5 3.5"/><path d="M21 12h-8M21 12l-3.5-3.5M21 12l-3.5 3.5"/>'
 };
 
 function escapeHtml(value) {
@@ -367,8 +368,7 @@ function renderDesktopWorkspace() {
   }).join("");
   const { columns, rows } = desktopGridMetrics();
   return `<section class="launcher-page launcher-page--desktop is-active" data-launcher-page="0" aria-label="Masaüstü çalışma alanı">
-    <section class="launcher-desktop-workspace" aria-labelledby="launcherDesktopTitle">
-      <div class="launcher-desktop-heading"><span class="launcher-eyebrow">RavzaDers masaüstü</span><h1 id="launcherDesktopTitle">Çalışma alanın</h1></div>
+    <section class="launcher-desktop-workspace">
       <div class="launcher-grid launcher-desktop-grid" id="launcherGrid" style="--desktop-columns:${columns};--desktop-rows:${rows}" aria-label="Masaüstü uygulamaları ve widget’ları">${slots}</div>
     </section>
   </section>`;

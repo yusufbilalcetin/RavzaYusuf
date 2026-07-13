@@ -16,6 +16,19 @@ html.launcher-experience {
   --launcher-glass-highlight: rgba(255, 255, 255, .10);
   --launcher-glass-shadow: 0 24px 70px rgba(0, 0, 0, .34);
   --launcher-glass-blur: 24px;
+  /* Topbar olcek tokenlari: her breakpoint bu birkac degeri degistirir,
+     tekil kurallar tekrar tekrar yazilmaz. */
+  --launcher-topbar-h: 58px;
+  --launcher-topbar-pad-y: 6px;
+  --launcher-topbar-pad-x: 8px;
+  --launcher-topbar-radius: 19px;
+  --launcher-topbar-gap: 8px;
+  --launcher-control-size: 44px;
+  --launcher-control-radius: 13px;
+  --launcher-brand-pad-x: 12px;
+  --launcher-brand-gap: 3px;
+  --launcher-brand-main-size: 17px;
+  --launcher-brand-sub-size: 9px;
   color-scheme: light dark;
   overflow: hidden;
 }
@@ -74,72 +87,90 @@ html.launcher-experience #topbar-root {
   pointer-events: none;
 }
 
-html.launcher-experience .launcher-topbar.topbar {
-  position: relative !important;
-  display: grid !important;
-  grid-template-columns: 48px minmax(0, 1fr) auto !important;
-  align-items: center !important;
-  gap: 12px !important;
-  width: min(100%, 1320px) !important;
-  height: 62px !important;
-  min-height: 62px !important;
-  margin: 0 auto !important;
-  padding: 7px 8px !important;
-  color: var(--launcher-ink) !important;
-  background: var(--launcher-glass-bg) !important;
-  border: 1px solid var(--launcher-glass-border) !important;
-  border-radius: 21px !important;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, .24), inset 0 1px 0 var(--launcher-glass-highlight) !important;
-  -webkit-backdrop-filter: saturate(150%) blur(22px) !important;
-  backdrop-filter: saturate(150%) blur(22px) !important;
-  pointer-events: auto;
-}
-
+/* Tek parca, simetrik topbar: sol ve sag kolonlar esit 1fr paylasir, marka
+   ortadaki auto kolonda - iki yan grubun icerik genisligi farkli olsa bile
+   marka her zaman tam ortada kalir. Butun boyutlandirma yukaridaki
+   token'lardan (--launcher-topbar-... ve --launcher-control-...) gelir;
+   breakpoint'ler sadece bu tokenlari degistirir. */
+html.launcher-experience .launcher-topbar.topbar,
 html.launcher-experience body:has(#dashboard.active) .launcher-topbar.topbar {
   position: relative !important;
   display: grid !important;
-  grid-template-columns: 48px minmax(0, 1fr) auto !important;
+  grid-template-columns: 1fr auto 1fr !important;
+  align-items: center !important;
+  gap: var(--launcher-topbar-gap) !important;
   width: min(100%, 1320px) !important;
-  height: 62px !important;
-  min-height: 62px !important;
+  height: var(--launcher-topbar-h) !important;
+  min-height: var(--launcher-topbar-h) !important;
   margin: 0 auto !important;
-  padding: 7px 8px !important;
+  padding: var(--launcher-topbar-pad-y) var(--launcher-topbar-pad-x) !important;
+  color: var(--launcher-ink) !important;
   background: var(--launcher-glass-bg) !important;
   border: 1px solid var(--launcher-glass-border) !important;
-  border-radius: 21px !important;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, .24), inset 0 1px 0 var(--launcher-glass-highlight) !important;
+  border-radius: var(--launcher-topbar-radius) !important;
+  box-shadow:
+    0 16px 46px rgba(0, 0, 0, .22),
+    inset 0 1px 0 var(--launcher-glass-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, .05) !important;
+  -webkit-backdrop-filter: saturate(135%) blur(22px) !important;
+  backdrop-filter: saturate(135%) blur(22px) !important;
+  pointer-events: auto;
 }
 
 html.launcher-experience .launcher-topbar::before {
   display: none !important;
 }
 
+/* Sag kumedeki her buton (ev/duzenle, ara, tema, mod) ayni gorsel sistemi
+   paylasir: ayni yukseklik, radius, zemin ve gecis. Yalnizca metin tasiyan
+   dugmeler (duzenle, tema) genislikte farklilasir. .launcher-edit-toggle
+   kendi display (none/inline-flex) kuralini route'a gore ayrica alir. */
 html.launcher-experience .launcher-home-control,
 html.launcher-experience .launcher-search-open,
 html.launcher-experience .launcher-topbar .theme-open-btn,
 html.launcher-experience .launcher-topbar .topbar-theme-btn {
-  display: inline-grid !important;
-  place-items: center;
-  width: 46px !important;
-  min-width: 46px !important;
-  height: 46px !important;
-  min-height: 46px !important;
+  display: inline-flex !important;
+}
+
+html.launcher-experience .launcher-home-control,
+html.launcher-experience .launcher-edit-toggle,
+html.launcher-experience .launcher-search-open,
+html.launcher-experience .launcher-topbar .theme-open-btn,
+html.launcher-experience .launcher-topbar .topbar-theme-btn {
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: var(--launcher-control-size) !important;
+  min-width: var(--launcher-control-size) !important;
+  height: var(--launcher-control-size) !important;
+  min-height: var(--launcher-control-size) !important;
   padding: 0 !important;
   color: var(--launcher-ink) !important;
   background: rgba(255, 255, 255, .075) !important;
   border: 1px solid rgba(255, 255, 255, .12) !important;
-  border-radius: 15px !important;
+  border-radius: var(--launcher-control-radius) !important;
   box-shadow: none !important;
+  font: 700 12px/1 "Plus Jakarta Sans", sans-serif;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 150ms ease, transform 150ms var(--launcher-ease-out), border-color 150ms ease;
 }
 
+html.launcher-experience .launcher-edit-toggle,
+html.launcher-experience .launcher-topbar .theme-open-btn {
+  width: auto !important;
+  padding-inline: 14px !important;
+}
+
 html.launcher-experience .launcher-home-control svg,
+html.launcher-experience .launcher-edit-toggle svg,
 html.launcher-experience .launcher-search-open svg,
 html.launcher-experience .launcher-topbar .theme-open-btn svg,
 html.launcher-experience .launcher-topbar .topbar-theme-btn svg {
-  width: 21px;
-  height: 21px;
+  width: 19px;
+  height: 19px;
+  flex: none;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -153,21 +184,37 @@ html.launcher-experience body[data-current-route="ana-sayfa"] .launcher-home-con
   pointer-events: none;
 }
 
+/* Marka: grid'in ortadaki auto kolonunda tam ortalanir, baslik/alt etiket
+   arasi sabit tokenla acilir. */
 html.launcher-experience .launcher-brand.topbar-love-brand {
   position: static !important;
+  grid-column: 2;
   justify-self: center;
   display: flex !important;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: var(--launcher-brand-gap);
   width: fit-content !important;
   max-width: 100% !important;
   min-width: 0 !important;
-  min-height: 44px !important;
-  padding: 2px 12px !important;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 var(--launcher-brand-pad-x) !important;
   color: var(--launcher-ink) !important;
   text-decoration: none;
+  text-align: center;
   filter: none !important;
   transform: none !important;
+  overflow: hidden;
+}
+
+html.launcher-experience .launcher-brand .love-brand-main,
+html.launcher-experience .launcher-brand .love-brand-sub {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 html.launcher-experience .launcher-brand::before,
@@ -178,33 +225,37 @@ html.launcher-experience .launcher-brand::after {
 html.launcher-experience .launcher-brand .love-brand-main {
   color: #fff4e8 !important;
   font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(18px, 2vw, 25px) !important;
+  font-size: var(--launcher-brand-main-size) !important;
   font-weight: 600 !important;
   line-height: 1 !important;
-  letter-spacing: -.025em !important;
+  letter-spacing: -.02em !important;
   text-shadow: 0 2px 12px rgba(0, 0, 0, .30) !important;
 }
 
 html.launcher-experience .launcher-brand .love-brand-sub {
-  margin-top: 3px;
+  margin-top: 0;
   color: rgba(255, 242, 234, .66) !important;
-  font-size: 9px !important;
+  font-size: var(--launcher-brand-sub-size) !important;
   font-weight: 700 !important;
   line-height: 1 !important;
   letter-spacing: .08em !important;
   text-transform: uppercase;
 }
 
-html.launcher-experience .launcher-topbar-actions {
-  display: flex;
+/* Sol grup (ev/duzenle) ilk kolonda basa, sag grup (ara/tema/mod) son
+   kolonda sona yasilanir; marka ortadaki kolonda tam ortada kalir. */
+html.launcher-experience .launcher-primary-actions {
+  grid-column: 1;
+  justify-self: start;
   align-items: center;
-  gap: 6px !important;
 }
 
-html.launcher-experience .launcher-topbar .theme-open-btn {
-  width: auto !important;
-  padding-inline: 13px !important;
-  gap: 7px;
+html.launcher-experience .launcher-topbar-actions {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--launcher-topbar-gap) !important;
 }
 
 html.launcher-experience .launcher-topbar .theme-open-btn > span:last-child {
@@ -227,10 +278,13 @@ html.launcher-experience .main-content {
   scrollbar-gutter: stable;
 }
 
-html.launcher-experience body[data-current-route]:not([data-current-route="ana-sayfa"]) .main-content {
-  bottom: calc(82px + var(--launcher-bottom)) !important;
-  height: auto !important;
-}
+/* ponytail: eskiden burada, dock icin 82px+ alt bosluk ayirilirdi. Ancak
+   .launcher-dock zaten "ana-sayfa" disindaki HER route'ta gizli (bkz. asagi,
+   body[data-current-route]:not([data-current-route="ana-sayfa"]) .launcher-dock),
+   yani bu rezervasyon hicbir zaman kullanilmayan bir dock icin bosuna sayfa
+   sonunda gorunmez bir bosluk/bar birakiyordu (ozellikle RavzaLingo gibi tam
+   ekran illustrasyonlu sayfalarda belirgindi). Kaldirildi; .main-content artik
+   base kuraldaki gibi tam yuksekligi kullanir. */
 
 html.launcher-experience body.is-game-fullscreen .main-content {
   bottom: 0 !important;
@@ -274,7 +328,10 @@ html.launcher-experience #page-root > .page.active:not(#dashboard) {
   min-height: 100dvh;
   margin-inline: auto;
   padding-top: 100px !important;
-  padding-bottom: 126px !important;
+  /* Onceki 126px, gizli/gorunmez dock icin ayrilmisti (bkz. .main-content
+     kurali) - dock bu route'larda hic gorunmedigi icin bu deger sayfa
+     sonunda bos bir bar birakiyordu. Sadece dogal bitis boslugu birakildi. */
+  padding-bottom: 32px !important;
 }
 
 html.launcher-experience .launcher-home {
@@ -361,6 +418,16 @@ html.launcher-experience .launcher-home-background img {
   object-position: var(--home-hero-desktop-position, center center) !important;
   border-radius: 0 !important;
   transform: none !important;
+}
+
+/* Kisa/genis pencerelerde (dar dikey alan) object-fit:cover, portre agirlikli
+   fotograflarin ust kismini (yuzleri) asiri kirpabilir. Boyle durumlarda
+   odak noktasini hafifce yukari kaydirarak kirpilmayi azalt - fotograf
+   bazinda ozel bir konum (--home-hero-desktop-position) tanimlanmadigi surece. */
+@media (max-height: 700px) {
+  html.launcher-experience .launcher-home-background img {
+    object-position: center 32% !important;
+  }
 }
 
 html.launcher-experience body:has(#dashboard.active) #dashboard.launcher-home .launcher-home-background :is(picture, img) {
@@ -790,6 +857,7 @@ html.launcher-experience .launcher-tone-blue { --launcher-icon-bg: linear-gradie
 html.launcher-experience .launcher-tone-red { --launcher-icon-bg: linear-gradient(145deg, #d8686f, #90323c); }
 html.launcher-experience .launcher-tone-indigo { --launcher-icon-bg: linear-gradient(145deg, #697ac7, #3a477f); }
 html.launcher-experience .launcher-tone-game { --launcher-icon-bg: #3c2b42; }
+html.launcher-experience .launcher-tone-burgundy { --launcher-icon-bg: linear-gradient(145deg, #d66f9b, #7d294e); }
 
 html.launcher-experience #launcher-shell-root {
   display: contents;
@@ -1422,26 +1490,19 @@ html.launcher-experience .launcher-editor-workspace-label {
     --launcher-glass-bg-strong: rgba(255, 255, 255, .33);
   }
 
+  html.launcher-experience[data-launcher-device="tablet"] {
+    --launcher-topbar-h: 60px;
+    --launcher-topbar-pad-y: 7px;
+    --launcher-topbar-pad-x: 9px;
+    --launcher-topbar-radius: 20px;
+    --launcher-topbar-gap: 9px;
+    --launcher-control-size: 45px;
+    --launcher-brand-main-size: 19px;
+  }
+
   html.launcher-experience[data-launcher-device="tablet"] #topbar-root {
     right: clamp(18px, 3vw, 34px);
     left: clamp(18px, 3vw, 34px);
-  }
-
-  html.launcher-experience[data-launcher-device="tablet"] .launcher-topbar.topbar,
-  html.launcher-experience[data-launcher-device="tablet"] body:has(#dashboard.active) .launcher-topbar.topbar {
-    grid-template-columns: 108px minmax(0, 1fr) auto !important;
-    height: 58px !important;
-    min-height: 58px !important;
-    border-radius: 20px !important;
-  }
-
-  html.launcher-experience[data-launcher-device="tablet"] .launcher-primary-actions {
-    min-width: 108px;
-  }
-
-  html.launcher-experience[data-launcher-device="tablet"] .launcher-edit-toggle {
-    min-width: 104px;
-    white-space: nowrap;
   }
 
   html.launcher-experience[data-launcher-device="tablet"] .launcher-home-content {
@@ -1586,64 +1647,36 @@ html.launcher-experience .launcher-editor-workspace-label {
     --launcher-glass-bg-strong: rgba(255, 255, 255, .30);
   }
 
+  html.launcher-experience[data-launcher-device="desktop"] {
+    --launcher-topbar-h: 60px;
+    --launcher-topbar-pad-y: 8px;
+    --launcher-topbar-pad-x: 10px;
+    --launcher-topbar-radius: 18px;
+    --launcher-topbar-gap: 10px;
+    --launcher-control-size: 46px;
+    --launcher-control-radius: 14px;
+    --launcher-brand-pad-x: 16px;
+    --launcher-brand-main-size: 21px;
+    --launcher-brand-sub-size: 10px;
+  }
+
   html.launcher-experience[data-launcher-device="desktop"] #topbar-root {
     right: 28px;
     left: 28px;
   }
 
-  html.launcher-experience[data-launcher-device="desktop"] .launcher-topbar.topbar,
-  html.launcher-experience[data-launcher-device="desktop"] body:has(#dashboard.active) .launcher-topbar.topbar {
-    display: flex !important;
-    width: min(100%, 1560px) !important;
-    height: 52px !important;
-    min-height: 52px !important;
-    padding: 3px 5px !important;
-    border-radius: 17px !important;
-  }
-
-  html.launcher-experience[data-launcher-device="desktop"] :is(.launcher-home-control, .launcher-search-open, .launcher-topbar .theme-open-btn, .launcher-topbar .topbar-theme-btn, .launcher-edit-toggle) {
-    width: 44px !important;
-    min-width: 44px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    border-radius: 13px !important;
-  }
-
   html.launcher-experience[data-launcher-device="desktop"] .launcher-edit-toggle {
-    width: auto !important;
-    min-width: 104px !important;
-    padding-inline: 12px !important;
-    white-space: nowrap;
+    min-width: 100px;
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-topbar .theme-open-btn {
-    width: auto !important;
-    min-width: 78px !important;
-    padding-inline: 11px !important;
-    white-space: nowrap;
-  }
-
-  html.launcher-experience[data-launcher-device="desktop"] .launcher-brand.topbar-love-brand {
-    order: 1;
-    align-items: flex-start;
-    justify-self: auto;
-    margin-right: auto !important;
-  }
-
-  html.launcher-experience[data-launcher-device="desktop"] .launcher-primary-actions {
-    order: 2;
-    flex: 0 0 104px;
-    min-width: 104px;
-  }
-
-  html.launcher-experience[data-launcher-device="desktop"] .launcher-topbar-actions {
-    order: 3;
+    min-width: 76px;
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-home-content {
     width: 100%;
     max-width: none;
-    padding: 76px 48px 116px;
+    padding: 84px 48px 116px;
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-pages-viewport {
@@ -1657,7 +1690,7 @@ html.launcher-experience .launcher-editor-workspace-label {
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-page--desktop {
-    height: calc(100dvh - 192px);
+    height: calc(100dvh - 200px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-desktop-workspace {
@@ -1666,28 +1699,14 @@ html.launcher-experience .launcher-editor-workspace-label {
     min-width: 0;
   }
 
-  html.launcher-experience[data-launcher-device="desktop"] .launcher-desktop-heading {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    height: 36px;
-    color: var(--launcher-ink);
-  }
-
-  html.launcher-experience[data-launcher-device="desktop"] .launcher-desktop-heading h1 {
-    margin: 0;
-    color: #fff8f3;
-    font: 600 clamp(22px, 2vw, 30px)/1 "Playfair Display", Georgia, serif;
-    text-shadow: 0 3px 18px rgba(0, 0, 0, .34);
-  }
-
+  /* Baslik kaldirildi: grid artik workspace'in tamamini kullanir. */
   html.launcher-experience[data-launcher-device="desktop"] .launcher-desktop-grid {
     display: grid;
     grid-template-columns: repeat(var(--desktop-columns), minmax(0, 1fr));
     grid-template-rows: repeat(var(--desktop-rows), minmax(0, 1fr));
     gap: 8px 10px;
     width: 100%;
-    height: calc(100% - 36px);
+    height: 100%;
     min-width: 0;
   }
 
@@ -1812,41 +1831,29 @@ html.launcher-experience .launcher-editor-workspace-label {
     --launcher-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
+  html.launcher-experience {
+    --launcher-topbar-h: 56px;
+    --launcher-topbar-pad-y: 5px;
+    --launcher-topbar-pad-x: 5px;
+    --launcher-topbar-radius: 18px;
+    --launcher-topbar-gap: 5px;
+    --launcher-control-size: 44px;
+    --launcher-control-radius: 14px;
+    --launcher-brand-pad-x: 2px;
+    --launcher-brand-main-size: 16px;
+    --launcher-brand-sub-size: 7px;
+  }
+
   html.launcher-experience #topbar-root {
     right: 8px;
     left: 8px;
   }
 
-  html.launcher-experience .launcher-topbar.topbar {
-    grid-template-columns: 44px minmax(0, 1fr) auto !important;
-    gap: 5px !important;
-    height: 56px !important;
-    min-height: 56px !important;
-    padding: 5px !important;
-    border-radius: 18px !important;
-  }
-
-  html.launcher-experience body:has(#dashboard.active) .launcher-topbar.topbar {
-    grid-template-columns: 44px minmax(0, 1fr) auto !important;
-    gap: 5px !important;
-    height: 56px !important;
-    min-height: 56px !important;
-    padding: 5px !important;
-    border-radius: 18px !important;
-  }
-
-  html.launcher-experience .launcher-home-control,
-  html.launcher-experience .launcher-search-open,
-  html.launcher-experience .launcher-topbar .theme-open-btn,
-  html.launcher-experience .launcher-topbar .topbar-theme-btn {
-    width: 44px !important;
-    min-width: 44px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    border-radius: 14px !important;
-  }
-
+  /* Bu genislikte "Tema" etiketi ikon-yalnizca hale gelir; diger dugmelerle
+     ayni kare govdeyi paylasir, kaybolmaz. */
   html.launcher-experience .launcher-topbar .theme-open-btn {
+    width: var(--launcher-control-size) !important;
+    min-width: var(--launcher-control-size) !important;
     padding: 0 !important;
   }
 
@@ -1854,26 +1861,11 @@ html.launcher-experience .launcher-editor-workspace-label {
     display: none;
   }
 
-  html.launcher-experience .launcher-brand {
-    padding-inline: 2px !important;
-  }
-
-  html.launcher-experience body:has(#dashboard.active) .launcher-brand.topbar-love-brand {
-    max-width: 34vw !important;
-    padding: 1px !important;
-  }
-
-  html.launcher-experience .launcher-brand .love-brand-main {
-    font-size: 17px !important;
-  }
-
-  html.launcher-experience .launcher-brand .love-brand-sub {
-    font-size: 7px !important;
-  }
-
   html.launcher-experience #page-root > .page.active:not(#dashboard) {
     padding-top: 78px !important;
-    padding-bottom: 108px !important;
+    /* bkz. desktop kuralindaki ayni not: dock bu route'larda gizli, eski
+       108px yalnizca bos bir bar birakiyordu. */
+    padding-bottom: 24px !important;
   }
 
   html.launcher-experience .launcher-home-background img {
@@ -2020,16 +2012,9 @@ html.launcher-experience .launcher-editor-workspace-label {
 }
 
 @media (max-width: 350px) {
-  html.launcher-experience .launcher-brand .love-brand-main {
-    font-size: 15px !important;
-  }
-
-  html.launcher-experience .launcher-topbar .theme-open-btn {
-    display: none !important;
-  }
-
-  html.launcher-experience .launcher-topbar.topbar {
-    grid-template-columns: 44px minmax(0, 1fr) auto !important;
+  html.launcher-experience {
+    --launcher-brand-main-size: 15px;
+    --launcher-topbar-gap: 4px;
   }
 
   html.launcher-experience .launcher-widget-heading {
@@ -2045,16 +2030,13 @@ html.launcher-experience .launcher-editor-workspace-label {
   }
 }
 
-/* Launcher düzenleme modu -------------------------------------------------- */
-html.launcher-experience body.launcher-editing .launcher-topbar.topbar,
-html.launcher-experience body.launcher-editing:has(#dashboard.active) .launcher-topbar.topbar {
-  grid-template-columns: auto minmax(0, 1fr) auto !important;
-}
-
+/* Launcher düzenleme modu --------------------------------------------------
+   Ev/duzenle butonlari ayni grid hucresinde ust uste durur (grid-area:1/1),
+   boylece route degisince genislik sicramasi olmaz; gorsel govdesi (boyut,
+   renk, radius) yukaridaki paylasilan buton sistemi tarafindan verilir. */
 html.launcher-experience .launcher-primary-actions {
   display: grid;
-  align-items: center;
-  min-width: 46px;
+  min-width: var(--launcher-control-size);
 }
 
 html.launcher-experience .launcher-primary-actions > * {
@@ -2063,20 +2045,6 @@ html.launcher-experience .launcher-primary-actions > * {
 
 html.launcher-experience .launcher-edit-toggle {
   display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: auto;
-  min-width: 46px;
-  min-height: 46px;
-  padding: 0 13px;
-  color: var(--launcher-ink);
-  background: rgba(255, 255, 255, .075);
-  border: 1px solid rgba(255, 255, 255, .12);
-  border-radius: 15px;
-  font: 700 12px/1 "Plus Jakarta Sans", sans-serif;
-  cursor: pointer;
-  transition: background-color 150ms ease, transform 150ms var(--launcher-ease-out), border-color 150ms ease;
 }
 
 html.launcher-experience body[data-current-route="ana-sayfa"] .launcher-edit-toggle {
@@ -2085,16 +2053,6 @@ html.launcher-experience body[data-current-route="ana-sayfa"] .launcher-edit-tog
 
 html.launcher-experience body[data-current-route="ana-sayfa"] .launcher-home-control {
   display: none !important;
-}
-
-html.launcher-experience .launcher-edit-toggle svg {
-  width: 19px;
-  height: 19px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
 }
 
 html.launcher-experience .launcher-edit-toggle .launcher-done-icon,

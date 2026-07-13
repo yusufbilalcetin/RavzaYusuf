@@ -16,7 +16,7 @@ import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
 import { closeGame, initOyun } from "../pages/oyun-page.js?v=alan-bulmacasi-20260710-1";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
-import { syncLauncherActive } from "./launcher.js";
+import { syncLauncherActive } from "./launcher.js?v=topbar-redesign-20260714-2";
 
 export const routeAliases = {
   dashboard: "ana-sayfa",
@@ -48,7 +48,7 @@ const routes = {
   "hizli-tekrar": { partial: "./partials/pages/hizli-tekrar.html", sectionId: "recap", navId: "nav-recap", init: initHizliTekrar },
   "birinci-sinif": { partial: "./partials/pages/birinci-sinif.html", sectionId: "grade1", navId: "nav-grade1", init: initBirinciSinif },
   "ikinci-sinif": { partial: "./partials/pages/ikinci-sinif.html", sectionId: "grade2", navId: "nav-grade2", init: initIkinciSinif },
-  oyun: { partial: "./partials/pages/oyun.html?v=alan-bulmacasi-20260710-1", sectionId: "games", navId: "nav-games", init: initOyun }
+  oyun: { partial: "./partials/pages/oyun.html?v=ok-bulmacasi-20260714-1", sectionId: "games", navId: "nav-games", init: initOyun }
 };
 
 let isNavigating = false;

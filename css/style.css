@@ -42,4 +42,4 @@
 @import url("./responsive/viewport-fixes.css");
 @import url("./layout/duzen-son.css");
 @import url("./themes/liquid-glass.css");
-@import url("./layout/launcher.css");
+@import url("./layout/launcher.css?v=hidden-bar-fix-20260715-1");
