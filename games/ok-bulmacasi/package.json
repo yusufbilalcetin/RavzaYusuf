@@ -1,0 +1,10 @@
+{
+  "name": "ravza-ok-bulmacasi",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "levels": "node ./scripts/generate-levels.mjs",
+    "test": "node ./tests/validate-game.mjs",
+    "check": "node --check ./js/app.js && node --check ./js/engine.js && node --check ./js/levels.js && node --check ./js/levels-data.js && node --check ./js/level-meta.js && node --check ./js/storage.js && node --check ./js/sound.js && node --check ./scripts/level-generator.mjs && node --check ./scripts/generate-levels.mjs"
+  }
+}

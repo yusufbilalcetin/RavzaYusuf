@@ -53,7 +53,8 @@ const gameItems = Object.freeze([
   app({ id: "renk-siralama", title: "Renk Sıralama", type: "game", route: "oyun", gameId: "renk-siralama", asset: "./assets/oyun-bolumu/optimized/ikon-renk-siralama.webp", tone: "game", category: "Oyunlar", keywords: ["renk", "sıralama"] }),
   app({ id: "sudoku", title: "Sudoku", type: "game", route: "oyun", gameId: "sudoku", icon: "sudoku", tone: "blue", category: "Oyunlar", keywords: ["sayı", "bulmaca"] }),
   app({ id: "chance-wheel", title: "Şans Çarkı", type: "link", href: "./games/cark-oyunu/index.html", icon: "wheel", tone: "rose", category: "Oyunlar", keywords: ["şans", "çark", "çevir"] }),
-  app({ id: "area-puzzle", title: "Alan Bulmacası", type: "link", href: "./games/alan-bulmacasi/index.html", icon: "grid", tone: "amber", category: "Oyunlar", keywords: ["alan", "bulmaca", "matematik"] })
+  app({ id: "area-puzzle", title: "Alan Bulmacası", type: "link", href: "./games/alan-bulmacasi/index.html", icon: "grid", tone: "amber", category: "Oyunlar", keywords: ["alan", "bulmaca", "matematik"] }),
+  app({ id: "arrow-puzzle", title: "Ok Bulmacası", type: "link", href: "./games/ok-bulmacasi/index.html", icon: "arrows", tone: "burgundy", category: "Oyunlar", keywords: ["ok", "bulmaca", "yön"] })
 ]);
 
 export const LAUNCHER_GROUPS = Object.freeze([

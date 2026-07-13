@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff8fb">
+  <meta name="color-scheme" content="light">
+  <title>Ravza'nın Ok Bulmacası</title>
+  <meta name="description" content="Ok ucundaki yolu tahtadan çek, çıkışı kapalıysa can kaybet. 100 bölüm, kolaydan zora.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./css/game.css?v=3">
+</head>
+<body>
+  <main class="game-app" id="gameApp">
+    <header class="game-header">
+      <a class="icon-button back-button" href="../../index.html?page=oyun" aria-label="Oyun alanına geri dön">
+        <span aria-hidden="true">←</span>
+      </a>
+
+      <div class="title-block">
+        <span class="game-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3v15M12 18l-5-5M12 18l5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="title-text">
+          <p>Ravza'ya özel</p>
+          <h1>Ok Bulmacası</h1>
+          <span>Bir yolun ucuna dokun, tahtadan çek. Çıkış yolu kapalıysa can gider!</span>
+        </span>
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-button" id="soundButton" type="button" aria-label="Sesi kapat" title="Ses">
+          <span id="soundIcon" aria-hidden="true">♪</span>
+        </button>
+        <button class="icon-button" id="helpButton" type="button" aria-label="Nasıl oynanır yardımını aç" title="Yardım">
+          <span aria-hidden="true">?</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="game-shell" aria-label="Ok bulmacası">
+      <div class="level-row">
+        <button class="level-button" id="levelButton" type="button" aria-label="Bölüm seçiciyi aç">
+          <span id="levelLabel">Bölüm 1</span>
+          <small id="difficultyLabel">Isınma</small>
+          <span aria-hidden="true">⌄</span>
+        </button>
+        <div class="lives-copy" aria-live="polite">
+          <span id="livesHearts" class="lives-hearts">♥♥♥</span>
+        </div>
+      </div>
+
+      <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
+
+      <div class="stats" aria-label="Oyun bilgileri">
+        <div class="stat"><span>Kalan Yol</span><strong id="remainingValue">0</strong></div>
+        <div class="stat"><span>Can</span><strong id="livesValue">3</strong></div>
+        <div class="stat"><span>Yıldız</span><strong id="starValue" aria-label="3 yıldız mümkün">★★★</strong></div>
+      </div>
+
+      <div class="board-wrap">
+        <div class="board" id="board" role="img" aria-label="Ok bulmacası tahtası">
+          <svg id="boardSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <p class="board-status" id="boardStatus" role="status" aria-live="polite">Bir yola dokunarak başla.</p>
+      </div>
+
+      <div class="controls" aria-label="Oyun kontrolleri">
+        <button class="control-button" id="hintButton" type="button" aria-label="İpucu kullan">
+          <span aria-hidden="true">✦</span><strong>İpucu</strong><small id="hintCount">3</small>
+        </button>
+        <button class="control-button" id="resetButton" type="button" aria-label="Bölümü yeniden başlat">
+          <span aria-hidden="true">↻</span><strong>Yeniden Başlat</strong>
+        </button>
+        <button class="control-button control-button--primary" id="nextButton" type="button" aria-label="Sonraki bölüme geç" disabled>
+          <span aria-hidden="true">→</span><strong>Sonraki</strong>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section>
+  </div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script type="module" src="./js/app.js?v=3"></script>
+</body>
+</html>
