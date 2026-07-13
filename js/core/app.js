@@ -1,9 +1,10 @@
 import { loadLayoutPartials } from "./partial-loader.js";
-import { initRouter, navigate } from "./router.js?v=alan-bulmacasi-20260710-1";
+import { initRouter, navigate } from "./router.js?v=launcher-20260713-1";
 import { installCompatibility } from "./compatibility.js?v=fit-visible-20260704";
 import { installAppShellScrollBridge } from "./app-shell-scroll.js";
 import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
 import { withTimeout } from "../utils/helpers.js";
+import { initLauncher } from "./launcher.js";
 
 // legacy-app.js normalde çok hızlı yüklenir (yerel/CDN'den tek modül); bu
 // süre yalnızca "CDN tamamen tıkanırsa ana içerik sonsuza dek beklemesin"
@@ -94,6 +95,7 @@ export async function initApp() {
     await loadLayoutPartials();
     startupState.shellRendered = true;
     installAppShellScrollBridge();
+    initLauncher();
 
     const legacy = bootLegacyAppInBackground();
     // Modül gerçekten yüklendiyse (window.toggleTheme vb. bağlansın diye)

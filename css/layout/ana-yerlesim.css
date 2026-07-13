@@ -125,11 +125,13 @@ img, video, canvas, svg, iframe { max-width: 100%; height: auto; }
 /* ================= SCROLLBAR ================= */
 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track { background: transparent; }
+
+html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text) 26%, transparent) transparent; }
 
 /* ==============================================================
    ============== MOBİL RESPONSIVE (tek, temiz katman) ==========

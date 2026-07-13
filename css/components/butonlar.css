@@ -2,11 +2,17 @@
 
 .primary-btn,
 .check-btn {
-  background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  background: var(--pink);
   color: #fff;
   padding: 12px 20px;
-  box-shadow: 0 16px 30px rgba(49, 68, 156, .20);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--pink) 26%, transparent), 0 1px 0 rgba(255,255,255,.18) inset;
 }
+
+.primary-btn:hover,
+.check-btn:hover { background: var(--pink-bright); }
+
+.primary-btn:active,
+.check-btn:active { background: color-mix(in srgb, var(--pink) 85%, black 15%); }
 
 .primary-btn.soft { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
 
@@ -15,21 +21,25 @@
 .ghost-btn:hover,
 .check-btn:hover,
 .mark-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   opacity: 1;
 }
 
 .secondary-btn {
   padding: 12px 20px;
-  background: var(--pink-pale);
-  color: var(--navy);
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  color: var(--text);
+  border: 1px solid var(--separator-strong);
 }
+
+.secondary-btn:hover { background: color-mix(in srgb, var(--text) 10%, transparent); }
+.secondary-btn:active { background: color-mix(in srgb, var(--text) 14%, transparent); }
 
 .ghost-btn {
   padding: 12px 20px;
   background: color-mix(in srgb, var(--input-bg) 78%, transparent);
   color: var(--text);
-  border: 1.5px solid var(--card-border);
+  border: 1px solid var(--separator-strong);
 }
 
 .mark-btn {

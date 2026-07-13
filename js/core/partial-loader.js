@@ -21,8 +21,8 @@ export async function mountPartial(targetId, path) {
 
 export async function loadLayoutPartials() {
   await Promise.all([
-    mountPartial("sidebar-root", "./partials/layout/sidebar.html"),
     mountPartial("topbar-root", "./partials/layout/topbar.html"),
-    mountPartial("tema-panel-root", "./partials/layout/tema-paneli.html")
+    mountPartial("tema-panel-root", "./partials/layout/tema-paneli.html"),
+    mountPartial("launcher-shell-root", "./partials/layout/launcher-shell.html")
   ]);
 }

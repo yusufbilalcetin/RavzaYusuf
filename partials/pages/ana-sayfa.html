@@ -1,25 +1,55 @@
-<section id="dashboard" class="page active">
+<section id="dashboard" class="page active launcher-home">
+  <div class="dashboard-visual-stage launcher-home-background" id="anaSayfaHeroStage" aria-hidden="true">
+    <picture class="ana-sayfa-hero-picture">
+      <source id="anaSayfaHeroMobileAvif" media="(max-width: 768px)" type="image/avif" sizes="100vw" />
+      <source id="anaSayfaHeroMobileWebp" media="(max-width: 768px)" type="image/webp" sizes="100vw" />
+      <source id="anaSayfaHeroDesktopAvif" media="(min-width: 769px)" type="image/avif" sizes="100vw" />
+      <source id="anaSayfaHeroDesktopWebp" media="(min-width: 769px)" type="image/webp" sizes="100vw" />
+      <img
+        id="anaSayfaHeroImage"
+        class="ana-sayfa-hero-image"
+        alt=""
+        width="1600"
+        height="900"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    </picture>
+  </div>
+  <div class="launcher-home-scrim" aria-hidden="true"></div>
 
-        <div class="dash-right">
+  <div class="launcher-home-content">
+    <section class="launcher-edit-toolbar glass-surface" id="launcherEditToolbar" aria-label="Ana ekran düzenleme araçları" hidden>
+      <p><strong>Düzenleme modu</strong><span>Öğeleri sürükle veya klavyeyle taşı.</span></p>
+      <div class="launcher-edit-tools">
+        <button type="button" data-launcher-editor="apps"><span aria-hidden="true">＋</span> Uygulama Ekle</button>
+        <button type="button" data-launcher-editor="widgets"><span aria-hidden="true">＋</span> Widget Ekle</button>
+        <button type="button" data-launcher-add-page><span aria-hidden="true">＋</span> Yeni Sayfa</button>
+        <button type="button" data-launcher-editor="reset">Düzeni Sıfırla</button>
+        <button class="launcher-edit-done" type="button" data-launcher-done>Bitti</button>
+      </div>
+    </section>
 
-          <div class="dashboard-visual-stage" id="anaSayfaHeroStage">
-            <picture class="ana-sayfa-hero-picture">
-              <source id="anaSayfaHeroMobileAvif" media="(max-width: 768px)" type="image/avif" sizes="calc(100vw - 20px)" />
-              <source id="anaSayfaHeroMobileWebp" media="(max-width: 768px)" type="image/webp" sizes="calc(100vw - 20px)" />
-              <source id="anaSayfaHeroDesktopAvif" media="(min-width: 769px)" type="image/avif" sizes="(max-width: 1600px) calc(100vw - 72px), 1536px" />
-              <source id="anaSayfaHeroDesktopWebp" media="(min-width: 769px)" type="image/webp" sizes="(max-width: 1600px) calc(100vw - 72px), 1536px" />
-              <img
-                id="anaSayfaHeroImage"
-                class="ana-sayfa-hero-image"
-                alt=""
-                width="1600"
-                height="900"
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-              />
-            </picture>
-          </div>
+    <div class="launcher-pages-shell">
+      <button class="launcher-page-arrow launcher-page-arrow--previous" type="button" data-launcher-page-step="-1" aria-label="Önceki sayfa" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+      <div class="launcher-pages-viewport" id="launcherPagesViewport" aria-label="Launcher sayfaları">
+        <div class="launcher-pages-track" id="launcherPagesTrack"></div>
+      </div>
+      <button class="launcher-page-arrow launcher-page-arrow--next" type="button" data-launcher-page-step="1" aria-label="Sonraki sayfa" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+      </button>
+    </div>
 
-        </div><!-- /dash-right -->
-      </section>
+    <nav class="launcher-page-controls glass-surface" id="launcherPageControls" aria-label="Launcher sayfaları"></nav>
+
+    <div class="sr-only" aria-hidden="true">
+      <span id="stat-question-bank">0</span>
+      <span id="quiz-progress-label">0%</span>
+      <span id="quiz-progress-text"></span>
+      <span id="quiz-progress-fill"></span>
+    </div>
+  </div>
+</section>

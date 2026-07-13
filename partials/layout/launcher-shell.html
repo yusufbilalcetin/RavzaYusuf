@@ -1,0 +1,58 @@
+<div class="launcher-dialog-layer" id="launcherFolderLayer" hidden>
+  <button class="launcher-dialog-scrim" type="button" data-launcher-close aria-label="Klasörü kapat"></button>
+  <section class="launcher-dialog launcher-folder-dialog" id="launcherFolderDialog" role="dialog" aria-modal="true" aria-labelledby="launcherFolderTitle" tabindex="-1">
+    <header class="launcher-dialog-head">
+      <div>
+        <span class="launcher-dialog-kicker">Uygulama klasörü</span>
+        <h2 id="launcherFolderTitle">Klasör</h2>
+      </div>
+      <button class="launcher-dialog-close" type="button" data-launcher-close aria-label="Klasörü kapat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="launcher-folder-grid" id="launcherFolderGrid"></div>
+  </section>
+</div>
+
+<div class="launcher-dialog-layer" id="launcherSearchLayer" hidden>
+  <button class="launcher-dialog-scrim" type="button" data-launcher-search-close aria-label="Aramayı kapat"></button>
+  <section class="launcher-dialog launcher-search-dialog" id="launcherSearchDialog" role="dialog" aria-modal="true" aria-labelledby="launcherSearchTitle" tabindex="-1">
+    <header class="launcher-dialog-head launcher-search-head">
+      <div>
+        <span class="launcher-dialog-kicker">RavzaDers</span>
+        <h2 id="launcherSearchTitle">Uygulama ve ders ara</h2>
+      </div>
+      <button class="launcher-dialog-close" type="button" data-launcher-search-close aria-label="Aramayı kapat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <label class="launcher-search-field">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+      <span class="sr-only">Arama</span>
+      <input id="launcherSearchInput" type="search" autocomplete="off" placeholder="Uygulama, oyun veya ders adı" />
+      <kbd>Esc</kbd>
+    </label>
+    <div class="launcher-search-results" id="launcherSearchResults" aria-live="polite"></div>
+  </section>
+</div>
+
+<div class="launcher-dialog-layer launcher-editor-layer" id="launcherEditorLayer" hidden>
+  <button class="launcher-dialog-scrim" type="button" data-launcher-editor-close aria-label="Düzenleme panelini kapat"></button>
+  <section class="launcher-dialog launcher-editor-dialog" id="launcherEditorDialog" role="dialog" aria-modal="true" aria-labelledby="launcherEditorTitle" tabindex="-1">
+    <header class="launcher-dialog-head">
+      <div>
+        <span class="launcher-dialog-kicker" id="launcherEditorKicker">Ana ekran düzeni</span>
+        <h2 id="launcherEditorTitle">Öğe ekle</h2>
+      </div>
+      <button class="launcher-dialog-close" type="button" data-launcher-editor-close aria-label="Düzenleme panelini kapat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="launcher-editor-content" id="launcherEditorContent"></div>
+  </section>
+</div>
+
+<div class="launcher-drag-layer" id="launcherDragLayer" aria-hidden="true"></div>
+<p class="sr-only" id="launcherLiveRegion" aria-live="assertive" aria-atomic="true"></p>
+
+<nav class="launcher-dock glass-surface" id="launcherDock" aria-label="Hızlı erişim"></nav>

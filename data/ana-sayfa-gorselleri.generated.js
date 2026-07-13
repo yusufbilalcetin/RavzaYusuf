@@ -146,6 +146,24 @@ export const ANA_SAYFA_GORSELLERI = Object.freeze([
     "mobilePosition": "center center"
   },
   {
+    "id": "sahil",
+    "name": "Sahil",
+    "alt": "Yusuf ve Ravza Sahil manzarasında",
+    "desktop": {
+      "fallback": "./assets/ana-sayfa/optimized/sahil-desktop-1280-09ca7108.webp",
+      "webpSrcSet": "./assets/ana-sayfa/optimized/sahil-desktop-960-77e83c0e.webp 960w, ./assets/ana-sayfa/optimized/sahil-desktop-1280-09ca7108.webp 1280w, ./assets/ana-sayfa/optimized/sahil-desktop-1600-a2b77dcd.webp 1600w",
+      "avifSrcSet": "./assets/ana-sayfa/optimized/sahil-desktop-960-4901a383.avif 960w, ./assets/ana-sayfa/optimized/sahil-desktop-1280-01de8c00.avif 1280w, ./assets/ana-sayfa/optimized/sahil-desktop-1600-3e512289.avif 1600w"
+    },
+    "mobile": {
+      "fallback": "./assets/ana-sayfa/optimized/sahil-mobile-480-c39d9fbb.webp",
+      "webpSrcSet": "./assets/ana-sayfa/optimized/sahil-mobile-360-24bc0055.webp 360w, ./assets/ana-sayfa/optimized/sahil-mobile-480-c39d9fbb.webp 480w, ./assets/ana-sayfa/optimized/sahil-mobile-720-e360b9e5.webp 720w",
+      "avifSrcSet": "./assets/ana-sayfa/optimized/sahil-mobile-360-45b07c79.avif 360w, ./assets/ana-sayfa/optimized/sahil-mobile-480-ed2abea0.avif 480w, ./assets/ana-sayfa/optimized/sahil-mobile-720-1c3d11a9.avif 720w"
+    },
+    "placeholder": "./assets/ana-sayfa/optimized/sahil-placeholder-9c34bede.webp",
+    "desktopPosition": "center center",
+    "mobilePosition": "center center"
+  },
+  {
     "id": "troll",
     "name": "Troll",
     "alt": "Yusuf ve Ravza Troll manzarasında",

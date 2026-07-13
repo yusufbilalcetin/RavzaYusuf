@@ -185,7 +185,11 @@ function renderIframeGame(target, url, title) {
   `;
 }
 
-function closeGame(root) {
+export function closeGame(root = document.getElementById("games")) {
+  if (!root) {
+    document.body.classList.remove("is-game-fullscreen");
+    return;
+  }
   pbnLog("oyun.closeGame");
   const stage = root.querySelector("#gameStage");
   const body = root.querySelector("#gameStageBody");

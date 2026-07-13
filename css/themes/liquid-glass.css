@@ -1,0 +1,478 @@
+/* ======================================================================
+   RAVZADERS · WEB-SAFE LIQUID GLASS
+   Rollback: <html> üzerindeki `theme-liquid-glass` sınıfını kaldır.
+   Bu katman layout ölçülerini değiştirmez; yalnız navigasyon ve geçici
+   kontrol yüzeylerini etkiler. İçerik kartları ve hero bilinçli olarak hariçtir.
+   ====================================================================== */
+
+html.theme-liquid-glass {
+  color-scheme: light dark;
+
+  --glass-app-bg: #f5f4fb;
+  --glass-surface-base: rgba(255, 255, 255, .84);
+
+  --glass-bg: rgba(255, 255, 255, .28);
+  --glass-bg-strong: rgba(255, 255, 255, .40);
+  --glass-bg-navigation: rgba(18, 10, 28, .28);
+  --glass-bg-soft: rgba(40, 28, 54, .045);
+  --glass-bg-hover: rgba(40, 28, 54, .075);
+  --glass-bg-active: rgba(40, 28, 54, .11);
+
+  --glass-border: rgba(53, 36, 72, .13);
+  --glass-border-strong: rgba(53, 36, 72, .19);
+  --glass-highlight: rgba(255, 255, 255, .22);
+
+  --glass-text-primary: #25202d;
+  --glass-text-secondary: #686170;
+  --glass-text-tertiary: #817988;
+
+  --glass-accent: var(--pink, #d4669c);
+  --glass-focus: #9d285f;
+  --glass-focus-navigation: #fff0f5;
+  --glass-accent-soft: color-mix(in srgb, var(--glass-accent) 15%, transparent);
+  --glass-accent-border: color-mix(in srgb, var(--glass-accent) 30%, transparent);
+
+  --glass-blur-md: 18px;
+  --glass-blur-lg: 24px;
+  --glass-sat-md: 150%;
+  --glass-sat-lg: 170%;
+
+  --glass-radius-control: 12px;
+  --glass-radius-panel: 18px;
+  --glass-radius-hero: 24px;
+
+  --glass-shadow:
+    0 12px 32px rgba(28, 18, 42, .13),
+    inset 0 1px 0 rgba(255, 255, 255, .52);
+  --glass-shadow-overlay:
+    0 24px 64px rgba(28, 18, 42, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .54);
+
+  --glass-transition: 180ms ease;
+  --glass-spring: 220ms cubic-bezier(.22, 1, .36, 1);
+}
+
+html.theme-liquid-glass body.dark {
+  --glass-app-bg: #0b0712;
+  --glass-surface-base: rgba(24, 15, 34, .84);
+
+  --glass-bg: rgba(18, 10, 28, .18);
+  --glass-bg-strong: rgba(18, 10, 28, .32);
+  --glass-bg-navigation: rgba(18, 10, 28, .22);
+  --glass-bg-soft: rgba(255, 255, 255, .055);
+  --glass-bg-hover: rgba(255, 255, 255, .085);
+  --glass-bg-active: rgba(255, 255, 255, .12);
+
+  --glass-border: rgba(255, 255, 255, .14);
+  --glass-border-strong: rgba(255, 255, 255, .18);
+  --glass-highlight: rgba(255, 255, 255, .10);
+  --glass-focus: #ff91ba;
+  --glass-focus-navigation: #ffd0df;
+
+  --glass-text-primary: #f5f5f7;
+  --glass-text-secondary: #aeaeb2;
+  --glass-text-tertiary: #8e8e93;
+
+  --glass-shadow:
+    0 12px 32px rgba(0, 0, 0, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .05);
+  --glass-shadow-overlay:
+    0 28px 72px rgba(0, 0, 0, .38),
+    inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+
+/* Faux-glass varsayılandır; backdrop-filter desteklenmese de okunaklı kalır. */
+html.theme-liquid-glass .glass-surface {
+  isolation: isolate;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+html.theme-liquid-glass .glass-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, .10),
+    rgba(255, 255, 255, .025) 38%,
+    transparent 62%
+  );
+  opacity: .62;
+}
+
+html.theme-liquid-glass .glass-surface > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.theme-liquid-glass .glass-surface--overlay {
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-overlay);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html.theme-liquid-glass .glass-surface {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg));
+    backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg));
+  }
+
+  html.theme-liquid-glass .glass-surface--navigation {
+    background: var(--glass-bg-navigation);
+  }
+
+  html.theme-liquid-glass .sidebar.glass-surface {
+    -webkit-backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+    backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+  }
+}
+
+/* ----------------------------------------------------------------------
+   Navigasyon yüzeyleri. Konum/ölçüler özellikle korunur.
+   ---------------------------------------------------------------------- */
+
+html.theme-liquid-glass .sidebar.glass-surface {
+  position: fixed;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--navy) 78%, transparent),
+      color-mix(in srgb, var(--navy-mid) 82%, transparent)) !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(255, 255, 255, .12) !important;
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, .055),
+    18px 0 44px rgba(8, 5, 18, .18) !important;
+}
+
+/* Desteklenen tarayıcıda opak fallback gradientini gerçek cam tint'iyle değiştir. */
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html.theme-liquid-glass .sidebar.glass-surface {
+    background: color-mix(in srgb, var(--navy) 28%, transparent) !important;
+    -webkit-backdrop-filter: brightness(.48) saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+    backdrop-filter: brightness(.48) saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+  }
+
+  html.theme-liquid-glass body.dark .sidebar.glass-surface {
+    background: var(--glass-bg-navigation) !important;
+    -webkit-backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+    backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+  }
+}
+
+html.theme-liquid-glass .topbar.glass-surface {
+  position: relative;
+  background: var(--glass-bg-navigation) !important;
+  border: 0;
+  border-bottom: 1px solid var(--glass-border-strong);
+  box-shadow:
+    0 10px 30px rgba(28, 18, 42, .08),
+    inset 0 1px 0 var(--glass-highlight);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html.theme-liquid-glass .topbar.glass-surface {
+    -webkit-backdrop-filter: brightness(.42) saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+    backdrop-filter: brightness(.42) saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+  }
+
+  html.theme-liquid-glass body.dark .topbar.glass-surface {
+    -webkit-backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+    backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
+  }
+}
+
+html.theme-liquid-glass body.dark .topbar.glass-surface {
+  background: var(--glass-bg-navigation) !important;
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, .22),
+    inset 0 1px 0 var(--glass-highlight);
+}
+
+/* Route'a özel !important topbar dolgularının cam tokenını ezmesini engeller. */
+html.theme-liquid-glass body:has(:is(
+  #dashboard.active,
+  #studyhub.active,
+  #quizhub.active,
+  #studydetail.active
+)) .topbar.glass-surface {
+  background: var(--glass-bg-navigation) !important;
+}
+
+/* Parent zaten glass: alt katmanlarda ikinci backdrop oluşturma. */
+html.theme-liquid-glass .sidebar-theme,
+html.theme-liquid-glass .sidebar-footer,
+html.theme-liquid-glass .sidebar .nav-links button,
+html.theme-liquid-glass .sidebar .nav-dropdown-summary,
+html.theme-liquid-glass .topbar button,
+html.theme-liquid-glass .topbar-love-brand {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html.theme-liquid-glass .sidebar-theme,
+html.theme-liquid-glass .sidebar-footer {
+  background: rgba(255, 255, 255, .025) !important;
+  border-color: rgba(255, 255, 255, .10) !important;
+}
+
+html.theme-liquid-glass .sidebar .nav-links button,
+html.theme-liquid-glass .sidebar .nav-dropdown-summary {
+  min-height: 44px;
+  border-radius: var(--glass-radius-control) !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transition:
+    background-color var(--glass-transition),
+    border-color var(--glass-transition),
+    color var(--glass-transition),
+    transform var(--glass-spring);
+}
+
+html.theme-liquid-glass .sidebar .nav-links button.active,
+html.theme-liquid-glass .sidebar .nav-dropdown.has-active > .nav-dropdown-summary {
+  background: var(--glass-accent-soft) !important;
+  border-color: var(--glass-accent-border) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09) !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html.theme-liquid-glass .sidebar .nav-links button:hover,
+  html.theme-liquid-glass .sidebar .nav-dropdown-summary:hover {
+    background: var(--glass-bg-hover) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+    transform: translateY(-1px);
+  }
+
+  html.theme-liquid-glass .menu-toggle:hover,
+  html.theme-liquid-glass .theme-open-btn:hover,
+  html.theme-liquid-glass .topbar-theme-btn:hover,
+  html.theme-liquid-glass .theme-sheet-close:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-strong);
+    transform: translateY(-1px);
+  }
+}
+
+html.theme-liquid-glass .sidebar .nav-links button:active,
+html.theme-liquid-glass .sidebar .nav-dropdown-summary:active,
+html.theme-liquid-glass .menu-toggle:active,
+html.theme-liquid-glass .theme-open-btn:active,
+html.theme-liquid-glass .topbar-theme-btn:active,
+html.theme-liquid-glass .theme-sheet-close:active {
+  background: var(--glass-bg-active);
+  transform: scale(.98);
+}
+
+/* Header içindeki marka ikinci bir cam panel değil, doğrudan header içeriğidir. */
+html.theme-liquid-glass .topbar-love-brand::before {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+html.theme-liquid-glass body.dark .topbar-love-brand::before {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+html.theme-liquid-glass body:has(#dashboard.active) .topbar-love-brand::before {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.theme-liquid-glass .menu-toggle,
+html.theme-liquid-glass .theme-open-btn,
+html.theme-liquid-glass .topbar-theme-btn,
+html.theme-liquid-glass .theme-sheet-close {
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--glass-text-primary);
+  background: var(--glass-bg-soft);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+  transition:
+    background-color var(--glass-transition),
+    border-color var(--glass-transition),
+    color var(--glass-transition),
+    transform var(--glass-spring),
+    box-shadow var(--glass-transition);
+}
+
+html.theme-liquid-glass .theme-switch {
+  min-width: 52px;
+  min-height: 44px;
+}
+
+html.theme-liquid-glass .theme-sheet-close {
+  min-width: 45px;
+  min-height: 45px;
+}
+
+html.theme-liquid-glass .theme-switch::before {
+  top: 10px !important;
+}
+
+@media (max-width: 768px) {
+  html.theme-liquid-glass body:has(#dashboard.active) .topbar {
+    grid-template-columns: 44px minmax(0, 1fr) auto !important;
+  }
+
+  html.theme-liquid-glass body:has(#dashboard.active) .menu-toggle,
+  html.theme-liquid-glass body:has(#dashboard.active) .theme-open-btn,
+  html.theme-liquid-glass body:has(#dashboard.active) .topbar-theme-btn,
+  html.theme-liquid-glass .menu-toggle,
+  html.theme-liquid-glass .theme-open-btn,
+  html.theme-liquid-glass .topbar-theme-btn {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+  }
+}
+
+html.theme-liquid-glass .menu-toggle:focus-visible,
+html.theme-liquid-glass .theme-open-btn:focus-visible,
+html.theme-liquid-glass .topbar-theme-btn:focus-visible,
+html.theme-liquid-glass .theme-sheet-close:focus-visible,
+html.theme-liquid-glass .sidebar .nav-links button:focus-visible,
+html.theme-liquid-glass .sidebar .nav-dropdown-summary:focus-visible {
+  outline: 2px solid var(--glass-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--glass-accent) 22%, transparent) !important;
+}
+
+html.theme-liquid-glass .topbar :is(.menu-toggle, .theme-open-btn, .topbar-theme-btn):focus-visible,
+html.theme-liquid-glass .sidebar :is(button, .nav-dropdown-summary):focus-visible {
+  outline-color: var(--glass-focus-navigation);
+}
+
+/* ----------------------------------------------------------------------
+   Geçici paneller ve modaller. Backdrop düz scrim; blur dış paneldedir.
+   ---------------------------------------------------------------------- */
+
+html.theme-liquid-glass .theme-sheet-backdrop,
+html.theme-liquid-glass .sidebar-backdrop,
+html.theme-liquid-glass .kahoot-modal-backdrop,
+html.theme-liquid-glass .pbn-modal-backdrop,
+html.theme-liquid-glass .exam-history-modal-backdrop {
+  background: rgba(10, 7, 16, .46);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html.theme-liquid-glass .theme-sheet.glass-surface {
+  position: fixed;
+  max-height: calc(100dvh - 100px) !important;
+  background: var(--glass-bg-strong) !important;
+  border: 1px solid var(--glass-border-strong);
+  border-radius: var(--glass-radius-hero);
+  box-shadow: var(--glass-shadow-overlay);
+  transition:
+    opacity 200ms ease-out,
+    visibility 200ms ease-out,
+    transform 200ms ease-out;
+  transform-origin: top right;
+}
+
+html.theme-liquid-glass :is(
+  .exam-cancel-dialog,
+  .exam-history-modal,
+  .kahoot-modal,
+  .pbn-modal
+) {
+  background: var(--glass-bg-strong) !important;
+  border: 1px solid var(--glass-border-strong) !important;
+  box-shadow: var(--glass-shadow-overlay) !important;
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html.theme-liquid-glass :is(
+    .exam-cancel-dialog,
+    .exam-history-modal,
+    .kahoot-modal,
+    .pbn-modal
+  ) {
+    -webkit-backdrop-filter: saturate(var(--glass-sat-md)) blur(var(--glass-blur-md));
+    backdrop-filter: saturate(var(--glass-sat-md)) blur(var(--glass-blur-md));
+  }
+}
+
+html.theme-liquid-glass .theme-choice-card {
+  background: var(--glass-bg-soft);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius-panel);
+  box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
+
+html.theme-liquid-glass .theme-choice-card.active {
+  border-color: var(--glass-accent-border);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--glass-accent) 18%, transparent),
+    inset 0 1px 0 var(--glass-highlight);
+}
+
+/* Hero içerik katmanıdır: blur/filter yok; yalnız frame kalitesi korunur. */
+html.theme-liquid-glass body:has(#dashboard.active) #dashboard .dashboard-visual-stage {
+  border-radius: var(--glass-radius-hero) !important;
+  border: 1px solid rgba(255, 255, 255, .14) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* ----------------------------------------------------------------------
+   Şeffaflık ve yüksek kontrast kaçış kapıları.
+   ---------------------------------------------------------------------- */
+
+@media (prefers-reduced-transparency: reduce) {
+  html.theme-liquid-glass .sidebar.glass-surface,
+  html.theme-liquid-glass .topbar.glass-surface,
+  html.theme-liquid-glass .glass-surface,
+  html.theme-liquid-glass :is(.exam-cancel-dialog, .exam-history-modal, .kahoot-modal, .pbn-modal) {
+    background: var(--glass-surface-base) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+html.theme-liquid-glass.reduce-transparency .sidebar.glass-surface,
+html.theme-liquid-glass.reduce-transparency .topbar.glass-surface,
+html.theme-liquid-glass.reduce-transparency .glass-surface,
+html.theme-liquid-glass.reduce-transparency :is(.exam-cancel-dialog, .exam-history-modal, .kahoot-modal, .pbn-modal) {
+  background: var(--glass-surface-base) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+@media (forced-colors: active) {
+  html.theme-liquid-glass .sidebar.glass-surface,
+  html.theme-liquid-glass .topbar.glass-surface,
+  html.theme-liquid-glass .glass-surface,
+  html.theme-liquid-glass :is(.exam-cancel-dialog, .exam-history-modal, .kahoot-modal, .pbn-modal),
+  html.theme-liquid-glass .theme-choice-card {
+    background: Canvas !important;
+    color: CanvasText !important;
+    border: 1px solid CanvasText !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  html.theme-liquid-glass .sidebar .nav-links button.active,
+  html.theme-liquid-glass .sidebar .nav-dropdown.has-active > .nav-dropdown-summary {
+    background: Highlight !important;
+    color: HighlightText !important;
+    border-color: Highlight !important;
+  }
+}

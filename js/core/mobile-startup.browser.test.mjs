@@ -312,19 +312,25 @@ try {
   browserErrors = [];
   const duplicateRehydrate = await evaluate(`(async () => {
     const root = document.getElementById('page-root');
+    const expectedSectionId = root.querySelector('.page.active')?.id || 'dashboard';
     root.innerHTML = '';
     window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
     await new Promise((r) => setTimeout(r, 150));
     root.innerHTML = '';
     window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
     await new Promise((r) => setTimeout(r, 500));
-    return { dashboardCount: document.querySelectorAll('#dashboard').length };
+    return {
+      expectedSectionId,
+      routeCount: document.querySelectorAll('#' + CSS.escape(expectedSectionId)).length,
+      activeCount: document.querySelectorAll('#page-root .page.active').length
+    };
   })()`);
-  if (duplicateRehydrate.dashboardCount !== 1) {
+  if (duplicateRehydrate.routeCount !== 1 || duplicateRehydrate.activeCount !== 1) {
     failures += 1;
     await captureFailure("scenario6-pageshow-duplicate");
   }
-  assert.equal(duplicateRehydrate.dashboardCount, 1, `Senaryo 6: art arda pageshow ${duplicateRehydrate.dashboardCount} adet #dashboard üretti (duplicate render!)`);
+  assert.equal(duplicateRehydrate.routeCount, 1, `Senaryo 6: art arda pageshow ${duplicateRehydrate.routeCount} adet #${duplicateRehydrate.expectedSectionId} üretti (duplicate render!)`);
+  assert.equal(duplicateRehydrate.activeCount, 1, `Senaryo 6: art arda pageshow ${duplicateRehydrate.activeCount} aktif sayfa üretti`);
   assert.deepEqual(browserErrors, [], `Senaryo 6: art arda pageshow hata üretti: ${browserErrors.join(" | ")}`);
   console.log("✓ Senaryo 6 (art arda pageshow): duplicate render yok, hata yok");
 

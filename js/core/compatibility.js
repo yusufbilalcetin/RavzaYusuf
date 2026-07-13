@@ -4,7 +4,7 @@ import { getAppScrollElement, getAppScrollTop } from "./app-shell-scroll.js";
 import { loadQuiz } from "../services/quiz-service.js";
 import { safeText } from "../utils/helpers.js";
 import { formatPercent } from "../utils/format.js";
-import { normalizeSearchText } from "../utils/search.js";
+import { matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
 
 const aliases = {
   unit6b: "ability",
@@ -70,6 +70,8 @@ function topicSearchIndex(topic) {
     ...(topic.searchAliases || [])
   ].join(" "));
 }
+
+const TOPIC_SEARCH_INDEXES = new Map(KONU_LISTESI.map((topic) => [topic.id, topicSearchIndex(topic)]));
 
 async function openStudyTopic(topicId) {
   const topic = getTopic(topicId);
@@ -285,7 +287,7 @@ function searchTopics(event) {
   const query = normalizeSearchText(input.value);
   if (query.length < 2) return;
 
-  const found = KONU_LISTESI.find((topic) => topicSearchIndex(topic).includes(query));
+  const found = KONU_LISTESI.find((topic) => matchesSearchIndex(TOPIC_SEARCH_INDEXES.get(topic.id), query));
   if (found) {
     openStudyTopic(found.id);
     return;

@@ -2,6 +2,7 @@ import { db } from "../config/firebase-config.js";
 import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { loadAllQuizzes } from "../services/quiz-service.js";
 import { withTimeout } from "../utils/helpers.js";
+import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
 import {
   doc,
   getDoc,
@@ -66,13 +67,6 @@ function stripHtml(html = "") {
   return String(html).replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ");
 }
 
-function normalizeSearchText(value = "") {
-  return String(value)
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
-}
-
 function getTopicSearchIndex(topic) {
   return normalizeSearchText([
     topic.title,
@@ -84,10 +78,12 @@ function getTopicSearchIndex(topic) {
   ].join(" "));
 }
 
+const TOPIC_SEARCH_INDEXES = new Map(TOPICS.map((topic) => [topic.id, getTopicSearchIndex(topic)]));
+
 function matchesTopicSearch(topic, query) {
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) return true;
-  return getTopicSearchIndex(topic).includes(normalizedQuery);
+  return matchesSearchIndex(TOPIC_SEARCH_INDEXES.get(topic.id), normalizedQuery);
 }
 
 const MEMORIZATION_CARDS = [
@@ -983,6 +979,8 @@ const THEME_STYLES = [
   "klasik-koyu",
   "pembe-tema"
 ];
+const systemThemeMedia = window.matchMedia?.("(prefers-color-scheme: dark)");
+let systemThemeListenerBound = false;
 
 function normalizeThemeStyle(themeId) {
   if (themeId === "gun-isigi") return "pembe-tema";
@@ -990,7 +988,8 @@ function normalizeThemeStyle(themeId) {
 }
 
 function initTheme() {
-  const savedMode = localStorage.getItem("eul_theme");
+  const storedMode = localStorage.getItem("eul_theme");
+  const savedMode = ["system", "light", "dark"].includes(storedMode) ? storedMode : "system";
   const savedStyle = normalizeThemeStyle(localStorage.getItem("eul_theme_style") || "noel-ask");
 
   if (localStorage.getItem("eul_theme_style") === "gun-isigi") {
@@ -998,7 +997,13 @@ function initTheme() {
   }
 
   applySiteTheme(savedStyle, false);
-  applyDark(savedMode === "dark");
+  applyThemePreference(savedMode, false);
+  if (systemThemeMedia && !systemThemeListenerBound) {
+    systemThemeListenerBound = true;
+    systemThemeMedia.addEventListener?.("change", () => {
+      if ((localStorage.getItem("eul_theme") || "system") === "system") applyThemePreference("system", false);
+    });
+  }
   updateThemeSelectionUi();
 }
 
@@ -1034,6 +1039,12 @@ function updateThemeSelectionUi() {
   const activeTheme = document.body.getAttribute("data-theme-style") || "noel-ask";
   document.querySelectorAll(".theme-choice-card").forEach((card) => {
     card.classList.toggle("active", card.dataset.themeId === activeTheme);
+  });
+  const mode = ["system", "light", "dark"].includes(localStorage.getItem("eul_theme")) ? localStorage.getItem("eul_theme") : "system";
+  document.querySelectorAll("[data-theme-mode]").forEach((button) => {
+    const active = button.dataset.themeMode === mode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
   });
 }
 
@@ -1080,15 +1091,27 @@ function applyDark(isDark) {
     topBtn.classList.toggle("is-dark", isDark);
     topBtn.setAttribute("aria-label", isDark ? "Gündüz moduna geç" : "Karanlık moda geç");
     const icon = topBtn.querySelector(".mode-toggle-icon");
-    if (icon) icon.textContent = isDark ? "🌙" : "☀️";
+    if (icon) {
+      icon.innerHTML = isDark
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="currentColor" stroke="none"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+    }
   }
   refreshExamPerformanceChartAfterThemeChange();
 }
 
+function applyThemePreference(preference, persist = true) {
+  const normalized = ["system", "light", "dark"].includes(preference) ? preference : "system";
+  const isDark = normalized === "dark" || (normalized === "system" && systemThemeMedia?.matches === true);
+  if (persist) localStorage.setItem("eul_theme", normalized);
+  applyDark(isDark);
+  window.setLauncherThemePreference?.(normalized);
+  updateThemeSelectionUi();
+}
+
 function toggleTheme() {
   const isDark = !document.body.classList.contains("dark");
-  applyDark(isDark);
-  localStorage.setItem("eul_theme", isDark ? "dark" : "light");
+  applyThemePreference(isDark ? "dark" : "light");
 }
 
 function closeMobileMenu() {
@@ -1622,11 +1645,8 @@ function renderMemorizationHub(filterText = "") {
   if (!grid) return;
   stopMemorySpeech();
 
-  const q = filterText.trim().toLowerCase();
-  const filtered = MEMORIZATION_CARDS.filter((card) =>
-    card.front.toLowerCase().includes(q) ||
-    card.back.toLowerCase().includes(q)
-  );
+  const q = normalizeSearchText(filterText);
+  const filtered = MEMORIZATION_CARDS.filter((card) => matchesSearchIndex(createSearchIndex(card.front, card.back), q));
 
   if (!filtered.length) {
     grid.innerHTML = `<div class="empty-grid">Bu aramaya uygun ezber kartı bulunamadı.</div>`;
@@ -1978,7 +1998,7 @@ function renderMemoryPractice() {
 
 function getRecapSearchValue() {
   const input = document.getElementById("recapFilter");
-  return input ? input.value.trim().toLowerCase() : "";
+  return normalizeSearchText(input?.value || "");
 }
 
 function getAllRecapUnits() {
@@ -1997,7 +2017,7 @@ function matchesRecapCard(card, searchText, selectedUnits) {
   if (!selectedUnits.includes(card.unit)) return false;
   if (!searchText) return true;
 
-  const haystack = [
+  const haystack = createSearchIndex([
     card.unit,
     card.title,
     card.formula,
@@ -2006,12 +2026,9 @@ function matchesRecapCard(card, searchText, selectedUnits) {
     card.trap,
     card.compare,
     ...(Array.isArray(card.checklist) ? card.checklist : [])
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+  ]);
 
-  return haystack.includes(searchText);
+  return matchesSearchIndex(haystack, searchText);
 }
 
 function toggleRecapUnitSelection(unit) {
@@ -2340,6 +2357,7 @@ window.toggleMenu = toggleMenu;
 window.closeMobileMenu = closeMobileMenu;
 window.searchTopics = searchTopics;
 window.toggleTheme = toggleTheme;
+window.setThemePreference = applyThemePreference;
 window.openThemeSheet = openThemeSheet;
 window.closeThemeSheet = closeThemeSheet;
 window.selectTheme = selectTheme;
@@ -6225,14 +6243,14 @@ function renderFillGapHub(filter = fillGapActiveFilter) {
     `;
   }
 
-  const q = String(searchEl?.value || "").trim().toLowerCase();
-  const activeFilterLower = String(fillGapActiveFilter || "all").toLowerCase();
+  const q = normalizeSearchText(searchEl?.value || "");
+  const activeFilterLower = normalizeSearchText(fillGapActiveFilter || "all");
   const exercises = getFillGapExercisesWithWords().filter((exercise) => {
-    const searchableText = [exercise.title, exercise.category, exercise.description, exercise.level, ...exercise.items.map((item) => `${item.sentence} ${item.answer} ${item.hintTr}`)].join(" ").toLowerCase();
+    const searchableText = createSearchIndex(exercise.title, exercise.category, exercise.description, exercise.level, exercise.items.map((item) => `${item.sentence} ${item.answer} ${item.hintTr}`));
     const matchesFilter = activeFilterLower === "all"
-      || String(exercise.category || "").toLowerCase() === activeFilterLower
-      || String(exercise.title || "").toLowerCase().includes(activeFilterLower);
-    return matchesFilter && (!q || searchableText.includes(q));
+      || normalizeSearchText(exercise.category || "") === activeFilterLower
+      || matchesSearchIndex(normalizeSearchText(exercise.title || ""), activeFilterLower);
+    return matchesFilter && matchesSearchIndex(searchableText, q);
   });
 
   filtersEl.innerHTML = `

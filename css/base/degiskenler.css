@@ -27,6 +27,14 @@
   --shadow-lg: 0 20px 54px rgba(15,23,42,.14);
   --glass-light: rgba(255,255,255,.74);
   --glass-dark: rgba(23,27,37,.76);
+
+  /* Apple/iOS incelme geçişi: ince ayraçlar ve hafif yüzey katmanları.
+     Mevcut --card-border/--text tonlarından türetilir, böylece 6 tema
+     presetinin + açık/koyu modun hepsinde otomatik doğru renkte kalır. */
+  --separator: color-mix(in srgb, var(--card-border) 70%, transparent);
+  --separator-strong: color-mix(in srgb, var(--card-border) 100%, black 6%);
+  --surface-hover: color-mix(in srgb, var(--text) 6%, transparent);
+  --surface-active: color-mix(in srgb, var(--text) 10%, transparent);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }

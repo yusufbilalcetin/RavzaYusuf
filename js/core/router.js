@@ -14,8 +14,9 @@ import { initSinavCoz } from "../pages/sinav-coz-page.js";
 import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
 import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
-import { initOyun } from "../pages/oyun-page.js?v=alan-bulmacasi-20260710-1";
+import { closeGame, initOyun } from "../pages/oyun-page.js?v=alan-bulmacasi-20260710-1";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
+import { syncLauncherActive } from "./launcher.js";
 
 export const routeAliases = {
   dashboard: "ana-sayfa",
@@ -97,6 +98,7 @@ function setActivePage(route) {
   document.documentElement.classList.toggle("is-ravzalingo-page", route.sectionId === "ravzalingo");
   document.body.classList.toggle("is-ravzalingo-page", route.sectionId === "ravzalingo");
   document.body.classList.toggle("rlz5-page-active", route.sectionId === "ravzalingo");
+  syncLauncherActive(Object.entries(routes).find(([, candidate]) => candidate === route)?.[0] || "ana-sayfa");
   if (route.sectionId !== "ravzalingo") {
     document.body.classList.remove("rlz5-show-goto", "rlz5-below-activity");
     document.getElementById("scrollTopBtn")?.classList.remove("rlz5-up-green");
@@ -105,11 +107,27 @@ function setActivePage(route) {
   document.body.classList.toggle("is-kahoot-page", route.sectionId === "kahoot");
 }
 
-export async function navigate(pageName = "ana-sayfa") {
+function syncRouteUrl(routeName, mode = "push") {
+  const url = new URL(location.href);
+  if (routeName === "ana-sayfa") url.searchParams.delete("page");
+  else url.searchParams.set("page", routeName);
+  const nextState = { route: routeName };
+  if (mode === "replace") history.replaceState(nextState, "", url);
+  else history.pushState(nextState, "", url);
+}
+
+function routeFromLocation(state = history.state) {
+  return state?.route || new URLSearchParams(location.search).get("page") || "ana-sayfa";
+}
+
+export async function navigate(pageName = "ana-sayfa", options = {}) {
   const routeName = normalizeRoute(pageName);
   const route = routes[routeName];
   if (!route) return navigate("ana-sayfa");
-  if (isNavigating && appState.currentRoute === routeName) return;
+  if (routeName !== "oyun" && document.body.classList.contains("is-game-fullscreen")) closeGame();
+  // Aynı rota hâlen yükleniyor olsa bile bfcache/rehydrate sırasında DOM
+  // temizlenmişse yeni çağrıyı yutma; token mekanizması eski çağrıyı eler.
+  if (isNavigating && appState.currentRoute === routeName && document.getElementById(route.sectionId)) return;
 
   const myToken = ++navigationToken;
   isNavigating = true;
@@ -120,6 +138,10 @@ export async function navigate(pageName = "ana-sayfa") {
     if (myToken !== navigationToken) return;
     document.querySelector("#page-root .startup-fallback")?.remove();
     setActivePage(route);
+    if (options.history !== false) {
+      const mode = options.historyMode || (appState.currentRoute ? "push" : "replace");
+      if (appState.currentRoute !== routeName || mode === "replace") syncRouteUrl(routeName, mode);
+    }
     appState.currentRoute = routeName;
     window.closeMobileMenu?.();
     const initResult = await route.init?.();
@@ -144,4 +166,10 @@ export function initRouter() {
   window.navigate = navigate;
   window.__getAppScrollElement = getAppScrollElement;
   window.__scrollAppToTop = scrollAppToTop;
+  if (!window.__ravzaPopstateRouterInstalled) {
+    window.__ravzaPopstateRouterInstalled = true;
+    window.addEventListener("popstate", (event) => {
+      navigate(routeFromLocation(event.state), { history: false });
+    });
+  }
 }

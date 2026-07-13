@@ -25,10 +25,10 @@
   --r-lg: 22px;
   --r-pill: 999px;
 
-  --ring: 0 0 0 3px rgba(236, 72, 153, .28);
-  --ease-ui: cubic-bezier(.16, 1, .3, 1);
+  --ring: 0 0 0 4px rgba(236, 72, 153, .28);
+  --ease-ui: cubic-bezier(0.22, 1, 0.36, 1);
   --t-fast: .16s var(--ease-ui);
-  --t-base: .24s var(--ease-ui);
+  --t-base: .22s var(--ease-ui);
 
   --tap: 44px;          /* dokunmatik minimum hedef */
   --grid-gap: var(--s-5);
@@ -97,7 +97,7 @@
   width: 100%;
   min-height: var(--tap);
   padding: var(--s-3) var(--s-4) !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--r-sm) !important;
   font-size: 14px;
   text-align: left;
   transition: background var(--t-base), border-color var(--t-base), color var(--t-base);

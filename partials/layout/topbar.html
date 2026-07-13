@@ -1,18 +1,31 @@
-<header class="topbar">
-      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Menüyü aç" aria-expanded="false">☰</button>
-      <a class="topbar-love-brand" href="#dashboard" onclick="navigate('ana-sayfa'); return false;" aria-label="Yusuf ve Ravza öğrenme yolculuğu ana sayfa">
-        <span class="love-brand-spark love-brand-spark-left" aria-hidden="true">✦</span>
-        <span class="love-brand-main">Yusuf <span class="love-heart" aria-hidden="true">♥</span> Ravza</span>
-        <span class="love-brand-sub">Öğrenme Yolculuğu</span>
-        <span class="love-brand-spark love-brand-spark-right" aria-hidden="true">✦</span>
-      </a>
-      <div class="topbar-right">
-        <button class="theme-open-btn" id="theme-open-btn" type="button" onclick="openThemeSheet()" title="Tema Seç">
-          <span class="theme-open-icon">✨</span>
-          <span>Tema</span>
-        </button>
-        <button class="topbar-theme-btn mode-toggle-btn" id="topbar-theme-btn" type="button" onclick="toggleTheme()" title="Gündüz / Gece modu" aria-label="Karanlık moda geç">
-          <span class="mode-toggle-icon">🌙</span>
-        </button>
-      </div>
-    </header>
+<header class="topbar launcher-topbar glass-surface glass-surface--navigation">
+  <div class="launcher-primary-actions">
+    <button class="launcher-home-control" id="launcherHomeControl" type="button" onclick="navigate('ana-sayfa')" aria-label="Ana ekrana dön">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M6.5 10v10h11V10"/><path d="M10 20v-5h4v5"/></svg>
+    </button>
+    <button class="launcher-edit-toggle" id="launcherEditToggle" type="button" aria-label="Ana ekranı düzenle" aria-pressed="false">
+      <svg class="launcher-edit-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.1-.9L19 8.2 15.8 5 4.9 15.9 4 20Z"/><path d="m13.8 7 3.2 3.2M4.9 15.9l3.2 3.2"/></svg>
+      <svg class="launcher-done-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>
+      <span class="launcher-edit-label-normal">Düzenle</span>
+      <span class="launcher-edit-label-done">Bitti</span>
+    </button>
+  </div>
+
+  <a class="topbar-love-brand launcher-brand" href="?page=ana-sayfa" onclick="navigate('ana-sayfa'); return false;" aria-label="Yusuf ve Ravza Öğrenme Yolculuğu ana ekranı">
+    <span class="love-brand-main">Yusuf <span class="love-heart" aria-hidden="true">♥</span> Ravza</span>
+    <span class="love-brand-sub">Öğrenme Yolculuğu</span>
+  </a>
+
+  <div class="topbar-right launcher-topbar-actions">
+    <button class="launcher-search-open" id="launcherSearchOpen" type="button" onclick="openLauncherSearch()" aria-label="Uygulama ve ders ara" title="Ara (Ctrl veya ⌘ + K)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+    </button>
+    <button class="theme-open-btn" id="theme-open-btn" type="button" onclick="openThemeSheet()" title="Tema seç">
+      <span class="theme-open-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z" fill="currentColor" stroke="none"/></svg></span>
+      <span>Tema</span>
+    </button>
+    <button class="topbar-theme-btn mode-toggle-btn" id="topbar-theme-btn" type="button" onclick="toggleTheme()" title="Gündüz / Gece modu" aria-label="Karanlık moda geç">
+      <span class="mode-toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="currentColor" stroke="none"/></svg></span>
+    </button>
+  </div>
+</header>

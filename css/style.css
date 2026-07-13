@@ -41,3 +41,5 @@
 @import url("./responsive/mobil.css");
 @import url("./responsive/viewport-fixes.css");
 @import url("./layout/duzen-son.css");
+@import url("./themes/liquid-glass.css");
+@import url("./layout/launcher.css");

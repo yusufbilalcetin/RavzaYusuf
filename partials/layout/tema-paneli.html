@@ -1,13 +1,22 @@
 <button class="theme-sheet-backdrop" id="theme-sheet-backdrop" aria-label="Tema panelini kapat" onclick="closeThemeSheet()"></button>
-    <aside class="theme-sheet" id="theme-sheet" aria-hidden="true">
+    <aside class="theme-sheet glass-surface glass-surface--overlay" id="theme-sheet" aria-hidden="true">
       <div class="theme-sheet-head">
         <div>
           <span class="unit-badge quiz-badge">TEMA</span>
           <h3>Tema Seç</h3>
           <p>Çalışma alanını tek dokunuşla değiştir.</p>
         </div>
-        <button type="button" class="theme-sheet-close" onclick="closeThemeSheet()" aria-label="Kapat">✕</button>
+        <button type="button" class="theme-sheet-close" onclick="closeThemeSheet()" aria-label="Kapat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       </div>
+
+      <section class="theme-mode-section" aria-labelledby="themeModeTitle">
+        <div><strong id="themeModeTitle">Görünüm</strong><small>Sistem seçimi cihaz ayarını otomatik izler.</small></div>
+        <div class="theme-mode-control" role="group" aria-label="Açık veya koyu görünüm">
+          <button type="button" data-theme-mode="system" aria-pressed="false" onclick="setThemePreference('system')">Sistem</button>
+          <button type="button" data-theme-mode="light" aria-pressed="false" onclick="setThemePreference('light')">Açık</button>
+          <button type="button" data-theme-mode="dark" aria-pressed="false" onclick="setThemePreference('dark')">Koyu</button>
+        </div>
+      </section>
 
       <div class="theme-sheet-grid">
         <button type="button" class="theme-choice-card" data-theme-id="noel-ask" onclick="selectTheme('noel-ask')">
@@ -16,7 +25,7 @@
             <strong>Noel Aşk Teması</strong>
             <small>Sevgi dolu, sıcak ve romantik yeni yıl görünümü.</small>
           </span>
-          <span class="theme-choice-check" aria-hidden="true">✓</span>
+          <span class="theme-choice-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
         </button>
 
         <button type="button" class="theme-choice-card" data-theme-id="gece-mavisi" onclick="selectTheme('gece-mavisi')">
@@ -25,7 +34,7 @@
             <strong>Gece Mavisi</strong>
             <small>Odak artıran serin mavi ve sakin gece tonları.</small>
           </span>
-          <span class="theme-choice-check" aria-hidden="true">✓</span>
+          <span class="theme-choice-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
         </button>
 
         <button type="button" class="theme-choice-card" data-theme-id="orman-yesili" onclick="selectTheme('orman-yesili')">
@@ -34,7 +43,7 @@
             <strong>Orman Yeşili</strong>
             <small>Doğadan ilham alan huzurlu ve derin tonlar.</small>
           </span>
-          <span class="theme-choice-check" aria-hidden="true">✓</span>
+          <span class="theme-choice-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
         </button>
 
         <button type="button" class="theme-choice-card" data-theme-id="mor-isik" onclick="selectTheme('mor-isik')">
@@ -43,7 +52,7 @@
             <strong>Mor Işık</strong>
             <small>Modern, enerjik ve parlak mor vurgu teması.</small>
           </span>
-          <span class="theme-choice-check" aria-hidden="true">✓</span>
+          <span class="theme-choice-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
         </button>
 
         <button type="button" class="theme-choice-card" data-theme-id="klasik-koyu" onclick="selectTheme('klasik-koyu')">
@@ -52,7 +61,7 @@
             <strong>Klasik Koyu</strong>
             <small>Zamansız, sade ve minimal koyu görünüm.</small>
           </span>
-          <span class="theme-choice-check" aria-hidden="true">✓</span>
+          <span class="theme-choice-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
         </button>
 
         <button type="button" class="theme-choice-card" data-theme-id="pembe-tema" onclick="selectTheme('pembe-tema')">
@@ -61,7 +70,7 @@
             <strong>Pembe Tema</strong>
             <small>Yumuşak pembe tonları, net kontrast ve sade romantik görünüm.</small>
           </span>
-          <span class="theme-choice-check" aria-hidden="true">✓</span>
+          <span class="theme-choice-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
         </button>
       </div>
     </aside>
