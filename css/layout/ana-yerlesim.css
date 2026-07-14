@@ -49,12 +49,69 @@ img, video, canvas, svg, iframe { max-width: 100%; height: auto; }
 .page.active { display: block; }
 
 .startup-fallback {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 40vh;
-  color: var(--text-muted, inherit);
+  padding: 24px;
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 26% 22%, rgba(232, 121, 160, .32), transparent 55%),
+    radial-gradient(circle at 78% 78%, rgba(123, 23, 62, .40), transparent 55%),
+    linear-gradient(160deg, #1a0b20 0%, #2b0f2c 48%, #170a1c 100%);
+}
+
+.startup-fallback__card {
+  width: min(320px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 32px;
+  border-radius: 24px;
   text-align: center;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .40), inset 0 1px 0 rgba(255, 255, 255, .12);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+}
+
+.startup-fallback__spinner {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, .12);
+  border-top-color: #ff8fc4;
+  border-right-color: #d8468b;
+  animation: startup-fallback-spin .9s linear infinite;
+}
+
+.startup-fallback__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #f5eef4;
+}
+
+.startup-fallback__subtitle {
+  margin: 0;
+  font-size: .85rem;
+  color: rgba(245, 238, 244, .6);
+}
+
+@keyframes startup-fallback-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-fallback__spinner {
+    animation: none;
+    border-top-color: rgba(255, 255, 255, .12);
+    border-right-color: #d8468b;
+  }
 }
 
 /* Çalışma Merkezi: yalnızca ana liste sayfası görünümü */
