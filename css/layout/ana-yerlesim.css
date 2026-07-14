@@ -57,60 +57,132 @@ img, video, canvas, svg, iframe { max-width: 100%; height: auto; }
   justify-content: center;
   padding: 24px;
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at 26% 22%, rgba(232, 121, 160, .32), transparent 55%),
-    radial-gradient(circle at 78% 78%, rgba(123, 23, 62, .40), transparent 55%),
-    linear-gradient(160deg, #1a0b20 0%, #2b0f2c 48%, #170a1c 100%);
+  background: rgba(10, 6, 14, .55);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
 }
 
-.startup-fallback__card {
-  width: min(320px, 100%);
+.startup-fallback__content {
+  width: min(360px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 40px 32px;
-  border-radius: 24px;
   text-align: center;
-  background: rgba(255, 255, 255, .06);
-  border: 1px solid rgba(255, 255, 255, .14);
-  box-shadow: 0 24px 64px rgba(0, 0, 0, .40), inset 0 1px 0 rgba(255, 255, 255, .12);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
 }
 
-.startup-fallback__spinner {
-  width: 52px;
-  height: 52px;
+.startup-fallback__ring {
+  position: relative;
+  width: clamp(96px, 8vw + 72px, 132px);
+  height: clamp(96px, 8vw + 72px, 132px);
   border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, .12);
-  border-top-color: #ff8fc4;
-  border-right-color: #d8468b;
-  animation: startup-fallback-spin .9s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .16);
+  box-shadow: 0 0 44px rgba(216, 70, 139, .22);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+}
+
+.startup-fallback__ring-track {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  animation: startup-fallback-spin 1.3s linear infinite;
+}
+
+.startup-fallback__ring-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 2.5px;
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, #ff5fa8 315deg, #ffd9ea 358deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.startup-fallback__ring-track::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px 4px rgba(255, 143, 196, .95);
+}
+
+.startup-fallback__logo {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.35rem, 1vw + 1.15rem, 1.6rem);
+  font-weight: 600;
+  color: #c9b8ff;
+  letter-spacing: .04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.startup-fallback__heart {
+  color: #ff5f9a;
+  font-size: 1.25em;
 }
 
 .startup-fallback__title {
-  margin: 0;
-  font-size: 1.05rem;
+  margin: 28px 0 0;
+  font-size: clamp(1.05rem, .4vw + 1rem, 1.3rem);
   font-weight: 600;
   color: #f5eef4;
 }
 
 .startup-fallback__subtitle {
-  margin: 0;
-  font-size: .85rem;
-  color: rgba(245, 238, 244, .6);
+  margin: 6px 0 0;
+  font-size: clamp(.85rem, .2vw + .8rem, 1rem);
+  color: #c9b8e0;
+}
+
+.startup-fallback__dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.startup-fallback__dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .3);
+  animation: startup-fallback-pulse 1.2s ease-in-out infinite;
+}
+
+.startup-fallback__dots span:nth-child(2) {
+  background: #ff6fa8;
+  animation-delay: .2s;
+}
+
+.startup-fallback__dots span:nth-child(3) {
+  background: #ff9fc7;
+  animation-delay: .4s;
 }
 
 @keyframes startup-fallback-spin {
   to { transform: rotate(360deg); }
 }
 
+@keyframes startup-fallback-pulse {
+  0%, 100% { opacity: .35; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .startup-fallback__spinner {
+  .startup-fallback__ring-track,
+  .startup-fallback__dots span {
     animation: none;
-    border-top-color: rgba(255, 255, 255, .12);
-    border-right-color: #d8468b;
   }
 }
 

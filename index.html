@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=hidden-bar-fix-20260715-1">
+  <link rel="stylesheet" href="./css/style.css?v=startup-loader-ring-20260716-1">
   <script type="module" src="./js/ana-sayfa-hero-bootstrap.js?v=home-hero-responsive-20260711-1"></script>
 </head>
 <body>
@@ -32,10 +32,16 @@
     <main class="main-content">
       <div class="content-wrapper" id="page-root">
         <section class="startup-fallback">
-          <div class="startup-fallback__card">
-            <div class="startup-fallback__spinner" aria-hidden="true"></div>
+          <div class="startup-fallback__content">
+            <div class="startup-fallback__ring" aria-hidden="true">
+              <div class="startup-fallback__ring-track"></div>
+              <span class="startup-fallback__logo">Y<span class="startup-fallback__heart">♥</span>R</span>
+            </div>
             <p class="startup-fallback__title">İçerik yükleniyor…</p>
             <p class="startup-fallback__subtitle">Lütfen bekleyin</p>
+            <div class="startup-fallback__dots" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
           </div>
         </section>
       </div>
