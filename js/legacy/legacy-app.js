@@ -1048,20 +1048,6 @@ function updateThemeSelectionUi() {
   });
 }
 
-function openThemeSheet() {
-  const sheet = document.getElementById("theme-sheet");
-  const backdrop = document.getElementById("theme-sheet-backdrop");
-  if (sheet) {
-    sheet.classList.add("open");
-    sheet.setAttribute("aria-hidden", "false");
-  }
-  if (backdrop) backdrop.classList.add("open");
-
-  // Tema paneli acikken Flashcard sticky arama bari ve scroll-top butonu
-  // modalin ustune cikmasin. Bu class CSS tarafinda cakismani engeller.
-  document.body.classList.add("theme-sheet-open");
-}
-
 function closeThemeSheet() {
   const sheet = document.getElementById("theme-sheet");
   const backdrop = document.getElementById("theme-sheet-backdrop");
@@ -2358,7 +2344,6 @@ window.closeMobileMenu = closeMobileMenu;
 window.searchTopics = searchTopics;
 window.toggleTheme = toggleTheme;
 window.setThemePreference = applyThemePreference;
-window.openThemeSheet = openThemeSheet;
 window.closeThemeSheet = closeThemeSheet;
 window.selectTheme = selectTheme;
 window.renderStudyHub = renderStudyHub;
@@ -2642,12 +2627,10 @@ document.addEventListener("keydown", (event) => {
 
   document.addEventListener("click", (event) => {
     if (!sheet || !backdrop) return;
-    const openBtn = document.getElementById("theme-open-btn");
     const clickedInsideSheet = sheet.contains(event.target);
-    const clickedOpenBtn = openBtn && openBtn.contains(event.target);
     const clickedBackdrop = backdrop.contains(event.target);
 
-    if (sheet.classList.contains("open") && !clickedInsideSheet && !clickedOpenBtn && clickedBackdrop) {
+    if (sheet.classList.contains("open") && !clickedInsideSheet && clickedBackdrop) {
       closeThemeSheet();
     }
   });

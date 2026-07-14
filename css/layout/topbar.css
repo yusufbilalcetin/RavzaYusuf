@@ -1,6 +1,5 @@
 /* ================= MAIN + TOPBAR ================= */
 
-.theme-open-btn:hover,
 .topbar-theme-btn:hover {
   transform: translateY(-1px);
   border-color: var(--pink);

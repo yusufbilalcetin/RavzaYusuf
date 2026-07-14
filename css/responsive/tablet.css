@@ -56,10 +56,6 @@
   }
   .topbar { gap: 8px; }
 
-  .theme-open-btn {
-    min-height: 40px;
-    padding: 8px 10px;
-  }
   .topbar-theme-btn {
     min-height: 40px;
     padding: 6px 6px 6px 10px;
@@ -402,7 +398,6 @@
   .memory-face strong { font-size: clamp(.95rem, 4.6vw, 1.22rem); }
   .page-header-left h2 { font-size: 25px; }
   .topbar { height: 70px; padding-inline: 12px; }
-  .theme-open-btn span:not(.theme-open-icon),
   .mode-toggle-text { display: none; }
 }
 
@@ -888,7 +883,6 @@
     flex-wrap: nowrap !important;
   }
 
-  .theme-open-btn span:not(.theme-open-icon),
   .mode-toggle-text,
   .topbar-badge {
     display: none !important;
@@ -1195,7 +1189,6 @@
   }
 
   body:has(#dashboard.active) .menu-toggle,
-  body:has(#dashboard.active) .theme-open-btn,
   body:has(#dashboard.active) .topbar-theme-btn {
     width: 40px !important;
     min-width: 40px !important;

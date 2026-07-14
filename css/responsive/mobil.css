@@ -417,11 +417,6 @@
     padding: 10px 12px;
   }
   .topbar-right { gap: 6px; }
-  .theme-open-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-  .theme-open-btn span:last-child { display: none; }
   .mode-toggle-text { display: none; }
   .topbar-theme-btn {
     padding: 6px 8px;
@@ -1508,16 +1503,6 @@
 
   body:has(#dashboard.active) .topbar-right {
     gap: 6px !important;
-  }
-
-  body:has(#dashboard.active) .theme-open-btn {
-    width: 44px !important;
-    min-width: 44px !important;
-    padding: 0 !important;
-  }
-
-  body:has(#dashboard.active) .theme-open-btn span:not(.theme-open-icon) {
-    display: none !important;
   }
 
   body:has(#dashboard.active) .main-content {

@@ -252,7 +252,6 @@ html.theme-liquid-glass .sidebar .nav-dropdown.has-active > .nav-dropdown-summar
   }
 
   html.theme-liquid-glass .menu-toggle:hover,
-  html.theme-liquid-glass .theme-open-btn:hover,
   html.theme-liquid-glass .topbar-theme-btn:hover,
   html.theme-liquid-glass .theme-sheet-close:hover {
     background: var(--glass-bg-hover);
@@ -264,7 +263,6 @@ html.theme-liquid-glass .sidebar .nav-dropdown.has-active > .nav-dropdown-summar
 html.theme-liquid-glass .sidebar .nav-links button:active,
 html.theme-liquid-glass .sidebar .nav-dropdown-summary:active,
 html.theme-liquid-glass .menu-toggle:active,
-html.theme-liquid-glass .theme-open-btn:active,
 html.theme-liquid-glass .topbar-theme-btn:active,
 html.theme-liquid-glass .theme-sheet-close:active {
   background: var(--glass-bg-active);
@@ -291,7 +289,6 @@ html.theme-liquid-glass body:has(#dashboard.active) .topbar-love-brand::before {
 }
 
 html.theme-liquid-glass .menu-toggle,
-html.theme-liquid-glass .theme-open-btn,
 html.theme-liquid-glass .topbar-theme-btn,
 html.theme-liquid-glass .theme-sheet-close {
   min-width: 44px;
@@ -328,10 +325,8 @@ html.theme-liquid-glass .theme-switch::before {
   }
 
   html.theme-liquid-glass body:has(#dashboard.active) .menu-toggle,
-  html.theme-liquid-glass body:has(#dashboard.active) .theme-open-btn,
   html.theme-liquid-glass body:has(#dashboard.active) .topbar-theme-btn,
   html.theme-liquid-glass .menu-toggle,
-  html.theme-liquid-glass .theme-open-btn,
   html.theme-liquid-glass .topbar-theme-btn {
     width: 44px !important;
     min-width: 44px !important;
@@ -342,7 +337,6 @@ html.theme-liquid-glass .theme-switch::before {
 }
 
 html.theme-liquid-glass .menu-toggle:focus-visible,
-html.theme-liquid-glass .theme-open-btn:focus-visible,
 html.theme-liquid-glass .topbar-theme-btn:focus-visible,
 html.theme-liquid-glass .theme-sheet-close:focus-visible,
 html.theme-liquid-glass .sidebar .nav-links button:focus-visible,
@@ -352,7 +346,7 @@ html.theme-liquid-glass .sidebar .nav-dropdown-summary:focus-visible {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--glass-accent) 22%, transparent) !important;
 }
 
-html.theme-liquid-glass .topbar :is(.menu-toggle, .theme-open-btn, .topbar-theme-btn):focus-visible,
+html.theme-liquid-glass .topbar :is(.menu-toggle, .topbar-theme-btn):focus-visible,
 html.theme-liquid-glass .sidebar :is(button, .nav-dropdown-summary):focus-visible {
   outline-color: var(--glass-focus-navigation);
 }

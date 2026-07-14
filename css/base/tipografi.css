@@ -429,38 +429,6 @@ body.dark .hub-search {
   box-shadow: 0 12px 26px rgba(15,23,42,.08);
 }
 
-.theme-open-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: var(--r-sm, 12px);
-  padding: 10px 16px;
-  font-weight: 700;
-  color: var(--navy);
-  background: color-mix(in srgb, var(--pink-pale) 55%, var(--white) 45%);
-  border: 1px solid var(--separator-strong);
-  box-shadow: 0 6px 18px rgba(15,23,42,.06);
-  cursor: pointer;
-  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms ease;
-}
-
-body.dark .theme-open-btn { color: var(--pink-bright); }
-
-.theme-open-btn:hover { transform: translateY(-1px); border-color: var(--pink); }
-.theme-open-btn:active { transform: scale(.98); }
-.theme-open-btn:focus-visible { outline: none; box-shadow: var(--ring, 0 0 0 4px rgba(212,102,156,.28)); }
-
-.theme-open-icon { display: inline-flex; }
-.theme-open-icon svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  stroke-width: 1.85;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .topbar-theme-btn {
   width: 42px;
   height: 42px;
@@ -7862,7 +7830,6 @@ body:has(#dashboard.active) .love-brand-sub {
 }
 
 body:has(#dashboard.active) .menu-toggle,
-body:has(#dashboard.active) .theme-open-btn,
 body:has(#dashboard.active) .topbar-theme-btn {
   background: rgba(84, 24, 48, .58) !important;
   border-color: rgba(255, 124, 172, .22) !important;
