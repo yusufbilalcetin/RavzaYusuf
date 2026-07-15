@@ -154,9 +154,32 @@ Adlandırma kuralları (script bunlara göre davranır):
 - Boyama preset'leri: `preset-<ad>.jpeg`.
 
 Yeni bölüm görseli eklerken dosyayı ilgili `original/` klasörüne koy, `npm run assets:optimize`
-çalıştır ve üretilen WebP yolunu kullan. Oyun ikonlarını `js/data/game-icons.js` içindeki ortak
-`GAME_ICONS` kaydına ekle; ardından `npm run games:icons` ve `npm run games:icons:check` çalıştır.
+çalıştır ve üretilen WebP yolunu kullan. Yeni bir oyunu adı, ikonu, rotası, sırası ve durumuyla
+`data/games.js` merkezi kataloğuna ekle; ardından `npm run games:icons` ve
+`npm run games:icons:check` çalıştır.
 
 > `assets/ana-sayfa/optimized/` içindeki dosyalar içerik-hash'li adlar taşır ve her üretimde değişir —
 > oraya sabit isimle link vermeyin, kalıcı 404 olur. Paylaşılan bir görsel gerekiyorsa kaynağını
 > ilgili bölümün `original/` klasörüne koyup bu pipeline'dan geçirin.
+
+## Proje kalite ve asset denetimi
+
+Merkezi oyun kataloğu `data/games.js` dosyasındadır. Launcher ve Oyun Alanı kartları aynı
+katalogdan üretilir. Statik denetim; eksik ikon ve rota, yinelenen ID, Linux/Vercel case
+uyumsuzluğu, 404, kullanılmayan veya büyük görseller, eksik görsel ölçüleri ve yinelenen
+kütüphane yüklemelerini raporlar.
+
+```bash
+npm run audit:assets       # bütün statik asset, katalog, kullanılmayan dosya ve performans kontrolleri
+npm run audit:routes       # lokal HTTP + Chromium ile ana sayfa, admin, oyunlar ve kitap yolları
+npm run audit:unused       # yalnızca kullanılmayan görseller
+npm run audit:performance  # boyut, width/height, preload/lazy ve tekrar yükleme kontrolleri
+npm run security:check     # high ve üzeri npm güvenlik açıkları
+npm run check              # deploy için birleşik katalog, asset, ikon ve kitap kontrol zinciri
+```
+
+Raporlar `test-artifacts/asset-audit-report.json` ve
+`test-artifacts/asset-audit-report.md` olarak üretilir. Dinamik olarak kullanılan fakat statik
+analizle bulunamayan yollar yalnızca `scripts/asset-audit-allowlist.json` içinde açıklanarak
+istisna tutulur. Kritik hata denetimi exit code `1` ile kapatır; yalnızca uyarılar exit code `0`
+ile raporlanır.

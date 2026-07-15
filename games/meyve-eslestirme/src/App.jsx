@@ -470,7 +470,7 @@ export default function App() {
     <main className="fruit-app">
       <header className="app-header">
         <div className="brand">
-          <img src={gameIcon} alt="" />
+            <img src={gameIcon} alt="" width="1024" height="1024" />
           <div>
             <span className="kicker">Meyve Mahjong</span>
             <h1>Bölüm {levelNumber} / {TOTAL_LEVELS}</h1>

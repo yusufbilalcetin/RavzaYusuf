@@ -1,5 +1,5 @@
 import { createSearchIndex } from "../utils/search.js";
-import { GAME_ICONS } from "./game-icons.js";
+import { ACTIVE_GAMES } from "../../data/games.js";
 
 const runtimeRegistry = new Map();
 
@@ -46,17 +46,20 @@ const preparationItems = Object.freeze([
   app({ id: "recap", title: "Hızlı Tekrar", type: "route", route: "hizli-tekrar", icon: "bolt", tone: "indigo", category: "Hazırlık", keywords: ["hızlı", "tekrar"] })
 ]);
 
-const gameItems = Object.freeze([
-  app({ id: "candy-match", title: "Candy Crush", type: "game", route: "oyun", gameId: "candy-match", asset: GAME_ICONS["candy-crush"], tone: "game", category: "Oyunlar", keywords: ["şeker", "eşleştirme"] }),
-  app({ id: "fruit-match", title: "Meyve Eşleştirme", type: "game", route: "oyun", gameId: "fruit-match", asset: GAME_ICONS["meyve-eslestirme"], tone: "game", category: "Oyunlar", keywords: ["meyve", "eşleştirme"] }),
-  app({ id: "flappy-bird", title: "Flappy Bird", type: "game", route: "oyun", gameId: "flappy-bird", asset: GAME_ICONS["flappy-bird"], tone: "game", category: "Oyunlar", keywords: ["kuş"] }),
-  app({ id: "boyama", title: "Boyama", type: "game", route: "oyun", gameId: "boyama", asset: GAME_ICONS.boyama, tone: "game", category: "Oyunlar", keywords: ["renk", "çizim"] }),
-  app({ id: "renk-siralama", title: "Renk Sıralama", type: "game", route: "oyun", gameId: "renk-siralama", asset: GAME_ICONS["renk-siralama"], tone: "game", category: "Oyunlar", keywords: ["renk", "sıralama"] }),
-  app({ id: "sudoku", title: "Sudoku", type: "game", route: "oyun", gameId: "sudoku", asset: GAME_ICONS.sudoku, tone: "blue", category: "Oyunlar", keywords: ["sayı", "bulmaca"] }),
-  app({ id: "chance-wheel", title: "Şans Çarkı", type: "link", href: "./games/cark-oyunu/index.html", asset: GAME_ICONS["sans-carki"], tone: "rose", category: "Oyunlar", keywords: ["şans", "çark", "çevir"] }),
-  app({ id: "area-puzzle", title: "Alan Bulmacası", type: "link", href: "./games/alan-bulmacasi/index.html", asset: GAME_ICONS["alan-bulmacasi"], tone: "amber", category: "Oyunlar", keywords: ["alan", "bulmaca", "matematik"] }),
-  app({ id: "arrow-puzzle", title: "Ok Bulmacası", type: "link", href: "./games/ok-bulmacasi/index.html", asset: GAME_ICONS["ok-bulmacasi"], tone: "burgundy", category: "Oyunlar", keywords: ["ok", "bulmaca", "yön"] })
-]);
+const gameItems = Object.freeze(ACTIVE_GAMES.map((game) => app({
+  id: game.launcherId || game.id,
+  title: game.name,
+  type: game.launchMode === "link" ? "link" : "game",
+  ...(game.launchMode === "link"
+    ? { href: `./${game.path}` }
+    : { route: "oyun", gameId: game.handlerId || game.id }),
+  asset: `./${game.icon}`,
+  assetWidth: 1024,
+  assetHeight: 1024,
+  tone: game.tone || "game",
+  category: "Oyunlar",
+  keywords: game.keywords
+})));
 
 export const LAUNCHER_GROUPS = Object.freeze([
   app({ id: "preparation", title: "Hazırlık", type: "folder", icon: "preparation", tone: "preparation", category: "Klasörler", keywords: ["ders", "çalışma"], defaultDockEligible: false, items: preparationItems }),

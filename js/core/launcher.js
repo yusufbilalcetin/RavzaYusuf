@@ -128,7 +128,9 @@ function iconMarkup(item, compact = false) {
   if (item.asset) {
     const prioritized = compact || item.id === "ravza-books";
     const srcset = item.asset2x ? ` srcset="${escapeHtml(item.asset)} 1x, ${escapeHtml(item.asset2x)} 2x"` : "";
-    return `<img src="${escapeHtml(item.asset)}"${srcset} width="128" height="128" alt="" loading="${prioritized ? "eager" : "lazy"}" decoding="async"${item.id === "ravza-books" ? ' fetchpriority="high"' : ""}>`;
+    const width = Number(item.assetWidth) || 128;
+    const height = Number(item.assetHeight) || 128;
+    return `<img src="${escapeHtml(item.asset)}"${srcset} width="${width}" height="${height}" alt="" loading="${prioritized ? "eager" : "lazy"}" decoding="async" fetchpriority="${prioritized ? "high" : "low"}">`;
   }
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[item.icon] || ICONS.fallback}</svg>`;
 }

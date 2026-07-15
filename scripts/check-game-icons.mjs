@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { GAME_ICONS } from "../js/data/game-icons.js";
+import { ACTIVE_GAMES } from "../data/games.js";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const expectedIds = [
@@ -37,11 +38,10 @@ const [gamePage, launcherData, boyamaPage] = await Promise.all([
   readFile(path.join(projectRoot, "js/pages/boyama-page.js"), "utf8"),
 ]);
 
-for (const publicPath of Object.values(GAME_ICONS)) {
-  assert.ok(gamePage.includes(publicPath), `Oyun Alanı ikon referansı eksik: ${publicPath}`);
-}
-assert.match(launcherData, /import \{ GAME_ICONS \}/, "Launcher ortak GAME_ICONS kaynağını kullanmıyor");
+assert.match(gamePage, /data-game-catalog/, "Oyun Alanı merkezi katalog hedefini içermiyor");
+assert.equal(ACTIVE_GAMES.length, expectedIds.length, "Aktif oyun sayısı ikon sayısıyla eşleşmiyor");
+assert.match(launcherData, /import \{ ACTIVE_GAMES \}/, "Launcher merkezi oyun kataloğunu kullanmıyor");
 assert.ok(boyamaPage.includes(GAME_ICONS.boyama), "Boyama giriş ekranı ortak ikonu kullanmıyor");
 assert.doesNotMatch(`${gamePage}\n${launcherData}\n${boyamaPage}`, /assets\/oyun-bolumu\/optimized\/ikon-/, "Eski oyun ikonu yolu hâlâ kullanılıyor");
 
-console.log(`[game-icons] Kontrol başarılı — ${expectedIds.length} PNG, ortak yollar ve giriş ekranı referansları tutarlı.`);
+process.stdout.write(`[game-icons] Kontrol başarılı — ${expectedIds.length} PNG, merkezi katalog ve giriş ekranı referansları tutarlı.\n`);

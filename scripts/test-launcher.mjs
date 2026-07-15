@@ -21,8 +21,8 @@ const BROWSERS = [
   { name: "chrome", path: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", port: 9362 }
 ].filter((browser) => existsSync(browser.path));
 const VIEWPORTS = [
-  [320, 700], [360, 800], [390, 844], [430, 932],
-  [768, 1024], [1024, 768], [1280, 800], [1440, 900], [1920, 1080]
+  [320, 568], [375, 812], [390, 844], [430, 932],
+  [768, 1024], [1024, 768], [1366, 768], [1440, 900], [1920, 1080]
 ];
 const THEME_MODES = ["dark", "light"];
 const probeFolderExpr = () => `(() => {
@@ -97,12 +97,21 @@ async function runBrowser(browserConfig) {
   const pending = new Map();
   const consoleIssues = [];
   const network404s = [];
+  const loadedLocalResources = new Set();
+  const initialRequestCounts = new Map();
   socket.addEventListener("message", (event) => {
     const message = JSON.parse(event.data);
     if (message.method === "Runtime.exceptionThrown") consoleIssues.push(message.params.exceptionDetails.text || "istisna");
     if (message.method === "Log.entryAdded" && message.params.entry.level === "error") consoleIssues.push(message.params.entry.text);
     if (message.method === "Network.responseReceived" && message.params.response.status === 404
       && message.params.response.url.startsWith(`http://127.0.0.1:${SERVER_PORT}`)) network404s.push(message.params.response.url);
+    if (message.method === "Network.responseReceived" && message.params.response.url.startsWith(`http://127.0.0.1:${SERVER_PORT}`)) {
+      loadedLocalResources.add(new URL(message.params.response.url).pathname);
+    }
+    if (message.method === "Network.requestWillBeSent" && message.params.request.url.startsWith(`http://127.0.0.1:${SERVER_PORT}`)) {
+      const pathname = new URL(message.params.request.url).pathname;
+      initialRequestCounts.set(pathname, (initialRequestCounts.get(pathname) || 0) + 1);
+    }
     if (!message.id || !pending.has(message.id)) return;
     const callbacks = pending.get(message.id);
     pending.delete(message.id);
@@ -151,6 +160,32 @@ async function runBrowser(browserConfig) {
     await command("Page.navigate", { url: `http://127.0.0.1:${SERVER_PORT}/index.html` });
     await waitFor("document.querySelectorAll('#launcherGrid .launcher-app').length > 0 && document.querySelector('.launcher-dock')");
     await delay(650);
+
+    assert.ok(!loadedLocalResources.has("/js/pages/oyun-page.js"), "Oyun rotası launcher açılışında gereksiz yüklendi");
+    assert.ok(!loadedLocalResources.has("/js/pages/boyama-page.js"), "Boyama modülü oyun açılmadan yüklendi");
+    assert.ok(!loadedLocalResources.has("/js/games/renk-siralama.js"), "Renk Sıralama modülü oyun açılmadan yüklendi");
+    assert.ok(![...loadedLocalResources].some((url) => url.startsWith("/games/candy-crush/dist/assets/")), "Candy Crush paketi oyun açılmadan yüklendi");
+    for (const icon of ["candy-crush", "meyve-eslestirme", "flappy-bird", "boyama"]) {
+      assert.equal(initialRequestCounts.get(`/assets/icons/games/${icon}.png`), 1, `${icon}: kritik ikon ilk açılışta tam bir istek oluşturmadı`);
+    }
+    for (const icon of ["renk-siralama", "sudoku", "sans-carki", "alan-bulmacasi", "ok-bulmacasi"]) {
+      assert.equal(initialRequestCounts.get(`/assets/icons/games/${icon}.png`) || 0, 0, `${icon}: ekran dışı ikon launcher açılışında gereksiz yüklendi`);
+    }
+
+    await evaluate("window.navigate('oyun', { history: false })");
+    await waitFor("document.body.dataset.currentRoute === 'oyun' && document.querySelectorAll('.game-tile-img').length === 9");
+    await delay(250);
+    assert.ok(loadedLocalResources.has("/js/pages/oyun-page.js"), "Oyun rotası açıldığında modül yüklenmedi");
+    assert.ok(!loadedLocalResources.has("/js/pages/boyama-page.js"), "Boyama modülü kart açılmadan yüklendi");
+    assert.ok(!loadedLocalResources.has("/js/games/renk-siralama.js"), "Renk Sıralama modülü kart açılmadan yüklendi");
+    await evaluate("document.querySelector('[data-game=renk-siralama]').click()");
+    await waitFor("document.body.classList.contains('is-game-fullscreen')");
+    await delay(250);
+    assert.ok(loadedLocalResources.has("/js/games/renk-siralama.js"), "Renk Sıralama açıldığında modül yüklenmedi");
+    await evaluate("document.querySelector('#gameCloseBtn').click()");
+    await waitFor("!document.body.classList.contains('is-game-fullscreen')");
+    await evaluate("window.navigate('ana-sayfa', { history: false })");
+    await waitFor("document.body.dataset.currentRoute === 'ana-sayfa'");
 
     for (const themeMode of THEME_MODES) {
       await evaluate(`document.body.classList.toggle('dark', ${themeMode === "dark"})`);

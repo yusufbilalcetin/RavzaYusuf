@@ -281,7 +281,7 @@ const TEMPLATE = `
         <div class="pbn-preset-grid" id="pbnPresetGrid">
           ${PRESET_IMAGES.map((item) => `
             <button type="button" class="pbn-preset-item" data-src="${item.src}" data-name="${item.name}">
-              <img src="${item.thumb}" alt="${item.name}" loading="lazy" />
+              <img src="${item.thumb}" alt="${item.name}" width="640" height="420" loading="lazy" decoding="async" />
               <span class="pbn-preset-copy">
                 <strong>${item.name}</strong>
                 <small>${item.note}</small>
@@ -317,7 +317,7 @@ const TEMPLATE = `
     <div class="pbn-screen pbn-screen-analysis" data-pbn-screen="analysis">
       <div class="pbn-analysis-card">
         <div class="pbn-analysis-preview">
-          <img id="pbnAnalysisPreview" alt="Yüklenen fotoğraf" />
+          <img id="pbnAnalysisPreview" alt="Yüklenen fotoğraf" data-dynamic-dimensions />
         </div>
         <h3 id="pbnAnalysisTitle">Fotoğraf analiz ediliyor…</h3>
         <div class="pbn-progress-bar">
@@ -376,7 +376,7 @@ const TEMPLATE = `
         <h2>Eser hazır</h2>
         <p>Eserin PNG kalitesinde hazır. Telefonda paylaşım sayfasından Fotoğraflar veya Galeri'ye kaydedebilirsin.</p>
         <div class="pbn-result-preview">
-          <img id="pbnResultImage" alt="Boyanmış sonuç" />
+          <img id="pbnResultImage" alt="Boyanmış sonuç" data-dynamic-dimensions />
         </div>
         <div class="pbn-result-actions">
           <button type="button" class="pbn-upload-btn" id="pbnShareResultBtn" data-phone-save-label>Telefona Kaydet (PNG)</button>
@@ -508,7 +508,7 @@ export function renderBoyamaApp(target, options = {}) {
       const progress = Math.max(0, Math.min(100, Math.round(Number(item.progress ?? snapshot?.progress ?? 0))));
       return `
       <div class="pbn-recent-item" data-id="${item.id}">
-        <img src="${item.thumbnail}" alt="${escapeHtml(item.name || "Çalışma")}" />
+        <img src="${item.thumbnail}" alt="${escapeHtml(item.name || "Çalışma")}" width="160" height="160" decoding="async" />
         <span class="pbn-recent-copy">
           <strong>${escapeHtml(item.name || "Boyama çalışması")}</strong>
           <small>${formatRecentTime(item.updatedAt || item.createdAt)}</small>
@@ -604,7 +604,7 @@ export function renderBoyamaApp(target, options = {}) {
       return `
       <article class="pbn-completed-card" data-id="${item.id}">
         <div class="pbn-completed-thumb">
-          <img src="${item.thumbnail}" alt="${name}" loading="lazy" />
+          <img src="${item.thumbnail}" alt="${name}" width="160" height="160" loading="lazy" decoding="async" />
           <span class="pbn-completed-badge">%100</span>
         </div>
         <div class="pbn-completed-body">

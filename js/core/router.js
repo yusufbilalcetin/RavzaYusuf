@@ -14,10 +14,34 @@ import { initSinavCoz } from "../pages/sinav-coz-page.js";
 import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
 import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
-import { closeGame, initOyun } from "../pages/oyun-page.js?v=alan-bulmacasi-20260710-1";
-import { closeRavzaBooks, initRavzaBooks } from "../pages/ravza-books-page.js?v=pdf-themes-20260716-1";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
 import { syncLauncherActive } from "./launcher.js?v=home-proportions-20260716-1";
+
+let oyunModule = null;
+let oyunModulePromise = null;
+let ravzaBooksModule = null;
+let ravzaBooksModulePromise = null;
+
+function loadOyunModule() {
+  oyunModulePromise ||= import("../pages/oyun-page.js?v=asset-audit-20260716-1").then((module) => {
+    oyunModule = module;
+    return module;
+  });
+  return oyunModulePromise;
+}
+
+function loadRavzaBooksModule() {
+  ravzaBooksModulePromise ||= import("../pages/ravza-books-page.js?v=asset-audit-20260716-1").then((module) => {
+    ravzaBooksModule = module;
+    return module;
+  });
+  return ravzaBooksModulePromise;
+}
+
+const initOyun = async (options) => (await loadOyunModule()).initOyun(options);
+const initRavzaBooks = async (options) => (await loadRavzaBooksModule()).initRavzaBooks(options);
+const closeGame = () => oyunModule?.closeGame();
+const closeRavzaBooks = () => ravzaBooksModule?.closeRavzaBooks();
 
 export const routeAliases = {
   dashboard: "ana-sayfa",
@@ -116,6 +140,7 @@ function syncRouteUrl(routeName, mode = "push") {
   const url = new URL(location.href);
   if (routeName === "ana-sayfa") url.searchParams.delete("page");
   else url.searchParams.set("page", routeName);
+  if (routeName !== "oyun") url.searchParams.delete("game");
   const nextState = { route: routeName };
   if (mode === "replace") history.replaceState(nextState, "", url);
   else history.pushState(nextState, "", url);

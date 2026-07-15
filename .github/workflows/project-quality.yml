@@ -1,0 +1,53 @@
+name: Project Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Repository checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js kurulumu
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Bağımlılıkları kur
+        run: npm ci
+
+      - name: Asset ve katalog denetimi
+        run: npm run audit:assets
+
+      - name: HTTP ve tarayıcı rota denetimi
+        run: npm run audit:routes
+
+      - name: Proje kontrol zinciri
+        run: npm run check
+
+      - name: Oyun veri testleri
+        run: |
+          npm test --prefix games/alan-bulmacasi
+          npm test --prefix games/ok-bulmacasi
+
+      - name: Yüksek önem düzeyinde güvenlik denetimi
+        run: npm run security:check
+
+      - name: Denetim raporlarını yükle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-audit-report
+          path: test-artifacts/asset-audit-report.*
+          if-no-files-found: warn

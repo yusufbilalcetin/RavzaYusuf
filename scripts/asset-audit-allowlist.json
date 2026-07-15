@@ -1,0 +1,23 @@
+{
+  "description": "Yalnızca statik analizle çözülemeyen, üretim hattı veya PDF.js tarafından dinamik kullanılan yollar.",
+  "unusedIgnore": [
+    "assets/icons/games/source/**",
+    "assets/vendor/pdfjs/cmaps/**",
+    "assets/vendor/pdfjs/standard_fonts/**",
+    "assets/vendor/pdfjs/iccs/**",
+    "assets/vendor/pdfjs/image_decoders/**"
+  ],
+  "referenceIgnore": [
+    "**/*.map",
+    "assets/vendor/pdfjs/LICENSE",
+    "assets/vendor/page-flip/LICENSE"
+  ],
+  "httpIgnore": [
+    "https://fonts.googleapis.com/**",
+    "https://fonts.gstatic.com/**",
+    "https://cdn.jsdelivr.net/**",
+    "https://www.gstatic.com/**",
+    "https://firestore.googleapis.com/**",
+    "https://api.qrserver.com/**"
+  ]
+}

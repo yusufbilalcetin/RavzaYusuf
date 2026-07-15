@@ -1,65 +1,19 @@
 import { createGameAudio } from "../utils/game-audio.js";
-import { renderRenkSiralamaGame } from "../games/renk-siralama.js";
-import { renderBoyamaApp } from "./boyama-page.js?v=alan-bulmacasi-20260710-1";
 import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
+import { ACTIVE_GAMES, findGame } from "../../data/games.js";
 
-const GAME_META = {
-  "boyama": {
-    badge: "YENİ NESİL",
-    title: "Boyama",
-    subtitle: "Fotoğrafını yükle, piksel piksel numaraya göre boya."
-  },
-  "candy-match": {
-    badge: "SONSUZ",
-    title: "Candy Crush",
-    subtitle: "Yan yana iki sekeri degistir. Uclu veya daha fazla eslesme puan verir; hamle siniri yok."
-  },
-  "fruit-match": {
-    badge: "100 BÖLÜM",
-    title: "Meyve Eşleştirme",
-    subtitle: "Açık meyve taşlarını eşleştir, tüm tahtayı temizle ve yıldızları topla."
-  },
-  "renk-siralama": {
-    badge: "SONSUZ SEVİYE",
-    title: "Renk Sıralama",
-    subtitle: "Renkli sıvıları cam tüplerde tek renge ayır. Seviyeler sonsuz, her biri çözülebilir."
-  },
-  "flappy-bird": {
-    badge: "SONSUZ",
-    title: "Flappy Bird",
-    subtitle: "Ekrana dokun veya bosluk tusuna bas, kusu borularin arasindan gecir."
-  },
-  "sudoku": {
-    badge: "BULMACA",
-    title: "Sudoku",
-    subtitle: "Her satir, sutun ve 3x3 blokta 1-9 rakamlari birer kez olacak sekilde tahtayi doldur."
-  },
-  "memory-boxes": {
-    badge: "YAKINDA",
-    title: "Hafiza Kutulari",
-    subtitle: "Ayni kartlari bulacagin hafiza oyunu burada acilacak."
-  },
-  "speed-race": {
-    badge: "YAKINDA",
-    title: "Hizli Yaris",
-    subtitle: "Sureye karsi soru cozme oyunu burada acilacak."
-  },
-  "word-pop": {
-    badge: "YAKINDA",
-    title: "Kelime Patlat",
-    subtitle: "Dogru kelime balonunu secme oyunu burada acilacak."
-  },
-  "picture-puzzle": {
-    badge: "YAKINDA",
-    title: "Resim Puzzle",
-    subtitle: "Parcalari yerine tasima oyunu burada acilacak."
-  },
-  "quiz-battle": {
-    badge: "YAKINDA",
-    title: "Quiz Kapismasi",
-    subtitle: "Puan toplayan yaris modu burada acilacak."
-  }
-};
+const GAME_META = Object.freeze(Object.fromEntries(ACTIVE_GAMES.map((game) => [
+  game.handlerId || game.id,
+  Object.freeze({ badge: game.badge, title: game.name, subtitle: game.subtitle })
+])));
+
+const GAME_MODULE_LOADERS = Object.freeze({
+  boyama: () => import("./boyama-page.js?v=alan-bulmacasi-20260710-1"),
+  "renk-siralama": () => import("../games/renk-siralama.js")
+});
+
+const loadedGameModules = new Map();
+let gameOpenToken = 0;
 
 const CANDIES = ["\u{1F353}", "\u{1F34B}", "\u{1F347}", "\u{1F36C}", "\u{1F36D}", "\u{1F9C1}"];
 const BOARD_SIZE = 7;
@@ -72,15 +26,66 @@ let sudokuState = null;
 let boyamaState = null;
 let renkSiralamaState = null;
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function visibleIconCount() {
+  if (matchMedia("(max-width: 767px)").matches) return 3;
+  if (matchMedia("(max-width: 1199px)").matches) return 6;
+  return ACTIVE_GAMES.length;
+}
+
+function renderGameCatalog(root) {
+  const grid = root.querySelector("[data-game-catalog]");
+  if (!grid || grid.dataset.rendered === "true") return;
+  const priorityCount = visibleIconCount();
+  grid.innerHTML = ACTIVE_GAMES.map((game, index) => {
+    const isPriority = index < priorityCount;
+    const image = `<img class="game-tile-img" src="./${escapeHtml(game.icon)}" alt="" width="1024" height="1024" loading="${isPriority ? "eager" : "lazy"}" decoding="async" fetchpriority="${isPriority ? "high" : "low"}">`;
+    const content = `<span class="game-tile-art game-tile-art--icon" aria-hidden="true">${image}<span class="game-tile-fallback">${escapeHtml(game.name.charAt(0))}</span></span><span class="game-tile-copy"><strong>${escapeHtml(game.name)}</strong></span>`;
+    if (game.launchMode === "link") {
+      return `<a class="game-tile is-live" href="./${escapeHtml(game.path)}" aria-label="${escapeHtml(game.name)} oyununu aç">${content}</a>`;
+    }
+    return `<button class="game-tile is-live" type="button" data-game="${escapeHtml(game.handlerId || game.id)}">${content}</button>`;
+  }).join("");
+  grid.dataset.rendered = "true";
+  grid.querySelectorAll(".game-tile-img").forEach((image) => {
+    image.addEventListener("error", () => {
+      image.hidden = true;
+      image.closest(".game-tile-art")?.classList.add("has-image-error");
+    }, { once: true });
+  });
+}
+
+async function loadGameModule(gameId) {
+  if (loadedGameModules.has(gameId)) return loadedGameModules.get(gameId);
+  const loader = GAME_MODULE_LOADERS[gameId];
+  if (!loader) return null;
+  const pending = loader().catch((error) => {
+    loadedGameModules.delete(gameId);
+    throw error;
+  });
+  loadedGameModules.set(gameId, pending);
+  return pending;
+}
+
 export function initOyun(options = {}) {
   const root = document.getElementById("games");
   if (!root) return undefined;
+
+  renderGameCatalog(root);
 
   if (root.dataset.gamesReady !== "true") {
     root.dataset.gamesReady = "true";
 
     root.querySelectorAll("[data-game]").forEach((tile) => {
-      tile.addEventListener("click", () => openGame(root, tile.dataset.game));
+      tile.addEventListener("click", () => void openGame(root, tile.dataset.game));
     });
 
     root.querySelector("#gameCloseBtn")?.addEventListener("click", () => closeGame(root));
@@ -89,19 +94,21 @@ export function initOyun(options = {}) {
   // Manual resume entrypoint used by the Boyama "Son Calismalar" action.
   window.__pbnOpenBoyamaResume = async (projectId) => {
     pbnLog("oyun.openBoyamaResume", { projectId });
-    openGame(root, "boyama", { resumeProjectId: projectId });
+    await openGame(root, "boyama", { resumeProjectId: projectId });
     try { return await boyamaState?.resumeReady; } catch { return false; }
   };
 
-  if (options.openGame) {
-    openGame(root, options.openGame);
+  const requestedGame = options.openGame || new URLSearchParams(location.search).get("game");
+  if (requestedGame && findGame(requestedGame)?.launchMode !== "link") {
+    void openGame(root, requestedGame);
     return { skipTopScroll: true };
   }
 
   return undefined;
 }
 
-function openGame(root, gameId, options = {}) {
+async function openGame(root, gameId, options = {}) {
+  const currentToken = ++gameOpenToken;
   pbnLog("oyun.openGame", { gameId });
   const meta = GAME_META[gameId] || GAME_META["candy-match"];
   const stage = root.querySelector("#gameStage");
@@ -137,7 +144,14 @@ function openGame(root, gameId, options = {}) {
     enterGameFullscreen(root);
     root.classList.remove("is-candy-crush-app", "is-sudoku", "is-boyama");
     root.classList.add("is-renk-siralama");
-    renkSiralamaState = renderRenkSiralamaGame(body, { onExit: () => closeGame(root) });
+    body.innerHTML = '<div class="game-module-loading" role="status">Renk Sıralama hazırlanıyor…</div>';
+    try {
+      const module = await loadGameModule(gameId);
+      if (currentToken !== gameOpenToken) return;
+      renkSiralamaState = module.renderRenkSiralamaGame(body, { onExit: () => closeGame(root) });
+    } catch {
+      if (currentToken === gameOpenToken) renderGameLoadError(body, meta.title);
+    }
   } else if (gameId === "sudoku") {
     enterGameFullscreen(root);
     root.classList.remove("is-candy-crush-app", "is-boyama", "is-renk-siralama");
@@ -147,7 +161,14 @@ function openGame(root, gameId, options = {}) {
     enterGameFullscreen(root);
     root.classList.remove("is-candy-crush-app", "is-sudoku", "is-renk-siralama");
     root.classList.add("is-boyama");
-    boyamaState = renderBoyamaApp(body, { resumeProjectId: options.resumeProjectId });
+    body.innerHTML = '<div class="game-module-loading" role="status">Boyama hazırlanıyor…</div>';
+    try {
+      const module = await loadGameModule(gameId);
+      if (currentToken !== gameOpenToken) return;
+      boyamaState = module.renderBoyamaApp(body, { resumeProjectId: options.resumeProjectId });
+    } catch {
+      if (currentToken === gameOpenToken) renderGameLoadError(body, meta.title);
+    }
   } else {
     exitGameFullscreen(root);
     root.classList.remove("is-candy-crush-app", "is-renk-siralama");
@@ -160,6 +181,10 @@ function openGame(root, gameId, options = {}) {
   }
 
   stage.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderGameLoadError(target, title) {
+  target.innerHTML = `<div class="game-module-error" role="alert"><strong>${escapeHtml(title)} yüklenemedi</strong><p>Bağlantını kontrol edip Oyun Alanı'ndan yeniden deneyebilirsin.</p></div>`;
 }
 
 function renderCandyCrushApp(target) {
@@ -186,6 +211,7 @@ function renderIframeGame(target, url, title) {
 }
 
 export function closeGame(root = document.getElementById("games")) {
+  gameOpenToken += 1;
   if (!root) {
     document.body.classList.remove("is-game-fullscreen");
     return;
