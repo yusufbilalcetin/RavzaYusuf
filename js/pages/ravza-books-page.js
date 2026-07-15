@@ -69,6 +69,7 @@ let resizePending = false;
 let originalThemeColor = null;
 let libraryAbort = null;
 let pdfjsLib = null;
+let pdfFetchController = null;
 let pdfLoadingTask = null;
 let pdfDocument = null;
 let pdfBookId = null;
@@ -348,6 +349,8 @@ function cancelPdfRenders() {
 async function destroyPdfDocument() {
   pdfRenderGeneration += 1;
   cancelPdfRenders();
+  pdfFetchController?.abort();
+  pdfFetchController = null;
   const loadingTask = pdfLoadingTask;
   const documentToDestroy = pdfDocument;
   pdfLoadingTask = null;
@@ -1072,31 +1075,86 @@ function pdfErrorMessage(error, phase = 'document', bookTitle = 'Kitap') {
   return `${bookTitle} yüklenemedi. PDF dosyasını ve yerel PDF.js dosyalarını kontrol edin.`;
 }
 
+async function fetchPdfBytes(book) {
+  const pdfUrl = new URL(book.file || book.pdfUrl, document.baseURI).href;
+  const controller = new AbortController();
+  pdfFetchController = controller;
+  let response;
+  try {
+    response = await fetch(pdfUrl, {
+      signal: controller.signal,
+      cache: 'default',
+      credentials: 'same-origin',
+    });
+  } catch (error) {
+    if (error?.name === 'AbortError') throw error;
+    throw new Error(`${book.title} PDF dosyası indirilemedi.`);
+  }
+  if (!response.ok) {
+    throw new Error(response.status === 404
+      ? `${book.title} PDF dosyası bulunamadı.`
+      : `${book.title} PDF dosyası indirilemedi (${response.status}).`);
+  }
+
+  const total = Math.max(0, Number(response.headers.get('content-length')) || 0);
+  if (!response.body?.getReader) {
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    showReaderLoading(`${book.title} hazırlanıyor…`, 100);
+    return bytes;
+  }
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  let loaded = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value?.byteLength) continue;
+      chunks.push(value);
+      loaded += value.byteLength;
+      showReaderLoading(`${book.title} hazırlanıyor…`, total > 0 ? (loaded / total) * 100 : null);
+    }
+  } finally {
+    try { reader.releaseLock(); } catch (_) {}
+  }
+
+  const bytes = new Uint8Array(loaded);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  showReaderLoading(`${book.title} hazırlanıyor…`, 100);
+  return bytes;
+}
+
 async function loadPdfDocument(book) {
   if (pdfDocument && pdfBookId === book.id) return pdfDocument;
   await destroyPdfDocument();
   const pdfjs = await ensurePdfJs();
-  const pdfUrl = new URL(book.file || book.pdfUrl, document.baseURI).href;
   pdfBookId = book.id;
-  pdfLoadingTask = pdfjs.getDocument({
-    url: pdfUrl,
-    cMapUrl: `${PDFJS_ASSET_ROOT}cmaps/`,
-    cMapPacked: true,
-    standardFontDataUrl: `${PDFJS_ASSET_ROOT}standard_fonts/`,
-    wasmUrl: `${PDFJS_ASSET_ROOT}wasm/`,
-    iccUrl: `${PDFJS_ASSET_ROOT}iccs/`,
-    verbosity: 0,
-  });
-  pdfLoadingTask.onProgress = ({ loaded, total }) => {
-    const percent = total > 0 ? (loaded / total) * 100 : null;
-    showReaderLoading(`${book.title} hazırlanıyor…`, percent);
-  };
   try {
+    const data = await fetchPdfBytes(book);
+    if (pdfBookId !== book.id) throw new DOMException('PDF yüklemesi iptal edildi.', 'AbortError');
+    pdfFetchController = null;
+    pdfLoadingTask = pdfjs.getDocument({
+      data,
+      cMapUrl: `${PDFJS_ASSET_ROOT}cmaps/`,
+      cMapPacked: true,
+      standardFontDataUrl: `${PDFJS_ASSET_ROOT}standard_fonts/`,
+      wasmUrl: `${PDFJS_ASSET_ROOT}wasm/`,
+      iccUrl: `${PDFJS_ASSET_ROOT}iccs/`,
+      verbosity: 0,
+    });
     pdfDocument = await pdfLoadingTask.promise;
     return pdfDocument;
   } catch (error) {
+    pdfFetchController = null;
     pdfBookId = null;
     pdfLoadingTask = null;
+    if (error?.name === 'AbortError') throw error;
+    if (error instanceof Error && /PDF dosyası/.test(error.message)) throw error;
     throw new Error(pdfErrorMessage(error, 'document', book.title));
   }
 }

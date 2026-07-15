@@ -9,6 +9,10 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(fileURLToPath(new URL('../', import.meta.url)));
 const PORT = 8784;
+const BASE_URL = (process.env.RAVZA_BOOKS_URL || `http://127.0.0.1:${PORT}`).replace(/\/$/, '');
+const READER_OVERRIDE = process.env.RAVZA_BOOKS_OVERRIDE_READER === '1'
+  ? await readFile(join(ROOT, 'js', 'pages', 'ravza-books-page.js'))
+  : null;
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const PROFILE = resolve(tmpdir(), `ravza-books-test-${Date.now()}`);
 const VIEWPORTS = [
@@ -95,6 +99,19 @@ const failedRequests = [];
 const requestUrls = new Map();
 socket.addEventListener('message', event => {
   const message = JSON.parse(event.data);
+  if (message.method === 'Fetch.requestPaused') {
+    if (READER_OVERRIDE && /\/js\/pages\/ravza-books-page\.js(?:\?|$)/.test(message.params.request.url)) {
+      void command('Fetch.fulfillRequest', {
+        requestId: message.params.requestId,
+        responseCode: 200,
+        responseHeaders: [{ name: 'Content-Type', value: 'application/javascript; charset=utf-8' }],
+        body: READER_OVERRIDE.toString('base64'),
+      });
+    } else {
+      void command('Fetch.continueRequest', { requestId: message.params.requestId });
+    }
+    return;
+  }
   if (message.method === 'Runtime.exceptionThrown') {
     consoleIssues.push(message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text || 'JavaScript hatası');
   }
@@ -134,7 +151,22 @@ async function waitFor(expression, timeout = 20000) {
     if (await evaluate(expression)) return;
     await delay(100);
   }
-  throw new Error(`Zaman aşımı: ${expression}`);
+  let snapshot = null;
+  try {
+    snapshot = await evaluate(`(() => ({
+      mode: document.querySelector('#ravzabooks')?.dataset.appMode,
+      error: document.querySelector('.reader-error p')?.textContent,
+      loading: document.querySelector('.reader-loading p')?.textContent,
+      loadingPercent: document.querySelector('.reader-loading-percent')?.textContent,
+      sheets: document.querySelectorAll('.book-sheet').length,
+      rendered: document.querySelectorAll('.pdf-page.is-rendered').length,
+      pageFlipGlobal: Boolean(window.St?.PageFlip),
+      resources: performance.getEntriesByType('resource')
+        .filter(entry => /page-flip|kucuk-prens|pdf\.worker|pdf\.js/.test(entry.name))
+        .map(entry => ({ name: entry.name, duration: Math.round(entry.duration), transferSize: entry.transferSize })),
+    }))()`);
+  } catch {}
+  throw new Error(`Zaman aşımı: ${expression}\nDurum: ${JSON.stringify(snapshot)}\nKonsol: ${consoleIssues.join(' | ')}`);
 }
 
 async function setViewport(width, height) {
@@ -154,8 +186,11 @@ try {
   await command('Runtime.enable');
   await command('Log.enable');
   await command('Network.enable');
+  if (READER_OVERRIDE) {
+    await command('Fetch.enable', { patterns: [{ urlPattern: '*js/pages/ravza-books-page.js*', requestStage: 'Request' }] });
+  }
   await setViewport(390, 844);
-  await command('Page.navigate', { url: `http://127.0.0.1:${PORT}/?page=ravza-books` });
+  await command('Page.navigate', { url: `${BASE_URL}/?page=ravza-books` });
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
   await evaluate("localStorage.removeItem('ravzaBooksProgress:kucuk-prens'); location.reload()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
