@@ -180,6 +180,24 @@ async function runBrowser(browserConfig) {
     const duplicatedAppIconRequest = [...initialRequestCounts].find(([pathname, count]) => pathname.startsWith("/assets/icons/apps/") && count > 1);
     assert.equal(duplicatedAppIconRequest, undefined, `Aynı uygulama ikonu birden fazla indirildi: ${JSON.stringify(duplicatedAppIconRequest)}`);
 
+    const iconSizing = await evaluate(`(() => {
+      const legacy = document.querySelector('[data-launcher-item="ravza-books"] .launcher-app-icon');
+      const premium = document.querySelector('[data-launcher-item="grade1"] .launcher-app-icon');
+      const premiumImage = premium?.querySelector('.app-icon-picture > img');
+      if (!legacy || !premium || !premiumImage) return null;
+      const legacyRect = legacy.getBoundingClientRect();
+      const premiumRect = premium.getBoundingClientRect();
+      const imageRect = premiumImage.getBoundingClientRect();
+      return {
+        legacyWidth: legacyRect.width,
+        premiumWidth: premiumRect.width,
+        opticalScale: imageRect.width / premiumRect.width
+      };
+    })()`);
+    assert.ok(iconSizing, "Ana uygulama ikonları boyut denetimi için bulunamadı");
+    assert.ok(Math.abs(iconSizing.legacyWidth - iconSizing.premiumWidth) <= 0.5, `Uygulama ikon kutuları eşit değil: ${JSON.stringify(iconSizing)}`);
+    assert.ok(iconSizing.opticalScale >= 1.17 && iconSizing.opticalScale <= 1.19, `Şeffaf logonun optik ölçeği geçersiz: ${JSON.stringify(iconSizing)}`);
+
     await evaluate("window.navigate('oyun', { history: false })");
     await waitFor("document.body.dataset.currentRoute === 'oyun' && document.querySelectorAll('.game-tile-img').length === 9");
     await delay(250);
