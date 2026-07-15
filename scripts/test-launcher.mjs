@@ -21,7 +21,7 @@ const BROWSERS = [
   { name: "chrome", path: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", port: 9362 }
 ].filter((browser) => existsSync(browser.path));
 const VIEWPORTS = [
-  [320, 568], [375, 812], [390, 844], [430, 932],
+  [320, 568], [360, 800], [375, 812], [390, 844], [430, 932],
   [768, 1024], [1024, 768], [1366, 768], [1440, 900], [1920, 1080]
 ];
 const THEME_MODES = ["dark", "light"];
@@ -171,6 +171,14 @@ async function runBrowser(browserConfig) {
     for (const icon of ["renk-siralama", "sudoku", "sans-carki", "alan-bulmacasi", "ok-bulmacasi"]) {
       assert.equal(initialRequestCounts.get(`/assets/icons/games/${icon}.png`) || 0, 0, `${icon}: ekran dışı ikon launcher açılışında gereksiz yüklendi`);
     }
+    for (const icon of ["ravzalingo", "kahoot", "calisma-merkezi", "ezber-merkezi"]) {
+      assert.equal(initialRequestCounts.get(`/assets/icons/apps/128/${icon}.avif`), 1, `${icon}: ilk görünür ikon preload ile tek istek oluşturmadı`);
+    }
+    for (const icon of ["bosluk-doldurma", "sinav-merkezi", "hizli-tekrar", "ok-bulmacasi"]) {
+      assert.equal(initialRequestCounts.get(`/assets/icons/apps/128/${icon}.avif`) || 0, 0, `${icon}: ekran dışı uygulama ikonu gereksiz yüklendi`);
+    }
+    const duplicatedAppIconRequest = [...initialRequestCounts].find(([pathname, count]) => pathname.startsWith("/assets/icons/apps/") && count > 1);
+    assert.equal(duplicatedAppIconRequest, undefined, `Aynı uygulama ikonu birden fazla indirildi: ${JSON.stringify(duplicatedAppIconRequest)}`);
 
     await evaluate("window.navigate('oyun', { history: false })");
     await waitFor("document.body.dataset.currentRoute === 'oyun' && document.querySelectorAll('.game-tile-img').length === 9");
@@ -381,9 +389,9 @@ async function runBrowser(browserConfig) {
         };
       })()`);
       assert.equal(gamesProbe.images.length, 9, `${width}x${height}: oyun ikonu sayisi hatali`);
-      assert.ok(gamesProbe.images.every((image) => image.width === 1024 && image.height === 1024), `${width}x${height}: 1024x1024 olmayan oyun ikonu var`);
+      assert.ok(gamesProbe.images.every((image) => image.width === image.height && [128, 256, 1024].includes(image.width)), `${width}x${height}: kare olmayan veya beklenmeyen ölçüde oyun ikonu var`);
       assert.ok(gamesProbe.images.every((image) => image.fit === "contain"), `${width}x${height}: object-fit contain uygulanmayan ikon var`);
-      assert.ok(gamesProbe.images.every((image) => image.src.startsWith("/assets/icons/games/")), `${width}x${height}: ortak klasor disinda ikon yolu var`);
+      assert.ok(gamesProbe.images.every((image) => image.src.startsWith("/assets/icons/games/") || /^\/assets\/icons\/apps\/(?:128|256)\/ok-bulmacasi\.(?:avif|webp|png)$/.test(image.src)), `${width}x${height}: ortak katalog disinda ikon yolu var`);
       assert.ok(gamesProbe.scrollWidth <= gamesProbe.viewportWidth + 1, `${width}x${height}: oyun ekrani yatay tasiyor`);
       assert.ok(gamesProbe.tilesInsideViewport, `${width}x${height}: oyun karti viewport disina tasiyor`);
 

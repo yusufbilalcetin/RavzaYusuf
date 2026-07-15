@@ -40,6 +40,7 @@ export const ASSET_AUDIT_CONFIG = Object.freeze({
 
 export function fileLimit(relativePath) {
   const value = relativePath.toLowerCase();
+  if (value.startsWith("assets/icons/apps/source/")) return null;
   if (value.startsWith("assets/icons/games/") && !value.includes("/source/")) return ["Oyun ikonu", ASSET_AUDIT_CONFIG.thresholds.gameIcon];
   if (/(^|\/)(logo|logos|branding)(\/|[-_.])/.test(value)) return ["Logo", ASSET_AUDIT_CONFIG.thresholds.logo];
   if (/\.(mp3|wav|ogg|m4a|aac)$/.test(value)) return ["Ses", ASSET_AUDIT_CONFIG.thresholds.audio];

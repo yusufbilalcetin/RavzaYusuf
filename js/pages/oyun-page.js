@@ -1,6 +1,7 @@
 import { createGameAudio } from "../utils/game-audio.js";
 import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
 import { ACTIVE_GAMES, findGame } from "../../data/games.js";
+import { appIconPictureMarkup } from "../../data/app-icons.js";
 
 const GAME_META = Object.freeze(Object.fromEntries(ACTIVE_GAMES.map((game) => [
   game.handlerId || game.id,
@@ -47,7 +48,15 @@ function renderGameCatalog(root) {
   const priorityCount = visibleIconCount();
   grid.innerHTML = ACTIVE_GAMES.map((game, index) => {
     const isPriority = index < priorityCount;
-    const image = `<img class="game-tile-img" src="./${escapeHtml(game.icon)}" alt="" width="1024" height="1024" loading="${isPriority ? "eager" : "lazy"}" decoding="async" fetchpriority="${isPriority ? "high" : "low"}">`;
+    const image = game.appIcon
+      ? appIconPictureMarkup(game.appIcon, {
+          eager: isPriority,
+          pictureClass: "app-icon-picture game-icon-picture",
+          imageClass: "game-tile-img",
+          width: 128,
+          height: 128
+        })
+      : `<img class="game-tile-img" src="./${escapeHtml(game.icon)}" alt="" width="1024" height="1024" loading="${isPriority ? "eager" : "lazy"}" decoding="async" fetchpriority="${isPriority ? "high" : "low"}">`;
     const content = `<span class="game-tile-art game-tile-art--icon" aria-hidden="true">${image}<span class="game-tile-fallback">${escapeHtml(game.name.charAt(0))}</span></span><span class="game-tile-copy"><strong>${escapeHtml(game.name)}</strong></span>`;
     if (game.launchMode === "link") {
       return `<a class="game-tile is-live" href="./${escapeHtml(game.path)}" aria-label="${escapeHtml(game.name)} oyununu aç">${content}</a>`;

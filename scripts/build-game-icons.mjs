@@ -48,12 +48,6 @@ const vectorIcons = Object.freeze({
       <path d="M14 14h33v33H14z" fill="#c2b3eb" stroke="#7960c1" stroke-width="2"/><path d="M47 14h39v33H47z" fill="#b5ddf3" stroke="#4d96c2" stroke-width="2"/><path d="M14 47h33v39H14z" fill="#b6dfcc" stroke="#4c9d78" stroke-width="2"/><path d="M47 47h39v39H47z" fill="#f3b5c9" stroke="#c95c83" stroke-width="2"/>
       <g font-family="Arial,sans-serif" font-size="12" font-weight="800" text-anchor="middle" fill="#fff"><rect x="24" y="24" width="14" height="14" rx="4" fill="#403244"/><text x="31" y="35">4</text><rect x="60" y="24" width="14" height="14" rx="4" fill="#403244"/><text x="67" y="35">8</text><rect x="24" y="60" width="14" height="14" rx="4" fill="#403244"/><text x="31" y="71">6</text><rect x="60" y="60" width="14" height="14" rx="4" fill="#403244"/><text x="67" y="71">4</text></g>
     </svg>`,
-  "ok-bulmacasi": `
-    <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 100 100">
-      <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0f6"/><stop offset=".55" stop-color="#f3c8da"/><stop offset="1" stop-color="#a93f6d"/></linearGradient><radialGradient id="gloss" cx=".32" cy=".2" r=".65"><stop stop-color="#fff" stop-opacity=".68"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
-      <rect x="2" y="2" width="96" height="96" rx="24" fill="url(#bg)"/><rect x="2" y="2" width="96" height="96" rx="24" fill="url(#gloss)"/><rect x="2" y="2" width="96" height="96" rx="24" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>
-      <path d="M27 76V43h31" fill="none" stroke="#5f2743" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="m47 28 12 15-18 5z" fill="#5f2743"/><circle cx="27" cy="76" r="5" fill="#fff" fill-opacity=".45"/>
-    </svg>`,
 });
 
 await mkdir(outputDir, { recursive: true });

@@ -1,0 +1,49 @@
+{
+  "version": 2,
+  "icons": {
+    "bosluk-doldurma": {
+      "hash": "f6f2d5c9e4bbbbc602ea3ba79e19b8838ac245a076bc533f65f3237545b91122",
+      "outputs": 12
+    },
+    "calisma-merkezi": {
+      "hash": "f3dafc795baa235875ff398bd6ae557fe8b551da7e2dfdaca6be364cf29d4a8e",
+      "outputs": 12
+    },
+    "ezber-merkezi": {
+      "hash": "18f28f11acdeca92e56c83a624048b4bf33b4d2f7dcdb79b4b59d61c60adb218",
+      "outputs": 12
+    },
+    "hizli-tekrar": {
+      "hash": "20a7289b0bb085323b5c3356feb8e0885088975229bb78fa07e5446c75d0800e",
+      "outputs": 12
+    },
+    "kahoot": {
+      "hash": "177dabafaea3aeddb7717f188fed19d17e9a442bf5e8d54732479ed016e28154",
+      "outputs": 12
+    },
+    "ok-bulmacasi": {
+      "hash": "d3c916d4be5867842105365645c283e6e291000dc580a04f43cb3869c2f041e8",
+      "outputs": 12
+    },
+    "quiz-merkezi": {
+      "hash": "df309ecac12e059cc4d0adbe62f0406d200ca59522311abcd576473e489c4c3e",
+      "outputs": 12
+    },
+    "ravzalingo": {
+      "hash": "1cebe9bc6b29cbe437f37edb1ebd53294598d43dfcda24c7c0baefe9cd51dd13",
+      "outputs": 12
+    },
+    "sinav-merkezi": {
+      "hash": "6969d1fbe5a3b71f4927e79d1072e10a89a8582d4b5902b02bd6d1ba39fdc77c",
+      "outputs": 12
+    },
+    "sinif-ogrenci": {
+      "hash": "dd29c83d56dbd09dcf2989990b0d2c8acc9e5fc8c4c9a87d198b605a94a2bfab",
+      "outputs": 12
+    },
+    "sinif-ogretmen": {
+      "hash": "e916c649356eb071cb605b6c47cb43de7c384a75f608564012cad5ce2a92041b",
+      "outputs": 12
+    }
+  }
+}

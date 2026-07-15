@@ -23,13 +23,17 @@ assert.deepEqual(Object.keys(GAME_ICONS), expectedIds, "GAME_ICONS sırası veya
 
 for (const id of expectedIds) {
   const publicPath = GAME_ICONS[id];
-  assert.equal(publicPath, `./assets/icons/games/${id}.png`, `${id}: ortak ikon yolu hatalı`);
+  const expectedPath = id === "ok-bulmacasi"
+    ? "./assets/icons/apps/128/ok-bulmacasi.png"
+    : `./assets/icons/games/${id}.png`;
+  assert.equal(publicPath, expectedPath, `${id}: ortak ikon yolu hatalı`);
   const filePath = path.join(projectRoot, publicPath.replace(/^\.\//, ""));
   await access(filePath);
   const metadata = await sharp(filePath).metadata();
   assert.equal(metadata.format, "png", `${id}: ikon PNG değil`);
-  assert.equal(metadata.width, 1024, `${id}: ikon genişliği 1024 değil`);
-  assert.equal(metadata.height, 1024, `${id}: ikon yüksekliği 1024 değil`);
+  const expectedSize = id === "ok-bulmacasi" ? 128 : 1024;
+  assert.equal(metadata.width, expectedSize, `${id}: ikon genişliği ${expectedSize} değil`);
+  assert.equal(metadata.height, expectedSize, `${id}: ikon yüksekliği ${expectedSize} değil`);
 }
 
 const [gamePage, launcherData, boyamaPage] = await Promise.all([

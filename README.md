@@ -147,6 +147,21 @@ npm run games:icons       # dokuz ortak oyun ikonunu 1024 × 1024 PNG olarak yen
 npm run games:icons:check # ikon boyutlarını, adlarını ve ortak kod referanslarını doğrular
 ```
 
+### Uygulama ikonları
+
+Launcher kartları, klasör modalı, arama sonuçları ve ilgili oyun ekranları
+`data/app-icons.js` içindeki tek katalogdan beslenir. Şeffaf, kare ve en az 1024 × 1024
+PNG ana kaynaklar `assets/icons/apps/source/` klasöründedir. Web için 64, 128, 256 ve
+512 piksel PNG/WebP/AVIF çıktıları otomatik üretilir.
+
+```bash
+npm run icons:generate # değişen ana kaynakların bütün optimize sürümlerini üretir
+npm run icons:audit    # kaynakları, çıktıları, merkezi eşleşmeleri ve dosya yollarını doğrular
+```
+
+Yeni veya güncellenmiş bir ikon için aynı kebab-case dosya adıyla ana PNG'yi `source/`
+klasörüne koy, `npm run icons:generate` ve ardından `npm run icons:audit` çalıştır.
+
 Adlandırma kuralları (script bunlara göre davranır):
 
 - Arka planlar: `<ad>-desktop.png` / `<ad>-mobile.png` — kendi çözünürlüğünde kalır.

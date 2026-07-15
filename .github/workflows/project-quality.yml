@@ -28,7 +28,9 @@ jobs:
         run: npm ci
 
       - name: Asset ve katalog denetimi
-        run: npm run audit:assets
+        run: |
+          npm run icons:audit
+          npm run audit:assets
 
       - name: HTTP ve tarayıcı rota denetimi
         run: npm run audit:routes

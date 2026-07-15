@@ -1,6 +1,7 @@
 {
   "description": "Yalnızca statik analizle çözülemeyen, üretim hattı veya PDF.js tarafından dinamik kullanılan yollar.",
   "unusedIgnore": [
+    "assets/icons/apps/**",
     "assets/icons/games/source/**",
     "assets/vendor/pdfjs/cmaps/**",
     "assets/vendor/pdfjs/standard_fonts/**",

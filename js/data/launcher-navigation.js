@@ -1,10 +1,12 @@
 import { createSearchIndex } from "../utils/search.js";
 import { ACTIVE_GAMES } from "../../data/games.js";
+import { findAppIcon } from "../../data/app-icons.js";
 
 const runtimeRegistry = new Map();
 
 export function createLauncherRegistryEntry(entry = {}) {
   if (!entry.id || !entry.title) throw new TypeError("Launcher kaydı id ve title alanlarını içermelidir.");
+  if (entry.appIcon && !findAppIcon(entry.appIcon)) throw new TypeError(`Bilinmeyen merkezi uygulama ikonu: ${entry.appIcon}`);
   const actionable = Boolean(entry.route || entry.href || entry.gameId || entry.type === "folder");
   const keywords = Array.isArray(entry.keywords) ? entry.keywords.filter(Boolean) : [];
   const normalized = {
@@ -13,6 +15,7 @@ export function createLauncherRegistryEntry(entry = {}) {
     title: String(entry.title),
     route: entry.route || null,
     icon: entry.icon || "fallback",
+    appIcon: entry.appIcon || null,
     category: entry.category || (entry.type === "game" ? "Oyunlar" : "Uygulamalar"),
     removable: entry.removable !== false,
     searchable: entry.searchable !== false,
@@ -36,14 +39,14 @@ function app(entry) {
 }
 
 const preparationItems = Object.freeze([
-  app({ id: "ravzalingo", title: "RavzaLingo", type: "route", route: "ravzalingo", icon: "language", tone: "green", category: "Hazırlık", keywords: ["dil", "kelime"] }),
-  app({ id: "kahoot", title: "Kahoot", type: "route", route: "kahoot", icon: "kahoot", tone: "violet", category: "Hazırlık", keywords: ["yarışma", "soru"] }),
-  app({ id: "studyhub", title: "Çalışma Merkezi", type: "route", route: "calisma-merkezi", icon: "book", tone: "teal", category: "Hazırlık", keywords: ["çalışma", "ders", "konu"] }),
-  app({ id: "memoryhub", title: "Ezber Merkezi", type: "route", route: "ezber-merkezi", icon: "memory", tone: "rose", category: "Hazırlık", keywords: ["ezber", "kart"] }),
-  app({ id: "fillgaphub", title: "Boşluk Doldurma", type: "route", route: "bosluk-doldurma", icon: "puzzle", tone: "amber", category: "Hazırlık", keywords: ["boşluk", "doldurma"] }),
-  app({ id: "quizhub", title: "Quiz Merkezi", type: "route", route: "quiz-merkezi", icon: "quiz", tone: "blue", category: "Hazırlık", keywords: ["quiz", "test"] }),
-  app({ id: "examcenter", title: "Sınav Merkezi", type: "route", route: "sinav-merkezi", icon: "target", tone: "red", category: "Hazırlık", keywords: ["sınav", "deneme"] }),
-  app({ id: "recap", title: "Hızlı Tekrar", type: "route", route: "hizli-tekrar", icon: "bolt", tone: "indigo", category: "Hazırlık", keywords: ["hızlı", "tekrar"] })
+  app({ id: "ravzalingo", title: "RavzaLingo", type: "route", route: "ravzalingo", appIcon: "ravzalingo", tone: "green", category: "Hazırlık", keywords: ["dil", "kelime"] }),
+  app({ id: "kahoot", title: "Kahoot", type: "route", route: "kahoot", appIcon: "kahoot", tone: "violet", category: "Hazırlık", keywords: ["yarışma", "soru"] }),
+  app({ id: "studyhub", title: "Çalışma Merkezi", type: "route", route: "calisma-merkezi", appIcon: "calisma-merkezi", tone: "teal", category: "Hazırlık", keywords: ["çalışma", "ders", "konu"] }),
+  app({ id: "memoryhub", title: "Ezber Merkezi", type: "route", route: "ezber-merkezi", appIcon: "ezber-merkezi", tone: "rose", category: "Hazırlık", keywords: ["ezber", "kart"] }),
+  app({ id: "fillgaphub", title: "Boşluk Doldurma", type: "route", route: "bosluk-doldurma", appIcon: "bosluk-doldurma", tone: "amber", category: "Hazırlık", keywords: ["boşluk", "doldurma"] }),
+  app({ id: "quizhub", title: "Quiz Merkezi", type: "route", route: "quiz-merkezi", appIcon: "quiz-merkezi", tone: "blue", category: "Hazırlık", keywords: ["quiz", "test"] }),
+  app({ id: "examcenter", title: "Sınav Merkezi", type: "route", route: "sinav-merkezi", appIcon: "sinav-merkezi", tone: "red", category: "Hazırlık", keywords: ["sınav", "deneme"] }),
+  app({ id: "recap", title: "Hızlı Tekrar", type: "route", route: "hizli-tekrar", appIcon: "hizli-tekrar", tone: "indigo", category: "Hazırlık", keywords: ["hızlı", "tekrar"] })
 ]);
 
 const gameItems = Object.freeze(ACTIVE_GAMES.map((game) => app({
@@ -53,9 +56,9 @@ const gameItems = Object.freeze(ACTIVE_GAMES.map((game) => app({
   ...(game.launchMode === "link"
     ? { href: `./${game.path}` }
     : { route: "oyun", gameId: game.handlerId || game.id }),
-  asset: `./${game.icon}`,
-  assetWidth: 1024,
-  assetHeight: 1024,
+  ...(game.appIcon
+    ? { appIcon: game.appIcon }
+    : { asset: `./${game.icon}`, assetWidth: 1024, assetHeight: 1024 }),
   tone: game.tone || "game",
   category: "Oyunlar",
   keywords: game.keywords
@@ -64,8 +67,8 @@ const gameItems = Object.freeze(ACTIVE_GAMES.map((game) => app({
 export const LAUNCHER_GROUPS = Object.freeze([
   app({ id: "preparation", title: "Hazırlık", type: "folder", icon: "preparation", tone: "preparation", category: "Klasörler", keywords: ["ders", "çalışma"], defaultDockEligible: false, items: preparationItems }),
   app({ id: "ravza-books", title: "Ravza Books", type: "route", route: "ravza-books", icon: "reader", asset: "./assets/branding/ravza-books-logo-128.webp", asset2x: "./assets/branding/ravza-books-logo-256.webp", tone: "amber", category: "Uygulamalar", keywords: ["kitap", "okuma", "hikâye", "sayfa"], defaultDockEligible: true }),
-  app({ id: "grade1", title: "1. Sınıf", type: "route", route: "birinci-sinif", icon: "grade1", tone: "grade1", status: "Yakında", category: "Sınıflar", keywords: ["birinci sınıf"], defaultDockEligible: false }),
-  app({ id: "grade2", title: "2. Sınıf", type: "route", route: "ikinci-sinif", icon: "grade2", tone: "grade2", status: "Yakında", category: "Sınıflar", keywords: ["ikinci sınıf"], defaultDockEligible: false }),
+  app({ id: "grade1", title: "1. Sınıf", type: "route", route: "birinci-sinif", appIcon: "sinif-ogretmen", tone: "grade1", status: "Yakında", category: "Sınıflar", keywords: ["birinci sınıf"], defaultDockEligible: false }),
+  app({ id: "grade2", title: "2. Sınıf", type: "route", route: "ikinci-sinif", appIcon: "sinif-ogrenci", tone: "grade2", status: "Yakında", category: "Sınıflar", keywords: ["ikinci sınıf"], defaultDockEligible: false }),
   app({ id: "games", title: "Oyun Alanı", type: "folder", icon: "games", tone: "games", category: "Klasörler", keywords: ["oyun", "eğlence"], defaultDockEligible: false, items: gameItems })
 ]);
 

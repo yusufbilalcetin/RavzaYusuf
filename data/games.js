@@ -122,7 +122,8 @@ const catalog = [
   {
     id: "ok-bulmacasi",
     name: "Ok Bulmacası",
-    icon: "assets/icons/games/ok-bulmacasi.png",
+    icon: "assets/icons/apps/128/ok-bulmacasi.png",
+    appIcon: "ok-bulmacasi",
     path: "games/ok-bulmacasi/",
     order: 9,
     status: "active",

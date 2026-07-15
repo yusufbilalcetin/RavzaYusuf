@@ -8,6 +8,7 @@ import {
 } from "../data/launcher-navigation.js";
 import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
+import { appIconPictureMarkup } from "../../data/app-icons.js";
 import {
   LAUNCHER_LAYOUT_KEY,
   LAUNCHER_WIDGETS,
@@ -97,18 +98,9 @@ const ICONS = {
   fallback: '<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
   home: '<path d="M4 11.5 12 4l8 7.5"/><path d="M6.5 10v10h11V10"/><path d="M10 20v-5h4v5"/>',
   preparation: '<path d="M3 8.5 12 4l9 4.5-9 4.5-9-4.5Z"/><path d="M6 11v5c0 1.6 2.7 3 6 3s6-1.4 6-3v-5"/><path d="M21 9v6"/>',
-  grade1: '<path d="M6 4.5A2.5 2.5 0 0 1 8.5 2H19v18H8.5A2.5 2.5 0 0 0 6 22Z"/><path d="M6 19.5A2.5 2.5 0 0 1 8.5 17H19"/><path d="M11 7h4M11 11h4"/>',
-  grade2: '<path d="M5 3h14v18l-7-4-7 4Z"/><path d="M9 8h6M9 12h6"/>',
   games: '<path d="M7 8h10a5 5 0 0 1 5 5v2a3 3 0 0 1-5.4 1.8L15 15H9l-1.6 1.8A3 3 0 0 1 2 15v-2a5 5 0 0 1 5-5Z"/><path d="M8 11v3M6.5 12.5h3"/><circle cx="15.5" cy="11.5" r=".7" fill="currentColor" stroke="none"/><circle cx="17.5" cy="13.5" r=".7" fill="currentColor" stroke="none"/>',
-  language: '<path d="M4 5h8v12H7l-3 3Z"/><path d="M12 8h8v10h-3l-3 3v-4h-2"/><path d="M7 9h2M7 12h3M15 12h2M15 15h2"/>',
-  kahoot: '<path d="M6 4v16M6 12l7-8M7 11l7 9"/><path d="M17 5v8M17 17v.1"/>',
   book: '<path d="M12 6c-2-1.5-5-2-8-1v13c3-1 6-.5 8 1 2-1.5 5-2 8-1V5c-3-1-6-.5-8 1Z"/><path d="M12 6v14"/>',
   reader: '<path d="M4 5.5c3.2-1.1 5.9-.5 8 1.5v12.5c-2.1-2-4.8-2.6-8-1.5Z"/><path d="M20 5.5c-3.2-1.1-5.9-.5-8 1.5v12.5c2.1-2 4.8-2.6 8-1.5Z"/><path d="M12 7v12.5"/>',
-  memory: '<path d="M9 3a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5v1a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/><path d="M15 3a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5v1a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3Z"/>',
-  puzzle: '<path d="M10 4h4a1 1 0 0 1 1 1v2.2a1.8 1.8 0 1 0 0 3.6V13a1 1 0 0 1-1 1h-2.2a1.8 1.8 0 1 1-3.6 0H6a1 1 0 0 1-1-1V9a1.8 1.8 0 1 0 0-3.6V5a1 1 0 0 1 1-1h2.2a1.8 1.8 0 0 1 3.6 0Z"/>',
-  quiz: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
-  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>',
-  bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor" stroke="none"/>',
   sudoku: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>',
   wheel: '<circle cx="12" cy="13" r="8"/><path d="m12 5 2.2 3.8 4.3.2-2.1 3.8 2 3.8-4.3.1L12 20l-2.1-3.3-4.3-.1 2-3.8L5.5 9l4.3-.2Z"/><path d="m12 2 1.5 3h-3Z" fill="currentColor" stroke="none"/>',
   grid: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
@@ -124,13 +116,16 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function iconMarkup(item, compact = false) {
+function iconMarkup(item, prioritized = false) {
+  if (item.appIcon) {
+    return appIconPictureMarkup(item.appIcon, { eager: prioritized });
+  }
   if (item.asset) {
-    const prioritized = compact || item.id === "ravza-books";
+    const eager = prioritized || item.id === "ravza-books";
     const srcset = item.asset2x ? ` srcset="${escapeHtml(item.asset)} 1x, ${escapeHtml(item.asset2x)} 2x"` : "";
     const width = Number(item.assetWidth) || 128;
     const height = Number(item.assetHeight) || 128;
-    return `<img src="${escapeHtml(item.asset)}"${srcset} width="${width}" height="${height}" alt="" loading="${prioritized ? "eager" : "lazy"}" decoding="async" fetchpriority="${prioritized ? "high" : "low"}">`;
+    return `<img src="${escapeHtml(item.asset)}"${srcset} width="${width}" height="${height}" alt="" loading="${eager ? "eager" : "lazy"}" decoding="async" fetchpriority="${eager ? "high" : "low"}">`;
   }
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[item.icon] || ICONS.fallback}</svg>`;
 }
@@ -140,17 +135,17 @@ function itemActionAttributes(item) {
   return `data-launcher-item="${escapeHtml(item.id)}"${item.route ? ` data-launcher-route="${escapeHtml(item.route)}"` : ""}`;
 }
 
-function folderPreview(group) {
+function folderPreview(group, prioritized = false) {
   return (group.items || []).slice(0, 4).map((item) => (
-    `<span class="launcher-folder-preview-item launcher-tone-${escapeHtml(item.tone || "home")}">${iconMarkup(item, true)}</span>`
+    `<span class="launcher-folder-preview-item launcher-tone-${escapeHtml(item.tone || "home")}">${iconMarkup(item, prioritized)}</span>`
   )).join("");
 }
 
-function appButton(item, context = "grid") {
+function appButton(item, context = "grid", prioritized = false) {
   const isFolder = item.type === "folder";
   const art = isFolder
-    ? `<span class="launcher-folder-preview" aria-hidden="true">${folderPreview(item)}</span>`
-    : iconMarkup(item);
+    ? `<span class="launcher-folder-preview" aria-hidden="true">${folderPreview(item, prioritized)}</span>`
+    : iconMarkup(item, prioritized);
   return `
     <button class="launcher-app launcher-app--${context}" type="button" ${itemActionAttributes(item)} aria-label="${escapeHtml(item.title)}">
       <span class="launcher-app-icon launcher-tone-${escapeHtml(item.tone || "home")}">${art}</span>
@@ -172,8 +167,10 @@ function editableAppSlot(item, pageIndex, itemIndex, layoutItem, placement = nul
   const source = launcherState.drag;
   const isDraggedSource = source?.sourceContext === "page" && source.sourcePage === pageIndex && source.itemId === item.id;
   const desktopStyle = placement ? ` style="grid-column:${placement.gridX} / span ${placement.columns || 1};grid-row:${placement.gridY} / span ${placement.rows || 1}"` : "";
+  const firstRowCount = launcherState.device === "mobile" ? 4 : launcherState.device === "tablet" ? 6 : 13;
+  const prioritized = pageIndex === launcherState.layout.activePage && itemIndex < firstRowCount;
   return `<div class="launcher-slot launcher-slot--app${placement ? " launcher-slot--desktop" : ""}${isDraggedSource ? " is-drag-placeholder" : ""}" data-launcher-slot data-launcher-context="page" data-launcher-page="${pageIndex}" data-launcher-index="${itemIndex}" data-launcher-type="${layoutItem.type}" data-launcher-id="${escapeHtml(item.id)}"${desktopStyle}>
-    ${isDraggedSource ? "" : appButton(item)}
+    ${isDraggedSource ? "" : appButton(item, "grid", prioritized)}
     ${launcherState.isEditing && item.removable !== false ? removeButton(item.title, item.type) : ""}
     ${launcherState.isEditing && item.type === "folder" ? folderEditButton(item) : ""}
   </div>`;
@@ -454,7 +451,7 @@ function renderDock() {
     if (!item) return "";
     const isDraggedSource = source?.sourceContext === "dock" && source.itemId === id;
     return `<div class="launcher-slot launcher-slot--dock${isDraggedSource ? " is-drag-placeholder" : ""}" data-launcher-slot data-launcher-context="dock" data-launcher-index="${index}" data-launcher-type="app" data-launcher-id="${escapeHtml(id)}">
-      ${isDraggedSource ? "" : appButton(item, "dock")}
+      ${isDraggedSource ? "" : appButton(item, "dock", true)}
       ${launcherState.isEditing && item.removable !== false ? removeButton(item.title, "app") : ""}
     </div>`;
   }).join("");
@@ -580,9 +577,10 @@ export function openLauncherFolder(groupId, trigger = document.activeElement, pu
   folderTrigger = showLayer(layer, dialog, trigger);
   launcherState.openFolderId = groupId;
   title.textContent = group.title;
+  const priorityCount = launcherState.device === "mobile" ? 3 : 4;
   grid.innerHTML = launcherState.isEditing && isCustom
-    ? `<label class="launcher-folder-name-field"><span>Klasör adı</span><input type="text" maxlength="40" value="${escapeHtml(group.title)}" data-launcher-folder-name="${escapeHtml(groupId)}"></label>${group.items.map((item) => `<div class="launcher-folder-edit-item">${appButton(item, "folder")}<button type="button" class="launcher-folder-item-remove" data-launcher-folder-remove="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.title)} uygulamasını klasörden çıkar">−</button></div>`).join("")}`
-    : group.items.map((item) => appButton(item, "folder")).join("");
+    ? `<label class="launcher-folder-name-field"><span>Klasör adı</span><input type="text" maxlength="40" value="${escapeHtml(group.title)}" data-launcher-folder-name="${escapeHtml(groupId)}"></label>${group.items.map((item, index) => `<div class="launcher-folder-edit-item">${appButton(item, "folder", index < priorityCount)}<button type="button" class="launcher-folder-item-remove" data-launcher-folder-remove="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.title)} uygulamasını klasörden çıkar">−</button></div>`).join("")}`
+    : group.items.map((item, index) => appButton(item, "folder", index < priorityCount)).join("");
   document.querySelectorAll(`[data-launcher-folder="${groupId}"]`).forEach((button) => button.setAttribute("aria-expanded", "true"));
   if (pushHistory) pushOverlayHistory("folder", groupId);
 }
@@ -621,8 +619,8 @@ function renderSearchResults(query = "") {
     root.innerHTML = '<p class="launcher-search-empty">Bu aramaya uygun uygulama, oyun veya ders bulunamadı.</p>';
     return;
   }
-  root.innerHTML = results.map((item) => `<button class="launcher-search-result" type="button" ${item.topicId ? `data-launcher-topic="${escapeHtml(item.topicId)}"` : itemActionAttributes(item)}>
-    <span class="launcher-search-result-icon launcher-tone-${escapeHtml(item.tone || "home")}">${iconMarkup(item, true)}</span>
+  root.innerHTML = results.map((item, index) => `<button class="launcher-search-result" type="button" ${item.topicId ? `data-launcher-topic="${escapeHtml(item.topicId)}"` : itemActionAttributes(item)}>
+    <span class="launcher-search-result-icon launcher-tone-${escapeHtml(item.tone || "home")}">${iconMarkup(item, index < 4)}</span>
     <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.subtitle || item.resultType)}</small></span>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
   </button>`).join("");
@@ -663,7 +661,7 @@ function editorAppsMarkup() {
   const customFolders = launcherState.layouts.folders.map((folder) => resolveLauncherGroup(folder.id)).filter(Boolean);
   const entries = launcherRegistryEntries(customFolders).filter((item) => !placed.has(item.id) || launcherState.layout.hiddenApps.includes(item.id));
   return `${pageSelectMarkup()}<label class="launcher-editor-filter"><span class="sr-only">Uygulamalarda ara</span><input type="search" placeholder="Uygulama ara" autocomplete="off" data-launcher-editor-filter></label><div class="launcher-editor-grid">${entries.length ? entries.map((item) => `<button class="launcher-editor-choice" type="button" data-search-index="${escapeHtml(item.searchIndex || createSearchIndex(item.title, item.category, item.keywords))}" data-launcher-add-app="${escapeHtml(item.id)}">
-    <span class="launcher-search-result-icon launcher-tone-${escapeHtml(item.tone || "home")}">${item.type === "folder" ? folderPreview(item) : iconMarkup(item, true)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${item.type === "folder" ? "Klasör" : "Uygulama"}</small></span><span aria-hidden="true">＋</span>
+    <span class="launcher-search-result-icon launcher-tone-${escapeHtml(item.tone || "home")}">${item.type === "folder" ? folderPreview(item) : iconMarkup(item)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${item.type === "folder" ? "Klasör" : "Uygulama"}</small></span><span aria-hidden="true">＋</span>
   </button>`).join("") : '<p class="launcher-editor-empty">Eklenebilecek başka bir uygulama yok.</p>'}</div>`;
 }
 
