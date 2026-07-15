@@ -192,7 +192,7 @@ async function runBrowser(config) {
       apps: document.querySelectorAll('#launcherGrid .launcher-app').length, hasHome: Boolean(document.querySelector('[data-launcher-id=home]')),
       order: state.layout.pages[0].items.map(item=>item.id).join(','), preference: state.layouts.themePreference, iconAppearance: state.layouts.iconAppearance, folders: Array.isArray(state.layouts.folders)
     }; })()`);
-    assert.deepEqual(initial, { version: 4, widgets: 0, apps: 5, hasHome: false, order: "preparation,ravza-books,grade1,grade2,games", preference: "system", iconAppearance: "standard", folders: true }, `${config.name}: v4 varsayılanı hatalı`);
+    assert.deepEqual(initial, { version: 4, widgets: 0, apps: 5, hasHome: false, order: "ravza-books,preparation,grade1,grade2,games", preference: "system", iconAppearance: "standard", folders: true }, `${config.name}: v4 varsayılanı hatalı`);
 
     const searchCases = [
       ["sans carki", "Şans Çarkı"], ["şans çarkı", "Şans Çarkı"], ["hizli", "Hızlı Tekrar"],
@@ -307,7 +307,7 @@ async function runBrowser(config) {
     }
     if (config.name === BROWSERS[0].name) {
       await fresh(390, 844);
-      assert.deepEqual(await evaluate("({state:window.__LAUNCHER_STATE__.layout.pages[0].items.map(item=>item.id),dom:[...document.querySelectorAll('#launcherGrid [data-launcher-id]')].map(node=>node.dataset.launcherId)})"), { state: ["preparation", "ravza-books", "grade1", "grade2", "games"], dom: ["preparation", "ravza-books", "grade1", "grade2", "games"] }, `${config.name}: temiz mobil ekran sırası bozuk`);
+      assert.deepEqual(await evaluate("({state:window.__LAUNCHER_STATE__.layout.pages[0].items.map(item=>item.id),dom:[...document.querySelectorAll('#launcherGrid [data-launcher-id]')].map(node=>node.dataset.launcherId)})"), { state: ["ravza-books", "preparation", "grade1", "grade2", "games"], dom: ["ravza-books", "preparation", "grade1", "grade2", "games"] }, `${config.name}: temiz mobil ekran sırası bozuk`);
       await screenshot("mobile-home-390.png");
       await fresh(820, 1180); await screenshot("tablet-home-820.png");
       await fresh(1440, 900); await screenshot("desktop-home-1440.png");

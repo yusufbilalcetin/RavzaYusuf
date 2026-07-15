@@ -1628,7 +1628,7 @@ html.launcher-experience .launcher-editor-workspace-label {
     --launcher-glass-bg: rgba(21, 15, 28, .18);
     --launcher-glass-bg-strong: rgba(21, 15, 28, .30);
     --launcher-glass-blur: 24px;
-    --launcher-top: max(10px, env(safe-area-inset-top));
+    --launcher-top: max(clamp(10px, 1.5vh, 16px), env(safe-area-inset-top));
     --launcher-bottom: max(12px, env(safe-area-inset-bottom));
   }
 
@@ -1638,16 +1638,16 @@ html.launcher-experience .launcher-editor-workspace-label {
   }
 
   html.launcher-experience[data-launcher-device="desktop"] {
-    --launcher-topbar-h: 60px;
-    --launcher-topbar-pad-y: 8px;
-    --launcher-topbar-pad-x: 10px;
-    --launcher-topbar-radius: 18px;
+    --launcher-topbar-h: clamp(60px, 6.85vh, 74px);
+    --launcher-topbar-pad-y: clamp(8px, 1vh, 10px);
+    --launcher-topbar-pad-x: 12px;
+    --launcher-topbar-radius: clamp(18px, 2.2vh, 24px);
     --launcher-topbar-gap: 10px;
-    --launcher-control-size: 46px;
-    --launcher-control-radius: 14px;
+    --launcher-control-size: clamp(46px, 5.2vh, 56px);
+    --launcher-control-radius: clamp(14px, 1.7vh, 18px);
     --launcher-brand-pad-x: 16px;
-    --launcher-brand-main-size: 21px;
-    --launcher-brand-sub-size: 10px;
+    --launcher-brand-main-size: clamp(21px, 2.5vh, 27px);
+    --launcher-brand-sub-size: clamp(10px, 1.1vh, 12px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] #topbar-root {
@@ -1655,14 +1655,19 @@ html.launcher-experience .launcher-editor-workspace-label {
     left: 28px;
   }
 
-  html.launcher-experience[data-launcher-device="desktop"] .launcher-edit-toggle {
-    min-width: 100px;
+  html.launcher-experience[data-launcher-device="desktop"] .launcher-topbar.topbar,
+  html.launcher-experience[data-launcher-device="desktop"] body:has(#dashboard.active) .launcher-topbar.topbar {
+    width: min(100%, 1650px) !important;
   }
 
-html.launcher-experience[data-launcher-device="desktop"] .launcher-home-content {
+  html.launcher-experience[data-launcher-device="desktop"] .launcher-edit-toggle {
+    min-width: clamp(100px, 6.6vw, 126px);
+  }
+
+  html.launcher-experience[data-launcher-device="desktop"] .launcher-home-content {
     width: 100%;
     max-width: none;
-    padding: 84px 48px 116px;
+    padding: clamp(90px, 9.8vh, 106px) 48px clamp(94px, 10.5vh, 110px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-pages-viewport {
@@ -1676,7 +1681,7 @@ html.launcher-experience[data-launcher-device="desktop"] .launcher-home-content 
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-page--desktop {
-    height: calc(100dvh - 200px);
+    height: calc(100dvh - clamp(184px, 20.3vh, 216px));
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-desktop-workspace {
@@ -1690,7 +1695,7 @@ html.launcher-experience[data-launcher-device="desktop"] .launcher-home-content 
     display: grid;
     grid-template-columns: repeat(var(--desktop-columns), minmax(0, 1fr));
     grid-template-rows: repeat(var(--desktop-rows), minmax(0, 1fr));
-    gap: 8px 10px;
+    gap: 8px clamp(8px, .7vw, 12px);
     width: 100%;
     height: 100%;
     min-width: 0;
@@ -1719,11 +1724,17 @@ html.launcher-experience[data-launcher-device="desktop"] .launcher-home-content 
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-slot--desktop .launcher-app-icon {
-    width: clamp(66px, 5.2vw, 82px);
+    width: clamp(72px, 8.8vh, 96px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-slot--desktop .launcher-app-label {
-    font-size: 13px;
+    margin-top: clamp(9px, 1.15vh, 12px);
+    font-size: clamp(13px, 1.48vh, 16px);
+  }
+
+  html.launcher-experience[data-launcher-device="desktop"] .launcher-slot--desktop .launcher-app-status {
+    margin-top: 5px;
+    font-size: clamp(9px, 1vh, 11px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-page-controls,
@@ -1732,19 +1743,19 @@ html.launcher-experience[data-launcher-device="desktop"] .launcher-home-content 
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-dock {
-    gap: 5px;
+    gap: clamp(5px, .45vw, 8px);
     max-width: calc(100% - 40px);
-    padding: 7px 9px 6px;
-    border-radius: 21px;
+    padding: clamp(7px, .8vh, 9px) clamp(9px, .65vw, 12px) clamp(6px, .7vh, 8px);
+    border-radius: clamp(21px, 2.3vh, 25px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-dock > .launcher-slot--dock,
   html.launcher-experience[data-launcher-device="desktop"] .launcher-app--dock {
-    width: 58px;
+    width: clamp(58px, 3.5vw, 68px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-app--dock .launcher-app-icon {
-    width: 48px;
+    width: clamp(48px, 5.35vh, 58px);
   }
 
   html.launcher-experience[data-launcher-device="desktop"] .launcher-app--dock .launcher-app-label {

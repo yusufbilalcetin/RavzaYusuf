@@ -320,6 +320,9 @@ async function runBrowser(config) {
           dock: rect(dock), grid: rect(grid), widget: rect(document.querySelector('.launcher-widget')),
           visibleApps, slots, overlaps, columns, rows, labels, targets, topbarTargets, topbarOverlaps, dockItems, iconBackdrop, pageDots,
           dockCount: dock.querySelectorAll(':scope > [data-launcher-slot]').length,
+          dockIds: [...dock.querySelectorAll(':scope > [data-launcher-slot]')].map(node => node.dataset.launcherId),
+          stateDockIds: [...window.__LAUNCHER_STATE__.layout.dock],
+          storedDockCounts: Object.fromEntries(Object.entries(window.__LAUNCHER_STATE__.layouts).filter(([, value]) => value?.dock).map(([key, value]) => [key, value.dock.length])),
           pages: window.__LAUNCHER_STATE__.layout.pages.length,
           totalApps: window.__LAUNCHER_STATE__.layout.pages.flatMap(p=>p.items).filter(i=>i.type!=='widget').length,
           pageControlsHidden: document.querySelector('#launcherPageControls').hidden || getComputedStyle(document.querySelector('#launcherPageControls')).display === 'none',
@@ -342,11 +345,11 @@ async function runBrowser(config) {
       }
       if (probe.widget) assert.ok(probe.widget.left >= -1 && probe.widget.right <= width + 1, `${tag}: widget yatay sınır dışında ${JSON.stringify(probe.widget)}`);
       assert.ok(probe.topbar.top >= -1 && probe.topbar.bottom <= height + 1 && probe.dock.top >= -1 && probe.dock.bottom <= height + 1, `${tag}: sabit shell dikey sınır dışında`);
-      assert.equal(probe.totalApps, 4, `${tag}: uygulama kaybı var`);
+      assert.equal(probe.totalApps, 5, `${tag}: uygulama kaybı var`);
       assert.ok(probe.visibleApps.every((app) => app.left >= -1 && app.right <= width + 1 && app.top >= -1 && app.bottom <= probe.dock.top + 2), `${tag}: uygulama kesiliyor ${JSON.stringify(probe.visibleApps)}`);
       const expectedColumns = mode === "mobile" ? 4 : mode === "tablet" ? (orientation === "portrait" ? 5 : width >= 1120 ? 7 : 6) : probe.columns;
       assert.equal(probe.columns, expectedColumns, `${tag}: grid sütun sayısı yanlış`);
-      assert.ok(probe.dockCount >= (mode === "mobile" ? 4 : mode === "tablet" ? 5 : 4) && probe.dockCount <= (mode === "mobile" ? 4 : mode === "tablet" ? 8 : 10), `${tag}: dock kapasitesi yanlış`);
+      assert.ok(probe.dockCount >= (mode === "mobile" ? 4 : mode === "tablet" ? 5 : 4) && probe.dockCount <= (mode === "mobile" ? 4 : mode === "tablet" ? 8 : 10), `${tag}: dock kapasitesi yanlış ${JSON.stringify({ count: probe.dockCount, ids: probe.dockIds, state: probe.stateDockIds, stored: probe.storedDockCounts })}`);
       assert.equal(probe.overlaps.length, 0, `${tag}: masaüstü öğeleri çakışıyor ${JSON.stringify(probe.overlaps)}`);
       assert.equal(mode === "desktop" ? probe.pageControlsHidden : true, true, `${tag}: masaüstünde sayfa noktaları görünür`);
       assert.equal(probe.gridCount, 1, `${tag}: launcherGrid çoğaltılmış`);
@@ -365,7 +368,8 @@ async function runBrowser(config) {
         await evaluate(`window.openLauncherFolder('${folderId}', null, false)`);
         await waitFor("document.querySelector('#launcherFolderLayer').classList.contains('is-open')");
         const folder = await evaluate(`(() => { const n=document.querySelector('#launcherFolderDialog'); const r=n.getBoundingClientRect(); return {count:n.querySelectorAll('[data-launcher-item]').length,left:r.left,right:r.right,top:r.top,bottom:r.bottom}; })()`);
-        assert.equal(folder.count, 8, `${tag}/${folderId}: klasör 8/8 değil`);
+        const expectedFolderCount = folderId === "games" ? 9 : 8;
+        assert.equal(folder.count, expectedFolderCount, `${tag}/${folderId}: klasör ${expectedFolderCount}/${expectedFolderCount} değil`);
         assert.ok(folder.left >= -1 && folder.right <= width + 1 && folder.top >= -1 && folder.bottom <= height + 1, `${tag}/${folderId}: klasör kesiliyor`);
         await evaluate("window.closeLauncherFolder(false)");
         await waitFor("document.querySelector('#launcherFolderLayer').hidden");

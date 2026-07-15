@@ -11,6 +11,8 @@ export const LEGACY_LAUNCHER_LAYOUT_V3_KEY = "ravzaders.launcher.layout.v3";
 export const LEGACY_LAUNCHER_LAYOUT_KEY = "ravzaders.launcher.layout.v1";
 export const LAUNCHER_LAYOUT_VERSION = 4;
 export const LAUNCHER_BREAKPOINTS = Object.freeze({ mobile: 768, desktop: 1200 });
+const STARTER_DESKTOP_LAYOUT_REVISION = 3;
+const STARTER_APP_IDS = Object.freeze(["ravza-books", "preparation", "grade1", "grade2", "games"]);
 
 export const LAUNCHER_WIDGETS = Object.freeze([
   { id: "study-summary", title: "Çalışma Özeti", description: "Tamamlanan çalışma, quiz ve sınav sonucunu birlikte gösterir.", size: "large", span: { columns: 4, rows: 3 }, route: "calisma-merkezi", keywords: ["çalışma", "özet"] },
@@ -60,8 +62,8 @@ export function launcherOrientation(width = globalThis.innerWidth || 1200, heigh
 
 function defaultItems() {
   return [
-    { type: "folder", id: "preparation" },
     { type: "app", id: "ravza-books" },
+    { type: "folder", id: "preparation" },
     { type: "app", id: "grade1" },
     { type: "app", id: "grade2" },
     { type: "folder", id: "games" }
@@ -81,8 +83,8 @@ function createDesktopLayout() {
   return {
     pages: [{ id: "desktop-workspace", items: defaultItems() }],
     items: [
-      { id: "preparation", type: "folder", gridX: 5, gridY: 1 },
-      { id: "ravza-books", type: "app", gridX: 6, gridY: 1 },
+      { id: "ravza-books", type: "app", gridX: 5, gridY: 1 },
+      { id: "preparation", type: "folder", gridX: 6, gridY: 1 },
       { id: "grade1", type: "app", gridX: 7, gridY: 1 },
       { id: "grade2", type: "app", gridX: 8, gridY: 1 },
       { id: "games", type: "folder", gridX: 9, gridY: 1 }
@@ -97,6 +99,7 @@ function createDesktopLayout() {
 export function createDefaultLauncherLayout() {
   return {
     version: LAUNCHER_LAYOUT_VERSION,
+    starterDesktopLayoutRevision: STARTER_DESKTOP_LAYOUT_REVISION,
     iconAppearance: "standard",
     themePreference: "system",
     mobile: createPagedLayout(QUICK_ACCESS_IDS),
@@ -227,19 +230,41 @@ function normalizedPreference(value) {
   return ["system", "light", "dark"].includes(value) ? value : "system";
 }
 
+function repairStarterDesktopLayout(desktop, candidateRevision) {
+  const pageItems = desktop.pages?.[0]?.items || [];
+  const appIds = pageItems.filter((item) => item.type !== "widget").map((item) => item.id);
+  const isStarterWorkspace = desktop.widgets.length === 0
+    && appIds.length === STARTER_APP_IDS.length
+    && STARTER_APP_IDS.every((id) => appIds.includes(id));
+  if (!isStarterWorkspace || Number(candidateRevision) >= STARTER_DESKTOP_LAYOUT_REVISION) return desktop;
+
+  const repaired = createDesktopLayout();
+  return {
+    ...desktop,
+    pages: repaired.pages,
+    items: repaired.items,
+    widgets: [],
+  };
+}
+
 export function normalizeLauncherLayout(candidate) {
   const fallback = createDefaultLauncherLayout();
   if (candidate?.version === 1 && Array.isArray(candidate.pages)) return migrateV1(candidate, fallback);
   if (!candidate || typeof candidate !== "object" || ![3, LAUNCHER_LAYOUT_VERSION].includes(candidate.version)) return fallback;
   const folders = normalizedFolders(candidate.folders || candidate.customFolders);
   const customIds = new Set(folders.map((folder) => folder.id));
+  const desktop = repairStarterDesktopLayout(
+    normalizeDesktopLayout(candidate.desktop, fallback.desktop, customIds),
+    candidate.starterDesktopLayoutRevision,
+  );
   return {
     version: LAUNCHER_LAYOUT_VERSION,
+    starterDesktopLayoutRevision: STARTER_DESKTOP_LAYOUT_REVISION,
     iconAppearance: typeof candidate.iconAppearance === "string" ? candidate.iconAppearance.slice(0, 32) : fallback.iconAppearance,
     themePreference: normalizedPreference(candidate.themePreference),
     mobile: normalizePagedLayout(candidate.mobile, fallback.mobile, 4, customIds),
     tablet: normalizePagedLayout(candidate.tablet, fallback.tablet, 8, customIds),
-    desktop: normalizeDesktopLayout(candidate.desktop, fallback.desktop, customIds),
+    desktop,
     folders
   };
 }
@@ -249,8 +274,9 @@ export function readLauncherLayout() {
     for (const key of [LAUNCHER_LAYOUT_KEY, LEGACY_LAUNCHER_LAYOUT_V3_KEY, LEGACY_LAUNCHER_LAYOUT_KEY]) {
       const stored = localStorage.getItem(key);
       if (!stored) continue;
-      const normalized = normalizeLauncherLayout(JSON.parse(stored));
-      if (key !== LAUNCHER_LAYOUT_KEY) saveLauncherLayout(normalized);
+      const parsed = JSON.parse(stored);
+      const normalized = normalizeLauncherLayout(parsed);
+      if (key !== LAUNCHER_LAYOUT_KEY || JSON.stringify(parsed) !== JSON.stringify(normalized)) saveLauncherLayout(normalized);
       return normalized;
     }
   } catch {

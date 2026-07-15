@@ -125,7 +125,11 @@ function escapeHtml(value) {
 }
 
 function iconMarkup(item, compact = false) {
-  if (item.asset) return `<img src="${escapeHtml(item.asset)}" alt="" loading="${compact ? "eager" : "lazy"}" decoding="async">`;
+  if (item.asset) {
+    const prioritized = compact || item.id === "ravza-books";
+    const srcset = item.asset2x ? ` srcset="${escapeHtml(item.asset)} 1x, ${escapeHtml(item.asset2x)} 2x"` : "";
+    return `<img src="${escapeHtml(item.asset)}"${srcset} width="128" height="128" alt="" loading="${prioritized ? "eager" : "lazy"}" decoding="async"${item.id === "ravza-books" ? ' fetchpriority="high"' : ""}>`;
+  }
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[item.icon] || ICONS.fallback}</svg>`;
 }
 
@@ -299,7 +303,7 @@ function distributePagedOverflow() {
 
 function desktopGridMetrics() {
   return {
-    columns: Math.max(8, Math.min(22, Math.floor((innerWidth - 104) / 112))),
+    columns: 13,
     rows: Math.max(4, Math.min(12, Math.floor((innerHeight - 206) / 118)))
   };
 }

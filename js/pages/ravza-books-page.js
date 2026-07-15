@@ -449,7 +449,7 @@ function renderLibrary() {
       <header class="library-header">
         <button class="library-exit" id="library-exit" type="button" aria-label="Ana sayfaya dön">${ICON.back}<span>Ana sayfa</span></button>
         <div class="library-brand">
-          <img src="./assets/branding/ravza-books-logo.png" alt="Ravza Books" />
+          <img src="./assets/branding/ravza-books-logo-256.webp" width="256" height="256" alt="Ravza Books" />
           <div>
             <span>Ravza Books</span>
             <h1>Kitaplığım</h1>
@@ -606,7 +606,7 @@ function showReaderLoading(message, progress = null) {
   root.className = 'reader-root';
   root.innerHTML = `
     <div class="reader-loading" role="status" aria-live="polite">
-      <img class="reader-loading-logo" src="./assets/branding/ravza-books-logo.png" alt="Ravza Books" />
+      <img class="reader-loading-logo" src="./assets/branding/ravza-books-logo-256.webp" width="256" height="256" alt="Ravza Books" />
       <p>${escapeHTML(message)}</p>
       <span class="reader-loading-track" aria-hidden="true"><i style="--loading-progress:${percent ?? 18}%"></i></span>
       ${percent === null ? '' : `<span class="reader-loading-percent">%${percent}</span>`}
@@ -620,7 +620,7 @@ function showReaderError(message) {
   root.className = 'reader-root';
   root.innerHTML = `
     <div class="reader-error" role="alert">
-      <img class="reader-error-logo" src="./assets/branding/ravza-books-logo.png" alt="Ravza Books" />
+      <img class="reader-error-logo" src="./assets/branding/ravza-books-logo-256.webp" width="256" height="256" alt="Ravza Books" />
       <strong>Kitap açılamadı</strong>
       <p>${escapeHTML(message)}</p>
       <button type="button" id="rdr-error-back">Kitaplığa dön</button>
@@ -1205,7 +1205,7 @@ function renderPdfPageElements(book, pageCount) {
   backCover.setAttribute('aria-label', `${book.title}, arka kapak`);
   backCover.innerHTML = `
     <div class="pdf-back-cover-inner">
-      <img src="./assets/branding/ravza-books-logo.png" alt="Ravza Books" />
+      <img src="./assets/branding/ravza-books-logo-256.webp" width="256" height="256" alt="Ravza Books" />
       <p>${escapeHTML(book.title)}</p>
       <span>${escapeHTML(book.author)}</span>
     </div>`;
