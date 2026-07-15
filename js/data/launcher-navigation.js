@@ -59,6 +59,7 @@ const gameItems = Object.freeze([
 
 export const LAUNCHER_GROUPS = Object.freeze([
   app({ id: "preparation", title: "Hazırlık", type: "folder", icon: "preparation", tone: "preparation", category: "Klasörler", keywords: ["ders", "çalışma"], defaultDockEligible: false, items: preparationItems }),
+  app({ id: "ravza-books", title: "Ravza Books", type: "route", route: "ravza-books", icon: "reader", asset: "./assets/branding/ravza-books-logo.png", tone: "amber", category: "Uygulamalar", keywords: ["kitap", "okuma", "hikâye", "sayfa"], defaultDockEligible: true }),
   app({ id: "grade1", title: "1. Sınıf", type: "route", route: "birinci-sinif", icon: "grade1", tone: "grade1", status: "Yakında", category: "Sınıflar", keywords: ["birinci sınıf"], defaultDockEligible: false }),
   app({ id: "grade2", title: "2. Sınıf", type: "route", route: "ikinci-sinif", icon: "grade2", tone: "grade2", status: "Yakında", category: "Sınıflar", keywords: ["ikinci sınıf"], defaultDockEligible: false }),
   app({ id: "games", title: "Oyun Alanı", type: "folder", icon: "games", tone: "games", category: "Klasörler", keywords: ["oyun", "eğlence"], defaultDockEligible: false, items: gameItems })

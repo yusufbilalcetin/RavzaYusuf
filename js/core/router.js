@@ -15,6 +15,7 @@ import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
 import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
 import { closeGame, initOyun } from "../pages/oyun-page.js?v=alan-bulmacasi-20260710-1";
+import { closeRavzaBooks, initRavzaBooks } from "../pages/ravza-books-page.js?v=library-20260715-3";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
 import { syncLauncherActive } from "./launcher.js?v=topbar-redesign-20260714-2";
 
@@ -30,7 +31,8 @@ export const routeAliases = {
   quizdetail: "quiz-coz",
   grade1: "birinci-sinif",
   grade2: "ikinci-sinif",
-  games: "oyun"
+  games: "oyun",
+  ravzabooks: "ravza-books"
 };
 
 const routes = {
@@ -48,6 +50,7 @@ const routes = {
   "hizli-tekrar": { partial: "./partials/pages/hizli-tekrar.html", sectionId: "recap", navId: "nav-recap", init: initHizliTekrar },
   "birinci-sinif": { partial: "./partials/pages/birinci-sinif.html", sectionId: "grade1", navId: "nav-grade1", init: initBirinciSinif },
   "ikinci-sinif": { partial: "./partials/pages/ikinci-sinif.html", sectionId: "grade2", navId: "nav-grade2", init: initIkinciSinif },
+  "ravza-books": { partial: "./partials/pages/ravza-books.html?v=library-20260715-3", sectionId: "ravzabooks", navId: null, init: initRavzaBooks },
   oyun: { partial: "./partials/pages/oyun.html?v=ok-bulmacasi-20260714-1", sectionId: "games", navId: "nav-games", init: initOyun }
 };
 
@@ -95,6 +98,8 @@ function setActivePage(route) {
   }
 
   document.body.classList.toggle("studydetail-active", route.sectionId === "studydetail");
+  document.documentElement.classList.toggle("is-ravza-books-page", route.sectionId === "ravzabooks");
+  document.body.classList.toggle("is-ravza-books-page", route.sectionId === "ravzabooks");
   document.documentElement.classList.toggle("is-ravzalingo-page", route.sectionId === "ravzalingo");
   document.body.classList.toggle("is-ravzalingo-page", route.sectionId === "ravzalingo");
   document.body.classList.toggle("rlz5-page-active", route.sectionId === "ravzalingo");
@@ -125,6 +130,7 @@ export async function navigate(pageName = "ana-sayfa", options = {}) {
   const route = routes[routeName];
   if (!route) return navigate("ana-sayfa");
   if (routeName !== "oyun" && document.body.classList.contains("is-game-fullscreen")) closeGame();
+  if (routeName !== "ravza-books" && document.body.classList.contains("is-ravza-books-page")) closeRavzaBooks();
   // Aynı rota hâlen yükleniyor olsa bile bfcache/rehydrate sırasında DOM
   // temizlenmişse yeni çağrıyı yutma; token mekanizması eski çağrıyı eler.
   if (isNavigating && appState.currentRoute === routeName && document.getElementById(route.sectionId)) return;

@@ -19,9 +19,11 @@
     "test:launcher:edit": "node ./scripts/test-launcher-edit.mjs",
     "test:launcher:responsive": "node ./scripts/test-launcher-responsive-modes.mjs",
     "test:launcher:v4": "node ./scripts/test-launcher-v4.mjs",
-    "test:launcher:audit": "node ./scripts/test-launcher-responsive-modes.mjs --audit"
+    "test:launcher:audit": "node ./scripts/test-launcher-responsive-modes.mjs --audit",
+    "test:ravza-books": "node ./scripts/test-ravza-books.mjs"
   },
   "devDependencies": {
+    "pdfjs-dist": "^5.7.284",
     "sharp": "^0.34.5"
   }
 }

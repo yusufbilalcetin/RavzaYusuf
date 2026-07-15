@@ -61,6 +61,7 @@ export function launcherOrientation(width = globalThis.innerWidth || 1200, heigh
 function defaultItems() {
   return [
     { type: "folder", id: "preparation" },
+    { type: "app", id: "ravza-books" },
     { type: "app", id: "grade1" },
     { type: "app", id: "grade2" },
     { type: "folder", id: "games" }
@@ -81,9 +82,10 @@ function createDesktopLayout() {
     pages: [{ id: "desktop-workspace", items: defaultItems() }],
     items: [
       { id: "preparation", type: "folder", gridX: 5, gridY: 1 },
-      { id: "grade1", type: "app", gridX: 6, gridY: 1 },
-      { id: "grade2", type: "app", gridX: 7, gridY: 1 },
-      { id: "games", type: "folder", gridX: 8, gridY: 1 }
+      { id: "ravza-books", type: "app", gridX: 6, gridY: 1 },
+      { id: "grade1", type: "app", gridX: 7, gridY: 1 },
+      { id: "grade2", type: "app", gridX: 8, gridY: 1 },
+      { id: "games", type: "folder", gridX: 9, gridY: 1 }
     ],
     widgets: [],
     dock: [...DESKTOP_DOCK_DEFAULTS],
@@ -161,6 +163,9 @@ function normalizePagedLayout(candidate, fallback, maxDock, customIds) {
   const allowedHidden = new Set([...registryIds(), ...customIds]);
   const hiddenApps = [...new Set(Array.isArray(candidate?.hiddenApps) ? candidate.hiddenApps : [])]
     .filter((id) => typeof id === "string" && allowedHidden.has(id));
+  if (!seenApps.has("ravza-books") && !hiddenApps.includes("ravza-books")) {
+    pages[0].items.splice(Math.min(1, pages[0].items.length), 0, { type: "app", id: "ravza-books" });
+  }
   return {
     pages,
     dock,

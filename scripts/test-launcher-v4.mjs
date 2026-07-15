@@ -166,7 +166,7 @@ async function runBrowser(config) {
     await waitFor("location.href === 'about:blank'");
     await command("Storage.clearDataForOrigin", { origin: `http://127.0.0.1:${PORT}`, storageTypes: "local_storage" });
     await command("Page.navigate", { url: `http://127.0.0.1:${PORT}/index.html?v4=${marker}` });
-    await waitFor(`window.__LAUNCHER_STATE__ && location.search === ${JSON.stringify(`?v4=${marker}`)} && document.querySelectorAll('#launcherGrid .launcher-app').length === 4`);
+    await waitFor(`window.__LAUNCHER_STATE__ && location.search === ${JSON.stringify(`?v4=${marker}`)} && document.querySelectorAll('#launcherGrid .launcher-app').length === 5`);
     await delay(320);
   }
   async function search(query) {
@@ -192,7 +192,7 @@ async function runBrowser(config) {
       apps: document.querySelectorAll('#launcherGrid .launcher-app').length, hasHome: Boolean(document.querySelector('[data-launcher-id=home]')),
       order: state.layout.pages[0].items.map(item=>item.id).join(','), preference: state.layouts.themePreference, iconAppearance: state.layouts.iconAppearance, folders: Array.isArray(state.layouts.folders)
     }; })()`);
-    assert.deepEqual(initial, { version: 4, widgets: 0, apps: 4, hasHome: false, order: "preparation,grade1,grade2,games", preference: "system", iconAppearance: "standard", folders: true }, `${config.name}: v4 varsayılanı hatalı`);
+    assert.deepEqual(initial, { version: 4, widgets: 0, apps: 5, hasHome: false, order: "preparation,ravza-books,grade1,grade2,games", preference: "system", iconAppearance: "standard", folders: true }, `${config.name}: v4 varsayılanı hatalı`);
 
     const searchCases = [
       ["sans carki", "Şans Çarkı"], ["şans çarkı", "Şans Çarkı"], ["hizli", "Hızlı Tekrar"],
@@ -301,13 +301,13 @@ async function runBrowser(config) {
       await waitFor(`document.documentElement.dataset.launcherDevice === '${width < 768 ? "mobile" : width < 1200 ? "tablet" : "desktop"}'`);
       const probe = await evaluate(`(() => ({ width:${width}, height:${height}, scroll:document.documentElement.scrollWidth, client:document.documentElement.clientWidth, apps:document.querySelectorAll('#launcherGrid .launcher-app').length, dock:getComputedStyle(document.querySelector('#launcherDock')).visibility, errors:document.querySelectorAll('img:not([src])').length }))()`);
       assert.ok(probe.scroll <= probe.client, `${config.name}/${width}: yatay taşma ${probe.scroll}/${probe.client}`);
-      assert.equal(probe.apps, 4, `${config.name}/${width}: varsayılan uygulamalar bozuldu`);
+      assert.equal(probe.apps, 5, `${config.name}/${width}: varsayılan uygulamalar bozuldu`);
       assert.equal(probe.dock, "visible", `${config.name}/${width}: ana ekranda dock görünmüyor`);
       responsive.push(probe);
     }
     if (config.name === BROWSERS[0].name) {
       await fresh(390, 844);
-      assert.deepEqual(await evaluate("({state:window.__LAUNCHER_STATE__.layout.pages[0].items.map(item=>item.id),dom:[...document.querySelectorAll('#launcherGrid [data-launcher-id]')].map(node=>node.dataset.launcherId)})"), { state: ["preparation", "grade1", "grade2", "games"], dom: ["preparation", "grade1", "grade2", "games"] }, `${config.name}: temiz mobil ekran sırası bozuk`);
+      assert.deepEqual(await evaluate("({state:window.__LAUNCHER_STATE__.layout.pages[0].items.map(item=>item.id),dom:[...document.querySelectorAll('#launcherGrid [data-launcher-id]')].map(node=>node.dataset.launcherId)})"), { state: ["preparation", "ravza-books", "grade1", "grade2", "games"], dom: ["preparation", "ravza-books", "grade1", "grade2", "games"] }, `${config.name}: temiz mobil ekran sırası bozuk`);
       await screenshot("mobile-home-390.png");
       await fresh(820, 1180); await screenshot("tablet-home-820.png");
       await fresh(1440, 900); await screenshot("desktop-home-1440.png");
@@ -320,8 +320,8 @@ async function runBrowser(config) {
     assert.equal(await evaluate("window.__LAUNCHER_STATE__.layouts.version"), 4, `${config.name}: v3→v4 migration başarısız`);
     const beforeBadJsonReload = await evaluate("performance.timeOrigin");
     await evaluate(`localStorage.setItem(${JSON.stringify(LAYOUT_KEY)},'{bad json'); location.reload()`);
-    await waitFor(`performance.timeOrigin !== ${beforeBadJsonReload} && window.__LAUNCHER_STATE__ && window.__LAUNCHER_STATE__.layouts.version === 4 && document.querySelectorAll('#launcherGrid .launcher-app').length === 4`);
-    assert.equal(await evaluate("document.querySelectorAll('#launcherGrid .launcher-app').length"), 4, `${config.name}: bozuk depolama fallback başarısız`);
+    await waitFor(`performance.timeOrigin !== ${beforeBadJsonReload} && window.__LAUNCHER_STATE__ && window.__LAUNCHER_STATE__.layouts.version === 4 && document.querySelectorAll('#launcherGrid .launcher-app').length === 5`);
+    assert.equal(await evaluate("document.querySelectorAll('#launcherGrid .launcher-app').length"), 5, `${config.name}: bozuk depolama fallback başarısız`);
 
     const relevantIssues = runtimeIssues.filter((issue) => !/firebase|firestore|ERR_BLOCKED_BY_CLIENT|Failed to fetch/i.test(issue));
     assert.deepEqual(relevantIssues, [], `${config.name}: console hataları: ${relevantIssues.join(" | ")}`);

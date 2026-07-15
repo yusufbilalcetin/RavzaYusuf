@@ -210,8 +210,8 @@ async function runBrowser(browserConfig) {
           && Math.abs(probe.background.width - width) <= 1 && Math.abs(probe.background.height - height) <= 1,
         `${tag}: arka plan viewport'u kaplamıyor ${JSON.stringify(probe.background)}`);
         assert.equal(probe.backgroundFilter, "none", `${tag}: ana fotoğraf kalıcı olarak filtrelenmiş`);
-        assert.ok(probe.apps.length > 0 && probe.apps.length <= 4, `${tag}: aktif sayfadaki ana kategori sayısı geçersiz`);
-        assert.equal(await evaluate("window.__LAUNCHER_STATE__.layout.pages.flatMap(page => page.items).filter(item => item.type !== 'widget').length"), 4, `${tag}: toplam ana kategori sayısı değişti`);
+        assert.ok(probe.apps.length > 0 && probe.apps.length <= 5, `${tag}: aktif sayfadaki ana kategori sayısı geçersiz`);
+        assert.equal(await evaluate("window.__LAUNCHER_STATE__.layout.pages.flatMap(page => page.items).filter(item => item.type !== 'widget').length"), 5, `${tag}: toplam ana kategori sayısı değişti`);
         assert.ok(probe.apps.every((app) => app.opacity > 0.9 && app.hitMatches), `${tag}: ana ekran uygulaması görünmez veya tıklanamaz ${JSON.stringify(probe.apps)}`);
         assert.ok(probe.targets.every((target) => target.width >= 43.5 && target.height >= 43.5), `${tag}: 44px altı hedef ${JSON.stringify(probe.targets.filter((target) => target.width < 43.5 || target.height < 43.5))}`);
         if (probe.topbarBackdrop !== "none") assert.match(probe.topbarBackdrop, /blur\(/, `${tag}: üst kontrol glass değil`);
