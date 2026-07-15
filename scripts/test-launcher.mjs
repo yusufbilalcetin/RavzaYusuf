@@ -209,9 +209,23 @@ async function runBrowser(browserConfig) {
     await delay(250);
     assert.ok(loadedLocalResources.has("/js/games/renk-siralama.js"), "Renk Sıralama açıldığında modül yüklenmedi");
     await evaluate("document.querySelector('#gameCloseBtn').click()");
-    await waitFor("!document.body.classList.contains('is-game-fullscreen')");
-    await evaluate("window.navigate('ana-sayfa', { history: false })");
-    await waitFor("document.body.dataset.currentRoute === 'ana-sayfa'");
+    await waitFor("document.body.dataset.currentRoute === 'ana-sayfa' && document.querySelector('#launcherFolderLayer').classList.contains('is-open')");
+    const gameExitState = await evaluate(`(() => ({
+      fullscreen: document.body.classList.contains('is-game-fullscreen'),
+      route: document.body.dataset.currentRoute,
+      page: new URLSearchParams(location.search).get('page'),
+      game: new URLSearchParams(location.search).get('game'),
+      folderTitle: document.querySelector('#launcherFolderTitle')?.textContent
+    }))()`);
+    assert.deepEqual(gameExitState, {
+      fullscreen: false,
+      route: "ana-sayfa",
+      page: null,
+      game: null,
+      folderTitle: "Oyun Alanı"
+    }, `Oyundan çıkış launcher'a dönmedi: ${JSON.stringify(gameExitState)}`);
+    await evaluate("window.closeLauncherFolder(false)");
+    await waitFor("document.querySelector('#launcherFolderLayer').hidden");
 
     for (const themeMode of THEME_MODES) {
       await evaluate(`document.body.classList.toggle('dark', ${themeMode === "dark"})`);

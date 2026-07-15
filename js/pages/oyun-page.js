@@ -2,6 +2,7 @@ import { createGameAudio } from "../utils/game-audio.js";
 import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
 import { ACTIVE_GAMES, findGame } from "../../data/games.js";
 import { appIconPictureMarkup } from "../../data/app-icons.js";
+import { openLauncherFolder } from "../core/launcher.js";
 
 const GAME_META = Object.freeze(Object.fromEntries(ACTIVE_GAMES.map((game) => [
   game.handlerId || game.id,
@@ -97,7 +98,7 @@ export function initOyun(options = {}) {
       tile.addEventListener("click", () => void openGame(root, tile.dataset.game));
     });
 
-    root.querySelector("#gameCloseBtn")?.addEventListener("click", () => closeGame(root));
+    root.querySelector("#gameCloseBtn")?.addEventListener("click", () => closeGame(root, { returnToLauncher: true }));
   }
 
   // Manual resume entrypoint used by the Boyama "Son Calismalar" action.
@@ -157,7 +158,7 @@ async function openGame(root, gameId, options = {}) {
     try {
       const module = await loadGameModule(gameId);
       if (currentToken !== gameOpenToken) return;
-      renkSiralamaState = module.renderRenkSiralamaGame(body, { onExit: () => closeGame(root) });
+      renkSiralamaState = module.renderRenkSiralamaGame(body, { onExit: () => closeGame(root, { returnToLauncher: true }) });
     } catch {
       if (currentToken === gameOpenToken) renderGameLoadError(body, meta.title);
     }
@@ -219,7 +220,7 @@ function renderIframeGame(target, url, title) {
   `;
 }
 
-export function closeGame(root = document.getElementById("games")) {
+export function closeGame(root = document.getElementById("games"), options = {}) {
   gameOpenToken += 1;
   if (!root) {
     document.body.classList.remove("is-game-fullscreen");
@@ -233,6 +234,17 @@ export function closeGame(root = document.getElementById("games")) {
   if (stage) stage.hidden = true;
   if (body) body.innerHTML = "";
   candyState = null;
+  if (options.returnToLauncher) returnToGameLauncher();
+}
+
+function returnToGameLauncher() {
+  const navigation = window.navigate?.("ana-sayfa", { historyMode: "replace" });
+  void Promise.resolve(navigation).then(() => {
+    requestAnimationFrame(() => {
+      const trigger = document.querySelector('[data-launcher-folder="games"]');
+      if (trigger) openLauncherFolder("games", trigger, false);
+    });
+  });
 }
 
 function destroyActiveGame() {
