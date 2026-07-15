@@ -182,23 +182,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 
 .brand-icon {
   flex: 0 0 auto;
-  display: grid;
-  place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: conic-gradient(var(--wheel-1) 0 14%, var(--wheel-2) 0 28%, var(--wheel-3) 0 42%,
-    var(--wheel-4) 0 57%, var(--wheel-5) 0 71%, var(--wheel-6) 0 86%, var(--wheel-7) 0 100%);
-  box-shadow: 0 1px 2px rgba(16, 18, 23, .2), inset 0 0 0 2px rgba(255, 255, 255, .55);
-}
-
-.brand-icon::after {
-  content: "";
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(16, 18, 23, .2);
+  display: block;
+  border-radius: 12px;
+  object-fit: contain;
+  box-shadow: 0 5px 14px rgba(16, 18, 23, .2);
 }
 
 .brand-text { min-width: 0; }

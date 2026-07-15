@@ -811,7 +811,26 @@ button {
   max-height: 100%;
   opacity: 0;
   object-fit: contain;
-  transition: opacity 140ms ease;
+  filter: none;
+  transition: opacity 140ms ease, filter 180ms ease;
+}
+
+&[data-reader-theme="sepia"] .book-sheet.pdf-page,
+&[data-reader-theme="sepia"] .pdf-canvas-frame {
+  background: #d8c39c !important;
+}
+
+&[data-reader-theme="sepia"] .pdf-page canvas {
+  filter: sepia(0.38) saturate(0.78) brightness(0.97) contrast(0.96);
+}
+
+&[data-reader-theme="dark"] .book-sheet.pdf-page,
+&[data-reader-theme="dark"] .pdf-canvas-frame {
+  background: #1a1916 !important;
+}
+
+&[data-reader-theme="dark"] .pdf-page canvas {
+  filter: invert(0.9) hue-rotate(180deg) brightness(0.82) contrast(0.94);
 }
 
 .pdf-page.is-rendered canvas {
@@ -1330,6 +1349,10 @@ button {
 .theme-btn[data-theme="sepia"]::before { background: #d9bd90; }
 .theme-btn[data-theme="dark"]::before { background: #24211c; }
 
+.theme-btn[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
 .switch {
   position: relative;
   display: inline-flex;
@@ -1512,7 +1535,6 @@ button {
       max(6px, env(safe-area-inset-bottom));
   }
 
-  .book-cradle,
   #rdr-flipbook {
     width: 100% !important;
     height: 100% !important;

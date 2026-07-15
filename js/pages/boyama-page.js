@@ -228,7 +228,7 @@ const TEMPLATE = `
     <div class="pbn-inline-toast pbn-app-error-toast" id="pbnAppErrorToast"></div>
     <div class="pbn-screen pbn-screen-home is-active" data-pbn-screen="home">
       <div class="pbn-hero">
-        <img class="pbn-brand-logo" src="./assets/oyun-bolumu/optimized/ikon-boyama.webp" alt="Boyama logosu" loading="eager" decoding="async" />
+        <img class="pbn-brand-logo" src="./assets/icons/games/boyama.png" alt="Boyama logosu" width="1024" height="1024" loading="eager" decoding="async" />
         <div class="pbn-hero-copy">
           <span class="unit-badge">Boyama stüdyosu</span>
           <h2>Numaraya Göre Boyama</h2>
@@ -338,7 +338,7 @@ const TEMPLATE = `
       <div class="pbn-paint-header">
         <button type="button" class="pbn-tool-btn" id="pbnBackBtn" title="Ana ekrana dön">←</button>
         <span class="pbn-paint-logo" aria-hidden="true">
-          <img src="./assets/oyun-bolumu/optimized/ikon-boyama.webp" alt="" loading="eager" decoding="async" />
+          <img src="./assets/icons/games/boyama.png" alt="" width="1024" height="1024" loading="eager" decoding="async" />
         </span>
         <div class="pbn-paint-progress">
           <div class="pbn-paint-progress-track">

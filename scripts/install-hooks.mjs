@@ -1,16 +1,16 @@
-// Opt-in: git'i .githooks/ klasörünü kullanacak şekilde ayarlar (pre-commit → hero:check).
+// Opt-in: git'i .githooks/ klasörünü kullanacak şekilde ayarlar.
 // Kullanıcının git ayarını yalnızca bu komut açıkça çalıştırıldığında değiştirir.
-// Kullanım: npm run hero:install-hooks
+// Kullanım: npm run hero:install-hooks veya npm run books:install-hooks
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 const run = promisify(execFile);
 try {
   await run("git", ["config", "core.hooksPath", ".githooks"]);
-  console.log("[hero] Git hook'ları etkin: core.hooksPath = .githooks");
-  console.log("[hero] Artık her commit öncesi 'npm run hero:check' çalışır.");
-  console.log("[hero] Geri almak için: git config --unset core.hooksPath");
+  console.log("[hooks] Git hook'ları etkin: core.hooksPath = .githooks");
+  console.log("[hooks] Her commit öncesi books:check; hero kaynakları varsa hero:check çalışır.");
+  console.log("[hooks] Geri almak için: git config --unset core.hooksPath");
 } catch (err) {
-  console.error(`[hero] Hook kurulumu başarısız: ${err.message}`);
+  console.error(`[hooks] Hook kurulumu başarısız: ${err.message}`);
   process.exit(1);
 }

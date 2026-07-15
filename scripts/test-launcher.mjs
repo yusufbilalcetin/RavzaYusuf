@@ -225,7 +225,7 @@ async function runBrowser(browserConfig) {
         }
 
         let folder;
-        for (const [folderId, expectedCount, label] of [["preparation", 8, "Hazırlık"], ["games", 8, "Oyun Alanı"]]) {
+        for (const [folderId, expectedCount, label] of [["preparation", 8, "Hazırlık"], ["games", 9, "Oyun Alanı"]]) {
           await evaluate(`window.openLauncherFolder('${folderId}', document.querySelector('[data-launcher-folder=${folderId}]'), false)`);
           await waitFor("document.querySelector('#launcherFolderLayer').classList.contains('is-open')")
             .catch((error) => { throw new Error(`${tag}/${folderId}: klasör açılamadı (${error.message})`); });
@@ -320,6 +320,49 @@ async function runBrowser(browserConfig) {
     for (const surface of ["dock", "topbar", "dialog"]) {
       assert.notEqual(glassByTheme.dark[surface].bg, glassByTheme.light[surface].bg, `${surface}: açık/koyu temada arka plan aynı kaldı (glass token regresyonu)`);
     }
+
+    await evaluate("window.navigate('oyun', { history: false })");
+    await waitFor("document.body.dataset.currentRoute === 'oyun' && document.querySelectorAll('.game-tile-img').length === 9");
+    for (const [width, height] of VIEWPORTS) {
+      await viewport(width, height);
+      await waitFor("[...document.querySelectorAll('.game-tile-img')].every((image) => image.complete && image.naturalWidth > 0)");
+      const gamesProbe = await evaluate(`(() => {
+        const images = [...document.querySelectorAll('.game-tile-img')];
+        const tiles = [...document.querySelectorAll('.game-tile')];
+        const viewportWidth = document.documentElement.clientWidth;
+        return {
+          scrollWidth: document.documentElement.scrollWidth,
+          viewportWidth,
+          images: images.map((image) => ({
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+            fit: getComputedStyle(image).objectFit,
+            src: new URL(image.currentSrc || image.src).pathname
+          })),
+          tilesInsideViewport: tiles.every((tile) => {
+            const rect = tile.getBoundingClientRect();
+            return rect.left >= -1 && rect.right <= viewportWidth + 1;
+          })
+        };
+      })()`);
+      assert.equal(gamesProbe.images.length, 9, `${width}x${height}: oyun ikonu sayisi hatali`);
+      assert.ok(gamesProbe.images.every((image) => image.width === 1024 && image.height === 1024), `${width}x${height}: 1024x1024 olmayan oyun ikonu var`);
+      assert.ok(gamesProbe.images.every((image) => image.fit === "contain"), `${width}x${height}: object-fit contain uygulanmayan ikon var`);
+      assert.ok(gamesProbe.images.every((image) => image.src.startsWith("/assets/icons/games/")), `${width}x${height}: ortak klasor disinda ikon yolu var`);
+      assert.ok(gamesProbe.scrollWidth <= gamesProbe.viewportWidth + 1, `${width}x${height}: oyun ekrani yatay tasiyor`);
+      assert.ok(gamesProbe.tilesInsideViewport, `${width}x${height}: oyun karti viewport disina tasiyor`);
+
+      if (isPrimaryBrowser && width === 390 && height === 844) {
+        const screenshot = await command("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+        await writeFile(join(ARTIFACTS, "games-page-mobile-390.png"), Buffer.from(screenshot.data, "base64"));
+      }
+      if (isPrimaryBrowser && width === 1440) {
+        const screenshot = await command("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+        await writeFile(join(ARTIFACTS, "games-page-desktop-1440.png"), Buffer.from(screenshot.data, "base64"));
+      }
+    }
+    await evaluate("window.navigate('ana-sayfa', { history: false })");
+    await waitFor("document.body.dataset.currentRoute === 'ana-sayfa'");
 
     await command("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
     await evaluate("window.openLauncherFolder('preparation', document.querySelector('[data-launcher-folder=preparation]'), false)");

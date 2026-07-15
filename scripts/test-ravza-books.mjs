@@ -226,6 +226,20 @@ try {
   }
 
   await setViewport(390, 844);
+  assert.equal(await evaluate("document.querySelectorAll('.library-book-card').length"), 5, 'Beş PDF kitabın tamamı kitaplıkta görünmüyor');
+  await evaluate("document.querySelector('.library-book-card[data-book-id=\"dede-korkut-hikayeleri\"]').click()");
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] .pdf-page.is-rendered')", 30000);
+  const dedeKorkutProbe = await evaluate(`(() => ({
+    title: document.querySelector('#rdr-control-title')?.textContent,
+    pdfPages: document.querySelectorAll('.book-sheet.pdf-page').length,
+    allSheets: document.querySelectorAll('.book-sheet').length,
+  }))()`);
+  assert.equal(dedeKorkutProbe.title, 'Dede Korkut Hikâyeleri', 'Dede Korkut başlığı yanlış');
+  assert.equal(dedeKorkutProbe.pdfPages, 200, 'Dede Korkut PDF sayfaları eksik');
+  assert.equal(dedeKorkutProbe.allSheets, 201, 'Dede Korkut arka kapağı oluşturulmadı');
+  await evaluate("document.querySelector('#rdr-back').click()");
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card[data-book-id=\"dede-korkut-hikayeleri\"]')");
+
   await evaluate("document.querySelector('.library-book-card').click()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] .pdf-page.is-rendered')", 30000);
   const readerProbe = await evaluate(`(() => {
@@ -250,9 +264,75 @@ try {
   assert.equal(readerProbe.hasDirectionButtons, false, 'Okuyucuda yön düğmesi bulunuyor');
   assert.equal(readerProbe.spread, 'single', 'Mobil okuyucu tek sayfa değil');
 
+  const mobilePdfFit = await evaluate(`(() => {
+    const cradle = document.querySelector('#book-cradle').getBoundingClientRect();
+    const canvas = document.querySelector('.pdf-page.is-rendered canvas').getBoundingClientRect();
+    return {
+      bookRatio: cradle.width / cradle.height,
+      canvasWidthFill: canvas.width / cradle.width,
+      canvasHeightFill: canvas.height / cradle.height,
+      overflow: Math.max(0, cradle.right - innerWidth) + Math.max(0, -cradle.left),
+    };
+  })()`);
+  assert.ok(Math.abs(mobilePdfFit.bookRatio - 0.75) < 0.01, 'Mobil PDF alanı sayfa oranına uymuyor');
+  assert.ok(mobilePdfFit.canvasWidthFill > 0.95 && mobilePdfFit.canvasHeightFill > 0.95, 'Mobil PDF tuvali sayfa alanını doldurmuyor');
+  assert.equal(mobilePdfFit.overflow, 0, 'Mobil PDF yatay taşıyor');
+
+  await evaluate("document.querySelector('.theme-btn[data-theme=\"sepia\"]').click()");
+  await delay(240);
+  const sepiaTheme = await evaluate(`(() => {
+    const canvas = document.querySelector('.pdf-page.is-rendered canvas');
+    const frame = canvas.closest('.pdf-canvas-frame');
+    const button = document.querySelector('.theme-btn[data-theme="sepia"]');
+    return {
+      theme: document.querySelector('#ravzabooks').dataset.readerTheme,
+      filter: getComputedStyle(canvas).filter,
+      background: getComputedStyle(frame).backgroundColor,
+      selected: button.classList.contains('selected'),
+      pressed: button.getAttribute('aria-pressed'),
+    };
+  })()`);
+  assert.equal(sepiaTheme.theme, 'sepia', 'Sepya tema köke uygulanmadı');
+  assert.match(sepiaTheme.filter, /sepia/, 'Sepya görünüm PDF canvasına uygulanmadı');
+  assert.notEqual(sepiaTheme.background, 'rgb(255, 255, 255)', 'Sepya görünüm PDF zeminini değiştirmedi');
+  assert.equal(sepiaTheme.selected && sepiaTheme.pressed === 'true', true, 'Sepya tema düğmesi seçili görünmüyor');
+
+  await evaluate("document.querySelector('.theme-btn[data-theme=\"dark\"]').click()");
+  await delay(240);
+  const darkTheme = await evaluate(`(() => {
+    const canvas = document.querySelector('.pdf-page.is-rendered canvas');
+    const button = document.querySelector('.theme-btn[data-theme="dark"]');
+    return {
+      theme: document.querySelector('#ravzabooks').dataset.readerTheme,
+      filter: getComputedStyle(canvas).filter,
+      selected: button.classList.contains('selected'),
+      pressed: button.getAttribute('aria-pressed'),
+    };
+  })()`);
+  assert.equal(darkTheme.theme, 'dark', 'Koyu tema köke uygulanmadı');
+  assert.match(darkTheme.filter, /invert/, 'Koyu görünüm PDF canvasına uygulanmadı');
+  assert.equal(darkTheme.selected && darkTheme.pressed === 'true', true, 'Koyu tema düğmesi seçili görünmüyor');
+
+  await evaluate("document.querySelector('.theme-btn[data-theme=\"light\"]').click()");
+  await delay(240);
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('.pdf-page.is-rendered canvas')).filter"), 'none', 'Açık tema PDF filtresini temizlemedi');
+  assert.equal(await evaluate("localStorage.getItem('ravzaBooksProgress:kucuk-prens')"), null, 'Tema değişimi kayıtlı sayfayı değiştirdi');
+
   await setViewport(1024, 768);
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] #reader-inner')?.dataset.spread === 'double'", 30000);
   assert.ok(await evaluate("document.querySelectorAll('.pdf-page canvas[data-render-key]').length <= 5"), 'Yatay tablette PDF render penceresi 5 sayfayı aşıyor');
+  const desktopPdfFit = await evaluate(`(() => {
+    const cradle = document.querySelector('#book-cradle').getBoundingClientRect();
+    return {
+      bookRatio: cradle.width / cradle.height,
+      leftMargin: cradle.left,
+      rightMargin: innerWidth - cradle.right,
+      overflow: Math.max(0, cradle.right - innerWidth) + Math.max(0, -cradle.left),
+    };
+  })()`);
+  assert.ok(Math.abs(desktopPdfFit.bookRatio - 1.5) < 0.01, 'Çift sayfa PDF alanı kitap oranına uymuyor');
+  assert.ok(Math.abs(desktopPdfFit.leftMargin - desktopPdfFit.rightMargin) < 1, 'Çift sayfa PDF ekranda ortalanmıyor');
+  assert.equal(desktopPdfFit.overflow, 0, 'Çift sayfa PDF yatay taşıyor');
   await setViewport(390, 844);
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] #reader-inner')?.dataset.spread === 'single'", 30000);
 
@@ -269,22 +349,56 @@ try {
     await delay(35);
   }
   await command('Input.dispatchMouseEvent', { type: 'mouseReleased', x: stage.left + 20, y: stage.y, button: 'left', buttons: 0, clickCount: 1 });
-  await waitFor("JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens')).pageIndex > 0");
+  await waitFor("Number(document.querySelector('#reader-inner')?.dataset.currentPage) > 1");
+  assert.equal(await evaluate("localStorage.getItem('ravzaBooksProgress:kucuk-prens')"), null, 'Sayfa kıvırma kayıtlı sayfayı otomatik oluşturdu');
 
   await evaluate(`(() => {
     const range = document.querySelector('#rdr-progress');
-    range.value = '28';
+    range.value = '4';
     range.dispatchEvent(new Event('input', { bubbles: true }));
     range.dispatchEvent(new Event('change', { bubbles: true }));
   })()`);
-  await waitFor("JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens')).pageIndex >= 28");
+  await waitFor("document.querySelector('#reader-inner')?.dataset.currentPage === '5'");
+  assert.equal(await evaluate("localStorage.getItem('ravzaBooksProgress:kucuk-prens')"), null, 'Sayfa barı kaydetmeden ilerleme kaydı oluşturdu');
   await evaluate("document.querySelector('#rdr-bookmark').click()");
   const saved = await evaluate("JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens'))");
   assert.equal(saved.bookId, 'kucuk-prens');
+  assert.equal(saved.savedPage, 5, 'Kaydet düğmesi savedPage değerini 5 yapmadı');
+  assert.equal(saved.pdfPage, 5, 'Kaydet düğmesi PDF sayfasını 5 olarak kaydetmedi');
+  assert.equal(saved.pageIndex, 4, 'Kaydet düğmesi sayfa indeksini doğru kaydetmedi');
   assert.equal(saved.totalPages, 166);
   assert.ok(saved.progress > 0 && saved.progress < 100);
   assert.ok(Number.isInteger(saved.bookmark), 'Yer imi sayfa numarası olarak kaydedilmedi');
   assert.ok(saved.lastOpenedAt > 0, 'lastOpenedAt kaydedilmedi');
+
+  await evaluate(`(() => {
+    const range = document.querySelector('#rdr-progress');
+    range.value = '9';
+    range.dispatchEvent(new Event('input', { bubbles: true }));
+    range.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  await waitFor("document.querySelector('#reader-inner')?.dataset.currentPage === '10'");
+  const afterUnsavedNavigation = await evaluate("JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens'))");
+  assert.equal(afterUnsavedNavigation.savedPage, 5, 'Kaydetmeden 10. sayfaya gitmek savedPage değerini değiştirdi');
+  assert.equal(afterUnsavedNavigation.pdfPage, 5, 'Kaydetmeden 10. sayfaya gitmek PDF kaydını değiştirdi');
+  assert.equal(afterUnsavedNavigation.updatedAt, saved.updatedAt, 'Normal gezinme kayıt zamanını değiştirdi');
+
+  await command('Page.navigate', { url: 'about:blank' });
+  await waitFor("location.href === 'about:blank'");
+  await command('Page.navigate', { url: `${BASE_URL}/?page=ravza-books` });
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
+  await evaluate("document.querySelector('.library-book-card').click()");
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] #reader-inner')?.dataset.currentPage === '5'", 30000);
+  const reopened = await evaluate(`(() => ({
+    currentPage: Number(document.querySelector('#reader-inner').dataset.currentPage),
+    savedPage: Number(document.querySelector('#reader-inner').dataset.savedPage),
+    sliderIndex: Number(document.querySelector('#rdr-progress').value),
+    stored: JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens')),
+  }))()`);
+  assert.equal(reopened.currentPage, 5, 'Uygulama son görüntülenen 10. sayfada açıldı');
+  assert.equal(reopened.savedPage, 5, 'Yeniden açılışta savedPage korunmadı');
+  assert.equal(reopened.sliderIndex, 4, 'Sayfa barı kaydedilen 5. sayfayı göstermiyor');
+  assert.equal(reopened.stored.savedPage, 5, 'Kalıcı kayıt yeniden açılışta değişti');
 
   await evaluate("document.querySelector('#rdr-back').click()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
@@ -321,6 +435,9 @@ try {
     range.dispatchEvent(new Event('input', { bubbles: true }));
     range.dispatchEvent(new Event('change', { bubbles: true }));
   })()`);
+  await waitFor("document.querySelector('#reader-inner')?.dataset.currentPage === '166'");
+  assert.equal(await evaluate("JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens')).completed"), false, 'Son sayfaya gitmek kitabı kaydetmeden tamamlandı yaptı');
+  await evaluate("document.querySelector('#rdr-bookmark').click()");
   await waitFor("JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens')).completed === true");
   await evaluate("document.querySelector('#rdr-back').click()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-reading-state.is-complete')");
@@ -340,7 +457,7 @@ try {
   await evaluate("document.querySelector('#rdr-error-back').click()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
 
-  process.stdout.write(`Ravza Books: ${VIEWPORTS.length} viewport, kitaplık, 166 PDF sayfası, tembel render, curl, ilerleme, geri dönüş ve hata durumu doğrulandı.\n`);
+  process.stdout.write(`Ravza Books: ${VIEWPORTS.length} viewport, açık/sepya/koyu PDF görünümü, 5'i kaydet → 10'a git → 5'te aç, curl ve hata durumu doğrulandı.\n`);
 } finally {
   try { socket.close(); } catch {}
   browser.kill();

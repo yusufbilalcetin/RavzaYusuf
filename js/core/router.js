@@ -15,7 +15,7 @@ import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
 import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
 import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
 import { closeGame, initOyun } from "../pages/oyun-page.js?v=alan-bulmacasi-20260710-1";
-import { closeRavzaBooks, initRavzaBooks } from "../pages/ravza-books-page.js?v=live-pdf-20260715-4";
+import { closeRavzaBooks, initRavzaBooks } from "../pages/ravza-books-page.js?v=pdf-themes-20260716-1";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
 import { syncLauncherActive } from "./launcher.js?v=home-proportions-20260716-1";
 

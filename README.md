@@ -16,7 +16,8 @@ RavzaYusuf/
 ├── assets/                 # Kategorilere ayrılmış görseller
 │   ├── ana-sayfa/          # Ana sayfa masaüstü ve mobil arka planları
 │   ├── calisma-bolumu/     # Çalışma, quiz ve RavzaLingo arka planları
-│   ├── oyun-bolumu/        # Oyun Alanı kart ikonları ve logoları
+│   ├── icons/games/        # Ortak 1024 × 1024 PNG oyun ikonları
+│   ├── oyun-bolumu/        # Oyun Alanı arka planları
 │   └── oyun-ici/           # Oyunların kendi içinde kullandığı görseller
 │
 ├── css/
@@ -135,22 +136,26 @@ Ana sayfa hero'su dışındaki tüm görseller basit bir pipeline'dan geçer: he
 assets/
   ana-sayfa/       → kendi hero pipeline'ı (yukarıdaki bölüm)
   calisma-bolumu/  → çalışma/quiz/RavzaLingo arka planları
-  oyun-bolumu/     → oyun kutucuğu ikonları (ikon-*) + oyun alanı arka planı
+  icons/games/     → ortak oyun ikonları (`<oyun>.png`) ve yeniden üretim kaynakları
+  oyun-bolumu/     → oyun alanı arka planı
   oyun-ici/boyama/ → boyama hazır görsel preset'leri (preset-*)
 ```
 
 ```bash
 npm run assets:optimize   # her original/ klasörünü tarar, kardeş optimized/ klasörüne WebP üretir
+npm run games:icons       # dokuz ortak oyun ikonunu 1024 × 1024 PNG olarak yeniden üretir
+npm run games:icons:check # ikon boyutlarını, adlarını ve ortak kod referanslarını doğrular
 ```
 
 Adlandırma kuralları (script bunlara göre davranır):
 
 - Arka planlar: `<ad>-desktop.png` / `<ad>-mobile.png` — kendi çözünürlüğünde kalır.
-- İkonlar: `ikon-<oyun>.<ext>` — 512px'e küçültülür (kutucukta ~150px gösteriliyor).
+- Oyun ikonları: `assets/icons/games/<oyun>.png` — 1024 × 1024 ve kebab-case.
 - Boyama preset'leri: `preset-<ad>.jpeg`.
 
-Yeni görsel eklerken: dosyayı ilgili `original/` klasörüne koy, `npm run assets:optimize` çalıştır,
-koda `assets/<bölüm>/optimized/<ad>.webp` yolunu yaz, `assets/<bölüm>/optimized/` klasörünü commit'le.
+Yeni bölüm görseli eklerken dosyayı ilgili `original/` klasörüne koy, `npm run assets:optimize`
+çalıştır ve üretilen WebP yolunu kullan. Oyun ikonlarını `js/data/game-icons.js` içindeki ortak
+`GAME_ICONS` kaydına ekle; ardından `npm run games:icons` ve `npm run games:icons:check` çalıştır.
 
 > `assets/ana-sayfa/optimized/` içindeki dosyalar içerik-hash'li adlar taşır ve her üretimde değişir —
 > oraya sabit isimle link vermeyin, kalıcı 404 olur. Paylaşılan bir görsel gerekiyorsa kaynağını

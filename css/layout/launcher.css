@@ -770,7 +770,7 @@ html.launcher-experience .launcher-app-icon > svg {
 html.launcher-experience .launcher-app-icon > img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 html.launcher-experience .launcher-app-label {
@@ -830,7 +830,7 @@ html.launcher-experience .launcher-folder-preview-item svg {
 html.launcher-experience .launcher-folder-preview-item img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 html.launcher-experience .launcher-tone-home { --launcher-icon-bg: linear-gradient(145deg, #d66f9b, #8f2856); }
@@ -1090,7 +1090,7 @@ html.launcher-experience .launcher-search-result-icon {
 html.launcher-experience .launcher-search-result-icon :is(svg, img) {
   width: 56%;
   height: 56%;
-  object-fit: cover;
+  object-fit: contain;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -1971,6 +1971,17 @@ html.launcher-experience #page-root > .page.active:not(#dashboard) {
     border-radius: 28px 28px 22px 22px;
     transform: translateY(8px) scale(.98);
     transform-origin: bottom center;
+  }
+
+  html.launcher-experience .launcher-folder-dialog {
+    background: rgba(29, 22, 34, .84);
+    -webkit-backdrop-filter: saturate(145%) blur(28px);
+    backdrop-filter: saturate(145%) blur(28px);
+  }
+
+  html.launcher-experience body:not(.dark) .launcher-folder-dialog {
+    color: #271b2d;
+    background: rgba(255, 250, 247, .88);
   }
 
   html.launcher-experience .launcher-dialog-head {

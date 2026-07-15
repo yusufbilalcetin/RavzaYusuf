@@ -111,11 +111,28 @@ a:focus-visible {
 .title-block {
   min-width: 0;
   padding-top: 2px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.title-block p,
-.title-block h1,
-.title-block > span {
+.game-logo {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: block;
+  border-radius: 14px;
+  object-fit: contain;
+  box-shadow: 0 10px 24px rgba(125, 41, 78, .22);
+}
+
+.title-copy {
+  min-width: 0;
+}
+
+.title-copy p,
+.title-copy h1,
+.title-copy > span {
   margin: 0;
 }
 
@@ -134,7 +151,7 @@ a:focus-visible {
   letter-spacing: -.035em;
 }
 
-.title-block > span {
+.title-copy > span {
   display: block;
   max-width: 580px;
   margin-top: 7px;
@@ -940,15 +957,20 @@ a:focus-visible {
     gap: 5px;
   }
 
-  .title-block p,
-  .title-block > span {
+  .title-copy p,
+  .title-copy > span {
     display: none;
   }
 
-  .title-block h1 {
+  .title-copy h1 {
     padding-top: 7px;
     font-size: clamp(17px, 5vw, 24px);
     text-align: center;
+  }
+
+  .game-logo {
+    width: 38px;
+    height: 38px;
   }
 
   .game-shell {
@@ -971,7 +993,7 @@ a:focus-visible {
     height: 39px;
   }
 
-  .title-block h1 {
+  .title-copy h1 {
     font-size: 16px;
     line-height: 1.15;
   }
@@ -1011,7 +1033,7 @@ a:focus-visible {
 
 @media (max-height: 760px) and (min-width: 621px) {
   .game-app { padding-top: 10px; }
-  .title-block > span { display: none; }
+  .title-copy > span { display: none; }
   .game-shell { margin-top: 10px; padding-block: 12px; }
   .stats { margin-block: 8px; }
   .board { width: min(100%, 56dvh); }

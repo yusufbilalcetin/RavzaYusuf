@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import gameIcon from "../../../assets/icons/games/meyve-eslestirme.png";
 
 const STORAGE_KEY = "meyve_mahjong_progress_v2";
 const TOTAL_LEVELS = 30;
@@ -469,7 +470,7 @@ export default function App() {
     <main className="fruit-app">
       <header className="app-header">
         <div className="brand">
-          <img src="./assets/game-logo-meyve-eslestirme.png" alt="" />
+          <img src={gameIcon} alt="" />
           <div>
             <span className="kicker">Meyve Mahjong</span>
             <h1>Bölüm {levelNumber} / {TOTAL_LEVELS}</h1>

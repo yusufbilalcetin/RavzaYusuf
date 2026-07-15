@@ -150,126 +150,6 @@
   text-decoration: none;
 }
 
-.chance-wheel-icon {
-  position: relative;
-  isolation: isolate;
-  background: linear-gradient(145deg, #18202b, #0f141c);
-}
-
-.chance-wheel-disc {
-  position: absolute;
-  inset: 14%;
-  border: 5px solid #d9ae50;
-  border-radius: 50%;
-  background: conic-gradient(
-    #9c4f45 0 12.5%,
-    #315d67 12.5% 25%,
-    #b78632 25% 37.5%,
-    #556b3c 37.5% 50%,
-    #5f4f79 50% 62.5%,
-    #9b643e 62.5% 75%,
-    #35675b 75% 87.5%,
-    #8b4058 87.5% 100%
-  );
-  box-shadow: 0 5px 13px rgba(20, 13, 8, .34), inset 0 0 0 2px rgba(255, 248, 223, .22);
-}
-
-.chance-wheel-pointer {
-  position: absolute;
-  z-index: 3;
-  top: 7%;
-  left: 50%;
-  width: 15%;
-  height: 22%;
-  transform: translateX(-50%);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-  background: #f0ca6c;
-}
-
-.chance-wheel-center {
-  position: absolute;
-  z-index: 4;
-  left: 50%;
-  top: 50%;
-  width: 34%;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  transform: translate(-50%, -50%);
-  border: 3px solid #f0ca6c;
-  border-radius: 50%;
-  background: #d4a949;
-  color: #211a0d;
-  font-size: clamp(6px, .8vw, 9px);
-  font-weight: 900;
-  letter-spacing: -.02em;
-  box-shadow: 0 3px 8px rgba(20, 13, 8, .4);
-}
-
-.game-tile:hover .chance-wheel-disc {
-  transform: rotate(16deg);
-  transition: transform .45s cubic-bezier(.16, 1, .3, 1);
-}
-
-.area-puzzle-icon {
-  position: relative;
-  background: #fff8fb;
-}
-
-.area-puzzle-preview {
-  position: absolute;
-  inset: 12%;
-  overflow: hidden;
-  border: 2px solid #534358;
-  border-radius: 12px;
-  background: #fffdfd;
-  box-shadow: inset 0 0 0 1px rgba(83, 67, 88, .12);
-}
-
-.area-preview-region {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  border: 2px solid;
-  font-style: normal;
-}
-
-.area-preview-region b {
-  min-width: 18px;
-  height: 18px;
-  display: grid;
-  place-items: center;
-  border-radius: 6px;
-  background: #403244;
-  color: #fff;
-  font-size: 9px;
-  line-height: 1;
-}
-
-.area-preview-region--four {
-  inset: 0 55% 55% 0;
-  border-color: #7960c1;
-  background: #c2b3eb;
-}
-
-.area-preview-region--eight {
-  inset: 0 0 55% 45%;
-  border-color: #4d96c2;
-  background: #b5ddf3;
-}
-
-.area-preview-region--six {
-  inset: 45% 55% 0 0;
-  border-color: #4c9d78;
-  background: #b6dfcc;
-}
-
-.area-preview-region--pink {
-  inset: 45% 0 0 45%;
-  border-color: #c95c83;
-  background: #f3b5c9;
-}
-
 .game-tile:hover {
   background: rgba(255, 255, 255, .46);
 }
@@ -290,7 +170,7 @@
   place-items: center;
 }
 
-/* Apple app-icon style art (SVG carries its own gradient/gloss) */
+/* Ortak kare oyun ikonları */
 .game-tile-art--icon {
   padding: 0;
   overflow: hidden;
@@ -302,7 +182,6 @@
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
 }
 
-.game-tile-art--icon svg,
 .game-tile-img {
   display: block;
   width: 100%;
@@ -310,7 +189,7 @@
 }
 
 .game-tile-img {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .game-tile:hover .game-tile-art--icon {
@@ -3043,18 +2922,20 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
 
 @media (max-width: 420px) {
   .game-tile-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px 10px;
   }
 
   .game-tile-art {
-    width: min(19vw, 82px);
-    height: min(19vw, 82px);
+    width: min(25vw, 88px);
+    height: min(25vw, 88px);
   }
 
   .game-tile-copy strong {
-    max-width: 21vw;
+    max-width: 29vw;
+    min-height: 2.5em;
     font-size: 12px;
+    white-space: normal;
   }
 
   .candy-board {

@@ -111,17 +111,10 @@ a:focus-visible {
   flex: none;
   width: 46px;
   height: 46px;
-  display: grid;
-  place-items: center;
+  display: block;
   border-radius: 14px;
-  background: linear-gradient(145deg, #d66f9b, #7d294e);
+  object-fit: contain;
   box-shadow: 0 10px 24px rgba(125, 41, 78, .32);
-  color: #fff;
-}
-
-.game-logo svg {
-  width: 24px;
-  height: 24px;
 }
 
 .title-text p,
@@ -753,11 +746,6 @@ a:focus-visible {
   .game-logo {
     width: 38px;
     height: 38px;
-  }
-
-  .game-logo svg {
-    width: 20px;
-    height: 20px;
   }
 
   .title-text h1 {

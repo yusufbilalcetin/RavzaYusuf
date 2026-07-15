@@ -1,8 +1,18 @@
 #!/bin/sh
-# Ana sayfa hero görsel bütünlüğü — commit öncesi doğrulama.
-# Etkinleştirmek için: npm run hero:install-hooks
-npm run hero:check || {
-  echo "[hero] pre-commit: hero:check başarısız — commit durduruldu."
-  echo "[hero] Düzeltmek için: npm run hero:optimize"
+# Hero görselleri ve PDF kitap bütünlüğü — commit öncesi doğrulama.
+# Etkinleştirmek için: npm run hero:install-hooks veya npm run books:install-hooks
+if [ -d "assets/ana-sayfa/original" ]; then
+  npm run hero:check || {
+    echo "[hero] pre-commit: hero:check başarısız — commit durduruldu."
+    echo "[hero] Düzeltmek için: npm run hero:optimize"
+    exit 1
+  }
+else
+  echo "[hero] Kaynak klasör yerelde yok; hero kaynak kontrolü atlandı."
+fi
+
+npm run books:check || {
+  echo "[books] pre-commit: books:check başarısız — commit durduruldu."
+  echo "[books] Düzeltmek için: npm run books:optimize"
   exit 1
 }

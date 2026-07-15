@@ -1,4 +1,4 @@
-import { RAVZA_BOOKS } from '../../data/ravza-books.js?v=library-20260715-2';
+import { RAVZA_BOOKS } from '../../data/ravza-books.js?v=books-pipeline-20260716-1';
 
 const PAGE_FLIP_SRC = 'https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.js';
 const PDFJS_MODULE_URL = new URL('../../assets/vendor/pdfjs/pdf.js', import.meta.url).href;
@@ -38,6 +38,8 @@ const state = {
   chapterId: null,
   pageNum: 1,
   currentIndex: 0,
+  currentPage: 1,
+  savedPage: 1,
   fontSize: 17,
   lineHeight: 1.4,
   theme: 'light',
@@ -73,6 +75,7 @@ let pdfFetchController = null;
 let pdfLoadingTask = null;
 let pdfDocument = null;
 let pdfBookId = null;
+let pdfPageAspectRatio = 3 / 4;
 let pdfRenderGeneration = 0;
 let pdfRenderBox = { width: 1, height: 1 };
 let pdfRenderDrain = Promise.resolve();
@@ -132,39 +135,50 @@ function saveBookmarks() {
   localStorage.setItem(STORAGE.bookmarks, JSON.stringify(state.bookmarks));
 }
 
-function saveProgress(page, index) {
+function saveCurrentPage(page, index) {
   if (!page || !state.bookId) return;
   const book = getBook(state.bookId);
   const now = Date.now();
+  const updatedAt = new Date(now).toISOString();
   if (state.bookType === 'pdf') {
     const pdfPage = clamp(Number(page.pdfPage) || Math.min(index + 1, pdfDocument?.numPages || 1), 1, pdfDocument?.numPages || 1);
     const pageCount = Math.max(1, pdfDocument?.numPages || Number(book?.totalPages) || readerPages.length - 1);
+    state.currentPage = pdfPage;
+    state.savedPage = state.currentPage;
     const record = {
       bookId: state.bookId,
       pdfPage,
       pageIndex: index,
+      savedPage: state.savedPage,
       totalPages: pageCount,
       progress: Number(clamp((pdfPage / pageCount) * 100, 0, 100).toFixed(1)),
       bookmark: isBookmarked(page) ? pdfPage : null,
       completed: pdfPage >= pageCount,
       lastOpenedAt: now,
+      updatedAt,
     };
     state.readingProgress[state.bookId] = record;
     try { localStorage.setItem(`${PDF_PROGRESS_PREFIX}${state.bookId}`, JSON.stringify(record)); } catch (_) {}
+    const root = document.getElementById('reader-inner');
+    if (root) root.dataset.savedPage = String(state.savedPage);
     return;
   }
   const pagesInChapter = readerPages.filter(item => item.chapterId === page.chapterId);
   const chapterPageIndex = pagesInChapter.findIndex(item => item === page);
   const pageCount = Math.max(1, readerPages.length);
+  state.currentPage = index + 1;
+  state.savedPage = state.currentPage;
   const record = {
     bookId: state.bookId,
     pdfPage: null,
     pageIndex: index,
+    savedPage: state.savedPage,
     totalPages: pageCount,
     progress: Number(clamp(((index + 1) / pageCount) * 100, 0, 100).toFixed(1)),
     bookmark: isBookmarked(page) ? index + 1 : null,
     completed: index >= pageCount - 1,
     lastOpenedAt: now,
+    updatedAt,
     chapterId: page.chapterId,
     pageNum: chapterPageIndex + 1,
     offset: page.sourceOffset,
@@ -172,6 +186,8 @@ function saveProgress(page, index) {
   };
   state.readingProgress[state.bookId] = record;
   try { localStorage.setItem(`${PDF_PROGRESS_PREFIX}${state.bookId}`, JSON.stringify(record)); } catch (_) {}
+  const root = document.getElementById('reader-inner');
+  if (root) root.dataset.savedPage = String(state.savedPage);
 }
 
 function normalizeProgress(book, progress) {
@@ -185,8 +201,11 @@ function normalizeProgress(book, progress) {
     ? clamp(rawPageIndex, 0, totalPages)
     : rawPageIndex;
   const pdfPage = book.type === 'pdf'
-    ? clamp(Number(progress.pdfPage) || pageIndex + 1, 1, totalPages)
+    ? clamp(Number(progress.savedPage) || Number(progress.pdfPage) || pageIndex + 1, 1, totalPages)
     : null;
+  const savedPage = book.type === 'pdf'
+    ? pdfPage
+    : clamp(Number(progress.savedPage) || pageIndex + 1, 1, totalPages);
   let percentage = Number(progress.progress);
   if (Number.isFinite(percentage) && percentage > 0 && percentage <= 1 && progress.updatedAt) percentage *= 100;
   if (!Number.isFinite(percentage)) {
@@ -204,6 +223,7 @@ function normalizeProgress(book, progress) {
     bookId: book.id,
     pdfPage,
     pageIndex,
+    savedPage,
     totalPages,
     progress: Number(clamp(percentage, 0, 100).toFixed(1)),
     bookmark: Number.isFinite(Number(bookmark)) ? Number(bookmark) : null,
@@ -239,8 +259,14 @@ function buildSampleContent() {
 }
 
 function applyTheme(theme) {
+  if (!['light', 'sepia', 'dark'].includes(theme)) return;
   state.theme = theme;
   document.getElementById('ravzabooks')?.setAttribute('data-reader-theme', theme);
+  document.querySelectorAll('#reader-inner .theme-btn').forEach(button => {
+    const selected = button.dataset.theme === theme;
+    button.classList.toggle('selected', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
   const color = theme === 'dark' ? '#171614' : theme === 'sepia' ? '#ddc8a5' : '#F4EAD7';
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
 }
@@ -282,6 +308,8 @@ function getCurrentPosition() {
 function findStartIndex(pages, progress) {
   if (!pages.length || !progress) return 0;
   if (pages[0]?.type === 'pdf') {
+    const savedPage = Number(progress.savedPage);
+    if (Number.isFinite(savedPage) && savedPage > 0) return clamp(savedPage - 1, 0, pages.length - 1);
     const byIndex = Number(progress.pageIndex);
     if (Number.isFinite(byIndex)) return clamp(byIndex, 0, pages.length - 1);
     return clamp((Number(progress.pdfPage) || 1) - 1, 0, pages.length - 1);
@@ -356,6 +384,7 @@ async function destroyPdfDocument() {
   pdfLoadingTask = null;
   pdfDocument = null;
   pdfBookId = null;
+  pdfPageAspectRatio = 3 / 4;
   if (documentToDestroy) {
     try { await documentToDestroy.destroy(); } catch (_) {}
   } else if (loadingTask) {
@@ -433,7 +462,11 @@ function textCoverMarkup(book) {
 function libraryCoverMarkup(book) {
   if (book.type !== 'pdf') return textCoverMarkup(book);
   const source = book.cover ? ` src="${escapeHTML(book.cover)}"` : '';
-  return `<img class="library-cover-image" data-book-cover="${escapeHTML(book.id)}"${source} alt="${escapeHTML(book.title)} kitap kapağı" />`;
+  const sourceSet = book.coverSrcSet ? ` srcset="${escapeHTML(book.coverSrcSet)}" sizes="(max-width: 520px) 42vw, 220px"` : '';
+  const dimensions = Number(book.coverWidth) > 0 && Number(book.coverHeight) > 0
+    ? ` width="${Number(book.coverWidth)}" height="${Number(book.coverHeight)}"`
+    : '';
+  return `<img class="library-cover-image" data-book-cover="${escapeHTML(book.id)}"${source}${sourceSet}${dimensions} alt="${escapeHTML(book.title)} kitap kapağı" decoding="async" />`;
 }
 
 function renderLibrary() {
@@ -585,16 +618,14 @@ function bindLibraryCover(image, signal) {
 }
 
 async function showLibrary() {
-  if (state.mode === 'reading') {
-    const currentPage = readerPages[state.currentIndex];
-    if (currentPage) saveProgress(currentPage, state.currentIndex);
-  }
   cleanupReader();
   await destroyPdfDocument();
   readerPages = [];
   state.bookId = null;
   state.chapterId = null;
   state.currentIndex = 0;
+  state.currentPage = 1;
+  state.savedPage = 1;
   renderLibrary();
 }
 
@@ -655,8 +686,10 @@ function buildReaderShell(book) {
   const root = document.getElementById('reader-inner');
   const isPdf = book.type === 'pdf';
   const progress = readBookProgress(book.id) || state.readingProgress[book.id] || null;
+  state.savedPage = progress?.savedPage || (book.type === 'pdf' ? progress?.pdfPage : Number(progress?.pageIndex) + 1) || 1;
   const bookmarked = Boolean(progress?.bookmark);
   root.className = `reader-root${state.accessible ? ' accessible' : ''}`;
+  root.dataset.bookType = isPdf ? 'pdf' : 'text';
   root.dataset.spread = shouldUsePortrait() ? 'single' : 'double';
   root.innerHTML = `
     <div id="rdr-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
@@ -671,7 +704,7 @@ function buildReaderShell(book) {
       <button class="control-btn" id="rdr-back" type="button" aria-label="Geri">${ICON.back}</button>
       <div class="control-title" id="rdr-control-title">${escapeHTML(book.title)}</div>
       <div class="control-actions">
-        <button class="control-btn${bookmarked ? ' active' : ''}" id="rdr-bookmark" type="button" aria-label="Yer imi" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}</button>
+        <button class="control-btn${bookmarked ? ' active' : ''}" id="rdr-bookmark" type="button" aria-label="Kaldığım sayfayı kaydet ve yer imini değiştir" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}</button>
         <button class="control-btn control-aa" id="rdr-settings-open" type="button" aria-label="Okuma ayarları" aria-expanded="false">Aa</button>
       </div>
     </header>
@@ -718,7 +751,7 @@ function buildReaderShell(book) {
           <div class="settings-row">
             <span class="setting-name">Sayfa görünümü</span>
             <div class="theme-controls">
-              ${['light', 'sepia', 'dark'].map(theme => `<button class="theme-btn${state.theme === theme ? ' selected' : ''}" type="button" data-theme="${theme}" aria-label="${theme === 'light' ? 'Açık' : theme === 'sepia' ? 'Sepya' : 'Koyu'} tema"></button>`).join('')}
+              ${['light', 'sepia', 'dark'].map(theme => `<button class="theme-btn${state.theme === theme ? ' selected' : ''}" type="button" data-theme="${theme}" aria-label="${theme === 'light' ? 'Açık' : theme === 'sepia' ? 'Sepya' : 'Koyu'} tema" aria-pressed="${state.theme === theme}"></button>`).join('')}
             </div>
           </div>
         </section>
@@ -760,7 +793,32 @@ function buildReaderShell(book) {
   return root;
 }
 
+function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
+  if (state.bookType !== 'pdf') return;
+  const stage = document.getElementById('rdr-stage');
+  const cradle = document.getElementById('book-cradle');
+  const root = document.getElementById('reader-inner');
+  if (!stage || !cradle) return;
+
+  const ratio = Number.isFinite(aspectRatio) && aspectRatio > 0 ? aspectRatio : 3 / 4;
+  const stageStyle = getComputedStyle(stage);
+  const horizontalPadding = parseFloat(stageStyle.paddingLeft) + parseFloat(stageStyle.paddingRight);
+  const verticalPadding = parseFloat(stageStyle.paddingTop) + parseFloat(stageStyle.paddingBottom);
+  const availableWidth = Math.max(1, stage.clientWidth - horizontalPadding);
+  const availableHeight = Math.max(1, stage.clientHeight - verticalPadding);
+  const portrait = shouldUsePortrait();
+  const pagesAcross = portrait ? 1 : 2;
+  const pageWidth = Math.min(availableWidth / pagesAcross, availableHeight * ratio);
+  const pageHeight = pageWidth / ratio;
+
+  cradle.style.width = `${Math.max(1, pageWidth * pagesAcross)}px`;
+  cradle.style.height = `${Math.max(1, pageHeight)}px`;
+  cradle.style.setProperty('--pdf-page-aspect', String(ratio));
+  if (root) root.dataset.spread = portrait ? 'single' : 'double';
+}
+
 function getLayoutMetrics() {
+  if (state.bookType === 'pdf') fitPdfBookToStage();
   const cradle = document.getElementById('book-cradle');
   if (!cradle) return null;
   const rect = cradle.getBoundingClientRect();
@@ -1050,7 +1108,6 @@ async function openTextReader(book, position = null) {
     if (index !== lastFlipIndex) playPageSound();
     lastFlipIndex = index;
     updateReaderUI(index);
-    saveProgress(readerPages[index], index);
   });
   pageFlip.on('changeState', event => {
     if (event.data === 'user_fold' || event.data === 'flipping') hideControls();
@@ -1062,7 +1119,6 @@ async function openTextReader(book, position = null) {
   document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
   setAppMode('reading');
   showControls(true);
-  saveProgress(readerPages[startIndex], startIndex);
 }
 
 function pdfErrorMessage(error, phase = 'document', bookTitle = 'Kitap') {
@@ -1156,6 +1212,17 @@ async function loadPdfDocument(book) {
     if (error?.name === 'AbortError') throw error;
     if (error instanceof Error && /PDF dosyası/.test(error.message)) throw error;
     throw new Error(pdfErrorMessage(error, 'document', book.title));
+  }
+}
+
+async function readPdfPageAspectRatio(document) {
+  try {
+    const page = await document.getPage(1);
+    const viewport = page.getViewport({ scale: 1 });
+    const ratio = viewport.width / viewport.height;
+    return Number.isFinite(ratio) && ratio > 0 ? ratio : 3 / 4;
+  } catch (_) {
+    return 3 / 4;
   }
 }
 
@@ -1369,6 +1436,9 @@ async function openPdfReader(book, position = null) {
     return;
   }
 
+  pdfPageAspectRatio = await readPdfPageAspectRatio(pdfDocument);
+  if (generation !== renderGeneration || !pdfDocument) return;
+
   buildReaderShell(book);
   applyTheme(state.theme);
   applyTypography();
@@ -1414,7 +1484,6 @@ async function openPdfReader(book, position = null) {
     if (index !== lastFlipIndex) playPageSound();
     lastFlipIndex = index;
     updateReaderUI(index);
-    saveProgress(readerPages[index], index);
     void updatePdfRenderWindow(index);
   });
   pageFlip.on('changeState', event => {
@@ -1430,7 +1499,6 @@ async function openPdfReader(book, position = null) {
   document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
   setAppMode('reading');
   showControls(true);
-  saveProgress(readerPages[startIndex], startIndex);
 }
 
 async function openBook(book, position = null) {
@@ -1463,8 +1531,8 @@ function toggleBookmark() {
   state.bookmarks[state.bookId] = entries;
   saveBookmarks();
   updateReaderUI(state.currentIndex);
-  saveProgress(page, state.currentIndex);
-  showToast(existingIndex >= 0 ? 'Yer imi kaldırıldı' : 'Sayfa yer imlerine eklendi');
+  saveCurrentPage(page, state.currentIndex);
+  showToast(existingIndex >= 0 ? 'Yer imi kaldırıldı · kaldığın sayfa kaydedildi' : 'Kaldığın sayfa kaydedildi');
 }
 
 function formatPageLabel(index) {
@@ -1480,6 +1548,9 @@ function updateReaderUI(index) {
   if (!readerPages.length) return;
   state.currentIndex = clamp(index, 0, readerPages.length - 1);
   const page = readerPages[state.currentIndex];
+  state.currentPage = state.bookType === 'pdf'
+    ? clamp(Number(page.pdfPage) || pdfDocument?.numPages || 1, 1, pdfDocument?.numPages || 1)
+    : state.currentIndex + 1;
   state.chapterId = page.chapterId;
   state.pageNum = state.currentIndex + 1;
   const label = document.getElementById('rdr-progress-label');
@@ -1505,6 +1576,11 @@ function updateReaderUI(index) {
   if (live) live.textContent = state.bookType === 'pdf'
     ? `${page.type === 'pdf-back-cover' ? 'Arka kapak' : `PDF sayfası ${page.pdfPage} / ${pdfDocument?.numPages || 1}`}`
     : `Sayfa ${state.currentIndex + 1} / ${readerPages.length}, ${page.chapterTitle}`;
+  const root = document.getElementById('reader-inner');
+  if (root) {
+    root.dataset.currentPage = String(state.currentPage);
+    root.dataset.savedPage = String(state.savedPage);
+  }
 }
 
 function showControls(autoHide = true) {
@@ -1845,7 +1921,6 @@ function bindReaderEvents(book) {
     button.addEventListener('click', () => {
       applyTheme(button.dataset.theme);
       savePrefs();
-      readerRoot.querySelectorAll('.theme-btn').forEach(item => item.classList.toggle('selected', item === button));
     }, { signal });
   });
 

@@ -6,6 +6,10 @@ Thumbs.db
 # Kaynak görseller (yalnızca yerelde; deploy edilen optimize WebP/AVIF çıktılarıdır)
 assets/**/original/
 
+# Kitap PDF'leri uygulamanın kendisidir; original/ içinde olsa da deploy edilir.
+!assets/books/original/
+!assets/books/original/*.pdf
+
 # Hero pipeline kaynak-hash cache'i (yerel; silinirse güvenle yeniden üretilir)
 .cache/
 
