@@ -73,8 +73,8 @@ export function createGameAudio({
     const t0 = ctx.currentTime + delay;
     const length = Math.max(1, Math.floor(ctx.sampleRate * dur));
     const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < length; i += 1) data[i] = Math.random() * 2 - 1;
+    const samples = buffer.getChannelData(0);
+    for (let i = 0; i < length; i += 1) samples[i] = Math.random() * 2 - 1;
     const src = ctx.createBufferSource();
     src.buffer = buffer;
     const filter = ctx.createBiquadFilter();

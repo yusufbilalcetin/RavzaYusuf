@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { withTimeout, TIMEOUT } from "./helpers.js";
+import { safeParse, withTimeout, TIMEOUT } from "./helpers.js";
 
 let rejections = 0;
 process.on("unhandledRejection", () => { rejections += 1; });
@@ -55,3 +55,25 @@ process.on("unhandledRejection", () => { rejections += 1; });
 }
 
 console.log("✓ withTimeout: gerçek değer, fallback, TIMEOUT sembolü, rejection yayılımı, geç-rejection güvenliği, timer temizliği");
+
+// safeParse: legacy-app.js ve features/kahoot.js'teki iki ayrı kopya burada
+// birleştirildi. Kritik nokta, geçerli "falsy" değerlerin fallback'e
+// düşmemesidir — eski kahoot kopyası `|| fallback` kullandığı için 0/false/""
+// değerlerini yutuyordu.
+{
+  assert.deepEqual(safeParse('{"xp":265}', {}), { xp: 265 });
+  assert.deepEqual(safeParse("[1,2]", []), [1, 2]);
+
+  // Bozuk, boş ve null kayıtlar fallback döner.
+  assert.deepEqual(safeParse("{bozuk-json", { a: 1 }), { a: 1 });
+  assert.deepEqual(safeParse("", { a: 1 }), { a: 1 });
+  assert.deepEqual(safeParse(null, { a: 1 }), { a: 1 });
+  assert.equal(safeParse("null", "fallback"), "fallback");
+
+  // Geçerli falsy değerler korunur (`||` ile sadeleştirilirse bu satırlar kırılır).
+  assert.equal(safeParse("0", "fallback"), 0);
+  assert.equal(safeParse("false", "fallback"), false);
+  assert.equal(safeParse('""', "fallback"), "");
+}
+
+console.log("✓ safeParse: geçerli JSON, bozuk/boş/null kayıt, falsy değerlerin korunması");

@@ -225,19 +225,19 @@ function mainStudyWidget() {
 }
 
 function smallWidget(widgetId) {
-  const data = studySnapshot();
-  const percent = data.total ? Math.round((data.studies.length / data.total) * 100) : 0;
-  const latestExam = data.exams[0];
-  const lastStudy = data.studies.at(-1);
+  const snapshot = studySnapshot();
+  const percent = snapshot.total ? Math.round((snapshot.studies.length / snapshot.total) * 100) : 0;
+  const latestExam = snapshot.exams[0];
+  const lastStudy = snapshot.studies.at(-1);
   const streak = safeJson("eul_study_streak", null);
-  const nextPlan = data.dailyPlan.find((entry) => entry && !entry.completed);
+  const nextPlan = snapshot.dailyPlan.find((entry) => entry && !entry.completed);
   const definitions = {
-    "daily-goal": { eyebrow: "Günlük hedef", value: `${percent}%`, text: data.studies.length ? `${data.studies.length}/${data.total} konu tamamlandı` : "Henüz çalışma kaydı yok.", route: "calisma-merkezi" },
-    "last-quiz": { eyebrow: "Son quiz", value: data.quizzes.length ? `${data.quizzes.length}/${data.total}` : "—", text: data.quizzes.length ? "Quiz ilerlemen kaydedildi." : "Henüz tamamlanan quiz yok.", route: "quiz-merkezi" },
+    "daily-goal": { eyebrow: "Günlük hedef", value: `${percent}%`, text: snapshot.studies.length ? `${snapshot.studies.length}/${snapshot.total} konu tamamlandı` : "Henüz çalışma kaydı yok.", route: "calisma-merkezi" },
+    "last-quiz": { eyebrow: "Son quiz", value: snapshot.quizzes.length ? `${snapshot.quizzes.length}/${snapshot.total}` : "—", text: snapshot.quizzes.length ? "Quiz ilerlemen kaydedildi." : "Henüz tamamlanan quiz yok.", route: "quiz-merkezi" },
     "study-streak": { eyebrow: "Çalışma serisi", value: Number(streak?.current || streak || 0) ? `${Number(streak?.current || streak)} gün` : "—", text: Number(streak?.current || streak || 0) ? "Seri devam ediyor." : "Seri verisi oluştuğunda burada görünür.", route: "calisma-merkezi" },
     "recent-lesson": { eyebrow: "Son çalışılan ders", value: lastStudy?.title || "Kayıt yok", text: lastStudy ? `${lastStudy.unit || "Ders"} · tamamlandı` : "Bir dersi tamamladığında burada görünür.", route: "calisma-merkezi" },
     "day-plan": { eyebrow: "Günün planı", value: nextPlan?.title || nextPlan?.lesson || "Plan yok", text: nextPlan ? (nextPlan.note || "Sıradaki kayıtlı çalışma") : "Bugün için kaydedilmiş plan yok.", route: "calisma-merkezi" },
-    "exam-summary": { eyebrow: "Sınav özeti", value: data.bestExam ? `%${data.bestExam}` : "—", text: latestExam ? `Son sınav: ${latestExam.score}/${latestExam.total}` : "Henüz sınav sonucu yok.", route: "sinav-merkezi" },
+    "exam-summary": { eyebrow: "Sınav özeti", value: snapshot.bestExam ? `%${snapshot.bestExam}` : "—", text: latestExam ? `Son sınav: ${latestExam.score}/${latestExam.total}` : "Henüz sınav sonucu yok.", route: "sinav-merkezi" },
     "favorite-apps": { eyebrow: "Favori uygulamalar", value: `${launcherState.layout.dock.length} kısayol`, text: launcherState.layout.dock.length ? launcherState.layout.dock.map((id) => resolveLauncherItem(id)?.title).filter(Boolean).join(" · ") : "Dock'a uygulama ekleyebilirsin.", route: null }
   };
   const content = definitions[widgetId] || definitions["daily-goal"];

@@ -697,41 +697,41 @@ export function createPbnEngine({ canvas, viewport, stage }) {
 
   function exportTemplateDataUrl(mime = "image/png") {
     // Numaralı boş şablon tek seferlik geçici tuvale çizilir.
-    const tmp = document.createElement("canvas");
-    tmp.width = width;
-    tmp.height = height;
-    const tctx = tmp.getContext("2d");
-    tctx.fillStyle = "#ffffff";
-    tctx.fillRect(0, 0, width, height);
+    const templateCanvas = document.createElement("canvas");
+    templateCanvas.width = width;
+    templateCanvas.height = height;
+    const templateCtx = templateCanvas.getContext("2d");
+    templateCtx.fillStyle = "#ffffff";
+    templateCtx.fillRect(0, 0, width, height);
 
-    tctx.strokeStyle = OUTLINE_CSS;
-    tctx.lineWidth = 1;
+    templateCtx.strokeStyle = OUTLINE_CSS;
+    templateCtx.lineWidth = 1;
     if (cellSize) {
-      tctx.beginPath();
+      templateCtx.beginPath();
       for (let x = 0; x <= width; x += cellSize) {
         const lx = Math.min(x, width - 1) + 0.5;
-        tctx.moveTo(lx, 0); tctx.lineTo(lx, height);
+        templateCtx.moveTo(lx, 0); templateCtx.lineTo(lx, height);
       }
       for (let y = 0; y <= height; y += cellSize) {
         const ly = Math.min(y, height - 1) + 0.5;
-        tctx.moveTo(0, ly); tctx.lineTo(width, ly);
+        templateCtx.moveTo(0, ly); templateCtx.lineTo(width, ly);
       }
-      tctx.stroke();
+      templateCtx.stroke();
     } else if (outline) {
       for (let i = 0; i < totalPixels; i++) {
-        if (outline[i]) tctx.fillRect(i % width, Math.floor(i / width), 1, 1);
+        if (outline[i]) templateCtx.fillRect(i % width, Math.floor(i / width), 1, 1);
       }
     }
 
     const fontSize = Math.max(9, Math.round((cellSize || 24) * 0.6));
-    tctx.font = `600 ${fontSize}px 'Segoe UI', Arial, sans-serif`;
-    tctx.textAlign = "center";
-    tctx.textBaseline = "middle";
-    tctx.fillStyle = "rgba(70,70,78,0.85)";
+    templateCtx.font = `600 ${fontSize}px 'Segoe UI', Arial, sans-serif`;
+    templateCtx.textAlign = "center";
+    templateCtx.textBaseline = "middle";
+    templateCtx.fillStyle = "rgba(70,70,78,0.85)";
     for (const region of regions) {
-      tctx.fillText(String(region.paletteNumber), region.labelX, region.labelY);
+      templateCtx.fillText(String(region.paletteNumber), region.labelX, region.labelY);
     }
-    return tmp.toDataURL(mime);
+    return templateCanvas.toDataURL(mime);
   }
 
   /* ---------- pointer interaction ---------- */

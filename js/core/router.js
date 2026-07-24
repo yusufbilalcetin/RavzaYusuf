@@ -4,16 +4,11 @@ import { initAnaSayfa } from "../pages/ana-sayfa-page.js";
 import { initRavzaLingo } from "../pages/ravzalingo-page.js";
 import { initKahoot } from "../pages/kahoot-page.js";
 import { initCalismaMerkezi } from "../pages/calisma-merkezi-page.js";
-import { initKonuDetay } from "../pages/konu-detay-page.js";
 import { initEzberMerkezi } from "../pages/ezber-merkezi-page.js";
 import { initBoslukDoldurma } from "../pages/bosluk-doldurma-page.js";
 import { initQuizMerkezi } from "../pages/quiz-merkezi-page.js";
-import { initQuizCoz } from "../pages/quiz-coz-page.js";
 import { initSinavMerkezi } from "../pages/sinav-merkezi-page.js";
-import { initSinavCoz } from "../pages/sinav-coz-page.js";
 import { initHizliTekrar } from "../pages/hizli-tekrar-page.js";
-import { initBirinciSinif } from "../pages/birinci-sinif-page.js";
-import { initIkinciSinif } from "../pages/ikinci-sinif-page.js";
 import { getAppScrollElement, scrollAppTo } from "./app-shell-scroll.js";
 import { syncLauncherActive } from "./launcher.js?v=home-proportions-20260716-1";
 
@@ -64,16 +59,16 @@ const routes = {
   ravzalingo: { partial: "./partials/pages/ravzalingo.html", sectionId: "ravzalingo", navId: "nav-ravzalingo", init: initRavzaLingo },
   kahoot: { partial: "./partials/pages/kahoot.html", sectionId: "kahoot", navId: "nav-kahoot", init: initKahoot },
   "calisma-merkezi": { partial: "./partials/pages/calisma-merkezi.html", sectionId: "studyhub", navId: "nav-studyhub", init: initCalismaMerkezi },
-  "konu-detay": { partial: "./partials/pages/konu-detay.html", sectionId: "studydetail", navId: "nav-studyhub", init: initKonuDetay },
+  "konu-detay": { partial: "./partials/pages/konu-detay.html", sectionId: "studydetail", navId: "nav-studyhub" },
   "ezber-merkezi": { partial: "./partials/pages/ezber-merkezi.html", sectionId: "memoryhub", navId: "nav-memoryhub", init: initEzberMerkezi },
   "bosluk-doldurma": { partial: "./partials/pages/bosluk-doldurma.html", sectionId: "fillgaphub", navId: "nav-fillgaphub", init: initBoslukDoldurma },
   "quiz-merkezi": { partial: "./partials/pages/quiz-merkezi.html", sectionId: "quizhub", navId: "nav-quizhub", init: initQuizMerkezi },
-  "quiz-coz": { partial: "./partials/pages/quiz-coz.html", sectionId: "quizdetail", navId: "nav-quizhub", init: initQuizCoz },
+  "quiz-coz": { partial: "./partials/pages/quiz-coz.html", sectionId: "quizdetail", navId: "nav-quizhub" },
   "sinav-merkezi": { partial: "./partials/pages/sinav-merkezi.html", sectionId: "examcenter", navId: "nav-examcenter", init: initSinavMerkezi },
-  "sinav-coz": { partial: "./partials/pages/sinav-coz.html", sectionId: "sinavcoz", navId: "nav-examcenter", init: initSinavCoz },
+  "sinav-coz": { partial: "./partials/pages/sinav-coz.html", sectionId: "sinavcoz", navId: "nav-examcenter" },
   "hizli-tekrar": { partial: "./partials/pages/hizli-tekrar.html", sectionId: "recap", navId: "nav-recap", init: initHizliTekrar },
-  "birinci-sinif": { partial: "./partials/pages/birinci-sinif.html", sectionId: "grade1", navId: "nav-grade1", init: initBirinciSinif },
-  "ikinci-sinif": { partial: "./partials/pages/ikinci-sinif.html", sectionId: "grade2", navId: "nav-grade2", init: initIkinciSinif },
+  "birinci-sinif": { partial: "./partials/pages/birinci-sinif.html", sectionId: "grade1", navId: "nav-grade1" },
+  "ikinci-sinif": { partial: "./partials/pages/ikinci-sinif.html", sectionId: "grade2", navId: "nav-grade2" },
   "ravza-books": { partial: "./partials/pages/ravza-books.html?v=library-20260715-3", sectionId: "ravzabooks", navId: null, init: initRavzaBooks },
   oyun: { partial: "./partials/pages/oyun.html?v=ok-bulmacasi-20260714-1", sectionId: "games", navId: "nav-games", init: initOyun }
 };

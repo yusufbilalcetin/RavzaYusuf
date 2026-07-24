@@ -1,3 +1,16 @@
+// localStorage'dan okunan JSON'u güvenle çözer. Bozuk/eksik kayıt, `null` ve
+// `undefined` durumlarında fallback döner; `0`, `false`, `""` gibi geçerli
+// değerler korunur (`||` ile sadeleştirmek bu değerleri yutardı).
+export function safeParse(raw, fallback) {
+  if (!raw) return fallback;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed === null || parsed === undefined ? fallback : parsed;
+  } catch {
+    return fallback;
+  }
+}
+
 export function safeText(text) {
   return String(text ?? "")
     .replaceAll("&", "&amp;")

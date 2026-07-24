@@ -1,0 +1,171 @@
+{
+  "metadata": {
+    "confidence": "low"
+  },
+  "ranges": [
+    {
+      "range": "1-10",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 6.5,
+      "dominantTargetLayouts": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetAverageGroupCount": 1,
+      "segmentBalance": "medium-dominant",
+      "nesting": "low",
+      "parallelCorridors": "low",
+      "safeFirstMoveTrend": "multiple-valid-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "11-30",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 16,
+      "dominantTargetLayouts": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetAverageGroupCount": 1,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "medium",
+      "parallelCorridors": "medium",
+      "safeFirstMoveTrend": "multiple-valid-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "31-50",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 27.25,
+      "dominantTargetLayouts": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetAverageGroupCount": 1,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "medium",
+      "parallelCorridors": "medium",
+      "safeFirstMoveTrend": "fewer-safe-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "51-70",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 36.5,
+      "dominantTargetLayouts": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network",
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetAverageGroupCount": 1.15,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "high",
+      "parallelCorridors": "high",
+      "safeFirstMoveTrend": "fewer-safe-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "71-80",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 42.5,
+      "dominantTargetLayouts": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetAverageGroupCount": 1.3,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "high",
+      "parallelCorridors": "high",
+      "safeFirstMoveTrend": "fewer-safe-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "81-100",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 50,
+      "dominantTargetLayouts": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetAverageGroupCount": 1.35,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "high",
+      "parallelCorridors": "high",
+      "safeFirstMoveTrend": "fewer-safe-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "101-120",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 55,
+      "dominantTargetLayouts": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetAverageGroupCount": 1.35,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "high",
+      "parallelCorridors": "high",
+      "safeFirstMoveTrend": "fewer-safe-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "121-130",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 62.5,
+      "dominantTargetLayouts": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetAverageGroupCount": 1.3,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "high",
+      "parallelCorridors": "high",
+      "safeFirstMoveTrend": "fewer-safe-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    },
+    {
+      "range": "131-150",
+      "evidenceConfidence": "low",
+      "verifiedReferenceAverageArrowCount": "unknown",
+      "verifiedReferenceDensity": "unknown",
+      "targetAverageArrowCount": 70,
+      "dominantTargetLayouts": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetAverageGroupCount": 1.35,
+      "segmentBalance": "short-and-medium-dominant",
+      "nesting": "high",
+      "parallelCorridors": "high",
+      "safeFirstMoveTrend": "fewer-safe-starts",
+      "progressionNote": "Bu değerler doğrulanmış referans ölçümü değil, özgün generator hedefidir."
+    }
+  ]
+}

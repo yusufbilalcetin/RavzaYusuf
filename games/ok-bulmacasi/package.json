@@ -4,7 +4,24 @@
   "type": "module",
   "scripts": {
     "levels": "node ./scripts/generate-levels.mjs",
-    "test": "node ./tests/validate-game.mjs",
-    "check": "node --check ./js/app.js && node --check ./js/engine.js && node --check ./js/levels.js && node --check ./js/levels-data.js && node --check ./js/level-meta.js && node --check ./js/storage.js && node --check ./js/sound.js && node --check ./scripts/level-generator.mjs && node --check ./scripts/generate-levels.mjs"
+    "generate:levels": "node ./scripts/generate-levels.mjs",
+    "audit:levels": "node ./scripts/audit-levels.mjs",
+    "research:arrows-levels": "node ./scripts/generate-arrows-research.mjs && node ./scripts/research-levels.mjs",
+    "audit:density": "node ./scripts/audit-levels.mjs",
+    "audit:originality": "node ./scripts/audit-originality.mjs",
+    "generate:ok-levels": "npm run research:arrows-levels && npm run generate:levels",
+    "validate:ok-levels": "npm run validate:levels",
+    "audit:ok-density": "npm run audit:density",
+    "audit:ok-originality": "npm run audit:originality",
+    "test:ok-engine": "npm test",
+    "test:ok-browser": "npm run test:browser",
+    "test:ok-visual": "npm run test:visual",
+    "test": "node ./tests/polyline.test.mjs && node ./tests/geometry.test.mjs && node ./tests/continuous-collision.test.mjs && node ./tests/density.test.mjs && node ./tests/validate-game.mjs",
+    "test:browser": "node ./tests/browser-smoke.mjs",
+    "test:visual": "node ./tests/visual-regression.mjs",
+    "lint": "npm run check",
+    "build": "npm run check && npm test",
+    "validate:levels": "node ./scripts/audit-levels.mjs",
+    "check": "node --check ./js/main.js && node --check ./js/state.js && node --check ./js/render.js && node --check ./js/screens.js && node --check ./js/engine.js && node --check ./js/geometry.js && node --check ./js/continuous-collision.js && node --check ./js/spatial-index.js && node --check ./js/polyline.js && node --check ./js/arrow-render.js && node --check ./js/level-audit.js && node --check ./js/validation.js && node --check ./js/levels.js && node --check ./js/levels-data.js && node --check ./js/level-meta.js && node --check ./js/storage.js && node --check ./scripts/level-generator.mjs && node --check ./scripts/generate-levels.mjs && node --check ./scripts/audit-levels.mjs && node --check ./scripts/audit-originality.mjs && node --check ./scripts/generate-arrows-research.mjs && node --check ./scripts/research-levels.mjs && node --check ./tests/continuous-collision.test.mjs && node --check ./tests/density.test.mjs && node --check ./tests/visual-regression.mjs"
   }
 }

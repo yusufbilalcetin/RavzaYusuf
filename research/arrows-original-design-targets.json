@@ -1,0 +1,6615 @@
+{
+  "generatorVersion": 11,
+  "targets": [
+    {
+      "inspiredLevelNumber": 1,
+      "seed": "ok-original-001",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 3
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 2,
+      "seed": "ok-original-002",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 4
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 3,
+      "seed": "ok-original-003",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 5
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 4,
+      "seed": "ok-original-004",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 5
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 5,
+      "seed": "ok-original-005",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 6
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 6,
+      "seed": "ok-original-006",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 7
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 7,
+      "seed": "ok-original-007",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 8
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 8,
+      "seed": "ok-original-008",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 8
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 9,
+      "seed": "ok-original-009",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 9
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 10,
+      "seed": "ok-original-010",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 3,
+        "max": 10,
+        "preferred": 10
+      },
+      "targetDensity": "very-low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "straight-corridors",
+        "nested-L"
+      ],
+      "targetDifficulty": "tutorial",
+      "targetTurnsPerArrow": {
+        "min": 0.5,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 11,
+      "seed": "ok-original-011",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 10
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 12,
+      "seed": "ok-original-012",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 11
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 13,
+      "seed": "ok-original-013",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 11
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 14,
+      "seed": "ok-original-014",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 12
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 15,
+      "seed": "ok-original-015",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 13
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 16,
+      "seed": "ok-original-016",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 13
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 17,
+      "seed": "ok-original-017",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 14
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 18,
+      "seed": "ok-original-018",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 14
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 19,
+      "seed": "ok-original-019",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 15
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 20,
+      "seed": "ok-original-020",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 16
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 21,
+      "seed": "ok-original-021",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 16
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 22,
+      "seed": "ok-original-022",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 17
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 23,
+      "seed": "ok-original-023",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 18
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 24,
+      "seed": "ok-original-024",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 18
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 25,
+      "seed": "ok-original-025",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 19
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 26,
+      "seed": "ok-original-026",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 19
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 27,
+      "seed": "ok-original-027",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 20
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 28,
+      "seed": "ok-original-028",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 21
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 29,
+      "seed": "ok-original-029",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 21
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U",
+        "horizontal-layers"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 30,
+      "seed": "ok-original-030",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 10,
+        "max": 22,
+        "preferred": 22
+      },
+      "targetDensity": "low",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "nested-L",
+        "nested-U"
+      ],
+      "targetDifficulty": "easy",
+      "targetTurnsPerArrow": {
+        "min": 1,
+        "max": 2.5
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "clear-safe-start"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 31,
+      "seed": "ok-original-031",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 22
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 32,
+      "seed": "ok-original-032",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 23
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 33,
+      "seed": "ok-original-033",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 23
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 34,
+      "seed": "ok-original-034",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 24
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 35,
+      "seed": "ok-original-035",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 24
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 36,
+      "seed": "ok-original-036",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 25
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 37,
+      "seed": "ok-original-037",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 25
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 38,
+      "seed": "ok-original-038",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 26
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 39,
+      "seed": "ok-original-039",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 26
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 40,
+      "seed": "ok-original-040",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 27
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 41,
+      "seed": "ok-original-041",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 28
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 42,
+      "seed": "ok-original-042",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 28
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 43,
+      "seed": "ok-original-043",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 29
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 44,
+      "seed": "ok-original-044",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 29
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 45,
+      "seed": "ok-original-045",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 30
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 46,
+      "seed": "ok-original-046",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 30
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 47,
+      "seed": "ok-original-047",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 31
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 48,
+      "seed": "ok-original-048",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 31
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 49,
+      "seed": "ok-original-049",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 32
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 50,
+      "seed": "ok-original-050",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 32
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 51,
+      "seed": "ok-original-051",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 33
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 52,
+      "seed": "ok-original-052",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 34
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 53,
+      "seed": "ok-original-053",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 34
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 54,
+      "seed": "ok-original-054",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 35
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 55,
+      "seed": "ok-original-055",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 35
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 56,
+      "seed": "ok-original-056",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 36
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 57,
+      "seed": "ok-original-057",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 36
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 58,
+      "seed": "ok-original-058",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 37
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 59,
+      "seed": "ok-original-059",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 37
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center",
+        "zigzag-network"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 60,
+      "seed": "ok-original-060",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 22,
+        "max": 38,
+        "preferred": 38
+      },
+      "targetDensity": "medium",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "compact-block",
+        "dense-center"
+      ],
+      "targetDifficulty": "medium",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 61,
+      "seed": "ok-original-061",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 35
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 62,
+      "seed": "ok-original-062",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 36
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 63,
+      "seed": "ok-original-063",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 36
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 64,
+      "seed": "ok-original-064",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 37
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 65,
+      "seed": "ok-original-065",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 37
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 66,
+      "seed": "ok-original-066",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 38
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 67,
+      "seed": "ok-original-067",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 38
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 68,
+      "seed": "ok-original-068",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 39
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 69,
+      "seed": "ok-original-069",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 39
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 70,
+      "seed": "ok-original-070",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 40
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 71,
+      "seed": "ok-original-071",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 40
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 72,
+      "seed": "ok-original-072",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 41
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 73,
+      "seed": "ok-original-073",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 41
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 74,
+      "seed": "ok-original-074",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 42
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 75,
+      "seed": "ok-original-075",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 42
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 76,
+      "seed": "ok-original-076",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 43
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 77,
+      "seed": "ok-original-077",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 43
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 78,
+      "seed": "ok-original-078",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 44
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 79,
+      "seed": "ok-original-079",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 44
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 80,
+      "seed": "ok-original-080",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 45
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 81,
+      "seed": "ok-original-081",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 45
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 82,
+      "seed": "ok-original-082",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 46
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 83,
+      "seed": "ok-original-083",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 46
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 84,
+      "seed": "ok-original-084",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 47
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 85,
+      "seed": "ok-original-085",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 47
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 86,
+      "seed": "ok-original-086",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 48
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 87,
+      "seed": "ok-original-087",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 48
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 88,
+      "seed": "ok-original-088",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 49
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 89,
+      "seed": "ok-original-089",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 49
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 90,
+      "seed": "ok-original-090",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 50
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 91,
+      "seed": "ok-original-091",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 50
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 92,
+      "seed": "ok-original-092",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 51
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 93,
+      "seed": "ok-original-093",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 51
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 94,
+      "seed": "ok-original-094",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 52
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 95,
+      "seed": "ok-original-095",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 52
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 96,
+      "seed": "ok-original-096",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 53
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 97,
+      "seed": "ok-original-097",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 53
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 98,
+      "seed": "ok-original-098",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 54
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 99,
+      "seed": "ok-original-099",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 54
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U",
+        "main-and-lower-group"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 100,
+      "seed": "ok-original-100",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 35,
+        "max": 55,
+        "preferred": 55
+      },
+      "targetDensity": "high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "nested-U"
+      ],
+      "targetDifficulty": "hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 101,
+      "seed": "ok-original-101",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 50
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 102,
+      "seed": "ok-original-102",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 51
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 103,
+      "seed": "ok-original-103",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 51
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 104,
+      "seed": "ok-original-104",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 52
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 105,
+      "seed": "ok-original-105",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 52
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 106,
+      "seed": "ok-original-106",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 53
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 107,
+      "seed": "ok-original-107",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 53
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 108,
+      "seed": "ok-original-108",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 54
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 109,
+      "seed": "ok-original-109",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 54
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 110,
+      "seed": "ok-original-110",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 55
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 111,
+      "seed": "ok-original-111",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 55
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 112,
+      "seed": "ok-original-112",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 56
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 113,
+      "seed": "ok-original-113",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 56
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 114,
+      "seed": "ok-original-114",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 57
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 115,
+      "seed": "ok-original-115",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 57
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 116,
+      "seed": "ok-original-116",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 58
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 117,
+      "seed": "ok-original-117",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 58
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 118,
+      "seed": "ok-original-118",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 59
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 119,
+      "seed": "ok-original-119",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 59
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 120,
+      "seed": "ok-original-120",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 60
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 121,
+      "seed": "ok-original-121",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 60
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 122,
+      "seed": "ok-original-122",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 61
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 123,
+      "seed": "ok-original-123",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 61
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 124,
+      "seed": "ok-original-124",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 62
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 125,
+      "seed": "ok-original-125",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 62
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 126,
+      "seed": "ok-original-126",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 63
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 127,
+      "seed": "ok-original-127",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 63
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 128,
+      "seed": "ok-original-128",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 64
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 129,
+      "seed": "ok-original-129",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 64
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 130,
+      "seed": "ok-original-130",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 65
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "very-hard",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 131,
+      "seed": "ok-original-131",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 65
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 132,
+      "seed": "ok-original-132",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 66
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 133,
+      "seed": "ok-original-133",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 66
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 134,
+      "seed": "ok-original-134",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 67
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 135,
+      "seed": "ok-original-135",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 67
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 136,
+      "seed": "ok-original-136",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 68
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 137,
+      "seed": "ok-original-137",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 68
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 138,
+      "seed": "ok-original-138",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 69
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 139,
+      "seed": "ok-original-139",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 69
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 140,
+      "seed": "ok-original-140",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 70
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 141,
+      "seed": "ok-original-141",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 70
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 142,
+      "seed": "ok-original-142",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 71
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 143,
+      "seed": "ok-original-143",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 71
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 144,
+      "seed": "ok-original-144",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 72
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 145,
+      "seed": "ok-original-145",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 72
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 146,
+      "seed": "ok-original-146",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 73
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 147,
+      "seed": "ok-original-147",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 73
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 148,
+      "seed": "ok-original-148",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 74
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 149,
+      "seed": "ok-original-149",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 74
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 1,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center",
+        "outside-layers"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    },
+    {
+      "inspiredLevelNumber": 150,
+      "seed": "ok-original-150",
+      "generatorVersion": 11,
+      "targetArrowCount": {
+        "min": 50,
+        "max": 75,
+        "preferred": 75
+      },
+      "targetDensity": "very-high",
+      "targetGroupCount": 2,
+      "targetLayoutFamilies": [
+        "irregular-maze",
+        "dense-center"
+      ],
+      "targetDifficulty": "expert",
+      "targetTurnsPerArrow": {
+        "min": 1.8,
+        "max": 3.8
+      },
+      "targetDirectionDistribution": {
+        "up": 0.25,
+        "down": 0.25,
+        "left": 0.25,
+        "right": 0.25
+      },
+      "requiredFeatures": [
+        "low-isolation",
+        "balanced-directions",
+        "short-medium-segments"
+      ],
+      "forbiddenFeatures": [
+        "reference-silhouette",
+        "reference-solution-order",
+        "matching-normalized-coordinates"
+      ],
+      "originalityConstraints": [
+        "Do not reuse the reference silhouette",
+        "Do not reuse the same solution order",
+        "Do not reuse matching normalized coordinates",
+        "Do not reproduce the same occupancy bitmap",
+        "Do not reproduce the same dependency graph"
+      ]
+    }
+  ]
+}

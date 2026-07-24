@@ -2,7 +2,7 @@ import { createGameAudio } from "../utils/game-audio.js";
 import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
 import { ACTIVE_GAMES, findGame } from "../../data/games.js";
 import { appIconPictureMarkup } from "../../data/app-icons.js";
-import { openLauncherFolder } from "../core/launcher.js";
+import { openLauncherFolder } from "../core/launcher.js?v=home-proportions-20260716-1";
 
 const GAME_META = Object.freeze(Object.fromEntries(ACTIVE_GAMES.map((game) => [
   game.handlerId || game.id,

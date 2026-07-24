@@ -1,3 +1,3 @@
-import { initApp } from "./core/app.js?v=pdf-themes-20260716-1";
+import { initApp } from "./core/app.js?v=liquid-optics-20260715-1";
 
 initApp();

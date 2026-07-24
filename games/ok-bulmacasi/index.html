@@ -3,90 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#fff8fb">
-  <meta name="color-scheme" content="light">
-  <title>Ravza'nın Ok Bulmacası</title>
-  <meta name="description" content="Ok ucundaki yolu tahtadan çek, çıkışı kapalıysa can kaybet. 100 bölüm, kolaydan zora.">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light dark">
+  <title>Ravza'nın Ok Kaçışı</title>
+  <meta name="description" content="Bütün okları çarpıştırmadan tahtadan çıkar.">
   <link rel="icon" type="image/png" href="../../assets/icons/apps/128/ok-bulmacasi.png">
-  <link rel="stylesheet" href="./css/game.css?v=3">
+  <link rel="stylesheet" href="./css/game.css?v=8">
 </head>
 <body>
   <main class="game-app" id="gameApp">
-    <header class="game-header">
-      <a class="icon-button back-button" href="../../index.html?page=oyun" aria-label="Oyun alanına geri dön">
-        <span aria-hidden="true">←</span>
-      </a>
-
-      <div class="title-block">
-        <picture class="game-logo-picture" aria-hidden="true">
-          <source type="image/avif" srcset="../../assets/icons/apps/128/ok-bulmacasi.avif 1x, ../../assets/icons/apps/256/ok-bulmacasi.avif 2x">
-          <source type="image/webp" srcset="../../assets/icons/apps/128/ok-bulmacasi.webp 1x, ../../assets/icons/apps/256/ok-bulmacasi.webp 2x">
-          <img class="game-logo" src="../../assets/icons/apps/128/ok-bulmacasi.png" alt="" width="128" height="128" decoding="async">
+    <section class="screen home-screen" id="screenHome" aria-label="Ok Kaçışı ana ekranı">
+      <button class="icon-button home-settings" id="openSettingsHome" type="button" aria-label="Ayarları aç">⚙</button>
+      <div class="home-hero">
+        <picture class="home-logo" aria-hidden="true">
+          <source type="image/avif" srcset="../../assets/icons/apps/256/ok-bulmacasi.avif">
+          <img src="../../assets/icons/apps/256/ok-bulmacasi.png" alt="" width="128" height="128">
         </picture>
-        <span class="title-text">
-          <p>Ravza'ya özel</p>
-          <h1>Ok Bulmacası</h1>
-          <span>Bir yolun ucuna dokun, tahtadan çek. Çıkış yolu kapalıysa can gider!</span>
-        </span>
+        <p>Ravza'ya özel</p>
+        <h1>Ok Kaçışı</h1>
+        <span>Doğru sırayı bul. Bütün okları özgür bırak.</span>
       </div>
-
-      <div class="header-actions">
-        <button class="icon-button" id="soundButton" type="button" aria-label="Sesi kapat" title="Ses">
-          <span id="soundIcon" aria-hidden="true">♪</span>
-        </button>
-        <button class="icon-button" id="helpButton" type="button" aria-label="Nasıl oynanır yardımını aç" title="Yardım">
-          <span aria-hidden="true">?</span>
-        </button>
+      <div class="home-actions">
+        <button class="primary-button" id="playButton" type="button">Bölüm <span id="continueLevel">1</span>'e devam et</button>
+        <button class="primary-button" id="newGameButton" type="button">Yeni oyun</button>
+        <button class="secondary-button" id="levelsButton" type="button">Bölümler</button>
       </div>
-    </header>
+      <button class="daily-card" id="dailyButton" type="button">
+        <span aria-hidden="true">◇</span><div><strong>Günlük Bulmaca</strong><small id="dailyStatus">Bugünün özgün bulmacasını oyna</small></div>
+      </button>
+      <div class="home-stats" aria-label="Oyun ilerlemesi"><span><strong id="completedCount">0</strong>Tamamlanan</span><span><strong id="perfectCount">0</strong>Kusursuz</span></div>
+      <a class="close-link" href="../../index.html?page=oyun">Oyun alanına dön</a>
+    </section>
 
-    <section class="game-shell" aria-label="Ok bulmacası">
-      <div class="level-row">
-        <button class="level-button" id="levelButton" type="button" aria-label="Bölüm seçiciyi aç">
-          <span id="levelLabel">Bölüm 1</span>
-          <small id="difficultyLabel">Isınma</small>
-          <span aria-hidden="true">⌄</span>
-        </button>
-        <div class="lives-copy" aria-live="polite">
-          <span id="livesHearts" class="lives-hearts">♥♥♥</span>
+    <section class="screen" id="screenLevels" aria-label="Bölüm seçme" hidden>
+      <header class="screen-header">
+        <button class="icon-button" id="backHome" type="button" aria-label="Ana ekrana dön">←</button>
+        <div class="title-block"><span class="title-copy"><p>Ok Kaçışı</p><h1>Bölüm seç</h1></span></div>
+        <button class="icon-button" id="openSettingsLevels" type="button" aria-label="Ayarları aç">⚙</button>
+      </header>
+      <p class="how-to">Tamamladıkça yeni bölümler açılır. Yıldız, kusursuz çözümü gösterir.</p>
+      <nav class="chapter-tabs" id="chapterTabs" aria-label="Kademe seç"></nav>
+      <p class="chapter-caption" id="chapterCaption"></p>
+      <div class="level-grid-wrap"><div class="level-grid" id="levelGrid" aria-label="Bölümler"></div></div>
+    </section>
+
+    <section class="screen screen--game" id="screenGame" hidden>
+      <header class="game-topbar">
+        <button class="icon-button game-chrome" id="backToLevels" type="button" aria-label="Bölüm seçmeye dön">←</button>
+        <div class="topbar-center">
+          <span class="level-tag" id="levelTag">Bölüm 1</span>
+          <div class="hearts" id="hearts" aria-live="polite" aria-label="3 can kaldı"></div>
         </div>
-      </div>
-
+        <button class="icon-button game-chrome" id="openSettingsGame" type="button" aria-label="Ayarları aç">⚙</button>
+      </header>
       <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
-
-      <div class="stats" aria-label="Oyun bilgileri">
-        <div class="stat"><span>Kalan Yol</span><strong id="remainingValue">0</strong></div>
-        <div class="stat"><span>Can</span><strong id="livesValue">3</strong></div>
-        <div class="stat"><span>Yıldız</span><strong id="starValue" aria-label="3 yıldız mümkün">★★★</strong></div>
+      <button class="tutorial" id="tutorial" type="button" hidden></button>
+      <div class="board" id="board">
+        <svg id="boardSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="group"
+          aria-label="Ok Kaçışı tahtası. Oynamak için yolu açık bir ok seç."></svg>
+        <div class="collision-note" id="collisionNote" role="status" aria-live="polite"></div>
       </div>
-
-      <div class="board-wrap">
-        <div class="board" id="board" role="img" aria-label="Ok bulmacası tahtası">
-          <svg id="boardSvg" xmlns="http://www.w3.org/2000/svg"></svg>
-        </div>
-        <p class="board-status" id="boardStatus" role="status" aria-live="polite">Bir yola dokunarak başla.</p>
-      </div>
-
-      <div class="controls" aria-label="Oyun kontrolleri">
-        <button class="control-button" id="hintButton" type="button" aria-label="İpucu kullan">
-          <span aria-hidden="true">✦</span><strong>İpucu</strong><small id="hintCount">3</small>
-        </button>
-        <button class="control-button" id="resetButton" type="button" aria-label="Bölümü yeniden başlat">
-          <span aria-hidden="true">↻</span><strong>Yeniden Başlat</strong>
-        </button>
-        <button class="control-button control-button--primary" id="nextButton" type="button" aria-label="Sonraki bölüme geç" disabled>
-          <span aria-hidden="true">→</span><strong>Sonraki</strong>
-        </button>
-      </div>
+      <p class="sr-only" id="gameStatus" aria-live="polite"></p>
+      <nav class="game-controls" aria-label="Oyun kontrolleri">
+        <button id="restartButton" type="button"><span aria-hidden="true">↻</span><small>Yeniden</small></button>
+        <button id="undoButton" type="button"><span aria-hidden="true">↶</span><small>Geri al</small></button>
+        <button id="fitButton" type="button"><span aria-hidden="true">⊙</span><small>Tümünü göster</small></button>
+        <button id="hintButton" type="button"><span aria-hidden="true">◇</span><small>İpucu</small></button>
+      </nav>
     </section>
   </main>
 
-  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-  <div class="modal-backdrop" id="modalBackdrop" hidden>
-    <section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section>
-  </div>
-  <div class="confetti" id="confetti" aria-hidden="true"></div>
+  <div class="modal-layer" id="modalLayer" hidden>
+    <section class="modal-card" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="resultTitle" hidden>
+      <span class="modal-symbol" id="resultSymbol" aria-hidden="true">✓</span>
+      <h2 id="resultTitle">Bölüm tamamlandı</h2><p id="resultMessage"></p>
+      <dl class="result-stats"><div><dt>Can</dt><dd id="statLives">3</dd></div><div><dt>Süre</dt><dd id="statTime">0:00</dd></div><div><dt>Hata</dt><dd id="statErrors">0</dd></div><div><dt>İpucu</dt><dd id="statHints">0</dd></div></dl>
+      <div class="modal-actions"><button class="primary-button" id="resultPrimary" type="button">Sonraki bölüm</button><button class="secondary-button" id="resultReplay" type="button">Tekrar oyna</button><button class="text-button" id="resultLevels" type="button">Bölümler</button></div>
+    </section>
 
-  <script type="module" src="./js/app.js?v=3"></script>
+    <section class="modal-card settings-card" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+      <div class="modal-heading"><h2 id="settingsTitle">Ayarlar</h2><button class="icon-button" id="closeSettings" type="button" aria-label="Ayarları kapat">×</button></div>
+      <div class="setting-list">
+        <label><span>Ses<small>Kısa oyun efektleri</small></span><input data-setting="sound" type="checkbox"></label>
+        <label><span>Titreşim<small>Dokunsal geri bildirim</small></span><input data-setting="vibration" type="checkbox"></label>
+        <label><span>Koyu tema<small>Gece kullanımına uygun</small></span><input data-setting="dark" type="checkbox"></label>
+        <label><span>Kalın çizgiler<small>Okları daha görünür yapar</small></span><input data-setting="thickLines" type="checkbox"></label>
+        <label><span>Azaltılmış hareket<small>Animasyonları sadeleştirir</small></span><input data-setting="reducedMotion" type="checkbox"></label>
+        <label><span>Zen modu<small>Yanlışta can kaybetmezsin</small></span><input data-setting="zen" type="checkbox"></label>
+      </div>
+      <button class="secondary-button settings-action" id="resetTutorialsButton" type="button">Eğitimleri tekrar göster</button>
+      <button class="danger-button" id="resetDataButton" type="button">Tüm ilerlemeyi sıfırla</button>
+    </section>
+
+    <section class="modal-card confirm-card" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" hidden>
+      <h2 id="confirmTitle">Bölüm yeniden başlatılsın mı?</h2><p id="confirmMessage">Bu bölümdeki mevcut hamlelerin silinecek.</p>
+      <div class="modal-actions"><button class="primary-button" id="confirmYes" type="button">Evet</button><button class="secondary-button" id="confirmNo" type="button">Vazgeç</button></div>
+    </section>
+  </div>
+  <script type="module" src="./js/main.js?v=10"></script>
 </body>
 </html>

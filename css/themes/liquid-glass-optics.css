@@ -1,0 +1,134 @@
+/*
+ * APPLE-INSPIRED LIQUID GLASS FOR THE WEB
+ *
+ * Apple uses Liquid Glass as a software interface material. It is not a
+ * physical display coating. This file is a web approximation built from
+ * backdrop filtering, contextual tint, inner highlights and pointer light.
+ * Content stays outside the material layer so text contrast remains stable.
+ */
+
+html.theme-liquid-glass {
+  --liquid-clear-fill: rgba(23, 16, 31, .24);
+  --liquid-regular-fill: rgba(25, 18, 34, .34);
+  --liquid-tinted-fill: rgba(24, 16, 32, .66);
+  --liquid-edge: rgba(255, 255, 255, .22);
+  --liquid-edge-soft: rgba(255, 255, 255, .10);
+  --liquid-specular: rgba(255, 255, 255, .34);
+  --liquid-specular-soft: rgba(255, 255, 255, .08);
+  --liquid-specular-active: rgba(255, 255, 255, .16);
+  --liquid-depth-shadow: rgba(7, 3, 14, .30);
+}
+
+html.theme-liquid-glass body:not(.dark) {
+  --liquid-clear-fill: rgba(255, 255, 255, .28);
+  --liquid-regular-fill: rgba(255, 255, 255, .42);
+  --liquid-tinted-fill: rgba(248, 244, 250, .76);
+  --liquid-edge: rgba(255, 255, 255, .62);
+  --liquid-edge-soft: rgba(61, 40, 72, .12);
+  --liquid-specular: rgba(255, 255, 255, .72);
+  --liquid-specular-soft: rgba(255, 255, 255, .18);
+  --liquid-specular-active: rgba(255, 255, 255, .30);
+  --liquid-depth-shadow: rgba(35, 21, 44, .20);
+}
+
+html.theme-liquid-glass :is(
+  .glass-surface,
+  .launcher-dialog,
+  .exam-cancel-dialog,
+  .exam-history-modal,
+  .kahoot-modal,
+  .pbn-modal
+) {
+  --glass-light-x: 18%;
+  --glass-light-y: 0%;
+  isolation: isolate;
+}
+
+html.theme-liquid-glass :is(.glass-surface, .launcher-dialog).is-glass-lit {
+  --liquid-surface-light: var(--liquid-specular-active);
+}
+
+/* Clear material: compact navigation that keeps the scene visible. */
+html.theme-liquid-glass.launcher-experience .launcher-topbar.topbar,
+html.theme-liquid-glass.launcher-experience body:has(#dashboard.active) .launcher-topbar.topbar,
+html.theme-liquid-glass.launcher-experience .launcher-dock {
+  background:
+    radial-gradient(190px circle at var(--glass-light-x) var(--glass-light-y), var(--liquid-surface-light, var(--liquid-specular-soft)), transparent 72%),
+    linear-gradient(135deg, rgba(255, 255, 255, .08), transparent 48%, rgba(255, 255, 255, .035)),
+    var(--liquid-clear-fill) !important;
+  border-color: var(--liquid-edge) !important;
+  box-shadow:
+    0 18px 52px var(--liquid-depth-shadow),
+    inset 0 1px 0 var(--liquid-specular),
+    inset 0 -1px 0 var(--liquid-edge-soft) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(165%) contrast(1.04) !important;
+  backdrop-filter: blur(24px) saturate(165%) contrast(1.04) !important;
+}
+
+/* Regular material: data-bearing widgets need a little more separation. */
+html.theme-liquid-glass.launcher-experience .launcher-widget {
+  background:
+    radial-gradient(230px circle at var(--glass-light-x) var(--glass-light-y), var(--liquid-surface-light, var(--liquid-specular-soft)), transparent 70%),
+    linear-gradient(145deg, rgba(255, 255, 255, .075), transparent 46%),
+    var(--liquid-regular-fill) !important;
+  border-color: var(--liquid-edge) !important;
+  box-shadow:
+    0 20px 56px var(--liquid-depth-shadow),
+    inset 0 1px 0 var(--liquid-specular),
+    inset 0 -1px 0 var(--liquid-edge-soft) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(155%) contrast(1.04) !important;
+  backdrop-filter: blur(26px) saturate(155%) contrast(1.04) !important;
+}
+
+/* Tinted material: modal content stays readable over detailed photography. */
+html.theme-liquid-glass.launcher-experience .launcher-dialog,
+html.theme-liquid-glass .theme-sheet.glass-surface--overlay,
+html.theme-liquid-glass :is(.exam-cancel-dialog, .exam-history-modal, .kahoot-modal, .pbn-modal) {
+  background:
+    radial-gradient(300px circle at var(--glass-light-x) var(--glass-light-y), var(--liquid-surface-light, var(--liquid-specular-soft)), transparent 72%),
+    linear-gradient(145deg, rgba(255, 255, 255, .09), transparent 42%),
+    var(--liquid-tinted-fill) !important;
+  border-color: var(--liquid-edge) !important;
+  box-shadow:
+    0 28px 78px var(--liquid-depth-shadow),
+    inset 0 1px 0 var(--liquid-specular),
+    inset 0 -1px 0 var(--liquid-edge-soft) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(145%) contrast(1.06) !important;
+  backdrop-filter: blur(30px) saturate(145%) contrast(1.06) !important;
+}
+
+/* Dialog scrims separate depth. The glass itself carries the blur. */
+html.theme-liquid-glass.launcher-experience .launcher-dialog-scrim {
+  background: rgba(8, 5, 13, .38);
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html.theme-liquid-glass.launcher-experience :is(.launcher-topbar.topbar, .launcher-widget, .launcher-dock, .launcher-dialog),
+  html.theme-liquid-glass .theme-sheet.glass-surface--overlay {
+    background: var(--glass-surface-base) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html.theme-liquid-glass.launcher-experience :is(.launcher-topbar.topbar, .launcher-widget, .launcher-dock, .launcher-dialog),
+  html.theme-liquid-glass .theme-sheet.glass-surface--overlay {
+    background: var(--glass-surface-base) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  html.theme-liquid-glass.launcher-experience :is(.launcher-topbar.topbar, .launcher-widget, .launcher-dock, .launcher-dialog),
+  html.theme-liquid-glass .theme-sheet.glass-surface--overlay,
+  html.theme-liquid-glass :is(.exam-cancel-dialog, .exam-history-modal, .kahoot-modal, .pbn-modal) {
+    color: CanvasText !important;
+    background: Canvas !important;
+    border: 1px solid CanvasText !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

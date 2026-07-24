@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "node ./server.mjs",
+    "start": "node ./server.mjs",
     "assets:optimize": "node ./scripts/optimize-assets.mjs",
     "generate:couples-pin": "node ./scripts/generate-couples-pin.mjs",
     "audit:responsive": "node ./scripts/audit-responsive.mjs",
@@ -24,7 +26,8 @@
     "audit:unused": "node ./scripts/audit-project-assets.mjs --unused",
     "audit:performance": "node ./scripts/audit-project-assets.mjs --performance",
     "security:check": "npm audit --audit-level=high",
-    "check": "npm run icons:audit && npm run audit:assets && npm run games:icons:check && npm run books:check",
+    "check:modules": "node ./scripts/check-module-versions.mjs",
+    "check": "npm run check:modules && npm run icons:audit && npm run audit:assets && npm run games:icons:check && npm run books:check",
     "test:home-hero": "node ./js/pages/ana-sayfa-rastgele-gorsel.test.mjs",
     "test:home-hero:browser": "node ./js/pages/ana-sayfa-rastgele-gorsel.browser.test.mjs",
     "test:liquid-glass": "node ./scripts/test-launcher.mjs",

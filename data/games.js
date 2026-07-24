@@ -130,7 +130,7 @@ const catalog = [
     launchMode: "link",
     launcherId: "arrow-puzzle",
     tone: "burgundy",
-    badge: "100 BÖLÜM",
+    badge: "150 BÖLÜM",
     subtitle: "Okların yönünü çöz ve tahtayı temizle.",
     keywords: ["ok", "bulmaca", "yön"]
   }

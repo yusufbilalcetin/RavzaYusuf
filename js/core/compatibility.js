@@ -258,14 +258,14 @@ async function submitTopicQuiz(topicId) {
     }
   });
 
-  const result = document.getElementById(`quiz-result-${topic.id}`);
-  if (!result) return;
+  const resultEl = document.getElementById(`quiz-result-${topic.id}`);
+  if (!resultEl) return;
 
   const percent = formatPercent(score, questions.length);
   setQuizDone(topic.id, true);
 
-  result.className = `quiz-result show ${score === questions.length ? "success" : "error"}`;
-  result.innerHTML = `
+  resultEl.className = `quiz-result show ${score === questions.length ? "success" : "error"}`;
+  resultEl.innerHTML = `
     <h3 class="result-title">Quiz Sonucu</h3>
     <p><strong>Puan:</strong> ${score}/${questions.length} · ${percent}%</p>
     <p>${score === questions.length ? "Harika! Bu quiz'i tamamen doğru çözdün." : "Quiz tamamlandı. Aşağıdaki açıklamaları gözden geçirip tekrar denemek istersen sayfayı yenileyebilirsin."}</p>

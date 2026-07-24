@@ -1,6 +1,8 @@
-import { LEVEL_DATA } from "./levels-data.js";
+import { LEVEL_DATA, LEVEL_METADATA } from "./levels-data.js";
 
-export { CHAPTER_NAMES, CHAPTER_SIZE, TOTAL_LEVELS, chapterOf, chapterRange, difficultyLabel } from "./level-meta.js";
+export { LEVEL_METADATA };
+
+export { CHAPTER_NAMES, TIERS, TOTAL_LEVELS, chapterOf, chapterRange, difficultyLabel } from "./level-meta.js";
 
 function decodeCells(flat) {
   const cells = [];
@@ -10,6 +12,7 @@ function decodeCells(flat) {
 
 export const LEVELS = LEVEL_DATA.map(([rows, cols, pieces], index) => ({
   id: index + 1,
+  ...LEVEL_METADATA,
   rows,
   cols,
   pieces: pieces.map(([cellsFlat, exitDir, blockedBy], pieceIndex) => ({
