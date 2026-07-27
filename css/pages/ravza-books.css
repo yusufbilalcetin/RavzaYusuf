@@ -739,6 +739,25 @@ button {
   isolation: isolate;
 }
 
+/*
+ * Kitap gölgesi. Daha önce #rdr-flipbook üzerinde drop-shadow filtresi olarak
+ * duruyordu; filtre, içindeki 167 sayfanın tamamını kapsadığı için her çevirme
+ * karesinde yeniden rasterize ediliyordu. Statik bir katman aynı görünümü
+ * animasyon maliyeti olmadan verir.
+ */
+.book-cradle::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 2% 0 0;
+  border-radius: 4px;
+  box-shadow: 0 18px 28px rgba(70, 52, 35, 0.28);
+}
+
+&[data-reader-theme="dark"] .book-cradle::before {
+  box-shadow: 0 22px 38px rgba(0, 0, 0, 0.62);
+}
+
 .book-cradle::after {
   content: "";
   position: absolute;
@@ -763,13 +782,13 @@ button {
   height: 100% !important;
   max-width: none !important;
   max-height: none !important;
-  filter: drop-shadow(0 18px 28px rgba(70, 52, 35, 0.2));
   touch-action: none;
   -webkit-touch-callout: none;
 }
 
-&[data-reader-theme="dark"] #rdr-flipbook {
-  filter: drop-shadow(0 22px 38px rgba(0, 0, 0, 0.58));
+/* Yalnızca çevirme sürerken GPU katmanı iste; bitince katman serbest kalsın. */
+.reader-stage.is-flipping .stf__item {
+  will-change: transform;
 }
 
 .rd-page {
@@ -812,7 +831,8 @@ button {
   opacity: 0;
   object-fit: contain;
   filter: none;
-  transition: opacity 140ms ease, filter 180ms ease;
+  /* filter geçişi kaldırıldı: büyük tuvalde her karede yeniden rasterize oluyordu. */
+  transition: opacity 140ms ease;
 }
 
 &[data-reader-theme="sepia"] .book-sheet.pdf-page,
@@ -1635,6 +1655,16 @@ button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* Okuma işlevi korunur, yalnızca ağır gölge katmanları sadeleşir. */
+  .book-cradle::before {
+    box-shadow: 0 6px 12px rgba(70, 52, 35, 0.18);
+  }
+
+  .rd-page.page-left .rd-page-inner,
+  .rd-page.page-right .rd-page-inner {
+    box-shadow: none;
   }
 }
 

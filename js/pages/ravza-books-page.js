@@ -1,15 +1,21 @@
 import { RAVZA_BOOKS } from '../../data/ravza-books.js?v=books-pipeline-20260716-1';
 
-const PAGE_FLIP_SRC = 'https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.js';
+const PAGE_FLIP_SRC = new URL('../../assets/vendor/page-flip/page-flip.browser.js', import.meta.url).href;
 const PDFJS_MODULE_URL = new URL('../../assets/vendor/pdfjs/pdf.js', import.meta.url).href;
 const PDFJS_WORKER_URL = new URL('../../assets/vendor/pdfjs/pdf.worker.js', import.meta.url).href;
 const PDFJS_ASSET_ROOT = new URL('../../assets/vendor/pdfjs/', import.meta.url).href;
 const PDF_PROGRESS_PREFIX = 'ravzaBooksProgress:';
-const PDF_RENDER_RADIUS = 2;
+/** Aynı anda tuvali ayrılmış (canlı) PDF sayfası sayısı. */
+const PDF_WINDOW_SIZE = 5;
+/** Komşu sayfa ön yüklemesi bu kadar sakinlikten sonra başlar. */
+const PDF_NEIGHBOUR_DELAY_MS = 220;
 const APP_MODES = new Set(['library', 'loading-book', 'reading', 'error']);
 const COVER_CACHE_NAME = 'ravza-books-covers-v1';
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const lowPowerDevice = Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 4;
+/** Düşük bellek / veri tasarrufu sinyalleri: zorunlu değil, yalnızca ön yükleme miktarını kısar. */
+const lowMemoryDevice = (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 4)
+  || Boolean(navigator.connection?.saveData);
 const PAGE_CURL_CONFIG = Object.freeze({
   edgeGrabRatio: 0.24,
   minimumEdgePx: 54,
@@ -64,6 +70,7 @@ let renderGeneration = 0;
 let lastLayoutKey = '';
 let lastFlipIndex = -1;
 let audioContext = null;
+let pageSoundBuffer = null;
 let pageFlipScriptPromise = null;
 let removeDirectPageCurl = null;
 let curlDragging = false;
@@ -82,12 +89,28 @@ let pdfRenderDrain = Promise.resolve();
 const pdfRenderPromises = new Map();
 const pdfRenderTasks = new Map();
 const pdfPageCache = new Map();
+/** Render sonucunun bitmap kopyası: pencereden çıkan sayfa geri geldiğinde PDF yeniden render edilmez. */
+const pdfBitmapCache = new Map();
 let pdfActivePages = new Set();
+let pdfIdleHandle = 0;
+let pdfWindowTimer = 0;
+let pdfNeighbourTimer = 0;
+let pendingRenderIndex = -1;
+let lastCradleSize = '';
 const coverObjectUrls = new Set();
 const coverGenerationJobs = new Map();
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+const supportsIdleCallback = typeof window.requestIdleCallback === 'function';
+const runWhenIdle = callback => (supportsIdleCallback
+  ? window.requestIdleCallback(callback, { timeout: 400 })
+  : window.setTimeout(callback, 32));
+const cancelIdle = handle => {
+  if (!handle) return;
+  if (supportsIdleCallback) window.cancelIdleCallback(handle);
+  else window.clearTimeout(handle);
+};
 const escapeHTML = value => String(value ?? '')
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
@@ -336,6 +359,7 @@ function findStartIndex(pages, progress) {
 function cleanupReader() {
   renderGeneration += 1;
   pdfRenderGeneration += 1;
+  lastCradleSize = '';
   cancelPdfRenders();
   removeDirectPageCurl?.();
   removeDirectPageCurl = null;
@@ -359,6 +383,13 @@ function cleanupReader() {
 
 function cancelPdfRenders() {
   pdfActivePages = new Set();
+  cancelIdle(pdfIdleHandle);
+  pdfIdleHandle = 0;
+  clearTimeout(pdfWindowTimer);
+  pdfWindowTimer = 0;
+  clearTimeout(pdfNeighbourTimer);
+  pdfNeighbourTimer = 0;
+  pendingRenderIndex = -1;
   const pending = [...pdfRenderPromises.values()];
   const cachedPages = [...pdfPageCache.values()];
   for (const task of pdfRenderTasks.values()) {
@@ -367,11 +398,87 @@ function cancelPdfRenders() {
   pdfRenderTasks.clear();
   pdfRenderPromises.clear();
   pdfPageCache.clear();
+  clearPdfBitmapCache();
   pdfRenderDrain = Promise.allSettled(pending).then(() => {
     for (const page of cachedPages) {
       try { page.cleanup(); } catch (_) {}
     }
   });
+}
+
+/** Cache'lenmiş bitmap sayısı: mobilde daha az bellek tutulur. */
+function pdfBitmapCacheLimit() {
+  if (lowMemoryDevice) return 4;
+  return shouldUsePortrait() ? 6 : 10;
+}
+
+function disposePdfBitmap(entry) {
+  if (!entry) return;
+  try { entry.bitmap?.close?.(); } catch (_) {}
+  if (entry.canvas) {
+    entry.canvas.width = 0;
+    entry.canvas.height = 0;
+  }
+}
+
+function clearPdfBitmapCache() {
+  for (const entry of pdfBitmapCache.values()) disposePdfBitmap(entry);
+  pdfBitmapCache.clear();
+}
+
+/** LRU: en eski kayıt önce düşer (Map ekleme sırasını korur). */
+function trimPdfBitmapCache() {
+  const limit = pdfBitmapCacheLimit();
+  while (pdfBitmapCache.size > limit) {
+    const oldestKey = pdfBitmapCache.keys().next().value;
+    disposePdfBitmap(pdfBitmapCache.get(oldestKey));
+    pdfBitmapCache.delete(oldestKey);
+  }
+}
+
+async function rememberPdfBitmap(pageNumber, canvas, renderKey) {
+  const previous = pdfBitmapCache.get(pageNumber);
+  if (previous) {
+    disposePdfBitmap(previous);
+    pdfBitmapCache.delete(pageNumber);
+  }
+  try {
+    if (typeof createImageBitmap === 'function') {
+      const bitmap = await createImageBitmap(canvas);
+      pdfBitmapCache.set(pageNumber, { bitmap, renderKey, width: canvas.width, height: canvas.height });
+    } else {
+      // Safari'nin eski sürümleri: canvas kopyası da işi görür.
+      const copy = document.createElement('canvas');
+      copy.width = canvas.width;
+      copy.height = canvas.height;
+      copy.getContext('2d', { alpha: false })?.drawImage(canvas, 0, 0);
+      pdfBitmapCache.set(pageNumber, { canvas: copy, renderKey, width: copy.width, height: copy.height });
+    }
+  } catch (_) {
+    return;
+  }
+  trimPdfBitmapCache();
+}
+
+/** Cache'teki bitmap aynı ölçüdeyse PDF'i yeniden render etmeden geri boyar. */
+function paintFromPdfBitmapCache(pageNumber, canvas, renderKey) {
+  const entry = pdfBitmapCache.get(pageNumber);
+  if (!entry || entry.renderKey !== renderKey) return false;
+  const source = entry.bitmap || entry.canvas;
+  if (!source) return false;
+  canvas.width = entry.width;
+  canvas.height = entry.height;
+  const context = canvas.getContext('2d', { alpha: false });
+  if (!context) return false;
+  try {
+    context.drawImage(source, 0, 0);
+  } catch (_) {
+    return false;
+  }
+  // LRU tazeleme: en son kullanılan sona alınır.
+  pdfBitmapCache.delete(pageNumber);
+  pdfBitmapCache.set(pageNumber, entry);
+  return true;
 }
 
 async function destroyPdfDocument() {
@@ -459,14 +566,18 @@ function textCoverMarkup(book) {
     </span>`;
 }
 
-function libraryCoverMarkup(book) {
+function libraryCoverMarkup(book, index = 0) {
   if (book.type !== 'pdf') return textCoverMarkup(book);
   const source = book.cover ? ` src="${escapeHTML(book.cover)}"` : '';
   const sourceSet = book.coverSrcSet ? ` srcset="${escapeHTML(book.coverSrcSet)}" sizes="(max-width: 520px) 42vw, 220px"` : '';
   const dimensions = Number(book.coverWidth) > 0 && Number(book.coverHeight) > 0
     ? ` width="${Number(book.coverWidth)}" height="${Number(book.coverHeight)}"`
     : '';
-  return `<img class="library-cover-image" data-book-cover="${escapeHTML(book.id)}"${source}${sourceSet}${dimensions} alt="${escapeHTML(book.title)} kitap kapağı" decoding="async" />`;
+  // İlk sıradaki kapaklar hemen, alttakiler tembel yüklenir.
+  const priority = index < 4
+    ? ' loading="eager" fetchpriority="high"'
+    : ' loading="lazy" fetchpriority="low"';
+  return `<img class="library-cover-image" data-book-cover="${escapeHTML(book.id)}"${source}${sourceSet}${dimensions}${priority} alt="${escapeHTML(book.title)} kitap kapağı" decoding="async" />`;
 }
 
 function renderLibrary() {
@@ -496,13 +607,13 @@ function renderLibrary() {
           <span>${BOOKS.length} kitap</span>
         </div>
         <ul class="library-grid" role="list">
-          ${BOOKS.map(book => {
+          ${BOOKS.map((book, index) => {
             const status = bookLibraryState(book);
             return `
               <li class="library-book-slot">
                 <button class="library-book-card" type="button" data-book-id="${escapeHTML(book.id)}" data-open-position="${status.completed ? 'restart' : 'resume'}" aria-label="${escapeHTML(book.title)}, ${escapeHTML(book.author)}. ${escapeHTML(status.label)}. ${escapeHTML(status.action)}">
                   <span class="library-cover-wrap">
-                    ${libraryCoverMarkup(book)}
+                    ${libraryCoverMarkup(book, index)}
                     <span class="library-cover-shine" aria-hidden="true"></span>
                   </span>
                   <span class="library-shelf" aria-hidden="true"></span>
@@ -634,6 +745,30 @@ function showReaderLoading(message, progress = null) {
   const root = document.getElementById('reader-inner');
   if (!root) return;
   const percent = Number.isFinite(progress) ? clamp(Math.round(progress), 0, 100) : null;
+
+  // İndirme ilerlerken tüm ekranı yeniden kurmak yerine yalnızca değişen
+  // parçaları güncelle: aksi hâlde her akış parçasında innerHTML yazılıyordu.
+  const existing = root.querySelector('.reader-loading');
+  if (existing) {
+    const text = existing.querySelector('p');
+    if (text && text.textContent !== message) text.textContent = message;
+    existing.querySelector('.reader-loading-track i')
+      ?.style.setProperty('--loading-progress', `${percent ?? 18}%`);
+    const label = existing.querySelector('.reader-loading-percent');
+    if (percent === null) {
+      label?.remove();
+    } else if (label) {
+      const next = `%${percent}`;
+      if (label.textContent !== next) label.textContent = next;
+    } else {
+      const span = document.createElement('span');
+      span.className = 'reader-loading-percent';
+      span.textContent = `%${percent}`;
+      existing.appendChild(span);
+    }
+    return;
+  }
+
   root.className = 'reader-root';
   root.innerHTML = `
     <div class="reader-loading" role="status" aria-live="polite">
@@ -665,15 +800,24 @@ function ensurePageFlip() {
   if (pageFlipScriptPromise) return pageFlipScriptPromise;
 
   pageFlipScriptPromise = new Promise(resolve => {
-    const existing = document.querySelector(`script[src="${PAGE_FLIP_SRC}"]`);
+    const existing = document.querySelector('script[data-ravza-page-flip]');
     const script = existing || document.createElement('script');
-    const complete = () => resolve(Boolean(window.St?.PageFlip));
+    const complete = () => {
+      const loaded = Boolean(window.St?.PageFlip);
+      if (!loaded) pageFlipScriptPromise = null;
+      resolve(loaded);
+    };
+    const fail = () => {
+      script.remove();
+      pageFlipScriptPromise = null;
+      resolve(false);
+    };
     script.addEventListener('load', complete, { once: true });
-    script.addEventListener('error', () => resolve(false), { once: true });
+    script.addEventListener('error', fail, { once: true });
     if (!existing) {
+      script.dataset.ravzaPageFlip = '2.0.7';
       script.src = PAGE_FLIP_SRC;
       script.async = true;
-      script.crossOrigin = 'anonymous';
       document.head.appendChild(script);
     } else if (window.St?.PageFlip) {
       complete();
@@ -811,10 +955,39 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
   const pageWidth = Math.min(availableWidth / pagesAcross, availableHeight * ratio);
   const pageHeight = pageWidth / ratio;
 
-  cradle.style.width = `${Math.max(1, pageWidth * pagesAcross)}px`;
-  cradle.style.height = `${Math.max(1, pageHeight)}px`;
-  cradle.style.setProperty('--pdf-page-aspect', String(ratio));
+  const width = Math.max(1, pageWidth * pagesAcross);
+  const height = Math.max(1, pageHeight);
+  // Yalnızca gerçekten değiştiyse yaz: aksi hâlde bu yazım, cradle'ı gözleyen
+  // ResizeObserver'ı yeniden tetikleyip oku-yaz döngüsü kuruyor.
+  const size = `${Math.round(width)}x${Math.round(height)}x${ratio.toFixed(4)}`;
+  if (size !== lastCradleSize) {
+    lastCradleSize = size;
+    cradle.style.width = `${width}px`;
+    cradle.style.height = `${height}px`;
+    cradle.style.setProperty('--pdf-page-aspect', String(ratio));
+  }
   if (root) root.dataset.spread = portrait ? 'single' : 'double';
+}
+
+/**
+ * Canvas render kutusunu bir kez ölçer. Render sırasında DOM ölçmek, animasyon
+ * boyunca değişen değerler yüzünden aynı sayfanın tekrar tekrar render
+ * edilmesine yol açıyordu; bu yüzden ölçüm yalnızca açılışta ve resize
+ * bittikten sonra yapılır.
+ */
+function measurePdfRenderBox(metrics) {
+  const frame = document.querySelector('.pdf-canvas-frame');
+  let paddingX = 12;
+  let paddingY = 12;
+  if (frame) {
+    const style = getComputedStyle(frame);
+    paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    paddingY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  }
+  pdfRenderBox = {
+    width: Math.max(1, metrics.pageWidth - (Number.isFinite(paddingX) ? paddingX : 12)),
+    height: Math.max(1, metrics.pageHeight - (Number.isFinite(paddingY) ? paddingY : 12)),
+  };
 }
 
 function getLayoutMetrics() {
@@ -1076,7 +1249,7 @@ async function openTextReader(book, position = null) {
   const available = await ensurePageFlip();
   if (generation !== renderGeneration) return;
   if (!available) {
-    showReaderError('Sayfa çevirme motoru yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin.');
+    showReaderError('Yerel sayfa çevirme motoru yüklenemedi. Uygulama dosyalarını kontrol edip kitabı yeniden açın.');
     return;
   }
 
@@ -1110,7 +1283,9 @@ async function openTextReader(book, position = null) {
     updateReaderUI(index);
   });
   pageFlip.on('changeState', event => {
-    if (event.data === 'user_fold' || event.data === 'flipping') hideControls();
+    const flipping = event.data === 'user_fold' || event.data === 'flipping';
+    setFlipCompositing(flipping);
+    if (flipping) hideControls();
   });
   pageFlip.loadFromHTML(flipbook.querySelectorAll('.rd-page'));
 
@@ -1162,6 +1337,7 @@ async function fetchPdfBytes(book) {
   const reader = response.body.getReader();
   const chunks = [];
   let loaded = 0;
+  let lastPercent = -1;
   try {
     while (true) {
       const { done, value } = await reader.read();
@@ -1169,7 +1345,12 @@ async function fetchPdfBytes(book) {
       if (!value?.byteLength) continue;
       chunks.push(value);
       loaded += value.byteLength;
-      showReaderLoading(`${book.title} hazırlanıyor…`, total > 0 ? (loaded / total) * 100 : null);
+      // Yüzde gerçekten değiştiyse arayüze dokun.
+      const percent = total > 0 ? Math.round((loaded / total) * 100) : null;
+      if (percent === null || percent !== lastPercent) {
+        lastPercent = percent ?? lastPercent;
+        showReaderLoading(`${book.title} hazırlanıyor…`, percent);
+      }
     }
   } finally {
     try { reader.releaseLock(); } catch (_) {}
@@ -1248,7 +1429,9 @@ function createPdfPageModels(pageCount) {
 
 function renderPdfPageElements(book, pageCount) {
   const flipbook = document.getElementById('rdr-flipbook');
-  flipbook.replaceChildren();
+  // Tüm sayfalar önce fragment'te kurulur; DOM'a tek seferde eklenince
+  // 167 ayrı layout geçersizleştirmesi yerine bir tane olur.
+  const fragment = document.createDocumentFragment();
   for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
     const element = document.createElement('section');
     const isCover = pageNumber === 1;
@@ -1262,7 +1445,7 @@ function renderPdfPageElements(book, pageCount) {
         <canvas width="1" height="1" aria-hidden="true"></canvas>
         <p class="pdf-page-status" role="status">Sayfa ${pageNumber} hazırlanıyor…</p>
       </div>`;
-    flipbook.appendChild(element);
+    fragment.appendChild(element);
   }
 
   const backCover = document.createElement('section');
@@ -1276,7 +1459,8 @@ function renderPdfPageElements(book, pageCount) {
       <p>${escapeHTML(book.title)}</p>
       <span>${escapeHTML(book.author)}</span>
     </div>`;
-  flipbook.appendChild(backCover);
+  fragment.appendChild(backCover);
+  flipbook.replaceChildren(fragment);
 }
 
 function releasePdfPageCanvas(pageNumber) {
@@ -1289,8 +1473,8 @@ function releasePdfPageCanvas(pageNumber) {
   const element = document.querySelector(`.pdf-page[data-pdf-page="${pageNumber}"]`);
   const canvas = element?.querySelector('canvas');
   if (canvas) {
-    canvas.width = 1;
-    canvas.height = 1;
+    canvas.width = 0;
+    canvas.height = 0;
     canvas.style.width = '';
     canvas.style.height = '';
     delete canvas.dataset.renderKey;
@@ -1310,16 +1494,22 @@ function clearPdfPage(pageNumber) {
   }
   const pending = pdfRenderPromises.get(pageNumber);
   if (pending) {
-    void pending.finally(() => {
-      if (pdfActivePages.has(pageNumber)) {
-        setTimeout(() => void renderPdfPage(pageNumber), 0);
-      } else {
-        releasePdfPageCanvas(pageNumber);
-      }
-    });
+    // İptal edilen render bitince yalnızca temizlik yapılır. Sayfa bu arada
+    // tekrar pencereye girdiyse render'ı updatePdfRenderWindow zaten kuyruğa
+    // alır; buradan yeniden tetiklemek iptal/başlat sarmalına yol açıyordu.
+    void pending.finally(() => releasePdfPageCanvas(pageNumber));
     return;
   }
   releasePdfPageCanvas(pageNumber);
+}
+
+/** DPR tavanı 2; çok büyük ekranlarda tuval piksel alanı da sınırlanır. */
+function pdfOutputScale(viewport) {
+  const base = Math.min(window.devicePixelRatio || 1, 2);
+  const maxPixels = lowMemoryDevice ? 2_200_000 : 4_500_000;
+  const area = Math.max(1, viewport.width * viewport.height);
+  if (area * base * base <= maxPixels) return base;
+  return Math.max(1, Number(Math.sqrt(maxPixels / area).toFixed(3)));
 }
 
 async function renderPdfPage(pageNumber) {
@@ -1343,16 +1533,27 @@ async function renderPdfPage(pageNumber) {
       }
       pdfPageCache.set(pageNumber, pdfPage);
       const unscaledViewport = pdfPage.getViewport({ scale: 1 });
-      const frameStyle = getComputedStyle(frame);
-      const horizontalPadding = parseFloat(frameStyle.paddingLeft) + parseFloat(frameStyle.paddingRight);
-      const verticalPadding = parseFloat(frameStyle.paddingTop) + parseFloat(frameStyle.paddingBottom);
-      const availableWidth = Math.max(1, (frame.clientWidth || pdfRenderBox.width) - horizontalPadding);
-      const availableHeight = Math.max(1, (frame.clientHeight || pdfRenderBox.height) - verticalPadding);
-      const cssScale = Math.min(availableWidth / unscaledViewport.width, availableHeight / unscaledViewport.height);
+      // Ölçüm DOM'dan değil, önceden hesaplanmış kutudan gelir: animasyon
+      // sırasında değişen clientWidth değerleri render anahtarını oynatıyordu.
+      const cssScale = Math.min(
+        pdfRenderBox.width / unscaledViewport.width,
+        pdfRenderBox.height / unscaledViewport.height,
+      );
       const viewport = pdfPage.getViewport({ scale: cssScale });
-      const outputScale = clamp(window.devicePixelRatio || 1, 1, 2.5);
+      const outputScale = pdfOutputScale(viewport);
       const renderKey = `${Math.round(viewport.width)}x${Math.round(viewport.height)}@${outputScale}`;
       if (canvas.dataset.renderKey === renderKey && element.classList.contains('is-rendered')) return true;
+
+      // Yakın geçmişte render edilmiş sayfa: PDF'i yeniden çizmeden geri boya.
+      if (paintFromPdfBitmapCache(pageNumber, canvas, renderKey)) {
+        canvas.style.width = `${Math.floor(viewport.width)}px`;
+        canvas.style.height = `${Math.floor(viewport.height)}px`;
+        canvas.dataset.renderKey = renderKey;
+        element.classList.remove('has-render-error');
+        element.classList.add('is-rendered');
+        status?.setAttribute('aria-hidden', 'true');
+        return true;
+      }
 
       canvas.width = Math.max(1, Math.floor(viewport.width * outputScale));
       canvas.height = Math.max(1, Math.floor(viewport.height * outputScale));
@@ -1373,6 +1574,7 @@ async function renderPdfPage(pageNumber) {
       element.classList.remove('has-render-error');
       element.classList.add('is-rendered');
       status?.setAttribute('aria-hidden', 'true');
+      void rememberPdfBitmap(pageNumber, canvas, renderKey);
       return true;
     } catch (error) {
       if (String(error?.name) === 'RenderingCancelledException') return false;
@@ -1394,23 +1596,82 @@ async function renderPdfPage(pageNumber) {
   }
 }
 
+/**
+ * Görünen sayfalar ve komşuları. Çift sayfa modunda yan yana duran iki sayfa da
+ * "görünür" sayılır; pencere toplamı PDF_WINDOW_SIZE ile sınırlıdır.
+ */
+function pdfWindowPages(pageIndex) {
+  const total = pdfDocument.numPages;
+  const current = clamp(pageIndex + 1, 1, total);
+  const visible = [current];
+  if (!shouldUsePortrait()) {
+    const partner = pageIndex % 2 === 0 ? current + 1 : current - 1;
+    if (partner >= 1 && partner <= total && partner !== current) visible.push(partner);
+  }
+
+  const ordered = [...visible];
+  const lowest = Math.min(...visible);
+  const highest = Math.max(...visible);
+  const neighbourReach = lowMemoryDevice ? 1 : total;
+  for (let offset = 1; offset <= neighbourReach && ordered.length < PDF_WINDOW_SIZE; offset += 1) {
+    const forward = highest + offset;
+    if (forward <= total && !ordered.includes(forward)) ordered.push(forward);
+    if (ordered.length >= PDF_WINDOW_SIZE) break;
+    const backward = lowest - offset;
+    if (backward >= 1 && !ordered.includes(backward)) ordered.push(backward);
+    if (highest + offset > total && lowest - offset < 1) break;
+  }
+  return { visible, ordered: ordered.slice(0, PDF_WINDOW_SIZE) };
+}
+
 async function updatePdfRenderWindow(pageIndex, waitForCurrent = false) {
   if (!pdfDocument) return;
-  const currentPage = clamp(pageIndex + 1, 1, pdfDocument.numPages);
-  const needed = new Set();
-  for (let offset = -PDF_RENDER_RADIUS; offset <= PDF_RENDER_RADIUS; offset += 1) {
-    const pageNumber = currentPage + offset;
-    if (pageNumber >= 1 && pageNumber <= pdfDocument.numPages) needed.add(pageNumber);
-  }
-  pdfActivePages = needed;
+  const { visible, ordered } = pdfWindowPages(pageIndex);
+  pdfActivePages = new Set(ordered);
   for (const pageNumber of new Set([...pdfPageCache.keys(), ...pdfRenderPromises.keys()])) {
-    if (!needed.has(pageNumber)) clearPdfPage(pageNumber);
+    if (!pdfActivePages.has(pageNumber)) clearPdfPage(pageNumber);
   }
-  const currentPromise = renderPdfPage(currentPage);
-  for (const pageNumber of needed) {
-    if (pageNumber !== currentPage) void renderPdfPage(pageNumber);
+
+  const visiblePromises = visible.map(pageNumber => renderPdfPage(pageNumber));
+  const neighbours = ordered.filter(pageNumber => !visible.includes(pageNumber));
+  cancelIdle(pdfIdleHandle);
+  pdfIdleHandle = 0;
+  clearTimeout(pdfNeighbourTimer);
+  if (neighbours.length) {
+    // Komşuları hemen başlatmak, kullanıcı çevirmeye devam ettiğinde yarıda
+    // kesilen render'lara yol açıyor. Okuyucu kısa süre sakinleşene kadar
+    // bekle: hızlı çevirmede boşa iş başlatılmaz.
+    pdfNeighbourTimer = window.setTimeout(() => {
+      pdfNeighbourTimer = 0;
+      pdfIdleHandle = runWhenIdle(() => {
+        pdfIdleHandle = 0;
+        for (const pageNumber of neighbours) {
+          if (pdfActivePages.has(pageNumber)) void renderPdfPage(pageNumber);
+        }
+      });
+    }, PDF_NEIGHBOUR_DELAY_MS);
   }
-  if (waitForCurrent) await currentPromise;
+  if (waitForCurrent) await Promise.all(visiblePromises);
+}
+
+/**
+ * Sayfa geçişi sırasında render penceresini güncellemeyi erteler: çevirme
+ * animasyonu bitmeden ağır iş başlatmak kare düşmesine yol açıyor.
+ */
+function schedulePdfRenderWindow(pageIndex) {
+  if (state.bookType !== 'pdf') return;
+  pendingRenderIndex = pageIndex;
+  clearTimeout(pdfWindowTimer);
+  pdfWindowTimer = window.setTimeout(flushPdfRenderWindow, 80);
+}
+
+function flushPdfRenderWindow() {
+  clearTimeout(pdfWindowTimer);
+  pdfWindowTimer = 0;
+  if (pendingRenderIndex < 0 || state.bookType !== 'pdf') return;
+  const index = pendingRenderIndex;
+  pendingRenderIndex = -1;
+  void updatePdfRenderWindow(index);
 }
 
 async function openPdfReader(book, position = null) {
@@ -1432,7 +1693,7 @@ async function openPdfReader(book, position = null) {
   }
   if (generation !== renderGeneration) return;
   if (!available) {
-    showReaderError('Sayfa çevirme motoru yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin.');
+    showReaderError('Yerel sayfa çevirme motoru yüklenemedi. Uygulama dosyalarını kontrol edip kitabı yeniden açın.');
     return;
   }
 
@@ -1450,13 +1711,13 @@ async function openPdfReader(book, position = null) {
     return;
   }
   lastLayoutKey = metrics.key;
-  pdfRenderBox = { width: metrics.pageWidth, height: metrics.pageHeight };
   readerPages = createPdfPageModels(pdfDocument.numPages);
   const savedPosition = position || readBookProgress(book.id);
   const startIndex = findStartIndex(readerPages, savedPosition);
   state.currentIndex = startIndex;
   state.pageNum = Math.min(startIndex + 1, pdfDocument.numPages);
   renderPdfPageElements(book, pdfDocument.numPages);
+  measurePdfRenderBox(metrics);
   updateReaderUI(startIndex);
 
   const flipbook = document.getElementById('rdr-flipbook');
@@ -1484,10 +1745,14 @@ async function openPdfReader(book, position = null) {
     if (index !== lastFlipIndex) playPageSound();
     lastFlipIndex = index;
     updateReaderUI(index);
-    void updatePdfRenderWindow(index);
+    // Ağır render işi çevirme animasyonu bittikten sonra yapılır.
+    schedulePdfRenderWindow(index);
   });
   pageFlip.on('changeState', event => {
-    if (event.data === 'user_fold' || event.data === 'flipping') hideControls();
+    const flipping = event.data === 'user_fold' || event.data === 'flipping';
+    setFlipCompositing(flipping);
+    if (flipping) hideControls();
+    else flushPdfRenderWindow();
   });
   pageFlip.loadFromHTML(flipbook.querySelectorAll('.book-sheet'));
   bindReaderEvents(book);
@@ -1571,7 +1836,12 @@ function updateReaderUI(index) {
     const active = isBookmarked(page);
     bookmark.classList.toggle('active', active);
     bookmark.setAttribute('aria-pressed', String(active));
-    bookmark.innerHTML = active ? ICON.bookmarkFill : ICON.bookmark;
+    // SVG'yi yalnızca durum değiştiğinde yeniden ayrıştır.
+    const iconState = active ? 'on' : 'off';
+    if (bookmark.dataset.iconState !== iconState) {
+      bookmark.dataset.iconState = iconState;
+      bookmark.innerHTML = active ? ICON.bookmarkFill : ICON.bookmark;
+    }
   }
   if (live) live.textContent = state.bookType === 'pdf'
     ? `${page.type === 'pdf-back-cover' ? 'Arka kapak' : `PDF sayfası ${page.pdfPage} / ${pdfDocument?.numPages || 1}`}`
@@ -1581,6 +1851,15 @@ function updateReaderUI(index) {
     root.dataset.currentPage = String(state.currentPage);
     root.dataset.savedPage = String(state.savedPage);
   }
+}
+
+/**
+ * Çevirme sürerken sahneye geçici bir sınıf ekler. CSS bu sınıfla yalnızca
+ * çevrilen katmana `will-change` verir ve tuval filtrelerini durdurur; sınıf
+ * kalkınca GPU katmanları da serbest bırakılır.
+ */
+function setFlipCompositing(active) {
+  document.getElementById('rdr-stage')?.classList.toggle('is-flipping', active);
 }
 
 function showControls(autoHide = true) {
@@ -1683,7 +1962,8 @@ function installDirectPageCurl() {
     return { surfaceRect, bounds, pageWidth, edgePx };
   };
 
-  const localPoint = (event, metrics = getMetrics()) => ({
+  // Ölçüm yalnızca pointerdown'da alınır; hareket sırasında layout okunmaz.
+  const localPoint = (event, metrics) => ({
     x: clamp(event.clientX - metrics.surfaceRect.left, -metrics.pageWidth, metrics.surfaceRect.width + metrics.pageWidth),
     y: clamp(event.clientY - metrics.surfaceRect.top, 0, metrics.surfaceRect.height),
   });
@@ -1960,7 +2240,10 @@ function bindReaderEvents(book) {
   }, { capture: true, signal });
 
   document.addEventListener('keydown', event => readerKeyHandler(event), { signal });
-  window.addEventListener('resize', () => {
+
+  // Tek bir debounce: resize ve ResizeObserver aynı yolu kullanır, böylece
+  // yeniden kurulum en fazla bir kez tetiklenir.
+  const onLayoutChange = () => {
     if (curlDragging) {
       resizePending = true;
       return;
@@ -1968,18 +2251,13 @@ function bindReaderEvents(book) {
     clearTimeout(repaginateTimer);
     repaginateTimer = window.setTimeout(() => {
       const metrics = getLayoutMetrics();
-      if (metrics && metrics.key !== lastLayoutKey) scheduleRepagination(0);
-    }, 320);
-  }, { signal });
+      if (!metrics || metrics.key === lastLayoutKey) return;
+      scheduleRepagination(0);
+    }, 200);
+  };
 
-  layoutObserver = new ResizeObserver(() => {
-    if (curlDragging) {
-      resizePending = true;
-      return;
-    }
-    const metrics = getLayoutMetrics();
-    if (metrics && metrics.key !== lastLayoutKey) scheduleRepagination(320);
-  });
+  window.addEventListener('resize', onLayoutChange, { signal, passive: true });
+  layoutObserver = new ResizeObserver(onLayoutChange);
   const cradle = document.getElementById('book-cradle');
   if (cradle) layoutObserver.observe(cradle);
 }
@@ -2112,13 +2390,18 @@ function playPageSound() {
     if (!AudioCtor) return;
     audioContext ||= new AudioCtor();
     if (audioContext.state === 'suspended') audioContext.resume();
-    const duration = 0.13;
-    const buffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * duration), audioContext.sampleRate);
-    const channel = buffer.getChannelData(0);
-    for (let i = 0; i < channel.length; i += 1) {
-      const envelope = Math.sin(Math.PI * (i / channel.length));
-      channel[i] = (Math.random() * 2 - 1) * envelope * 0.22;
+    // Gürültü buffer'ı bir kez üretilir; her çevirmede yeniden doldurmak
+    // ana iş parçacığında gereksiz yük oluşturuyordu.
+    if (!pageSoundBuffer) {
+      const duration = 0.13;
+      pageSoundBuffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * duration), audioContext.sampleRate);
+      const channel = pageSoundBuffer.getChannelData(0);
+      for (let i = 0; i < channel.length; i += 1) {
+        const envelope = Math.sin(Math.PI * (i / channel.length));
+        channel[i] = (Math.random() * 2 - 1) * envelope * 0.22;
+      }
     }
+    const buffer = pageSoundBuffer;
     const source = audioContext.createBufferSource();
     const filter = audioContext.createBiquadFilter();
     const gain = audioContext.createGain();
@@ -2163,5 +2446,6 @@ export function closeRavzaBooks() {
   if (audioContext) {
     try { audioContext.close(); } catch (_) {}
     audioContext = null;
+    pageSoundBuffer = null;
   }
 }
