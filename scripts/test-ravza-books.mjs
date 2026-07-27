@@ -227,8 +227,34 @@ try {
 
   await setViewport(390, 844);
   assert.equal(await evaluate("document.querySelectorAll('.library-book-card').length"), 5, 'Beş PDF kitabın tamamı kitaplıkta görünmüyor');
+  assert.equal(
+    [...requestUrls.values()].filter(url => /page-flip/i.test(url)).length,
+    0,
+    'PageFlip okuyucu açılmadan istendi',
+  );
+  await command('Network.emulateNetworkConditions', {
+    offline: false,
+    latency: 350,
+    downloadThroughput: 1_500_000,
+    uploadThroughput: 750_000,
+  });
   await evaluate("document.querySelector('.library-book-card[data-book-id=\"dede-korkut-hikayeleri\"]').click()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] .pdf-page.is-rendered')", 30000);
+  await command('Network.emulateNetworkConditions', {
+    offline: false,
+    latency: 0,
+    downloadThroughput: -1,
+    uploadThroughput: -1,
+  });
+  const pageFlipRequests = [...requestUrls.values()].filter(url => /page-flip/i.test(url));
+  assert.equal(pageFlipRequests.length, 1, `PageFlip bir kez yerine ${pageFlipRequests.length} kez istendi`);
+  assert.match(pageFlipRequests[0], /\/assets\/vendor\/page-flip\/page-flip\.browser\.js$/);
+  assert.equal(pageFlipRequests.some(url => /unpkg\.com/i.test(url)), false, 'PageFlip için unpkg isteği kaldı');
+  assert.equal(
+    await evaluate("document.querySelectorAll('script[data-ravza-page-flip=\"2.0.7\"]').length"),
+    1,
+    'StPageFlip script etiketi bir kez yerine birden fazla yüklendi',
+  );
   const dedeKorkutProbe = await evaluate(`(() => ({
     title: document.querySelector('#rdr-control-title')?.textContent,
     pdfPages: document.querySelectorAll('.book-sheet.pdf-page').length,
@@ -456,6 +482,29 @@ try {
   assert.match(await evaluate("document.querySelector('.reader-error p').textContent"), /PDF/);
   await evaluate("document.querySelector('#rdr-error-back').click()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
+
+  await command('Network.setBlockedURLs', { urls: [] });
+  await command('Network.setCacheDisabled', { cacheDisabled: true });
+  await evaluate('location.reload()');
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
+  await command('Network.emulateNetworkConditions', {
+    offline: true,
+    latency: 0,
+    downloadThroughput: 0,
+    uploadThroughput: 0,
+  });
+  await evaluate("document.querySelector('.library-book-card').click()");
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"error\"] #rdr-error-back')", 20000);
+  assert.ok(
+    (await evaluate("document.querySelector('.reader-error p').textContent")).trim().length > 0,
+    'Çevrimdışı açılışta anlaşılır hata gösterilmedi',
+  );
+  await command('Network.emulateNetworkConditions', {
+    offline: false,
+    latency: 0,
+    downloadThroughput: -1,
+    uploadThroughput: -1,
+  });
 
   process.stdout.write(`Ravza Books: ${VIEWPORTS.length} viewport, açık/sepya/koyu PDF görünümü, 5'i kaydet → 10'a git → 5'te aç, curl ve hata durumu doğrulandı.\n`);
 } finally {
