@@ -6,6 +6,7 @@ import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
 import { withTimeout } from "../utils/helpers.js";
 import { initLauncher } from "./launcher.js?v=home-proportions-20260716-1";
 import { initLiquidGlassSurfaceSystem } from "../services/liquid-glass-service.js?v=liquid-optics-20260715-1";
+import { initSearchClearControls } from "../utils/search-clear.js";
 
 // legacy-app.js normalde çok hızlı yüklenir (yerel/CDN'den tek modül); bu
 // süre yalnızca "CDN tamamen tıkanırsa ana içerik sonsuza dek beklemesin"
@@ -95,6 +96,7 @@ export async function initApp() {
 
     await loadLayoutPartials();
     startupState.shellRendered = true;
+    initSearchClearControls();
     initLiquidGlassSurfaceSystem();
     installAppShellScrollBridge();
     initLauncher();

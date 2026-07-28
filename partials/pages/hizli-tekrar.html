@@ -8,7 +8,7 @@
         </div>
 
         <div class="recap-toolbar">
-          <input type="text" id="recapFilter" class="hub-search" placeholder="Kural, unite veya kalip ara... ornek: passive / 4B / for vs since" oninput="renderRecap()">
+          <input type="text" id="recapFilter" class="hub-search" placeholder="Kural, unite veya kalip ara... ornek: passive / 4B / for vs since" aria-label="Hızlı tekrar kartlarında ara" data-clearable-search oninput="renderRecap()">
           <div class="recap-actions">
             <span id="recapCount" class="recap-meta-pill">0 kart</span>
             <button type="button" class="recap-reset" onclick="resetRecapFilters()">Filtreleri Temizle</button>

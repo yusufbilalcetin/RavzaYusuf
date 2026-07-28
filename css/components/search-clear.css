@@ -1,0 +1,214 @@
+.search-clear-control {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  color-scheme: var(--search-color-scheme, light);
+}
+
+.search-clear-control > input[data-clearable-search] {
+  width: 100%;
+  padding-inline-end: 60px;
+  color: var(--search-text, #2d3748);
+  caret-color: var(--search-focus-border, #d4669c);
+  background-color: var(--search-bg, #f8f9fe);
+  background-clip: padding-box;
+  border-color: var(--search-border, #9ca3af);
+  -webkit-appearance: none;
+  appearance: none;
+  color-scheme: var(--search-color-scheme, light);
+  transition: none;
+}
+
+.search-clear-control > input[data-clearable-search]::placeholder {
+  color: var(--search-placeholder, #596273);
+  opacity: 1;
+}
+
+.search-clear-control > input[data-clearable-search]:hover:not(:disabled) {
+  background-color: var(--search-hover-bg, #eef0f5);
+  border-color: var(--search-hover-border, #b75b87);
+}
+
+.search-clear-control > input[data-clearable-search]:focus {
+  color: var(--search-text, #2d3748);
+  background-color: var(--search-bg, #f8f9fe);
+  border-color: var(--search-focus-border, #d4669c);
+  outline: 3px solid transparent;
+  box-shadow:
+    0 0 0 3px var(--search-focus-ring, rgba(212, 102, 156, .34)),
+    var(--search-shadow, 0 10px 26px rgba(15, 23, 42, .06));
+}
+
+.search-clear-control > input[data-clearable-search]:focus-visible {
+  outline-color: var(--search-focus-border, #d4669c);
+  outline-offset: 2px;
+}
+
+.search-clear-control > input[data-clearable-search]:disabled {
+  color: var(--search-disabled-text, #7a8090);
+  -webkit-text-fill-color: var(--search-disabled-text, #7a8090);
+  background-color: var(--search-disabled-bg, #eef0f5);
+  border-color: var(--search-border, #9ca3af);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: .76;
+}
+
+input[data-clearable-search]::-webkit-search-decoration,
+input[data-clearable-search]::-webkit-search-cancel-button,
+input[data-clearable-search]::-webkit-search-results-button,
+input[data-clearable-search]::-webkit-search-results-decoration {
+  display: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[data-clearable-search]::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+input[data-clearable-search]:-webkit-autofill,
+input[data-clearable-search]:-webkit-autofill:hover,
+input[data-clearable-search]:-webkit-autofill:focus,
+input[data-clearable-search]:-webkit-autofill:active {
+  color: var(--search-text, #2d3748);
+  -webkit-text-fill-color: var(--search-text, #2d3748);
+  caret-color: var(--search-focus-border, #d4669c);
+  border-color: var(--search-border, #9ca3af);
+  -webkit-box-shadow: 0 0 0 1000px var(--search-autofill-bg, #f8f9fe) inset;
+  box-shadow: 0 0 0 1000px var(--search-autofill-bg, #f8f9fe) inset;
+}
+
+input[data-clearable-search]:-webkit-autofill:focus,
+input[data-clearable-search]:-webkit-autofill:focus-visible {
+  border-color: var(--search-focus-border, #d4669c);
+  -webkit-box-shadow:
+    0 0 0 1000px var(--search-autofill-bg, #f8f9fe) inset,
+    0 0 0 3px var(--search-focus-ring, rgba(212, 102, 156, .34));
+  box-shadow:
+    0 0 0 1000px var(--search-autofill-bg, #f8f9fe) inset,
+    0 0 0 3px var(--search-focus-ring, rgba(212, 102, 156, .34));
+}
+
+input[data-clearable-search]:autofill {
+  color: var(--search-text, #2d3748);
+  caret-color: var(--search-focus-border, #d4669c);
+  background-color: var(--search-autofill-bg, #f8f9fe);
+  border-color: var(--search-border, #9ca3af);
+}
+
+.search-clear-button {
+  position: absolute;
+  inset-inline-end: 8px;
+  top: 50%;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  color: var(--search-clear-icon, #2d3748);
+  background: var(--search-clear-bg, #d9dbe2);
+  border: 1px solid var(--search-clear-border, #8d94a3);
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(63, 37, 53, .12), inset 0 1px 0 rgba(255, 255, 255, .32);
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  transform: translateY(-50%);
+  transition: transform 150ms ease;
+}
+
+.search-clear-button[hidden] {
+  display: none !important;
+}
+
+.search-clear-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.search-clear-button:hover:not(:disabled) {
+  color: var(--search-clear-icon, #2d3748);
+  background: var(--search-clear-hover-bg, #e1bdce);
+  border-color: var(--search-clear-hover-border, #b75b87);
+  box-shadow: 0 5px 14px rgba(126, 32, 70, .16), inset 0 1px 0 rgba(255, 255, 255, .34);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.search-clear-button:active:not(:disabled) {
+  background: var(--search-clear-active-bg, #d7a5bd);
+  border-color: var(--search-focus-border, #d4669c);
+  transform: translateY(-50%) scale(.96);
+}
+
+.search-clear-button:focus-visible {
+  outline: 3px solid var(--search-focus-border, #d4669c);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--search-focus-ring, rgba(212, 102, 156, .34));
+}
+
+.search-clear-button:disabled,
+.search-clear-control > input[data-clearable-search]:disabled + .search-clear-button {
+  color: var(--search-disabled-text, #7a8090);
+  background: var(--search-disabled-bg, #eef0f5);
+  border-color: var(--search-border, #9ca3af);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: .72;
+  pointer-events: none;
+}
+
+.hub-toolbar > .search-clear-control,
+.recap-toolbar > .search-clear-control {
+  flex: 1 1 320px;
+}
+
+.memory-search-row > .search-clear-control,
+.filter-panel > .search-clear-control,
+.launcher-editor-filter > .search-clear-control,
+.topbar-search > .search-clear-control {
+  width: 100%;
+}
+
+.fill-gap-toolbar > .search-clear-control {
+  flex: 1 1 320px;
+  min-width: 260px;
+}
+
+.search-clear-label {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .fill-gap-toolbar > .search-clear-control {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-clear-control > input[data-clearable-search],
+  .search-clear-button {
+    transition: none;
+  }
+}

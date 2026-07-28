@@ -439,8 +439,9 @@
 .memory-search-sticky .hub-search {
   min-height: 48px;
   border-radius: 18px;
-  background: rgba(255,255,255,.86);
-  color: var(--text);
+  background: var(--search-bg);
+  color: var(--search-text);
+  border-color: var(--search-border);
 }
 
 .memory-favorite-filter-btn.active,

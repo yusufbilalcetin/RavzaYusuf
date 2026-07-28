@@ -31,14 +31,32 @@
 }
 
 #quizhub .hub-search::placeholder {
-  color: rgba(255, 230, 238, .62);
+  color: var(--search-placeholder);
+  opacity: 1;
 }
 
-#quizhub .hub-search:focus {
-  border-color: rgba(255, 143, 189, .72) !important;
+#quizhub .hub-search:hover:not(:disabled) {
+  background: var(--search-hover-bg);
+  border-color: var(--search-hover-border);
+}
+
+#quizhub .hub-search:focus,
+#quizhub .hub-search:focus-visible {
+  color: var(--search-text);
+  background: var(--search-bg);
+  border-color: var(--search-focus-border);
+  outline: 3px solid var(--search-focus-border);
+  outline-offset: 2px;
   box-shadow:
-    0 0 0 3px rgba(255, 143, 189, .14),
-    0 18px 46px rgba(0, 0, 0, .25);
+    0 0 0 3px var(--search-focus-ring),
+    var(--search-shadow);
+}
+
+#quizhub .hub-search:disabled {
+  color: var(--search-disabled-text);
+  background: var(--search-disabled-bg);
+  border-color: var(--search-border);
+  box-shadow: none;
 }
 
 #quizhub .hub-legend {

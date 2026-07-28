@@ -1,3 +1,5 @@
+@import url("./components/search-clear.css");
+
 :root {
   --admin-bg: #10070c;
   --admin-bg-2: #190b13;
@@ -53,6 +55,26 @@ body {
 }
 
 body.admin-page {
+  --search-color-scheme: dark;
+  --search-bg: rgba(255, 255, 255, .075);
+  --search-text: var(--admin-text);
+  --search-placeholder: color-mix(in srgb, var(--admin-text) 86%, var(--admin-bg));
+  --search-border: var(--admin-pink-2);
+  --search-hover-bg: rgba(255, 255, 255, .11);
+  --search-hover-border: color-mix(in srgb, var(--admin-text) 42%, var(--admin-pink-2) 58%);
+  --search-focus-border: color-mix(in srgb, var(--admin-text) 56%, var(--admin-pink-2) 44%);
+  --search-focus-ring: rgba(255, 79, 147, .24);
+  --search-icon: var(--admin-muted);
+  --search-clear-bg: rgba(255, 255, 255, .14);
+  --search-clear-icon: var(--admin-text);
+  --search-clear-border: var(--admin-pink-2);
+  --search-clear-hover-bg: rgba(255, 79, 147, .22);
+  --search-clear-hover-border: color-mix(in srgb, var(--admin-pink-2) 72%, transparent);
+  --search-clear-active-bg: rgba(255, 79, 147, .32);
+  --search-disabled-bg: rgba(255, 255, 255, .05);
+  --search-disabled-text: color-mix(in srgb, var(--admin-muted) 72%, var(--admin-bg));
+  --search-autofill-bg: #2b1823;
+  --search-shadow: inset 0 1px 0 rgba(255, 255, 255, .04), 0 10px 26px rgba(0, 0, 0, .18);
   min-height: 100vh;
   color: var(--admin-text);
   font-family: "Plus Jakarta Sans", system-ui, sans-serif;
@@ -230,7 +252,7 @@ select option {
 
 .login-form button,
 .primary-action,
-.filter-panel button,
+.filter-panel button:not(.search-clear-button),
 .view-site-btn,
 .modal-form button[type="submit"],
 .modal-actions button,
@@ -258,7 +280,7 @@ select option {
 
 .login-form button:hover,
 .primary-action:hover,
-.filter-panel button:hover,
+.filter-panel button:not(.search-clear-button):hover,
 .view-site-btn:hover,
 .modal-form button[type="submit"]:hover,
 .modal-actions button:hover,
@@ -473,12 +495,12 @@ select option {
   max-width: 620px;
 }
 
-.topbar-search span {
+.topbar-search > .topbar-search-icon {
   position: absolute;
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--admin-muted);
+  color: var(--search-icon);
   pointer-events: none;
   z-index: 1;
 }
@@ -1197,7 +1219,7 @@ select option {
   margin-bottom: 18px;
 }
 
-.filter-panel button:not(.primary-action) {
+.filter-panel button:not(.primary-action):not(.search-clear-button) {
   background: rgba(255,255,255,.08);
   border: 1px solid var(--admin-border);
   box-shadow: none;
@@ -2007,7 +2029,7 @@ select option {
     grid-template-columns: 1fr;
   }
 
-  .filter-panel button,
+  .filter-panel button:not(.search-clear-button),
   .filter-panel .primary-action,
   .header-actions button,
   .header-actions .primary-action {

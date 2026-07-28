@@ -1,5 +1,6 @@
 import { db } from "../config/firebase-config.js";
 import { DEFAULT_TOPICS, DEFAULT_QUIZZES, DEFAULT_EXAMS } from "../../data/content-defaults.js";
+import { initSearchClearControls, syncSearchClearControl } from "../utils/search-clear.js";
 import {
   collection,
   doc,
@@ -831,6 +832,7 @@ function activatePage(pageId, pushHash = true) {
   $$(".admin-section").forEach((section) => section.classList.toggle("active", section.dataset.page === pageId));
   closeMobileMenu();
   $("#globalSearch").value = "";
+  syncSearchClearControl($("#globalSearch"));
   clearGlobalSearch();
   if (pushHash) history.replaceState(null, "", `#${pageId}`);
 }
@@ -1123,6 +1125,7 @@ async function init() {
     source: "content-defaults.js"
   }));
   renderAll();
+  initSearchClearControls();
   bindEvents();
   const hasSession = sessionStorage.getItem(SESSION_KEY) === "1";
   if (hasSession) {

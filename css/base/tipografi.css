@@ -10,6 +10,29 @@
   --table-hover: #232b3d;
   --pink-pale: #291625;
   --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  --search-color-scheme: dark;
+  --search-bg: color-mix(in srgb, var(--input-bg) 94%, #000 6%);
+  --search-text: var(--text);
+  --search-placeholder: color-mix(in srgb, var(--text) 70%, var(--search-bg));
+  --search-border: color-mix(in srgb, var(--input-brd) 70%, var(--text) 30%);
+  --search-hover-bg: color-mix(in srgb, var(--input-bg) 88%, var(--text) 12%);
+  --search-hover-border: color-mix(in srgb, var(--text) 40%, var(--pink-bright) 60%);
+  --search-focus-border: var(--pink-bright);
+  --search-focus-ring: color-mix(in srgb, var(--pink-bright) 42%, transparent);
+  --search-icon: color-mix(in srgb, var(--text) 90%, var(--input-bg));
+  --search-clear-bg: color-mix(in srgb, var(--input-bg) 78%, var(--text) 22%);
+  --search-clear-icon: var(--text);
+  --search-clear-border: color-mix(in srgb, var(--input-brd) 62%, var(--text) 38%);
+  --search-clear-hover-bg: color-mix(in srgb, var(--input-bg) 62%, var(--text) 38%);
+  --search-clear-hover-border: color-mix(in srgb, var(--input-brd) 46%, var(--text) 54%);
+  --search-clear-active-bg: color-mix(in srgb, var(--input-bg) 72%, var(--text) 28%);
+  --search-disabled-bg: color-mix(in srgb, var(--input-bg) 90%, var(--bg) 10%);
+  --search-disabled-text: color-mix(in srgb, var(--text) 48%, var(--input-bg));
+  --search-autofill-bg: color-mix(in srgb, var(--input-bg) 88%, var(--pink-pale) 12%);
+  --search-panel-bg: color-mix(in srgb, var(--white) 88%, transparent);
+  --search-panel-border: color-mix(in srgb, var(--card-border) 78%, var(--text) 22%);
+  --search-shadow: inset 0 1px 0 rgba(255, 255, 255, .04), 0 14px 34px rgba(0, 0, 0, .22);
+  --search-panel-shadow: 0 14px 34px rgba(0, 0, 0, .24);
 }
 
 body[data-theme-style="noel-ask"] {
@@ -672,12 +695,12 @@ body.dark[data-theme-style="noel-ask"] .memory-back {
   min-width: 0;
   max-width: 100%;
   min-height: 58px;
-  padding: 0 24px;
-  color: #fff;
-  background: rgba(12, 10, 24, .82) !important;
-  border: 1px solid rgba(255, 130, 170, .35) !important;
+  padding: 0 64px 0 24px;
+  color: var(--search-text);
+  background: var(--search-bg);
+  border: 1.5px solid var(--search-border);
   border-radius: 999px;
-  box-shadow: 0 18px 46px rgba(0, 0, 0, .25);
+  box-shadow: var(--search-shadow);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   position: relative;
@@ -774,12 +797,12 @@ body.dark:has(#studyhub.active) .topbar {
   min-width: 0;
   max-width: 100%;
   min-height: 58px;
-  padding: 0 24px;
-  color: #fff;
-  background: rgba(12, 10, 24, .82) !important;
-  border: 1px solid rgba(255, 130, 170, .35) !important;
+  padding: 0 64px 0 24px;
+  color: var(--search-text);
+  background: var(--search-bg);
+  border: 1.5px solid var(--search-border);
   border-radius: 999px;
-  box-shadow: 0 18px 46px rgba(0, 0, 0, .25);
+  box-shadow: var(--search-shadow);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   position: relative;
@@ -3292,11 +3315,11 @@ body.dark .memory-favorite-btn {
   margin: 0 0 18px;
   padding: 10px 12px;
   border-radius: 22px;
-  background: rgba(255, 247, 251, 0.90);
+  background: var(--search-panel-bg);
   backdrop-filter: blur(18px) saturate(1.15);
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  border: 1px solid rgba(212, 102, 156, 0.22);
-  box-shadow: 0 12px 30px rgba(126, 32, 70, 0.10);
+  border: 1px solid var(--search-panel-border);
+  box-shadow: var(--search-panel-shadow);
 }
 
 .memory-search-row,
@@ -3330,11 +3353,10 @@ body.dark .memory-favorite-btn {
 }
 
 body.dark .memory-search-sticky {
-  background: rgba(20, 12, 18, 0.90);
-  border-color: rgba(255,255,255,.10);
+  background: var(--search-panel-bg);
+  border-color: var(--search-panel-border);
 }
 
-body.dark .memory-search-sticky .hub-search,
 body.dark .memory-favorite-filter-btn {
   background: rgba(35, 24, 32, 0.92);
   color: var(--text);

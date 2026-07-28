@@ -65,10 +65,11 @@
     <main class="admin-main">
       <header class="admin-topbar">
         <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Menüyü aç" aria-expanded="false">☰</button>
-        <label class="topbar-search">
-          <span aria-hidden="true">⌕</span>
-          <input id="globalSearch" type="search" placeholder="Ara... (ör. kullanıcı, içerik, test)" autocomplete="off">
-        </label>
+        <div class="topbar-search" role="search">
+          <span class="topbar-search-icon" aria-hidden="true">⌕</span>
+          <label class="search-clear-label" for="globalSearch">Admin panelinde ara</label>
+          <input id="globalSearch" type="search" placeholder="Ara... (ör. kullanıcı, içerik, test)" autocomplete="off" data-clearable-search>
+        </div>
         <div class="topbar-actions">
           <a class="view-site-btn" href="index.html" target="_blank" rel="noopener">Siteyi Görüntüle</a>
           <button class="notification-btn" type="button" data-demo-action="Bildirim merkezi açıldı" aria-label="Bildirimler">
@@ -193,7 +194,7 @@
           </div>
           <div class="stat-grid four" id="userStats"></div>
           <div class="filter-panel">
-            <input id="userSearch" type="search" placeholder="Kullanıcı ara">
+            <input id="userSearch" type="search" placeholder="Kullanıcı ara" aria-label="Kullanıcı ara" data-clearable-search>
             <select id="userRoleFilter"><option value="">Rol seçimi</option><option>Öğrenci</option><option>Yönetici</option></select>
             <select id="userStatusFilter"><option value="">Durum filtresi</option><option>Aktif</option><option>Pasif</option></select>
             <button type="button" id="userFilterButton">Filtrele</button>
@@ -278,7 +279,7 @@
           </div>
           <div class="stat-grid four" id="quizStats"></div>
           <div class="filter-panel">
-            <input id="quizSearch" type="search" placeholder="Quiz ara">
+            <input id="quizSearch" type="search" placeholder="Quiz ara" aria-label="Quiz ara" data-clearable-search>
             <select id="quizCategoryFilter"><option value="">Kategori seç</option><option>Kelime</option><option>Dilbilgisi</option><option>Okuma</option></select>
             <select id="quizDifficultyFilter"><option value="">Zorluk seç</option><option>Kolay</option><option>Orta</option><option>Zor</option></select>
             <select id="quizStatusFilter"><option value="">Durum seç</option><option>Yayında</option><option>Taslak</option></select>
@@ -307,7 +308,7 @@
           </div>
           <div class="stat-grid four" id="examStats"></div>
           <div class="filter-panel">
-            <input id="examSearch" type="search" placeholder="Sınav ara... (ad, açıklama)">
+            <input id="examSearch" type="search" placeholder="Sınav ara... (ad, açıklama)" aria-label="Sınav ara" data-clearable-search>
             <select id="examTypeFilter"><option value="">Tür</option><option>Genel</option><option>Kelime</option><option>Konu</option><option>Okuma</option><option>Dinleme</option><option>Dilbilgisi</option></select>
             <select id="examStatusFilter"><option value="">Durum</option><option>Yayınlandı</option><option>Tamamlandı</option><option>Planlandı</option><option>Taslak</option></select>
             <input id="examDateFilter" type="text" placeholder="Tarih aralığı">
@@ -357,7 +358,7 @@
           </div>
           <div class="stat-grid four" id="flashcardStats"></div>
           <div class="filter-panel">
-            <input id="cardSearch" type="search" placeholder="Kart başlığı ara">
+            <input id="cardSearch" type="search" placeholder="Kart başlığı ara" aria-label="Kart başlığı ara" data-clearable-search>
             <select id="cardCategoryFilter"><option value="">Kategori</option><option>Kelime</option><option>Dilbilgisi</option><option>Genel</option><option>Konuşma</option><option>Okuma</option></select>
             <select id="cardDifficultyFilter"><option value="">Zorluk</option><option>Kolay</option><option>Orta</option><option>Zor</option></select>
             <select id="cardStatusFilter"><option value="">Durum</option><option>Yayında</option><option>Taslak</option><option>Arşivlendi</option></select>

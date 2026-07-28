@@ -8,6 +8,7 @@ import {
 } from "../data/launcher-navigation.js";
 import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
+import { syncSearchClearControl } from "../utils/search-clear.js";
 import { appIconPictureMarkup } from "../../data/app-icons.js";
 import {
   LAUNCHER_LAYOUT_KEY,
@@ -637,6 +638,7 @@ export function openLauncherSearch(trigger = document.activeElement, pushHistory
   searchTrigger = showLayer(layer, dialog, trigger);
   input.value = "";
   renderSearchResults();
+  syncSearchClearControl(input);
   requestAnimationFrame(() => input.focus({ preventScroll: true }));
   if (pushHistory) pushOverlayHistory("search");
 }
@@ -660,7 +662,7 @@ function editorAppsMarkup() {
   const placed = new Set(launcherState.layout.pages.flatMap((page) => page.items.filter((item) => item.type !== "widget").map((item) => item.id)));
   const customFolders = launcherState.layouts.folders.map((folder) => resolveLauncherGroup(folder.id)).filter(Boolean);
   const entries = launcherRegistryEntries(customFolders).filter((item) => !placed.has(item.id) || launcherState.layout.hiddenApps.includes(item.id));
-  return `${pageSelectMarkup()}<label class="launcher-editor-filter"><span class="sr-only">Uygulamalarda ara</span><input type="search" placeholder="Uygulama ara" autocomplete="off" data-launcher-editor-filter></label><div class="launcher-editor-grid">${entries.length ? entries.map((item) => `<button class="launcher-editor-choice" type="button" data-search-index="${escapeHtml(item.searchIndex || createSearchIndex(item.title, item.category, item.keywords))}" data-launcher-add-app="${escapeHtml(item.id)}">
+  return `${pageSelectMarkup()}<div class="launcher-editor-filter" role="search"><label class="sr-only" for="launcherEditorAppFilter">Uygulamalarda ara</label><input id="launcherEditorAppFilter" type="search" placeholder="Uygulama ara" autocomplete="off" data-clearable-search data-launcher-editor-filter></div><div class="launcher-editor-grid">${entries.length ? entries.map((item) => `<button class="launcher-editor-choice" type="button" data-search-index="${escapeHtml(item.searchIndex || createSearchIndex(item.title, item.category, item.keywords))}" data-launcher-add-app="${escapeHtml(item.id)}">
     <span class="launcher-search-result-icon launcher-tone-${escapeHtml(item.tone || "home")}">${item.type === "folder" ? folderPreview(item) : iconMarkup(item)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${item.type === "folder" ? "Klasör" : "Uygulama"}</small></span><span aria-hidden="true">＋</span>
   </button>`).join("") : '<p class="launcher-editor-empty">Eklenebilecek başka bir uygulama yok.</p>'}</div>`;
 }
@@ -668,7 +670,7 @@ function editorAppsMarkup() {
 function editorWidgetsMarkup() {
   const placed = new Set(launcherState.layout.pages.flatMap((page) => page.items.filter((item) => item.type === "widget").map((item) => item.id)));
   const available = LAUNCHER_WIDGETS.filter((widget) => !placed.has(widget.id));
-  return `${pageSelectMarkup()}<label class="launcher-editor-filter"><span class="sr-only">Widget'larda ara</span><input type="search" placeholder="Widget ara" autocomplete="off" data-launcher-editor-filter></label><div class="launcher-widget-gallery">${available.length ? available.map((widget) => `<button class="launcher-widget-choice" type="button" data-search-index="${escapeHtml(widget.searchIndex)}" data-launcher-add-widget="${escapeHtml(widget.id)}">
+  return `${pageSelectMarkup()}<div class="launcher-editor-filter" role="search"><label class="sr-only" for="launcherEditorWidgetFilter">Widget'larda ara</label><input id="launcherEditorWidgetFilter" type="search" placeholder="Widget ara" autocomplete="off" data-clearable-search data-launcher-editor-filter></div><div class="launcher-widget-gallery">${available.length ? available.map((widget) => `<button class="launcher-widget-choice" type="button" data-search-index="${escapeHtml(widget.searchIndex)}" data-launcher-add-widget="${escapeHtml(widget.id)}">
     <span><small>${escapeHtml(widget.size)}</small><strong>${escapeHtml(widget.title)}</strong><em>${escapeHtml(widget.description)}</em></span><span aria-hidden="true">＋</span>
   </button>`).join("") : '<p class="launcher-editor-empty">Tüm widget’lar ana ekranda bulunuyor.</p>'}</div>`;
 }
@@ -1528,7 +1530,10 @@ export function initLauncher() {
   window.addEventListener("pointercancel", cancelPointerDrag);
   document.querySelectorAll("[data-launcher-close]").forEach((button) => button.addEventListener("click", () => closeLauncherFolder()));
   document.querySelectorAll("[data-launcher-search-close]").forEach((button) => button.addEventListener("click", () => closeLauncherSearch()));
-  document.getElementById("launcherSearchInput")?.addEventListener("input", (event) => renderSearchResults(event.currentTarget.value));
+  const launcherSearchInput = document.getElementById("launcherSearchInput");
+  launcherSearchInput?.addEventListener("input", (event) => {
+    renderSearchResults(event.currentTarget.value);
+  });
   document.addEventListener("input", (event) => {
     if (event.target.matches?.("[data-launcher-editor-filter]")) filterEditorChoices(event.target.value);
   });

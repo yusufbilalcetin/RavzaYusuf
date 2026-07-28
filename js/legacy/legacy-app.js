@@ -3,6 +3,7 @@ import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { loadAllQuizzes } from "../services/quiz-service.js";
 import { safeParse, withTimeout } from "../utils/helpers.js";
 import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
+import { syncSearchClearControl } from "../utils/search-clear.js";
 import {
   doc,
   getDoc,
@@ -2034,7 +2035,10 @@ function clearRecapUnitSelections() {
 
 function resetRecapFilters() {
   const input = document.getElementById("recapFilter");
-  if (input) input.value = "";
+  if (input) {
+    input.value = "";
+    syncSearchClearControl(input);
+  }
   activeRecapUnits = getAllRecapUnits();
   renderRecap();
 }
