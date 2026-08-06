@@ -17,6 +17,26 @@ const BOOSTER_MESSAGES = {
   colorBlast: "Renk Temizleyici: temizlenecek rengi sec."
 };
 
+function cssHexColor(name, fallback) {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const match = raw.match(/^#([\da-f]{3}|[\da-f]{6})$/i);
+  if (!match) return fallback;
+  const hex = match[1].length === 3
+    ? match[1].split("").map((digit) => digit + digit).join("")
+    : match[1];
+  return Number.parseInt(hex, 16);
+}
+
+function readThemePalette() {
+  return {
+    board: cssHexColor("--game-canvas-board", 0x14586f),
+    boardBorder: cssHexColor("--game-canvas-border", 0x8fd9ea),
+    selected: cssHexColor("--game-canvas-selected", 0x6acbf1),
+    selectedBorder: cssHexColor("--game-canvas-selected-border", 0xfff09b),
+    cell: cssHexColor("--game-canvas-cell", 0xffffff)
+  };
+}
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
@@ -37,6 +57,8 @@ export default class GameScene extends Phaser.Scene {
     this.cellGroups = new Map();
     this.dragState = null;
     this.hasRenderedBoard = false;
+    this.themePalette = readThemePalette();
+    this.themeRefreshQueued = false;
   }
 
   create() {
@@ -82,6 +104,27 @@ export default class GameScene extends Phaser.Scene {
     this.renderBoard({ animate: false });
   }
 
+  refreshTheme() {
+    this.themePalette = readThemePalette();
+    if (!this.engine || !this.scene?.isActive()) return;
+    if (this.inputLocked || this.dragState) {
+      if (this.themeRefreshQueued) return;
+      this.themeRefreshQueued = true;
+      const retry = () => {
+        if (!this.scene?.isActive()) return;
+        if (this.inputLocked || this.dragState) {
+          this.time.delayedCall(80, retry);
+          return;
+        }
+        this.themeRefreshQueued = false;
+        this.renderBoard({ animate: false });
+      };
+      this.time.delayedCall(80, retry);
+      return;
+    }
+    this.renderBoard({ animate: false });
+  }
+
   renderBoard(options = {}) {
     if (!this.engine) return;
 
@@ -105,9 +148,9 @@ export default class GameScene extends Phaser.Scene {
     this.metrics = { originX, originY, cellSize, boardWidth, boardHeight };
 
     const back = this.add.graphics();
-    back.fillStyle(0x14586f, 0.30);
+    back.fillStyle(this.themePalette.board, 0.30);
     back.fillRoundedRect(originX - 14, originY - 14, boardWidth + 28, boardHeight + 28, 22);
-    back.lineStyle(4, 0x8fd9ea, 0.30);
+    back.lineStyle(4, this.themePalette.boardBorder, 0.30);
     back.strokeRoundedRect(originX - 14, originY - 14, boardWidth + 28, boardHeight + 28, 22);
     this.boardLayer.add(back);
 
@@ -136,12 +179,12 @@ export default class GameScene extends Phaser.Scene {
 
     const base = this.add.graphics();
     if (this.selected === index) {
-      base.fillStyle(0x6acbf1, 0.55);
+      base.fillStyle(this.themePalette.selected, 0.55);
       base.fillRoundedRect(pad, pad, inner, inner, 11);
-      base.lineStyle(4, 0xfff09b, 0.95);
+      base.lineStyle(4, this.themePalette.selectedBorder, 0.95);
       base.strokeRoundedRect(pad, pad, inner, inner, 11);
     } else {
-      base.fillStyle(0xffffff, 0.03);
+      base.fillStyle(this.themePalette.cell, 0.03);
       base.fillRoundedRect(pad, pad, inner, inner, 11);
     }
     group.add(base);

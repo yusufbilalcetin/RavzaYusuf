@@ -4,6 +4,7 @@
   --felt: #1f5c38;
   --felt-deep: #123a23;
   --felt-dark: #0b2416;
+  --felt-highlight: #2c7148;
   --tile: #fff3c4;
   --tile-top: #fffaE0;
   --tile-edge: #b9822f;
@@ -14,7 +15,47 @@
   --cream-text: #fff7de;
   --muted: rgba(255, 247, 222, 0.72);
   --danger: #d75645;
+  --brand-start: rgba(16, 44, 27, 0.94);
+  --brand-end: rgba(10, 32, 20, 0.9);
+  --gear-start: #2c7148;
+  --gear-end: #123a23;
+  --message-bg: rgba(9, 39, 22, 0.55);
+  --board-start: #26623f;
+  --board-end: #143a24;
+  --overlay-scrim: rgba(9, 31, 18, 0.65);
+  --overlay-card-start: #fff7d5;
+  --overlay-card-end: #f1d890;
+  --overlay-blocked-start: #fff3df;
+  --overlay-blocked-end: #f3c6a2;
+  --overlay-card-ink: #2c1c0d;
+  --overlay-copy: rgba(44, 28, 13, 0.72);
+  --overlay-kicker: #856013;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html[data-resolved-theme="dark"] {
+  color-scheme: dark;
+  --felt: #163f2a;
+  --felt-deep: #0d291a;
+  --felt-dark: #07170e;
+  --felt-highlight: #205a37;
+  --cream-text: #fffbea;
+  --muted: rgba(255, 251, 234, 0.76);
+  --brand-start: rgba(9, 29, 18, 0.97);
+  --brand-end: rgba(5, 19, 12, 0.95);
+  --gear-start: #205a37;
+  --gear-end: #0b2717;
+  --message-bg: rgba(4, 23, 13, 0.72);
+  --board-start: #17472d;
+  --board-end: #0b2818;
+  --overlay-scrim: rgba(2, 12, 7, 0.76);
+  --overlay-card-start: #2b271a;
+  --overlay-card-end: #1c2015;
+  --overlay-blocked-start: #34231c;
+  --overlay-blocked-end: #251713;
+  --overlay-card-ink: #fff7de;
+  --overlay-copy: rgba(255, 247, 222, 0.74);
+  --overlay-kicker: #f6cf4a;
 }
 
 * {
@@ -35,7 +76,7 @@ body {
   background:
     repeating-linear-gradient(35deg, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 16px),
     repeating-linear-gradient(125deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 22px),
-    radial-gradient(120% 90% at 50% -10%, #2c7148 0%, var(--felt) 45%, var(--felt-deep) 78%, var(--felt-dark) 100%);
+    radial-gradient(120% 90% at 50% -10%, var(--felt-highlight) 0%, var(--felt) 45%, var(--felt-deep) 78%, var(--felt-dark) 100%);
   color: var(--cream-text);
 }
 
@@ -73,7 +114,7 @@ button:focus-visible {
   padding: 8px 12px;
   border-radius: 16px;
   border: 1px solid rgba(255, 240, 180, 0.2);
-  background: linear-gradient(180deg, rgba(16, 44, 27, 0.94), rgba(10, 32, 20, 0.9));
+  background: linear-gradient(180deg, var(--brand-start), var(--brand-end));
   box-shadow: 0 10px 22px rgba(4, 20, 12, 0.28);
 }
 
@@ -82,7 +123,7 @@ button:focus-visible {
   height: 34px;
   border-radius: 999px;
   border: 1px solid rgba(255, 240, 180, 0.35);
-  background: linear-gradient(180deg, #2c7148, #123a23);
+  background: linear-gradient(180deg, var(--gear-start), var(--gear-end));
   color: var(--gold);
   font-size: 16px;
   cursor: pointer;
@@ -143,7 +184,7 @@ button:focus-visible {
   padding: 7px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255, 240, 180, 0.18);
-  background: rgba(9, 39, 22, 0.55);
+  background: var(--message-bg);
   color: var(--muted);
   font-size: 11.5px;
   font-weight: 700;
@@ -170,7 +211,7 @@ button:focus-visible {
   background:
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 18px),
     repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 22px),
-    linear-gradient(150deg, #26623f, #143a24 72%);
+    linear-gradient(150deg, var(--board-start), var(--board-end) 72%);
   box-shadow: inset 0 8px 22px rgba(3, 20, 12, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.04);
   touch-action: manipulation;
 }
@@ -318,7 +359,7 @@ button:focus-visible {
   display: grid;
   place-items: center;
   padding: 18px;
-  background: rgba(9, 31, 18, 0.65);
+  background: var(--overlay-scrim);
   backdrop-filter: blur(6px);
 }
 
@@ -330,18 +371,18 @@ button:focus-visible {
   padding: 20px;
   border-radius: 18px;
   border: 1px solid rgba(255, 240, 180, 0.35);
-  background: linear-gradient(180deg, #fff7d5, #f1d890);
-  color: var(--ink);
+  background: linear-gradient(180deg, var(--overlay-card-start), var(--overlay-card-end));
+  color: var(--overlay-card-ink);
   text-align: center;
   box-shadow: 0 20px 45px rgba(3, 20, 12, 0.38);
 }
 
 .overlay-card.is-blocked {
-  background: linear-gradient(180deg, #fff3df, #f3c6a2);
+  background: linear-gradient(180deg, var(--overlay-blocked-start), var(--overlay-blocked-end));
 }
 
 .overlay-card span {
-  color: #856013;
+  color: var(--overlay-kicker);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -355,7 +396,7 @@ button:focus-visible {
 
 .overlay-card p {
   margin: 0;
-  color: rgba(44, 28, 13, 0.72);
+  color: var(--overlay-copy);
   font-size: 13.5px;
   font-weight: 700;
 }

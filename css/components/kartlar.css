@@ -1,21 +1,21 @@
 .search-bar input,
 .hub-search {
   width: 100%;
-  border: 1.5px solid color-mix(in srgb, var(--card-border) 76%, var(--pink) 24%);
-  background: var(--input-bg);
-  color: var(--text);
+  border: 1.5px solid var(--search-border);
+  background: var(--search-bg);
+  color: var(--search-text);
   border-radius: 18px;
   min-height: 50px;
   padding: 11px 16px 11px 44px;
   outline: none;
-  transition: .2s ease;
+  transition: var(--dur-base) var(--ease-out);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 10px 26px rgba(15,23,42,.04);
 }
 
 .search-bar input:focus,
 .hub-search:focus {
-  border-color: var(--pink);
-  box-shadow: 0 0 0 3px rgba(212,102,156,.12);
+  border-color: var(--search-focus-border);
+  box-shadow: 0 0 0 3px var(--search-focus-ring);
 }
 
 .hero {
@@ -59,18 +59,18 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--pink), var(--pink-bright));
-  transition: width .4s ease;
+  transition: width .4s var(--ease-out);
   box-shadow: 0 10px 20px rgba(124,58,237,.24);
 }
 
 .panel-badge,
 .unit-badge {
-  color: #fff;
-  background: linear-gradient(135deg, var(--pink), var(--pink-bright));
+  color: var(--text-on-accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
 }
 
 .panel-badge.quiz,
-.quiz-badge { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.quiz-badge { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; }
 
 .panel-badge.exam,
 .exam-badge { background: linear-gradient(135deg, #0f766e, #14b8a6); }
@@ -88,9 +88,9 @@
 
 .warning-box {
   border-left-color: var(--warning);
-  background: linear-gradient(135deg, rgba(245,158,11,.08), rgba(245,158,11,.04));
-  border: 1px solid rgba(245,158,11,.18);
-  color: #92400e;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  color: var(--warning-fg);
 }
 
 .info-box {
@@ -100,15 +100,15 @@
 }
 
 .exam-meta-item {
-  background: var(--input-bg);
-  border: 1px solid var(--card-border);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px;
 }
 
 .result-stat {
-  background: var(--input-bg);
-  border: 1px solid var(--card-border);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px;
 }
@@ -118,10 +118,10 @@
 .empty-grid {
   grid-column: 1 / -1;
   text-align: center;
-  color: var(--text-light);
+  color: var(--text-secondary);
   padding: 24px;
-  background: var(--input-bg);
-  border: 1px dashed var(--card-border);
+  background: var(--bg-input);
+  border: 1px dashed var(--border);
   border-radius: 18px;
 }
 
@@ -143,24 +143,24 @@
 .result-insight-card {
   padding: 16px 18px;
   border-radius: 18px;
-  border: 1px solid var(--card-border);
-  background: color-mix(in srgb, var(--input-bg) 84%, white 16%);
+  border: 1px solid var(--border);
+  background: var(--bg-surface-secondary);
   margin-bottom: 16px;
 }
 
 .review-card {
   border-radius: 20px;
   padding: 18px;
-  border: 1px solid var(--card-border);
-  background: var(--white);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
   box-shadow: var(--shadow-sm);
 }
 
-.review-card-correct { border-color: rgba(16,185,129,.28); }
+.review-card-correct { border-color: var(--success-border); }
 
-.review-card-wrong { border-color: rgba(239,68,68,.24); }
+.review-card-wrong { border-color: var(--error-border); }
 
-.review-card-empty { border-color: rgba(226,232,240,.95); }
+.review-card-empty { border-color: var(--border); }
 
 /* ================= EXAM MODE CARDS ================= */
 
@@ -280,7 +280,7 @@
 .streak-days span.done {
   background: linear-gradient(135deg, #ff9f43, #ff6b6b);
   border-color: transparent;
-  color: #fff;
+  color: var(--text-on-accent);
   box-shadow: 0 12px 24px rgba(255, 111, 80, .22);
 }
 

@@ -6,7 +6,7 @@ html.launcher-experience {
   --launcher-panel-strong: rgba(23, 12, 29, .58);
   --launcher-edge: rgba(255, 255, 255, .18);
   --launcher-shadow: 0 26px 70px rgba(10, 4, 18, .24);
-  --launcher-ease-out: cubic-bezier(.22, 1, .36, 1);
+  --launcher-ease-out: var(--ease-emphasis);
   --launcher-top: max(14px, env(safe-area-inset-top));
   --launcher-bottom: max(14px, env(safe-area-inset-bottom));
   /* Gerçek cam yüzeyler: dock/topbar/dialog/widget hepsi bu 6 token'ı paylaşır. */
@@ -50,7 +50,10 @@ html.launcher-experience {
   --launcher-search-muted: #e2d2da;
   --launcher-search-arrow: #d8c8d0;
   --launcher-search-autofill-bg: #342536;
-  color-scheme: light dark;
+  /* color-scheme burada YOK: `light dark` yazmak kökü OS tercihine bağlıyor ve
+     site toggle'ından koparıyordu (koyu moda geçince kaydırma çubuğu, <select>
+     açılır listesi ve autofill açık kalıyordu). Kök artık index.html'deki tema
+     ön-yükleyicisinden inline set edilir, alt ağaç ise body'den miras alır. */
   overflow: hidden;
 }
 
@@ -194,7 +197,7 @@ html.launcher-experience .launcher-topbar .topbar-theme-btn {
   font: 700 12px/1 "Plus Jakarta Sans", sans-serif;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 150ms ease, transform 150ms var(--launcher-ease-out), border-color 150ms ease;
+  transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--launcher-ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 
 html.launcher-experience .launcher-edit-toggle {
@@ -661,7 +664,7 @@ html.launcher-experience .launcher-progress-track i {
   height: 100%;
   background: #f383aa;
   border-radius: inherit;
-  transition: width 220ms ease-out;
+  transition: width var(--dur-base) ease-out;
 }
 
 html.launcher-experience .launcher-widget-footer {
@@ -688,7 +691,7 @@ html.launcher-experience .launcher-widget-footer button {
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 150ms ease, transform 150ms var(--launcher-ease-out);
+  transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--launcher-ease-out);
 }
 
 html.launcher-experience .launcher-widget-footer button svg {
@@ -788,7 +791,7 @@ html.launcher-experience .launcher-app-icon {
   border-radius: 25%;
   box-shadow: 0 13px 28px rgba(8, 3, 15, .22), inset 0 1px rgba(255, 255, 255, .20);
   transform: translateZ(0);
-  transition: transform 170ms var(--launcher-ease-out), box-shadow 170ms ease;
+  transition: transform var(--dur-fast) var(--launcher-ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
 
 html.launcher-experience .launcher-app-icon::after {
@@ -954,7 +957,7 @@ html.launcher-experience .launcher-dialog-layer {
   place-items: center;
   padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
   opacity: 0;
-  transition: opacity 210ms ease-out;
+  transition: opacity var(--dur-base) ease-out;
 }
 
 html.launcher-experience .launcher-dialog-layer[hidden] {
@@ -1952,6 +1955,51 @@ html.launcher-experience .launcher-editor-workspace-label {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Ana ekran acilis animasyonu.
+
+   Sinif oturum basina bir kez verilir (bkz. js/core/launcher.js): her ana
+   ekrana donuste tekrar oynarsa gecikme hissi verir, bir kez oynayinca
+   "acilis" olur. Sadece transform ve opacity animasyonlanir.
+   --------------------------------------------------------------------------- */
+@keyframes launcherIconIn {
+  from { opacity: 0; transform: scale(.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes launcherDockIn {
+  from { opacity: 0; transform: translateX(50%) translateY(16px); }
+  to { opacity: 1; transform: translateX(50%) translateY(0); }
+}
+
+@keyframes launcherFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+html.launcher-intro .launcher-grid > * {
+  animation: launcherIconIn var(--dur-slow) var(--ease-emphasis) both;
+  animation-delay: calc(140ms + var(--launcher-index, 0) * 26ms);
+}
+
+/* Dock ikonlardan sonra gelir: goz once grid'e, sonra alt cubuga iner. */
+html.launcher-intro .launcher-dock {
+  animation: launcherDockIn var(--dur-slow) var(--ease-emphasis) both;
+  animation-delay: 260ms;
+}
+
+html.launcher-intro .launcher-topbar.topbar {
+  animation: launcherFadeIn var(--dur-slow) var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.launcher-intro .launcher-grid > *,
+  html.launcher-intro .launcher-dock,
+  html.launcher-intro .launcher-topbar.topbar {
+    animation: none;
+  }
+}
+
 @media (max-width: 1040px) {
   html.launcher-experience .launcher-home-layout {
     grid-template-columns: minmax(290px, 390px) minmax(440px, 1fr);
@@ -2257,7 +2305,7 @@ html.launcher-experience .launcher-pages-track {
   align-items: flex-start;
   width: 100%;
   transform: translate3d(0, 0, 0);
-  transition: transform 300ms cubic-bezier(.22, 1, .36, 1);
+  transition: transform 300ms var(--ease-emphasis);
 }
 
 html.launcher-experience .launcher-pages-track.is-instant {
@@ -2614,7 +2662,7 @@ html.launcher-experience .launcher-page-dot > span {
   background: rgba(255, 255, 255, .48);
   border: 1px solid rgba(255, 255, 255, .35);
   border-radius: 50%;
-  transition: width 180ms var(--launcher-ease-out), background-color 180ms ease;
+  transition: width var(--dur-base) var(--launcher-ease-out), background-color var(--dur-base) var(--ease-out);
 }
 
 html.launcher-experience .launcher-page-dot.is-active > span {

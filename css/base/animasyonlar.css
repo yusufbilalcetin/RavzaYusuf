@@ -1,5 +1,16 @@
+/* Sayfa govdesi position:fixed arka plan katmanlari tasiyabilir. Govdeye
+   transform vermek bu katmanlarin containing block'unu viewporttan sayfaya
+   cevirir ve fill-mode nedeniyle animasyon sonrasinda da kalici olabilir.
+   Hareket alt iceriklerin revealUp animasyonunda kalir; sayfa yalniz solar. */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Sayfa ici kademeli giris: baslik once, icerik hemen ardindan.
+   Sirali gelis, her seyin ayni anda patlamasindan daha sakin okunur. */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -15,14 +26,12 @@
   75% { transform: translateX(-3px); }
 }
 
-@keyframes memory-speak-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 102, 156, 0.35); }
-  50% { box-shadow: 0 0 0 5px rgba(212, 102, 156, 0); }
-}
-
-@keyframes memory-speak-pulse-back {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.35); }
-  50% { box-shadow: 0 0 0 5px rgba(255, 255, 255, 0); }
+/* Disari acilan halka. Eskiden box-shadow spread'i animasyonlaniyordu; o
+   compositor'da calismaz, her karede yeniden boyanir. Ayni gorsel sonuc
+   transform + opacity ile alinir (bkz. pages/ezber-merkezi.css). */
+@keyframes speakPulseRing {
+  0%, 100% { opacity: .35; transform: scale(1); }
+  50% { opacity: 0; transform: scale(1.32); }
 }
 
 @keyframes memShake {
@@ -93,32 +102,23 @@
   50% { transform: scale(1.15) rotate(180deg); opacity: 1; }
 }
 
+/* Guclu parlama katmaninin opakligi (bkz. layout/sidebar.css). */
 @keyframes kahootLogoGlow {
-  0%, 100% {
-    box-shadow:
-      0 0 0 2px rgba(168, 85, 247, 0.55),
-      0 0 28px rgba(236, 72, 153, 0.55),
-      0 14px 28px rgba(0, 0, 0, 0.32);
-  }
-  50% {
-    box-shadow:
-      0 0 0 3px rgba(168, 85, 247, 0.85),
-      0 0 56px rgba(236, 72, 153, 0.85),
-      0 14px 28px rgba(0, 0, 0, 0.32);
-  }
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 
-/* Opsiyonel sayfa geçişi: mevcut route sistemi bu sınıfları kullanmak
-   zorunda değil, yalnızca kullanmak isteyen bir yer için hazır dursun. */
-.page-enter {
+/* Scroll-reveal: js/core/scroll-reveal.js gorunur alana giren ogeye
+   .is-revealed ekler. Baslangic durumu yalnizca observer kurulduysa
+   uygulanir (html.has-scroll-reveal) - JS calismazsa veya reduced-motion
+   aktifse icerik hicbir zaman gizli kalmaz. */
+html.has-scroll-reveal [data-reveal] {
   opacity: 0;
-  transform: translateY(4px);
 }
 
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 220ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+html.has-scroll-reveal [data-reveal].is-revealed {
+  animation: revealUp var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--reveal-index, 0) * 55ms);
 }
 
 /* Tek kanonik reduced-motion bloğu: site genelinde animasyon/geçiş süresi
@@ -129,7 +129,12 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  html.has-scroll-reveal [data-reveal] {
+    opacity: 1;
   }
 }

@@ -13,15 +13,20 @@
 /* ================= HUB TOOLBAR ================= */
 
 ::selection {
-  background: var(--pink-bright);
-  color: var(--white);
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+:where(button, input, textarea, select, summary, a[href], [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .hub-search::placeholder,
 .search-bar input::placeholder,
 input::placeholder,
 textarea::placeholder {
-  color: color-mix(in srgb, var(--text) 62%, transparent);
+  color: var(--text-muted);
   opacity: 1;
 }
 
@@ -32,51 +37,51 @@ textarea::placeholder {
 }
 
 .result-option-review.is-selected-answer:not(.is-correct-answer) {
-  background: rgba(239,68,68,.10);
-  border-color: rgba(239,68,68,.34);
+  background: var(--error-bg);
+  border-color: var(--error-border);
 }
 
 .result-option-review.is-wrong-selected .selected-tag {
-  background: #ef4444;
-  color: #fff;
+  background: var(--error);
+  color: var(--text-on-accent);
   border-color: transparent;
 }
 
 .result-option-explanation-item.is-correct,
 .result-option-explanation-item.is-selected-correct {
-  background: rgba(16, 185, 129, .10);
-  border-color: rgba(16, 185, 129, .35);
+  background: var(--success-bg);
+  border-color: var(--success-border);
 }
 
 .result-option-explanation-item.is-correct .option-explanation-letter,
 .result-option-explanation-item.is-selected-correct .option-explanation-letter {
-  background: #10b981;
-  color: #fff;
+  background: var(--success);
+  color: var(--text-on-accent);
   border-color: transparent;
 }
 
 .result-option-explanation-item.is-correct .option-explanation-head em,
 .result-option-explanation-item.is-selected-correct .option-explanation-head em {
-  background: rgba(16, 185, 129, .16);
-  color: #047857;
-  border-color: rgba(16, 185, 129, .25);
+  background: var(--success-bg);
+  color: var(--success-fg);
+  border-color: var(--success-border);
 }
 
 .result-option-explanation-item.is-selected-wrong {
-  background: rgba(239, 68, 68, .10);
-  border-color: rgba(239, 68, 68, .36);
+  background: var(--error-bg);
+  border-color: var(--error-border);
 }
 
 .result-option-explanation-item.is-selected-wrong .option-explanation-letter {
-  background: #ef4444;
-  color: #fff;
+  background: var(--error);
+  color: var(--text-on-accent);
   border-color: transparent;
 }
 
 .result-option-explanation-item.is-selected-wrong .option-explanation-head em {
-  background: rgba(239, 68, 68, .14);
-  color: #b91c1c;
-  border-color: rgba(239, 68, 68, .24);
+  background: var(--error-bg);
+  color: var(--error-fg);
+  border-color: var(--error-border);
 }
 
 /* =========================================================

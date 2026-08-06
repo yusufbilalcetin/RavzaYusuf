@@ -2,7 +2,7 @@
   width: 100%;
   border-collapse: collapse;
   min-width: 520px;
-  background: var(--white);
+  background: var(--bg-surface);
 }
 
 /* ========= TABLET (≤ 1024px) ========= */

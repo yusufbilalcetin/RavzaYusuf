@@ -124,24 +124,37 @@ const ICON = {
   bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z"/></svg>',
 };
 
-function loadStorage() {
+function readStoredJson(key, fallback) {
   try {
-    const prefs = JSON.parse(localStorage.getItem(STORAGE.prefs) || '{}');
-    state.fontSize = clamp(Number(prefs.fontSize) || 17, 16, 24);
-    state.lineHeight = [1.35, 1.4, 1.45].includes(Number(prefs.lineHeight))
-      ? Number(prefs.lineHeight)
-      : 1.4;
-    state.theme = ['light', 'sepia', 'dark'].includes(prefs.theme) ? prefs.theme : 'light';
-    state.accessible = Boolean(prefs.accessible);
-    state.pageSound = prefs.pageSound !== false;
-    state.bookmarks = JSON.parse(localStorage.getItem(STORAGE.bookmarks) || '{}');
-    state.readingProgress = JSON.parse(localStorage.getItem(STORAGE.progress) || '{}');
-    importedBook = JSON.parse(localStorage.getItem(STORAGE.importedBook) || 'null');
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
   } catch (_) {
-    state.bookmarks = {};
-    state.readingProgress = {};
-    importedBook = null;
+    return fallback;
   }
+}
+
+function isPlainRecord(value) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function readStoredRecord(key) {
+  const value = readStoredJson(key, {});
+  return isPlainRecord(value) ? value : {};
+}
+
+function loadStorage() {
+  const prefs = readStoredRecord(STORAGE.prefs);
+  state.fontSize = clamp(Number(prefs.fontSize) || 17, 16, 24);
+  state.lineHeight = [1.35, 1.4, 1.45].includes(Number(prefs.lineHeight))
+    ? Number(prefs.lineHeight)
+    : 1.4;
+  state.theme = ['light', 'sepia', 'dark'].includes(prefs.theme) ? prefs.theme : 'light';
+  state.accessible = Boolean(prefs.accessible);
+  state.pageSound = prefs.pageSound !== false;
+  state.bookmarks = readStoredRecord(STORAGE.bookmarks);
+  state.readingProgress = readStoredRecord(STORAGE.progress);
+  const storedImportedBook = readStoredJson(STORAGE.importedBook, null);
+  importedBook = isPlainRecord(storedImportedBook) ? storedImportedBook : null;
 }
 
 function savePrefs() {
@@ -265,6 +278,10 @@ function readBookProgress(bookId) {
 }
 
 function buildSampleContent() {
+  // Bellekteki deger baska bir eski kod yolu tarafindan degistirilmis olsa da
+  // kitaplik acilisi koleksiyon erisimi sirasinda cokmemeli.
+  if (!isPlainRecord(state.bookmarks)) state.bookmarks = {};
+  if (!isPlainRecord(state.readingProgress)) state.readingProgress = {};
   const validImported = importedBook
     && importedBook.id
     && Array.isArray(importedBook.chapters)
@@ -718,6 +735,11 @@ function bindLibraryCover(image, signal) {
       if (signal.aborted || !image.isConnected) return;
       const objectUrl = URL.createObjectURL(blob);
       coverObjectUrls.add(objectUrl);
+      // Responsive source candidates keep winning over `src` after the
+      // original cover request fails. Remove them so the generated PDF cover
+      // is the image the browser actually paints.
+      image.removeAttribute('srcset');
+      image.removeAttribute('sizes');
       image.src = objectUrl;
       image.classList.remove('is-generating', 'is-missing');
     } catch (_) {
@@ -779,19 +801,21 @@ function showReaderLoading(message, progress = null) {
     </div>`;
 }
 
-function showReaderError(message) {
+function showReaderError(message, options = {}) {
   setAppMode('error');
   const root = document.getElementById('reader-inner');
   if (!root) return;
+  const actionLabel = options.actionLabel || 'Kitaplığa dön';
+  const action = typeof options.action === 'function' ? options.action : () => void showLibrary();
   root.className = 'reader-root';
   root.innerHTML = `
     <div class="reader-error" role="alert">
       <img class="reader-error-logo" src="./assets/branding/ravza-books-logo-256.webp" width="256" height="256" alt="Ravza Books" />
       <strong>Kitap açılamadı</strong>
       <p>${escapeHTML(message)}</p>
-      <button type="button" id="rdr-error-back">Kitaplığa dön</button>
+      <button type="button" id="rdr-error-back">${escapeHTML(actionLabel)}</button>
     </div>`;
-  root.querySelector('#rdr-error-back')?.addEventListener('click', () => void showLibrary(), { once: true });
+  root.querySelector('#rdr-error-back')?.addEventListener('click', action, { once: true });
   document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
 }
 
@@ -938,25 +962,29 @@ function buildReaderShell(book) {
 }
 
 function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
-  if (state.bookType !== 'pdf') return;
+  if (state.bookType !== 'pdf') return true;
   const stage = document.getElementById('rdr-stage');
   const cradle = document.getElementById('book-cradle');
   const root = document.getElementById('reader-inner');
-  if (!stage || !cradle) return;
+  if (!stage || !cradle) return false;
 
   const ratio = Number.isFinite(aspectRatio) && aspectRatio > 0 ? aspectRatio : 3 / 4;
   const stageStyle = getComputedStyle(stage);
   const horizontalPadding = parseFloat(stageStyle.paddingLeft) + parseFloat(stageStyle.paddingRight);
   const verticalPadding = parseFloat(stageStyle.paddingTop) + parseFloat(stageStyle.paddingBottom);
-  const availableWidth = Math.max(1, stage.clientWidth - horizontalPadding);
-  const availableHeight = Math.max(1, stage.clientHeight - verticalPadding);
+  const availableWidth = stage.clientWidth - (Number.isFinite(horizontalPadding) ? horizontalPadding : 0);
+  const availableHeight = stage.clientHeight - (Number.isFinite(verticalPadding) ? verticalPadding : 0);
+  // Hidden->visible gecisinde 0x0 olcuyu 1x1'e clamp etmek kitap motorunu bu
+  // sahte boyutta kilitliyordu. Parent gercek olcu almadan cradle'a yazma.
+  if (availableWidth < 2 || availableHeight < 2) return false;
   const portrait = shouldUsePortrait();
   const pagesAcross = portrait ? 1 : 2;
   const pageWidth = Math.min(availableWidth / pagesAcross, availableHeight * ratio);
   const pageHeight = pageWidth / ratio;
 
-  const width = Math.max(1, pageWidth * pagesAcross);
-  const height = Math.max(1, pageHeight);
+  const width = pageWidth * pagesAcross;
+  const height = pageHeight;
+  if (width < 2 || height < 2) return false;
   // Yalnızca gerçekten değiştiyse yaz: aksi hâlde bu yazım, cradle'ı gözleyen
   // ResizeObserver'ı yeniden tetikleyip oku-yaz döngüsü kuruyor.
   const size = `${Math.round(width)}x${Math.round(height)}x${ratio.toFixed(4)}`;
@@ -967,6 +995,45 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
     cradle.style.setProperty('--pdf-page-aspect', String(ratio));
   }
   if (root) root.dataset.spread = portrait ? 'single' : 'double';
+  return true;
+}
+
+function readerStageHasPositiveSize() {
+  const stage = document.getElementById('rdr-stage');
+  if (!stage) return false;
+  const style = getComputedStyle(stage);
+  const horizontalPadding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+  const verticalPadding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  const width = stage.clientWidth - (Number.isFinite(horizontalPadding) ? horizontalPadding : 0);
+  const height = stage.clientHeight - (Number.isFinite(verticalPadding) ? verticalPadding : 0);
+  return width >= 2 && height >= 2;
+}
+
+function waitForReaderStageSize(generation, timeout = 5000) {
+  if (generation !== renderGeneration) return Promise.resolve(false);
+  if (readerStageHasPositiveSize()) return Promise.resolve(true);
+  const stage = document.getElementById('rdr-stage');
+  if (!stage || typeof ResizeObserver !== 'function') return Promise.resolve(false);
+
+  return new Promise(resolveReady => {
+    let settled = false;
+    let timer = 0;
+    const observer = new ResizeObserver(() => finish(readerStageHasPositiveSize()));
+    const finish = ready => {
+      if (settled || (!ready && generation === renderGeneration)) return;
+      settled = true;
+      observer.disconnect();
+      clearTimeout(timer);
+      resolveReady(Boolean(ready && generation === renderGeneration));
+    };
+    observer.observe(stage);
+    timer = window.setTimeout(() => {
+      settled = true;
+      observer.disconnect();
+      resolveReady(false);
+    }, timeout);
+    requestAnimationFrame(() => finish(readerStageHasPositiveSize()));
+  });
 }
 
 /**
@@ -991,13 +1058,14 @@ function measurePdfRenderBox(metrics) {
 }
 
 function getLayoutMetrics() {
-  if (state.bookType === 'pdf') fitPdfBookToStage();
+  if (state.bookType === 'pdf' && !fitPdfBookToStage()) return null;
   const cradle = document.getElementById('book-cradle');
   if (!cradle) return null;
   const rect = cradle.getBoundingClientRect();
   const portrait = shouldUsePortrait();
-  const pageWidth = Math.max(1, Math.floor(rect.width / (portrait ? 1 : 2)));
-  const pageHeight = Math.max(1, Math.floor(rect.height));
+  const pageWidth = Math.floor(rect.width / (portrait ? 1 : 2));
+  const pageHeight = Math.floor(rect.height);
+  if (pageWidth < 1 || pageHeight < 1) return null;
   return {
     portrait,
     pageWidth,
@@ -1234,6 +1302,10 @@ async function openTextReader(book, position = null) {
   if (document.fonts?.ready) await document.fonts.ready;
   await nextFrame();
   if (generation !== renderGeneration) return;
+  if (!await waitForReaderStageSize(generation)) {
+    if (generation === renderGeneration) showReaderError('Okuma alanı hazırlanamadı. Pencereyi görünür tutup yeniden deneyin.');
+    return;
+  }
 
   const metrics = getLayoutMetrics();
   if (!metrics || metrics.pageWidth < 1 || metrics.pageHeight < 1) return;
@@ -1705,6 +1777,10 @@ async function openPdfReader(book, position = null) {
   applyTypography();
   await nextFrame();
   if (generation !== renderGeneration || !pdfDocument) return;
+  if (!await waitForReaderStageSize(generation)) {
+    if (generation === renderGeneration) showReaderError('Okuma alanı hazırlanamadı. Pencereyi görünür tutup yeniden deneyin.');
+    return;
+  }
   const metrics = getLayoutMetrics();
   if (!metrics || metrics.pageWidth < 1 || metrics.pageHeight < 1) {
     showReaderError('Okuma alanı hazırlanamadı. Ekran yönünü değiştirip yeniden deneyin.');
@@ -2259,6 +2335,7 @@ function bindReaderEvents(book) {
   window.addEventListener('resize', onLayoutChange, { signal, passive: true });
   layoutObserver = new ResizeObserver(onLayoutChange);
   const cradle = document.getElementById('book-cradle');
+  if (stage) layoutObserver.observe(stage);
   if (cradle) layoutObserver.observe(cradle);
 }
 
@@ -2426,8 +2503,11 @@ export async function initRavzaBooks() {
   applyTheme(state.theme);
   applyTypography();
   if (!BOOKS.length) {
-    document.getElementById('reader-inner').innerHTML = '<p class="reader-error" role="alert">Okunacak kitap bulunamadı.</p>';
-    return;
+    showReaderError('Okunacak kitap bulunamadı.', {
+      actionLabel: 'Ana sayfaya dön',
+      action: () => window.navigate?.('ana-sayfa'),
+    });
+    return { skipTopScroll: true };
   }
   renderLibrary();
   return { skipTopScroll: true };

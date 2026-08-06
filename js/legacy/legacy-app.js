@@ -992,6 +992,11 @@ function normalizeThemeStyle(themeId) {
 }
 
 function initTheme() {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.syncDom();
+    window.__RAVZA_THEME__.bindControls();
+    return;
+  }
   const storedMode = localStorage.getItem("eul_theme");
   const savedMode = ["system", "light", "dark"].includes(storedMode) ? storedMode : "system";
   const savedStyle = normalizeThemeStyle(localStorage.getItem("eul_theme_style") || "noel-ask");
@@ -1030,6 +1035,10 @@ function refreshExamPerformanceChartAfterThemeChange() {
 }
 
 function applySiteTheme(themeId, persist = true) {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.setStyle(themeId, { persist, reason: "legacy-style" });
+    return;
+  }
   const normalized = normalizeThemeStyle(themeId);
   document.body.setAttribute("data-theme-style", normalized);
   if (persist) {
@@ -1040,6 +1049,10 @@ function applySiteTheme(themeId, persist = true) {
 }
 
 function updateThemeSelectionUi() {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.syncControls();
+    return;
+  }
   const activeTheme = document.body.getAttribute("data-theme-style") || "noel-ask";
   document.querySelectorAll(".theme-choice-card").forEach((card) => {
     card.classList.toggle("active", card.dataset.themeId === activeTheme);
@@ -1053,6 +1066,10 @@ function updateThemeSelectionUi() {
 }
 
 function closeThemeSheet() {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.closePanel();
+    return;
+  }
   const sheet = document.getElementById("theme-sheet");
   const backdrop = document.getElementById("theme-sheet-backdrop");
   if (sheet) {
@@ -1065,12 +1082,21 @@ function closeThemeSheet() {
 }
 
 function selectTheme(themeId) {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.setStyle(themeId, { reason: "legacy-style" });
+    window.__RAVZA_THEME__.closePanel();
+    return;
+  }
   applySiteTheme(normalizeThemeStyle(themeId));
   // Tema secildikten sonra panel kapanir; sticky arama tekrar normal calisir.
   closeThemeSheet();
 }
 
 function applyDark(isDark) {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.setMode(isDark ? "dark" : "light", { reason: "legacy-dark" });
+    return;
+  }
   document.body.classList.toggle("dark", isDark);
   const btn = document.getElementById("theme-switch");
   if (btn) {
@@ -1091,6 +1117,11 @@ function applyDark(isDark) {
 }
 
 function applyThemePreference(preference, persist = true) {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.setMode(preference, { persist, reason: "legacy-mode" });
+    window.setLauncherThemePreference?.(preference);
+    return;
+  }
   const normalized = ["system", "light", "dark"].includes(preference) ? preference : "system";
   const isDark = normalized === "dark" || (normalized === "system" && systemThemeMedia?.matches === true);
   if (persist) localStorage.setItem("eul_theme", normalized);
@@ -1100,6 +1131,10 @@ function applyThemePreference(preference, persist = true) {
 }
 
 function toggleTheme() {
+  if (window.__RAVZA_THEME__) {
+    window.__RAVZA_THEME__.toggle();
+    return;
+  }
   const isDark = !document.body.classList.contains("dark");
   applyThemePreference(isDark ? "dark" : "light");
 }
@@ -5772,18 +5807,11 @@ document.addEventListener("keydown", (event) => {
     }, { passive: true });
   }
 
-  // Dark/light veya tema değişimi dışarıdan da yapılırsa performans grafiğini
-  // otomatik yeniden çiz. Böylece SVG içindeki yazılar eski tema renginde kalmaz.
+  // Merkezi tema olayında yalnız SVG görsel katmanını yeniden çiz; MutationObserver
+  // class/data değişiminde aynı güncelleme için birden çok kez çalışıyordu.
   if (!window.__examChartThemeObserverReady) {
     window.__examChartThemeObserverReady = true;
-    const observer = new MutationObserver((mutations) => {
-      const shouldRefresh = mutations.some((mutation) =>
-        mutation.type === "attributes" &&
-        (mutation.attributeName === "class" || mutation.attributeName === "data-theme-style")
-      );
-      if (shouldRefresh) refreshExamPerformanceChartAfterThemeChange();
-    });
-    observer.observe(document.body, { attributes: true, attributeFilter: ["class", "data-theme-style"] });
+    window.addEventListener("app:theme-change", refreshExamPerformanceChartAfterThemeChange);
   }
   window.updateProfessionalExamDashboardStats = updateProfessionalExamDashboardStats;
 
@@ -10214,12 +10242,13 @@ body.rlz5-page-active .page.ravzalingo-page.active::before {
   bottom: 0 !important;
   z-index: 0 !important;
   pointer-events: none !important;
-  background-image: url("assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
+  background-color: #0f1a20 !important;
+  background-image: url("/assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-attachment: scroll !important;
-  transform: translateZ(0) !important;
+  transform: none !important;
 }
 
 body.is-ravzalingo-page .page.ravzalingo-page.active::after,
@@ -10293,7 +10322,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
   body.rlz5-page-active .page.ravzalingo-page.active::before {
     top: 70px !important;
     left: 0 !important;
-    background-image: url("assets/calisma-bolumu/optimized/ravzalingo-mobile.webp") !important;
+    background-image: url("/assets/calisma-bolumu/optimized/ravzalingo-mobile.webp") !important;
     background-size: cover !important;
     background-position: center top !important;
     background-repeat: no-repeat !important;
@@ -10319,7 +10348,7 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
 @media (max-width: 900px) and (orientation: landscape) {
   body.is-ravzalingo-page .page.ravzalingo-page.active::before,
   body.rlz5-page-active .page.ravzalingo-page.active::before {
-    background-image: url("assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
+    background-image: url("/assets/calisma-bolumu/optimized/ravzalingo-desktop.webp") !important;
     background-position: center center !important;
   }
 }
@@ -10330,9 +10359,16 @@ body.rlz5-page-active #ravzaLingoRoot .rlz5-summary-card {
     background-position: center top !important;
   }
 }
-
-
     `;
+    // Background and responsive background rules live in the bundled source
+    // CSS. The old embedded tail was appended after the bundle and silently
+    // overrode its sharper overlay, fallback and viewport-fixed behavior.
+    const embeddedBackgroundStart = style.textContent.lastIndexOf(
+      "/* =========================================================\n   FINAL FIX"
+    );
+    if (embeddedBackgroundStart >= 0) {
+      style.textContent = style.textContent.slice(0, embeddedBackgroundStart);
+    }
     document.head.appendChild(style);
   }
 

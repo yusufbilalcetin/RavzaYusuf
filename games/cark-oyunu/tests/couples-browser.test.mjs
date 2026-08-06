@@ -70,7 +70,7 @@ await new Promise((resolve) => server.listen(PORT, "127.0.0.1", resolve));
 const edge = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 const profile = join(tmpdir(), `ravza-couples-${Date.now()}`);
 const browser = spawn(edge, [
-  "--headless=new", "--disable-gpu", "--no-first-run",
+  "--headless=new", "--disable-gpu", "--disable-extensions", "--no-first-run",
   "--remote-debugging-port=9334", `--user-data-dir=${profile}`, "about:blank"
 ], { stdio: "ignore" });
 
@@ -183,7 +183,7 @@ try {
   const locked = await evaluate(`({
     privatePanel: document.querySelectorAll('.private-panel').length,
     coupleModal: document.querySelectorAll('.couples-overlay').length,
-    images: document.querySelectorAll('img').length,
+    images: document.querySelectorAll('.couples-overlay img, .private-panel img').length,
     codes: /[ABC]-\\d/.test(document.body.textContent),
     normalOptions: document.querySelector('#optionCount')?.textContent
   })`);
@@ -327,7 +327,7 @@ try {
   const relocked = await evaluate(`({
     panel: document.querySelectorAll('.private-panel').length,
     overlay: document.querySelectorAll('.couples-overlay').length,
-    images: document.querySelectorAll('img').length,
+    images: document.querySelectorAll('.couples-overlay img, .private-panel img').length,
     chips: document.querySelectorAll('.chip').length,
     codes: /\\d+\\. pozisyon/.test(document.body.textContent),
     lockedTitle: document.querySelector('.locked-card h2')?.textContent,

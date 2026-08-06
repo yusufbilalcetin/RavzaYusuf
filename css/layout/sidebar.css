@@ -45,7 +45,7 @@
   font-weight: 700;
   cursor: pointer;
   border-radius: 16px;
-  transition: .2s ease;
+  transition: var(--dur-base) var(--ease-out);
   user-select: none;
 }
 
@@ -67,7 +67,7 @@
 .nav-dropdown-icon {
   margin-left: auto;
   font-size: 12px;
-  transition: transform .25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform .25s var(--ease-emphasis);
 }
 
 .nav-dropdown[open] .nav-dropdown-icon { transform: rotate(180deg); }
@@ -135,7 +135,7 @@
 
 .sidebar {
   transform: translateX(-105%) !important;
-  transition: transform .28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow .28s ease !important;
+  transition: transform .28s var(--ease-emphasis), box-shadow .28s var(--ease-out) !important;
   z-index: 1200 !important;
 }
 
@@ -259,6 +259,20 @@
     0 0 0 2px rgba(168, 85, 247, 0.62),
     0 0 36px rgba(236, 72, 153, 0.70),
     0 14px 28px rgba(0, 0, 0, 0.34);
+}
+
+/* Parlama ayri bir katmanda durur ve yalnizca opakligi degisir. Eskiden
+   box-shadow'un kendisi animasyonlaniyordu; o her karede yeniden boyama
+   demek. Guclu hal ustte sabit durup soluklasinca sonuc ayni gorunur. */
+.kahoot-qr-logo-badge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 3px rgba(168, 85, 247, 0.85),
+    0 0 56px rgba(236, 72, 153, 0.85);
   animation: kahootLogoGlow 2.6s ease-in-out infinite;
 }
 

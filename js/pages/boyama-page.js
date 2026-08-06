@@ -126,36 +126,36 @@ const KMEANS_ITERATIONS = 14;
 
 const PRESET_IMAGES = [
   {
-    src: "./assets/oyun-bolumu/optimized/oyun-merkezi-desktop.webp",
-    thumb: "./assets/oyun-ici/boyama/optimized/preset-orman-masali.webp",
+    src: "/assets/oyun-bolumu/optimized/oyun-merkezi-desktop.webp",
+    thumb: "/assets/oyun-ici/boyama/optimized/preset-orman-masali.webp",
     name: "Orman Masalı",
     tag: "Masal",
     note: "Sıcak ışık, yoğun detay"
   },
   {
-    src: "./assets/calisma-bolumu/optimized/ravzalingo-desktop.webp",
-    thumb: "./assets/oyun-ici/boyama/optimized/preset-yesil-bahce.webp",
+    src: "/assets/calisma-bolumu/optimized/ravzalingo-desktop.webp",
+    thumb: "/assets/oyun-ici/boyama/optimized/preset-yesil-bahce.webp",
     name: "Yeşil Bahçe",
     tag: "Doğa",
     note: "Yumuşak geçişler"
   },
   {
-    src: "./assets/calisma-bolumu/optimized/calisma-merkezi-desktop.webp",
-    thumb: "./assets/oyun-ici/boyama/optimized/preset-calisma-kosesi.webp",
+    src: "/assets/calisma-bolumu/optimized/calisma-merkezi-desktop.webp",
+    thumb: "/assets/oyun-ici/boyama/optimized/preset-calisma-kosesi.webp",
     name: "Çalışma Köşesi",
     tag: "Sakin",
     note: "Dengeli renk alanları"
   },
   {
-    src: "./assets/calisma-bolumu/optimized/bilgi-yarismasi-desktop.webp",
-    thumb: "./assets/oyun-ici/boyama/optimized/preset-bilgi-yarisi.webp",
+    src: "/assets/calisma-bolumu/optimized/bilgi-yarismasi-desktop.webp",
+    thumb: "/assets/oyun-ici/boyama/optimized/preset-bilgi-yarisi.webp",
     name: "Bilgi Yarışı",
     tag: "Canlı",
     note: "Kontrast ve parlak tonlar"
   },
   {
-    src: "./assets/calisma-bolumu/optimized/calisma-detay-desktop.webp",
-    thumb: "./assets/oyun-ici/boyama/optimized/preset-sakin-vadi.webp",
+    src: "/assets/calisma-bolumu/optimized/calisma-detay-desktop.webp",
+    thumb: "/assets/oyun-ici/boyama/optimized/preset-sakin-vadi.webp",
     name: "Sakin Vadi",
     tag: "Manzara",
     note: "Geniş gölge paleti"

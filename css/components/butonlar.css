@@ -1,20 +1,34 @@
 /* ================= BUTTONS ================= */
 
+/* Dokunsal geri bildirim: basildiginda buton hafifce iceri cokuyor.
+   Launcher ikonlarindaki scale(.97) ile ayni sistem - fiziksel bir tus
+   hissi verir ve dokunmatikte "kayit alindi" sinyali olur. Sure kisa
+   tutulur; basma geri bildirimi anlik olmali. */
+.primary-btn,
+.secondary-btn,
+.ghost-btn,
+.check-btn,
+.mark-btn {
+  transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+
 .primary-btn,
 .check-btn {
-  background: var(--pink);
-  color: #fff;
+  background: var(--accent);
+  color: var(--text-on-accent);
   padding: 12px 20px;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--pink) 26%, transparent), 0 1px 0 rgba(255,255,255,.18) inset;
 }
 
 .primary-btn:hover,
-.check-btn:hover { background: var(--pink-bright); }
+.check-btn:hover { background: var(--accent-hover); }
 
 .primary-btn:active,
-.check-btn:active { background: color-mix(in srgb, var(--pink) 85%, black 15%); }
+.check-btn:active { background: var(--accent-active); }
 
-.primary-btn.soft { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+/* Mor oyun/sınav kimliği üzerinde beyaz 5.7:1; genel accent mürekkebi burada
+   3.3:1 kaldığı için bu bilinçli kontrast istisnasıdır. */
+.primary-btn.soft { background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: #fff; }
 
 .primary-btn:hover,
 .secondary-btn:hover,
@@ -27,62 +41,64 @@
 
 .secondary-btn {
   padding: 12px 20px;
-  background: color-mix(in srgb, var(--text) 7%, transparent);
-  color: var(--text);
-  border: 1px solid var(--separator-strong);
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
 }
 
-.secondary-btn:hover { background: color-mix(in srgb, var(--text) 10%, transparent); }
-.secondary-btn:active { background: color-mix(in srgb, var(--text) 14%, transparent); }
+.secondary-btn:hover { background: var(--surface-active); }
+.secondary-btn:active { background: var(--surface-selected); }
 
 .ghost-btn {
   padding: 12px 20px;
-  background: color-mix(in srgb, var(--input-bg) 78%, transparent);
-  color: var(--text);
-  border: 1px solid var(--separator-strong);
+  background: color-mix(in srgb, var(--bg-input) 78%, transparent);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
 }
 
 .mark-btn {
   padding: 12px 20px;
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1.5px solid rgba(16,185,129,.22);
+  background: var(--success-bg);
+  color: var(--success-fg);
+  border: 1.5px solid var(--success-border);
 }
 
 .mark-btn.done {
   background: var(--success);
-  color: #fff;
+  color: var(--text-on-accent);
   border-color: var(--success);
 }
 
 .exam-nav-btn:hover { transform: translateY(-1px); }
 
 .exam-nav-btn.is-current {
-  box-shadow: 0 0 0 2px rgba(124,58,237,.26), var(--shadow-sm);
-  border-color: rgba(124,58,237,.4);
+  background: var(--exam-bg);
+  color: var(--exam-fg);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--exam) 28%, transparent), var(--shadow-sm);
+  border-color: var(--exam-border);
 }
 
 .exam-nav-btn.is-answered {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--navy-light) 14%, white), color-mix(in srgb, var(--pink-bright) 12%, white));
-  color: var(--navy);
+  background: var(--accent-soft);
+  color: var(--text-primary);
 }
 
 .exam-nav-btn.is-correct {
-  background: rgba(16,185,129,.14);
-  border-color: rgba(16,185,129,.4);
-  color: #047857;
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-fg);
 }
 
 .exam-nav-btn.is-wrong {
-  background: rgba(239,68,68,.14);
-  border-color: rgba(239,68,68,.38);
-  color: #b91c1c;
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error-fg);
 }
 
 .exam-nav-btn.is-empty {
-  background: #ffffff;
-  border-color: rgba(226,232,240,.95);
-  color: #475569;
+  background: var(--bg-surface);
+  border-color: var(--border);
+  color: var(--text-secondary);
 }
 
 .exam-prev-btn { justify-self: start; }
@@ -91,8 +107,8 @@
 .exam-finish-btn { justify-self: end; }
 
 .exam-cancel-btn:hover {
-  background: rgba(239, 68, 68, .14);
-  border-color: rgba(239, 68, 68, .4);
+  background: var(--error-bg);
+  border-color: var(--error-border);
   transform: translateY(-1px);
 }
 
@@ -114,29 +130,29 @@
 
 .exam-result-actions.simple .exam-action-btn.primary {
   background: linear-gradient(135deg, #17bebb, #14a6a3);
-  color: #fff;
+  color: var(--text-on-accent);
   border-color: transparent;
 }
 
 .exam-result-actions.simple .exam-action-btn.secondary {
-  background: color-mix(in srgb, var(--pink) 14%, var(--white));
-  color: var(--text);
-  border-color: color-mix(in srgb, var(--pink) 30%, var(--card-border));
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
 }
 
 .exam-result-actions.simple .exam-action-btn.ghost {
   background: transparent;
-  color: var(--text);
-  border-color: color-mix(in srgb, var(--card-border) 82%, var(--pink) 18%);
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--border) 82%, var(--accent) 18%);
 }
 
 .exam-result-actions.simple .exam-action-btn.ghost:hover {
-  background: color-mix(in srgb, var(--pink-pale) 62%, transparent);
+  background: var(--accent-soft);
 }
 
 .exam-nav-btn.is-focused-result {
   box-shadow: 0 0 0 3px rgba(212, 102, 156, .28), var(--shadow-sm);
-  border-color: var(--pink) !important;
+  border-color: var(--accent) !important;
   transform: translateY(-1px);
 }
 
@@ -151,9 +167,9 @@
 }
 
 .device-btn-ghost {
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1.5px solid var(--card-border);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border);
 }
 
 .device-cookie-style .device-btn-primary,
@@ -173,4 +189,18 @@
   background: rgba(255,255,255,0.12) !important;
   border-color: rgba(255,130,180,0.55) !important;
   transform: translateX(-2px) translateY(-1px);
+}
+
+/* Basma durumu en sonda: yukaridaki :hover kurallarinin transform'unu
+   ezmesi gerekiyor. Kaldirma (-1px) korunur, uzerine cokme eklenir. */
+.primary-btn:active,
+.secondary-btn:active,
+.ghost-btn:active,
+.check-btn:active,
+.mark-btn:active {
+  transform: translateY(-1px) scale(.98);
+}
+
+.detail-back-btn:active {
+  transform: translateX(-2px) translateY(-1px) scale(.98);
 }

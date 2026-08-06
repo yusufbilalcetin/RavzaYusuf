@@ -40,7 +40,7 @@ const profile = join(tmpdir(), `ravza-wheel-${Date.now()}`);
 // Arka plana alma / kısıtlama kapalı: aksi hâlde sayfa "hidden" olur, requestAnimationFrame durur
 // ve zamana bağlı spin animasyonu hiç bitmez (uygulama hatası değil, headless ortam davranışı).
 const browser = spawn(edge, [
-  "--headless=new", "--disable-gpu", "--no-first-run",
+  "--headless=new", "--disable-gpu", "--disable-extensions", "--no-first-run",
   "--disable-renderer-backgrounding",
   "--disable-backgrounding-occluded-windows",
   "--disable-background-timer-throttling",

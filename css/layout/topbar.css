@@ -59,7 +59,7 @@
   border: 1px solid var(--separator);
   box-shadow: 0 4px 14px rgba(15,23,42,.05);
   opacity: 1;
-  transition: background .3s ease, border-color .3s ease;
+  transition: background .3s var(--ease-out), border-color .3s var(--ease-out);
 }
 
 .topbar-love-brand:hover {

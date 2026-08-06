@@ -3,7 +3,7 @@
    ========================================================= */
 
 :root {
-  --pbn-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --pbn-ease: var(--ease-out);
   --pbn-ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
   --pbn-shadow-soft: 0 24px 70px -28px rgba(18, 29, 58, .35);
   --pbn-shadow-float: 0 10px 40px -12px rgba(18, 29, 58, .22);
@@ -498,7 +498,7 @@ body.dark .pbn-app {
   box-shadow: 0 10px 26px -10px rgba(0, 0, 0, .5);
   pointer-events: none;
   opacity: 0;
-  transition: opacity .2s ease, transform .2s ease;
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   white-space: nowrap;
 }
 .pbn-inline-toast.is-visible {

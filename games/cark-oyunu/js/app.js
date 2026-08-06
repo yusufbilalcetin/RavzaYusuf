@@ -90,34 +90,40 @@ let audioCtx = null;
 
 // —— Tema (koyu/açık) ————————————————————————————————————————————————
 
-const THEME_KEY = "ravza-wheel-theme-v1";
-
 function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
   elements.themeToggle.setAttribute("aria-pressed", String(theme === "dark"));
   elements.themeToggle.setAttribute("aria-label", theme === "dark" ? "Açık temaya geç" : "Koyu temaya geç");
   elements.themeToggle.querySelector(".icon-sun").hidden = theme === "dark";
   elements.themeToggle.querySelector(".icon-moon").hidden = theme !== "dark";
 }
 
+function resolvedTheme() {
+  return window.RavzaGameTheme?.getState().resolvedMode
+    || document.documentElement.dataset.resolvedTheme
+    || document.documentElement.dataset.theme
+    || "light";
+}
+
+function handleThemeChange(event) {
+  applyTheme(event.detail?.resolvedMode || resolvedTheme());
+  drawWheel();
+}
+
 function initTheme() {
-  let saved = null;
-  try {
-    saved = localStorage.getItem(THEME_KEY);
-  } catch {
-    saved = null;
-  }
-  applyTheme(saved === "dark" ? "dark" : "light");
+  applyTheme(resolvedTheme());
+  window.addEventListener("app:theme-change", handleThemeChange);
 }
 
 function toggleTheme() {
-  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-  try {
-    localStorage.setItem(THEME_KEY, next);
-  } catch {
-    // Depolama kapalıysa tema yalnızca bu oturumda uygulanır.
+  const next = resolvedTheme() === "dark" ? "light" : "dark";
+  if (window.RavzaGameTheme) {
+    window.RavzaGameTheme.setMode(next);
+  } else {
+    document.documentElement.dataset.theme = next;
+    document.documentElement.dataset.resolvedTheme = next;
+    applyTheme(next);
+    drawWheel();
   }
-  applyTheme(next);
 }
 
 function optionById(id) {
@@ -170,9 +176,9 @@ function handleViewportResize() {
 function drawEmptyWheel(size, center, radius) {
   context.beginPath();
   context.arc(center, center, radius, 0, Math.PI * 2);
-  context.fillStyle = "#c7c9ce";
+  context.fillStyle = cssThemeColor("--wheel-empty-bg", "#c7c9ce");
   context.fill();
-  context.fillStyle = "#565d68";
+  context.fillStyle = cssThemeColor("--wheel-empty-text", "#565d68");
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.font = `600 ${Math.max(14, size * .03)}px "Segoe UI", sans-serif`;
@@ -180,6 +186,10 @@ function drawEmptyWheel(size, center, radius) {
 }
 
 const FONT_STACK = 'Inter, "Segoe UI", sans-serif';
+
+function cssThemeColor(name, fallback) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
 
 /** Dilim rengine göre okunabilir yazı rengi (WCAG: açık zeminde koyu, koyu zeminde açık metin). */
 function inkOn(background) {
@@ -237,7 +247,7 @@ function drawWheel(options = visualOptions, angle = rotation) {
     const start = POINTER_ANGLE + angle + index * slice;
     const end = start + slice;
     const background = option.id === selectedVisualId
-      ? "#7f8792"
+      ? cssThemeColor("--wheel-selected", "#7f8792")
       : options.length === 1 ? "#9d0038" : COLORS[index % COLORS.length];
 
     context.beginPath();
@@ -247,7 +257,7 @@ function drawWheel(options = visualOptions, angle = rotation) {
     context.fillStyle = background;
     context.fill();
     if (options.length > 1) {
-      context.strokeStyle = "rgba(255,255,255,.30)";
+      context.strokeStyle = cssThemeColor("--wheel-divider", "rgba(255,255,255,.30)");
       context.lineWidth = Math.max(1, size * .0015);
       context.stroke();
     }
@@ -444,7 +454,8 @@ async function enterPrivate() {
     wheel: couplesWheel,
     state: couplesState,
     onSpin: () => spin(),
-    onChange: () => { couples.saveCouplesState(couplesState); render(); }
+    onChange: () => { couples.saveCouplesState(couplesState); render(); },
+    returnFocus: elements.spinButton
   });
   elements.privateHost.replaceChildren(privateUI.panel);
   document.body.append(privateUI.overlay);
@@ -566,7 +577,13 @@ function showResult(value) {
 function closeResult() {
   elements.overlay.hidden = true;
   elements.confetti.replaceChildren();
-  elements.spinButton.focus();
+  // Odak modal tetikleyicisine donsun; uzun sayfada tarayici carki
+  // viewporta getirmek icin sayfayi kendiliginden kaydirmasin.
+  try {
+    elements.spinButton.focus({ preventScroll: true });
+  } catch {
+    elements.spinButton.focus();
+  }
 }
 
 // —— İbre "tık" tepkisi —————————————————————————————————————————————
@@ -770,6 +787,7 @@ function bindEvents() {
     cancelAnimationFrame(animationFrame);
     observer.disconnect();
     window.removeEventListener("resize", handleViewportResize);
+    window.removeEventListener("app:theme-change", handleThemeChange);
     privateUI?.destroy();
     privateUI = null;
     clearPinInput(elements.lockInput);

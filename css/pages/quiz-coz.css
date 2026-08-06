@@ -12,7 +12,7 @@
   border: 1.5px solid var(--input-brd);
   background: var(--input-bg);
   cursor: pointer;
-  transition: .15s ease;
+  transition: var(--dur-fast) var(--ease-out);
   color: var(--text);
   touch-action: manipulation;
 }

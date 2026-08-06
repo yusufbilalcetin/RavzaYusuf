@@ -26,6 +26,7 @@ import {
 } from "./launcher-layout.js";
 
 const RECENT_KEY = "ravzaLauncherRecent";
+const INTRO_KEY = "ravzaLauncherIntroPlayed";
 const OVERLAY_TRANSITION_MS = 210;
 const EDGE_DWELL_MS = 540;
 const FOLDER_DWELL_MS = 600;
@@ -492,12 +493,42 @@ function setActivePage(index, { save = true, animate = true } = {}) {
   updatePagePosition(animate);
 }
 
+// En son ikonun gecikmesi + suresi; sinif bu sureden sonra kaldirilir.
+// Kalici birakilirsa her yeniden render (surukleme, duzen degisikligi)
+// animasyonu bastan oynatir.
+const INTRO_TOTAL_MS = 1500;
+
+// Kademeli acilis oturum basina bir kez oynar. Her ana ekrana donuste
+// tekrarlarsa gecikme gibi hissedilir; bir kez oynayinca "acilis" olur.
+function playHomeIntroOnce() {
+  let alreadyPlayed = false;
+  try {
+    alreadyPlayed = sessionStorage.getItem(INTRO_KEY) === "1";
+    sessionStorage.setItem(INTRO_KEY, "1");
+  } catch {
+    // Depolama kullanilamazsa acilis her oturumda oynar; islevsel bir kayip degil.
+  }
+  if (alreadyPlayed) return;
+  const root = document.documentElement;
+  root.classList.add("launcher-intro");
+  setTimeout(() => root.classList.remove("launcher-intro"), INTRO_TOTAL_MS);
+}
+
+// Kademe gecikmesi ikonun grid icindeki sirasindan gelir (bkz. launcher.css).
+function indexGridSlots() {
+  document.querySelectorAll(".launcher-grid > *").forEach((slot, index) => {
+    slot.style.setProperty("--launcher-index", String(index));
+  });
+}
+
 export function renderLauncherHome() {
   renderPages();
   renderDock();
   renderPageControls();
+  indexGridSlots();
   syncLauncherActive(document.body.dataset.currentRoute || "ana-sayfa");
   syncEditingUi();
+  playHomeIntroOnce();
 }
 
 function readRecent() {
@@ -544,10 +575,19 @@ function showLayer(layer, dialog, trigger) {
   if (closingTimer) clearTimeout(closingTimer);
   layer.hidden = false;
   document.body.classList.add("launcher-overlay-open");
-  requestAnimationFrame(() => {
-    layer.classList.add("is-open");
-    requestAnimationFrame(() => dialog.focus({ preventScroll: true }));
-  });
+  // Açılış geçişinin oynayabilmesi için başlangıç durumunun (hidden kalkmış,
+  // henüz .is-open yok) tarayıcıya yazılmış olması gerekir. Bunu sağlamanın
+  // requestAnimationFrame'den daha güvenilir yolu senkron bir düzen okumasıdır:
+  // sekme arka plandayken veya oluşturma askıya alınmışken rAF geri çağırımı
+  // hiç çalışmaz, o durumda .is-open eklenmez ve panel görünmez olmasına
+  // rağmen hidden=false kaldığı için ekranı kilitlerdi.
+  void layer.offsetWidth;
+  layer.classList.add("is-open");
+  // Odak, açılışı tetikleyen olay bittikten sonra verilir. setTimeout tercih
+  // edilir: requestAnimationFrame arka plan sekmesinde hiç çalışmayabilir.
+  setTimeout(() => {
+    if (!layer.hidden) dialog.focus({ preventScroll: true });
+  }, 0);
   return trigger;
 }
 
@@ -1408,7 +1448,19 @@ function startEditLongPress(event) {
 }
 
 function swipePointerDown(event) {
-  if (isDesktopLauncher() || launcherState.drag || event.target.closest("button, a, input, select, [data-launcher-slot]")) return;
+  if (isDesktopLauncher() || launcherState.drag) return;
+  // Metin/deger giren alanlarda yatay surukleme secim veya deger degisimidir,
+  // sayfa kaydirma degil.
+  if (event.target.closest("input, select, textarea, a")) return;
+  // Duzenleme modunda ikonlar surukleniyor: orada slot uzerinden baslayan
+  // hareket tasima demektir (bkz. pointerDragStart).
+  if (launcherState.isEditing && event.target.closest("[data-launcher-slot]")) return;
+  // Normal modda ikonun uzerinden de kaydirilabilir - iOS ana ekraninda
+  // oldugu gibi. Onceden her buton/slot disarida birakiliyordu; dar ekranda
+  // ikonlar alani tamamen doldurdugu icin sayfalar arasinda gecmek fiilen
+  // imkansizdi. Kaza eseri sayfa degistirme riski yok: swipePointerUp en az
+  // SWIPE_THRESHOLD_PX yatay mesafe ve yatay baskinlik ariyor, dokunma ve
+  // dikey kaydirma esigi gecmiyor.
   launcherState.swipe = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, time: performance.now(), locked: false };
 }
 
@@ -1454,6 +1506,11 @@ function handleViewportResize() {
     if (nextDevice === launcherState.device && nextOrientation === launcherState.orientation && !widthChanged) return;
     cancelPointerDrag();
     cancelKeyboardMove(false);
+    // Not: bu blok her genişlik değişiminde açık overlay'leri kapatıyor, yalnızca
+    // cihaz sınıfı değişiminde değil. Yalnızca cihaz değişiminde kapatmayı denedim
+    // (mobil klavye veya kaydırma çubuğu yüzünden açık klasörün kapanmaması için);
+    // ancak düzenleme modu akışı bu davranışa dayanıyor ve test:launcher:edit'teki
+    // kenar-bekleme adımı bozuluyor. Ayrı olarak ele alınmalı.
     closeLauncherFolder(false, false);
     closeLauncherSearch(false, false);
     closeLauncherEditor(false);

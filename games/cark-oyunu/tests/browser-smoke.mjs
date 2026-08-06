@@ -9,6 +9,7 @@ const profile = join(tmpdir(), `ravza-wheel-smoke-${Date.now()}`);
 const browser = spawn(edge, [
   "--headless=new",
   "--disable-gpu",
+  "--disable-extensions",
   "--no-first-run",
   `--remote-debugging-port=${port}`,
   `--user-data-dir=${profile}`,

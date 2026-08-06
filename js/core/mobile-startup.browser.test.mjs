@@ -56,6 +56,7 @@ await new Promise((resolveListen) => server.listen(serverPort, "127.0.0.1", reso
 const browser = spawn(edge, [
   "--headless=new",
   "--disable-gpu",
+  "--disable-extensions",
   "--no-first-run",
   `--remote-debugging-port=${browserPort}`,
   `--user-data-dir=${profile}`,
@@ -96,7 +97,12 @@ function isFirebaseRequest(url) {
 socket.addEventListener("message", (event) => {
   const message = JSON.parse(event.data);
 
-  if (message.method === "Runtime.exceptionThrown") browserErrors.push(message.params.exceptionDetails.text || "Tarayıcı istisnası");
+  if (message.method === "Runtime.exceptionThrown") {
+    const details = message.params.exceptionDetails;
+    const description = details.exception?.description || details.text || "Tarayıcı istisnası";
+    const source = details.url ? ` (${details.url}:${details.lineNumber + 1}:${details.columnNumber + 1})` : "";
+    browserErrors.push(`${description}${source}`);
+  }
   if (message.method === "Log.entryAdded" && message.params.entry.level === "error") browserErrors.push(message.params.entry.text);
 
   if (message.method === "Fetch.requestPaused") {

@@ -16,3 +16,11 @@ npm run books:check || {
   echo "[books] Düzeltmek için: npm run books:optimize"
   exit 1
 }
+
+# CSS paketi repoya commit edilir (Vercel'de build adımı yok); kaynak
+# değişip paket yeniden üretilmezse site eski stille yayına çıkar.
+npm run css:check || {
+  echo "[css] pre-commit: css:check başarısız — commit durduruldu."
+  echo "[css] Düzeltmek için: npm run build:css"
+  exit 1
+}

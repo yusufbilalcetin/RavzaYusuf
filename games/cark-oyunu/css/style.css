@@ -42,6 +42,10 @@
 
   --peg-color: #d7d9de;
   --peg-shine: #ffffff;
+  --wheel-empty-bg: #c7c9ce;
+  --wheel-empty-text: #565d68;
+  --wheel-selected: #7f8792;
+  --wheel-divider: rgba(255, 255, 255, .30);
 
   --stat-a-bg: #fdf2f6;
   --stat-a-fg: var(--accent);
@@ -54,7 +58,7 @@
   font-feature-settings: "cv02", "cv03", "cv04";
 }
 
-/* Karanlık mod: js/app.js document.documentElement.dataset.theme'i ayarlar.
+/* Karanlık mod: ortak oyun tema köprüsü document.documentElement.dataset.theme'i ayarlar.
    Çark paletindeki renklere (--wheel-*, --accent) dokunulmaz — kullanıcı isteği:
    "çark renkleri fazla kararmamalı". Yalnızca sayfa/kart yüzeyleri koyulaşır. */
 html[data-theme="dark"] {
@@ -68,6 +72,10 @@ html[data-theme="dark"] {
   --accent-ring: rgba(224, 80, 128, .28);
   --peg-color: #4a5062;
   --peg-shine: #7d8496;
+  --wheel-empty-bg: #343946;
+  --wheel-empty-text: #d7dbe3;
+  --wheel-selected: #596273;
+  --wheel-divider: rgba(255, 255, 255, .38);
   --stat-a-bg: #2a1520;
   --stat-b-bg: #17233a;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);

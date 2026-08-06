@@ -4,6 +4,11 @@ import {
   getOrSelectHomeHero
 } from "./pages/ana-sayfa-rastgele-gorsel.js";
 
+const initialRoute = new URL(location.href).searchParams.get("page");
+const shouldBootstrapHomeHero = !initialRoute || initialRoute === "ana-sayfa";
+
+if (shouldBootstrapHomeHero) {
+
 globalThis.__RAVZA_YUSUF_HOME_HERO_METRICS__ = { cls: 0, lcp: 0 };
 try {
   new PerformanceObserver((list) => {
@@ -46,4 +51,5 @@ if (selectedTheme) {
   heroPreload.setAttribute("imagesizes", sizes);
   heroPreload.setAttribute("fetchpriority", "high");
   document.head.append(heroPreload);
+}
 }

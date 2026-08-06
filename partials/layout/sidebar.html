@@ -37,9 +37,12 @@
     <button
       class="theme-switch"
       id="theme-switch"
-      onclick="toggleTheme()"
+      type="button"
+      data-theme-toggle
+      aria-controls="theme-sheet"
+      aria-expanded="false"
       aria-label="Karanlık moda geç"
-      title="Gündüz / Gece modu"></button>
+      title="Tema değiştir; ayrıntılar için uzun basın veya çift tıklayın"></button>
     <div class="theme-switch-label">
       <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" fill="currentColor" stroke="none"/></svg></span>
     </div>

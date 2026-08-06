@@ -77,7 +77,7 @@ await new Promise((resolve) => server.listen(PORT, "127.0.0.1", resolve));
 
 const profile = join(tmpdir(), `ravza-spin-stability-${Date.now()}`);
 const browser = spawn(EDGE, [
-  "--headless=new", "--disable-gpu", "--no-first-run",
+  "--headless=new", "--disable-gpu", "--disable-extensions", "--no-first-run",
   "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows",
   "--disable-background-timer-throttling", "--disable-features=CalculateNativeWinOcclusion",
   `--remote-debugging-port=${DEBUG_PORT}`, `--user-data-dir=${profile}`, "about:blank"
@@ -157,10 +157,26 @@ async function evaluate(expression) {
 
 async function viewport(width, height) {
   await command("Emulation.setDeviceMetricsOverride", {
-    width, height, deviceScaleFactor: 1, mobile: width <= 820,
+    // Tek sekmede ardisik viewport testi yaparken device-mode'u degistirmek
+    // Chromium'da gecikmeli bir layout yeniden kurulumu tetikler ve sonraki
+    // spin baslangic olcumunu onceki viewporttan birakabilir. Responsive CSS
+    // icin genislik yeterlidir; dokunmatik akisi ayri browser testindedir.
+    width, height, deviceScaleFactor: 1, mobile: false,
     screenWidth: width, screenHeight: height
   });
-  await delay(100);
+  const expectedMobile = width <= 820;
+  const expectedCompact = width <= 1050;
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const settled = await evaluate(`innerWidth === ${width}
+      && matchMedia('(max-width: 820px)').matches === ${expectedMobile}
+      && matchMedia('(max-width: 1050px)').matches === ${expectedCompact}`);
+    if (settled) {
+      await evaluate("new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))");
+      return;
+    }
+    await delay(25);
+  }
+  throw new Error(`${width}x${height} viewport/media query durumu yerlesmedi`);
 }
 
 async function waitFor(expression, timeout = 3000) {
@@ -322,6 +338,18 @@ function validateRun(label, result) {
     const pivotDelta = Math.max(
       delta(sample.values.pointerPivot.x, basePivot.x), delta(sample.values.pointerPivot.y, basePivot.y)
     );
+    if (wheelPositionDelta > 2 || stagePositionDelta > 2 || pivotDelta > 1) {
+      console.error(JSON.stringify({
+        prefix,
+        baseWheel,
+        currentWheel: sample.values.wheel,
+        baseStage,
+        currentStage: sample.values.wheelStage,
+        basePivot,
+        currentPivot: sample.values.pointerPivot,
+        document: sample.document
+      }));
+    }
     if (wheelSizeDelta > 1) failures.push(`${prefix}: #wheelCanvas boyut farkı ${wheelSizeDelta}px`);
     if (wheelPositionDelta > 2) failures.push(`${prefix}: #wheelCanvas konum farkı ${wheelPositionDelta}px`);
     if (stagePositionDelta > 2) failures.push(`${prefix}: #wheelWrap konum farkı ${stagePositionDelta}px`);
@@ -358,24 +386,28 @@ async function runSpinCase(width, height, mode, { resizeHeight = true } = {}) {
   const closeSelector = mode === "private" ? ".couples-actions .primary-button" : "#modalClose";
   await evaluate(`document.querySelector('${closeSelector}').click()`);
   await delay(50);
+  await evaluate("window.__spinStability.measure('modal-close')");
   const afterClose = await evaluate(`({
     scrollWidth: document.documentElement.scrollWidth,
     clientWidth: document.documentElement.clientWidth,
     scrollX, scrollY,
-    wheel: (() => { const r = document.querySelector('#wheelCanvas').getBoundingClientRect(); return { width: r.width, height: r.height, top: r.top, left: r.left }; })()
+    wheel: (() => { const r = document.querySelector('#wheelCanvas').getBoundingClientRect(); return { width: r.width, height: r.height, top: r.top, left: r.left }; })(),
+    layout: (() => {
+      const app = document.querySelector('.wheel-app');
+      const style = getComputedStyle(app);
+      return {
+        innerWidth,
+        gridTemplateColumns: style.gridTemplateColumns,
+        gap: style.gap,
+        padding: style.padding,
+        mobile: matchMedia('(max-width: 820px)').matches,
+        compact: matchMedia('(max-width: 1050px)').matches,
+        frozen: document.querySelector('#wheelWrap').classList.contains('is-size-frozen')
+      };
+    })()
   })`);
   result.afterClose = afterClose;
-  result.samples.push({
-    stage: "modal-close", values: {
-      wheel: { ...afterClose.wheel }, wheelStage: { ...afterClose.wheel },
-      pointerPivot: { x: afterClose.wheel.left + afterClose.wheel.width / 2, y: afterClose.wheel.top + afterClose.wheel.height * .015 }
-    },
-    document: {
-      scrollWidth: afterClose.scrollWidth, clientWidth: afterClose.clientWidth,
-      bodyScrollWidth: afterClose.scrollWidth, bodyClientWidth: afterClose.clientWidth,
-      scrollX: afterClose.scrollX, scrollY: afterClose.scrollY
-    }
-  });
+  result.samples.push(await evaluate("window.__spinStability.samples.at(-1)"));
   return result;
 }
 

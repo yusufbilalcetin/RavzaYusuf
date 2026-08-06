@@ -6,7 +6,7 @@
 
   #studyhub.active::before {
     inset: 70px 0 0 0;
-    background-image: url("../../assets/calisma-bolumu/optimized/calisma-merkezi-mobile.webp");
+    background-image: url("/assets/calisma-bolumu/optimized/calisma-merkezi-mobile.webp");
     background-position: center top;
     background-attachment: scroll;
   }
@@ -84,7 +84,7 @@
 
   #quizhub.active::before {
     inset: 70px 0 0 0;
-    background-image: url("../../assets/calisma-bolumu/optimized/bilgi-yarismasi-mobile.webp");
+    background-image: url("/assets/calisma-bolumu/optimized/bilgi-yarismasi-mobile.webp");
     background-position: center top;
     background-attachment: scroll;
   }
@@ -1432,7 +1432,7 @@
 
   #studydetail.active::before {
     inset: 64px 0 0;
-    background-image: url("../../assets/calisma-bolumu/optimized/calisma-detay-mobile.webp");
+    background-image: url("/assets/calisma-bolumu/optimized/calisma-detay-mobile.webp");
     background-position: center top;
     background-attachment: scroll;
   }

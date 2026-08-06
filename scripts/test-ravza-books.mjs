@@ -97,10 +97,20 @@ const pendingCommands = new Map();
 const consoleIssues = [];
 const failedRequests = [];
 const requestUrls = new Map();
+let failReaderImportOnce = false;
+let readerImportRequests = 0;
 socket.addEventListener('message', event => {
   const message = JSON.parse(event.data);
   if (message.method === 'Fetch.requestPaused') {
-    if (READER_OVERRIDE && /\/js\/pages\/ravza-books-page\.js(?:\?|$)/.test(message.params.request.url)) {
+    const isReaderModule = /\/js\/pages\/ravza-books-page\.js(?:\?|$)/.test(message.params.request.url);
+    if (isReaderModule) readerImportRequests += 1;
+    if (isReaderModule && failReaderImportOnce) {
+      failReaderImportOnce = false;
+      void command('Fetch.failRequest', {
+        requestId: message.params.requestId,
+        errorReason: 'Aborted',
+      });
+    } else if (READER_OVERRIDE && isReaderModule) {
       void command('Fetch.fulfillRequest', {
         requestId: message.params.requestId,
         responseCode: 200,
@@ -186,14 +196,45 @@ try {
   await command('Runtime.enable');
   await command('Log.enable');
   await command('Network.enable');
-  if (READER_OVERRIDE) {
-    await command('Fetch.enable', { patterns: [{ urlPattern: '*js/pages/ravza-books-page.js*', requestStage: 'Request' }] });
-  }
+  await command('Fetch.enable', { patterns: [{ urlPattern: '*js/pages/ravza-books-page.js*', requestStage: 'Request' }] });
   await setViewport(390, 844);
   await command('Page.navigate', { url: `${BASE_URL}/?page=ravza-books` });
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
   await evaluate("localStorage.removeItem('ravzaBooksProgress:kucuk-prens'); location.reload()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
+
+  // Parse edilebilir fakat yanlis sekilli eski storage verisi kitaplik
+  // acilisini cokertmemeli. Bu, gercekte gorulen sonsuz loading regresyonudur.
+  await evaluate("localStorage.setItem('ravza-books-progress', 'null'); location.reload()");
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
+  assert.equal(await evaluate("document.querySelectorAll('.library-book-card').length"), 5, 'null progress storage kitapligi bos birakti');
+  assert.equal(await evaluate("Boolean(document.querySelector('.startup-error, .reader-error'))"), false, 'null progress storage hata ekrani uretti');
+  await evaluate("localStorage.removeItem('ravza-books-progress')");
+
+  // Ilk lazy import istegi gercekten basarisiz olsun. Hata, tam ekran reader
+  // icinde gorunmeli ve ayni oturumdaki Retry yeni bir module istegi yapmali.
+  await command('Network.setCacheDisabled', { cacheDisabled: true });
+  await command('Page.navigate', { url: 'about:blank' });
+  await waitFor("location.href === 'about:blank'");
+  failReaderImportOnce = true;
+  readerImportRequests = 0;
+  await command('Page.navigate', { url: `${BASE_URL}/?page=ravza-books&import-retry=${Date.now()}` });
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"error\"] #rdr-route-retry')");
+  const routeErrorVisible = await evaluate(`(() => {
+    const button = document.querySelector('#rdr-route-retry');
+    const rect = button.getBoundingClientRect();
+    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    return rect.width > 0 && rect.height > 0 && (hit === button || button.contains(hit));
+  })()`);
+  assert.equal(routeErrorVisible, true, 'Lazy import hata ve Retry arayuzu reader ustunde gorunmuyor');
+  assert.equal(readerImportRequests, 1, 'Ilk import arizasi birden fazla istek uretti');
+  await evaluate("document.querySelector('#rdr-route-retry').click()");
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
+  assert.equal(readerImportRequests, 2, 'Retry yeni bir Ravza Books modul istegi yapmadi');
+  await command('Network.setCacheDisabled', { cacheDisabled: false });
+  consoleIssues.length = 0;
+  failedRequests.length = 0;
+  requestUrls.clear();
 
   for (const [width, height, columns] of VIEWPORTS) {
     await setViewport(width, height);
@@ -238,8 +279,55 @@ try {
     downloadThroughput: 1_500_000,
     uploadThroughput: 750_000,
   });
+  // SPA gecisinde okuyucu parent'i gecici olarak 0x0 olabilir. Eski kod bu
+  // olcuyu 1x1'e clamp edip PageFlip'i pencere resize edilene kadar kilitliyordu.
+  // Sahneyi gercekten gizleyip tekrar gorunur yaparak ResizeObserver tabanli
+  // toparlanmanin harici bir resize olayi olmadan calistigini dogrula.
+  await evaluate(`(() => {
+    const style = document.createElement('style');
+    style.id = 'ravza-books-zero-stage-regression';
+    style.textContent = \`
+      #screen-reader,
+      #reader-inner,
+      #rdr-stage {
+        width: 0 !important;
+        height: 0 !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+    \`;
+    document.head.append(style);
+  })()`);
   await evaluate("document.querySelector('.library-book-card[data-book-id=\"dede-korkut-hikayeleri\"]').click()");
+  await waitFor("document.querySelector('#rdr-stage') && document.querySelector('#book-cradle')");
+  const collapsedReader = await evaluate(`(() => {
+    const stage = document.querySelector('#rdr-stage').getBoundingClientRect();
+    const cradle = document.querySelector('#book-cradle').getBoundingClientRect();
+    return { stage: [stage.width, stage.height], cradle: [cradle.width, cradle.height] };
+  })()`);
+  assert.ok(
+    collapsedReader.stage[0] < 2 && collapsedReader.stage[1] < 2,
+    `Gizli reader sahnesi 0x0 olmadi: ${JSON.stringify(collapsedReader)}`,
+  );
+  await evaluate("document.querySelector('#ravza-books-zero-stage-regression').remove()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] .pdf-page.is-rendered')", 30000);
+  const restoredReader = await evaluate(`(() => {
+    const stage = document.querySelector('#rdr-stage').getBoundingClientRect();
+    const cradle = document.querySelector('#book-cradle').getBoundingClientRect();
+    const flipParent = document.querySelector('.stf__parent')?.getBoundingClientRect();
+    const sheet = document.querySelector('.book-sheet')?.getBoundingClientRect();
+    return {
+      stage: [stage.width, stage.height],
+      cradle: [cradle.width, cradle.height],
+      flipParent: flipParent ? [flipParent.width, flipParent.height] : null,
+      sheet: sheet ? [sheet.width, sheet.height] : null,
+    };
+  })()`);
+  for (const [name, size] of Object.entries(restoredReader)) {
+    assert.ok(size && size[0] > 20 && size[1] > 20, `${name} gizli->gorunur gecisinden sonra toparlanmadi: ${JSON.stringify(restoredReader)}`);
+  }
   await command('Network.emulateNetworkConditions', {
     offline: false,
     latency: 0,

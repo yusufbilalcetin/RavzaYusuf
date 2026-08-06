@@ -100,11 +100,11 @@ body.is-game-fullscreen .games-page.is-game-fullscreen.is-renk-siralama .game-st
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform .16s ease,
-    border-color .16s ease,
-    background .16s ease,
-    box-shadow .16s ease,
-    opacity .16s ease;
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
 }
 
 .rs-icon-btn {
@@ -299,8 +299,8 @@ body.is-game-fullscreen .games-page.is-game-fullscreen.is-renk-siralama .game-st
   cursor: pointer;
   transform-origin: 50% 14%;
   transition:
-    transform .22s cubic-bezier(.2, .8, .2, 1),
-    filter .2s ease;
+    transform var(--dur-base) var(--ease-out),
+    filter var(--dur-base) var(--ease-out);
 }
 
 .rs-glass {
@@ -412,9 +412,27 @@ body.is-game-fullscreen .games-page.is-game-fullscreen.is-renk-siralama .game-st
     0 0 28px rgba(255, 216, 61, .30);
 }
 
-.rs-tube.is-hint-source,
-.rs-tube.is-hint-target {
-  animation: rsHintPulse .7s ease-in-out infinite alternate;
+/* Parlama katmani .rs-glass'in geometrisini birebir tasir (ayni inset ve
+   yaricap), boylece isik tupun U siluetini izler - eskiden drop-shadow'un
+   yaptigi is. .rs-tube overflow kesmedigi icin isik disari tasabilir. */
+.rs-tube.is-hint-source::after,
+.rs-tube.is-hint-target::after,
+.rs-tube-grid.is-level-complete .rs-tube::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 6%;
+  bottom: 6%;
+  border-radius: 0 0 999px 999px;
+  pointer-events: none;
+  animation: rsGlowPulse var(--rs-glow-duration, .7s) ease-in-out infinite alternate;
+}
+
+.rs-tube.is-hint-source::after,
+.rs-tube.is-hint-target::after {
+  --rs-glow-from: .29;
+  box-shadow: 0 0 28px rgba(37, 229, 215, .62);
 }
 
 .rs-tube.is-hint-target .rs-glass {
@@ -447,8 +465,10 @@ body.is-game-fullscreen .games-page.is-game-fullscreen.is-renk-siralama .game-st
     0 0 22px rgba(48, 224, 111, .20);
 }
 
-.rs-tube-grid.is-level-complete .rs-tube {
-  animation: rsCompleteGlow 1.15s ease-in-out infinite alternate;
+.rs-tube-grid.is-level-complete .rs-tube::after {
+  --rs-glow-from: .33;
+  --rs-glow-duration: 1.15s;
+  box-shadow: 0 0 20px rgba(255, 216, 61, .36);
 }
 
 .rs-stream {
@@ -645,18 +665,14 @@ body.is-game-fullscreen .games-page.is-game-fullscreen.is-renk-siralama .game-st
   80% { transform: translateX(2px); }
 }
 
-@keyframes rsHintPulse {
-  from {
-    filter: drop-shadow(0 0 10px rgba(37, 229, 215, .18));
-  }
-  to {
-    filter: drop-shadow(0 0 28px rgba(37, 229, 215, .62));
-  }
-}
-
-@keyframes rsCompleteGlow {
-  from { filter: drop-shadow(0 0 8px rgba(255, 216, 61, .12)); }
-  to { filter: drop-shadow(0 0 20px rgba(255, 216, 61, .36)); }
+/* Parlama katmaninin opakligi. Eskiden filter: drop-shadow'un kendisi
+   animasyonlaniyordu; filter compositor'da calismaz ve seviye sonunda
+   TUM tupler ayni anda her karede yeniden boyaniyordu. Glow artik sabit
+   bir box-shadow olarak ayri bir katmanda duruyor, yalnizca opakligi
+   degisiyor (bkz. .rs-tube.is-hint-source::after). */
+@keyframes rsGlowPulse {
+  from { opacity: var(--rs-glow-from, .3); }
+  to { opacity: 1; }
 }
 
 @keyframes rsStreamFlow {

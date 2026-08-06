@@ -20,8 +20,17 @@ for (const theme of HERO_THEME_POOL) {
 
 const projectRoot = resolve(fileURLToPath(new URL("../../", import.meta.url)));
 const edge = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
-const browserPort = 9334;
-const serverPort = 8765;
+const availablePort = () => new Promise((resolvePort, rejectPort) => {
+  const probe = createServer();
+  probe.unref();
+  probe.once("error", rejectPort);
+  probe.listen(0, "127.0.0.1", () => {
+    const address = probe.address();
+    probe.close(() => resolvePort(address.port));
+  });
+});
+const browserPort = await availablePort();
+const serverPort = await availablePort();
 const profile = join(tmpdir(), `ravza-home-hero-${Date.now()}`);
 const captureScreenshots = process.env.CAPTURE_HOME_HERO === "1";
 const mimeTypes = {
@@ -62,6 +71,7 @@ await new Promise((resolveListen) => server.listen(serverPort, "127.0.0.1", reso
 const browser = spawn(edge, [
   "--headless=new",
   "--disable-gpu",
+  "--disable-extensions",
   "--no-first-run",
   `--remote-debugging-port=${browserPort}`,
   `--user-data-dir=${profile}`,

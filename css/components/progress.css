@@ -7,28 +7,28 @@
 
 .empty-state { text-align: center; padding: 24px; }
 
-.result-stat.success strong { color: #059669; }
+.result-stat.success strong { color: var(--success-fg); }
 
-.result-stat.danger strong { color: #dc2626; }
+.result-stat.danger strong { color: var(--error-fg); }
 
-.result-stat.neutral strong { color: #334155; }
+.result-stat.neutral strong { color: var(--text-secondary); }
 
 .review-status-correct {
-  background: rgba(16,185,129,.14);
-  color: #047857;
-  border-color: rgba(16,185,129,.28);
+  background: var(--success-bg);
+  color: var(--success-fg);
+  border-color: var(--success-border);
 }
 
 .review-status-wrong {
-  background: rgba(239,68,68,.14);
-  color: #b91c1c;
-  border-color: rgba(239,68,68,.24);
+  background: var(--error-bg);
+  color: var(--error-fg);
+  border-color: var(--error-border);
 }
 
 .review-status-empty {
-  background: #ffffff;
-  color: #334155;
-  border-color: rgba(226,232,240,.95);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
 
 .exam-empty-state { min-height: 220px; }

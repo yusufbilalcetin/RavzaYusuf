@@ -3,8 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#7b1731" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0f080b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" id="app-theme-color" content="#f5f4fb">
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const modes = ["light", "dark", "system"];
+      const styles = ["noel-ask", "gece-mavisi", "orman-yesili", "mor-isik", "klasik-koyu", "pembe-tema"];
+      const read = (key) => {
+        try { return localStorage.getItem(key); } catch (_) { return null; }
+      };
+      try {
+        const storedMode = read("eul_theme");
+        const storedStyle = read("eul_theme_style");
+        const mode = modes.includes(storedMode) ? storedMode : "system";
+        const legacyStyle = storedStyle === "gun-isigi" ? "pembe-tema" : storedStyle;
+        const style = styles.includes(legacyStyle) ? legacyStyle : "noel-ask";
+        const resolvedMode = mode === "system"
+          ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+          : mode;
+        const bootBackgrounds = {
+          light: { "noel-ask": "#fff6f8", "pembe-tema": "#fff4f8" },
+          dark: {
+            "noel-ask": "#0f080b",
+            "gece-mavisi": "#08111f",
+            "orman-yesili": "#08120d",
+            "mor-isik": "#0d0718",
+            "klasik-koyu": "#0f1117",
+            "pembe-tema": "#10070c"
+          }
+        };
+        const background = bootBackgrounds[resolvedMode][style]
+          || (resolvedMode === "dark" ? "#0f1117" : "#f5f4fb");
+        const state = Object.freeze({ mode, resolvedMode, style });
+        const apply = (element) => {
+          if (!element) return false;
+          element.dataset.themeMode = mode;
+          element.dataset.resolvedTheme = resolvedMode;
+          element.dataset.themeStyle = style;
+          element.classList.toggle("dark", resolvedMode === "dark");
+          element.classList.toggle("theme-dark", resolvedMode === "dark");
+          element.classList.toggle("theme-light", resolvedMode === "light");
+          element.style.colorScheme = resolvedMode;
+          return true;
+        };
+        apply(root);
+        root.style.backgroundColor = background;
+        document.getElementById("app-theme-color")?.setAttribute("content", background);
+        globalThis.__RAVZA_THEME_BOOT__ = state;
+        if (!apply(document.body)) {
+          const observer = new MutationObserver(() => {
+            if (apply(document.body)) observer.disconnect();
+          });
+          observer.observe(root, { childList: true });
+        }
+      } catch (_) {
+        root.dataset.themeMode = "system";
+        root.dataset.resolvedTheme = "light";
+        root.dataset.themeStyle = "noel-ask";
+        root.classList.add("theme-light");
+        root.style.colorScheme = "light";
+        root.style.backgroundColor = "#f5f4fb";
+        document.getElementById("app-theme-color")?.setAttribute("content", "#f5f4fb");
+        globalThis.__RAVZA_THEME_BOOT__ = Object.freeze({ mode: "system", resolvedMode: "light", style: "noel-ask" });
+      }
+    })();
+  </script>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
@@ -17,19 +80,15 @@
     QR kod her zaman bu adrese yönlendirir.
   -->
   <meta name="kahoot-public-url" content="https://ravza-yusuf63.vercel.app/">
-  <link rel="preload" as="image" href="./assets/branding/ravza-books-logo-128.webp" imagesrcset="./assets/branding/ravza-books-logo-128.webp 1x, ./assets/branding/ravza-books-logo-256.webp 2x" fetchpriority="high">
-  <link rel="preload" as="image" type="image/avif" href="./assets/icons/apps/128/ravzalingo.avif" imagesrcset="./assets/icons/apps/128/ravzalingo.avif 1x, ./assets/icons/apps/256/ravzalingo.avif 2x" fetchpriority="high">
-  <link rel="preload" as="image" type="image/avif" href="./assets/icons/apps/128/kahoot.avif" imagesrcset="./assets/icons/apps/128/kahoot.avif 1x, ./assets/icons/apps/256/kahoot.avif 2x" fetchpriority="high">
-  <link rel="preload" as="image" type="image/avif" href="./assets/icons/apps/128/calisma-merkezi.avif" imagesrcset="./assets/icons/apps/128/calisma-merkezi.avif 1x, ./assets/icons/apps/256/calisma-merkezi.avif 2x" fetchpriority="high">
-  <link rel="preload" as="image" type="image/avif" href="./assets/icons/apps/128/ezber-merkezi.avif" imagesrcset="./assets/icons/apps/128/ezber-merkezi.avif 1x, ./assets/icons/apps/256/ezber-merkezi.avif 2x" fetchpriority="high">
-  <link rel="preload" as="image" href="./assets/icons/games/candy-crush.png" fetchpriority="high">
-  <link rel="preload" as="image" href="./assets/icons/games/meyve-eslestirme.png" fetchpriority="high">
-  <link rel="preload" as="image" href="./assets/icons/games/flappy-bird.png" fetchpriority="high">
-  <link rel="preload" as="image" href="./assets/icons/games/boyama.png" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=liquid-optics-20260715-1">
+  <!--
+    Tek paket: css/style.css 50 dosyalik @import manifestidir ve kaynak
+    dogrulugu odur; gelistirme yine ayri dosyalarda yapilir. Servis edilen
+    surum `npm run build:css` ile uretilir (bkz. scripts/build-css.mjs).
+  -->
+  <link rel="stylesheet" href="./css/style.min.css?v=liquid-optics-20260715-1">
   <script type="module" src="./js/ana-sayfa-hero-bootstrap.js?v=home-hero-responsive-20260711-1"></script>
 </head>
 <body>
@@ -59,7 +118,12 @@
     <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Yukarı çık">↑</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" defer></script>
+  <!--
+    QRCode kutuphanesi burada eager yuklenmez: js/features/kahoot-room.js
+    ensureQrLibrary() ile ihtiyac aninda, uc CDN yedegi ve yerel bir encoder
+    fallback'iyle kendisi yukluyor. Buradaki etiket her acilista ayni dosyayi
+    ikinci kez cekiyordu.
+  -->
   <script type="module" src="./js/main.js?v=liquid-optics-20260715-1"></script>
 </body>
 </html>

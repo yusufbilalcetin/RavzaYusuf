@@ -62,10 +62,18 @@ function tone(frequency, duration = 0.06) {
 }
 
 function applySettings() {
-  document.documentElement.classList.toggle("theme-dark", progress.settings.dark);
+  const resolvedMode = window.RavzaGameTheme?.getState().resolvedMode
+    || document.documentElement.dataset.resolvedTheme
+    || (progress.settings.dark ? "dark" : "light");
+  const isDark = resolvedMode === "dark";
+  document.documentElement.classList.toggle("theme-dark", isDark);
   document.documentElement.classList.toggle("thick-lines", progress.settings.thickLines);
   document.documentElement.classList.toggle("reduce-motion", progress.settings.reducedMotion);
-  document.querySelectorAll("[data-setting]").forEach((input) => { input.checked = Boolean(progress.settings[input.dataset.setting]); });
+  document.querySelectorAll("[data-setting]").forEach((input) => {
+    input.checked = input.dataset.setting === "dark"
+      ? isDark
+      : Boolean(progress.settings[input.dataset.setting]);
+  });
 }
 
 function showScreen(name) {
@@ -296,7 +304,14 @@ function bindEvents() {
   [byId("openSettingsHome"), byId("openSettingsLevels"), byId("openSettingsGame")].forEach((button) => button.addEventListener("click", openSettings));
   dom.settingsClose.addEventListener("click", closeModal);
   document.querySelectorAll("[data-setting]").forEach((input) => input.addEventListener("change", () => {
-    progress.settings[input.dataset.setting] = input.checked; saveProgress(progress); applySettings();
+    const setting = input.dataset.setting;
+    progress.settings[setting] = input.checked;
+    saveProgress(progress);
+    if (setting === "dark") {
+      if (window.RavzaGameTheme) window.RavzaGameTheme.setMode(input.checked ? "dark" : "light");
+      else document.documentElement.classList.toggle("theme-dark", input.checked);
+    }
+    applySettings();
     if (game && input.dataset.setting === "zen") game.zen = input.checked;
     if (game) renderHud();
   }));
@@ -319,6 +334,7 @@ function bindEvents() {
   });
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveGameSession(); });
   window.addEventListener("pagehide", saveGameSession);
+  window.addEventListener("app:theme-change", applySettings);
 }
 
 applySettings(); bindEvents(); showScreen("home");

@@ -7,6 +7,7 @@ import { withTimeout } from "../utils/helpers.js";
 import { initLauncher } from "./launcher.js?v=home-proportions-20260716-1";
 import { initLiquidGlassSurfaceSystem } from "../services/liquid-glass-service.js?v=liquid-optics-20260715-1";
 import { initSearchClearControls } from "../utils/search-clear.js";
+import { bindThemeControls, getThemeState, initThemeSystem } from "./theme.js";
 
 // legacy-app.js normalde çok hızlı yüklenir (yerel/CDN'den tek modül); bu
 // süre yalnızca "CDN tamamen tıkanırsa ana içerik sonsuza dek beklemesin"
@@ -61,6 +62,13 @@ function bootLegacyAppInBackground() {
   const importPromise = import("../legacy/legacy-app.js");
   const ready = importPromise
     .then(() => {
+      // Fast path'te legacy modulu routerdan once yuklenir ve initRouter()
+      // asagida global navigate sahipligini devralir. Import 4 saniyelik
+      // bekleme sinirini asarsa sira tersine doner; legacy top-level kodu
+      // window.navigate'i eski DOM routeriyla yeniden ezer. Modül tamamen
+      // degerlendirildikten sonra normal yukleme sirasindaki sahipligi geri
+      // kurmak bos/active sayfasi olmayan rota durumunu merkezi olarak onler.
+      if (window.__routerNavigate) initRouter();
       installCompatibility();
       return window.__bootLegacyApp?.();
     })
@@ -87,6 +95,9 @@ export async function initApp() {
 
   try {
     installDiagnostics();
+    // Head'deki senkron bootstrap ilk paint'i korur; bu merkez runtime state,
+    // system media listener ve tek app:theme-change olayının sahipliğini alır.
+    initThemeSystem();
     startupState.domReady = true;
     pbnLog("boot", {
       hash: location.hash,
@@ -96,10 +107,12 @@ export async function initApp() {
 
     await loadLayoutPartials();
     startupState.shellRendered = true;
+    bindThemeControls();
     initSearchClearControls();
     initLiquidGlassSurfaceSystem();
     installAppShellScrollBridge();
     initLauncher();
+    window.setLauncherThemePreference?.(getThemeState().mode);
 
     const legacy = bootLegacyAppInBackground();
     // Modül gerçekten yüklendiyse (window.toggleTheme vb. bağlansın diye)

@@ -203,5 +203,39 @@
           </div>
 
           <div class="exam-motivation-note">★ Unutma: Başarı, küçük çabaların her gün tekrarlanmasıyla gelir. Kendine inan, vazgeçme! 💪</div>
+
+        <button
+          type="button"
+          id="examHistoryModalBackdrop"
+          class="exam-history-modal-backdrop"
+          data-reveal-skip
+          aria-label="Sınav geçmişini kapat"
+          onclick="closeExamHistoryModal()">
+        </button>
+
+        <section
+          id="examHistoryModal"
+          class="exam-history-modal"
+          data-reveal-skip
+          role="dialog"
+          aria-modal="true"
+          aria-hidden="true"
+          aria-labelledby="examHistoryModalTitle">
+          <div class="exam-history-modal-head">
+            <div>
+              <span class="unit-badge exam-badge">SINAV GEÇMİŞİ</span>
+              <h3 id="examHistoryModalTitle">Son Sınavlarım</h3>
+              <p>Son sınav sonuçlarını ve kaydedilmiş soru ayrıntılarını incele.</p>
+            </div>
+            <button
+              type="button"
+              class="exam-history-modal-close"
+              aria-label="Sınav geçmişini kapat"
+              onclick="closeExamHistoryModal()">✕</button>
+          </div>
+          <div id="examHistoryModalList" class="exam-history-modal-list">
+            <div class="exam-empty-mini">Henüz sınav geçmişi yok.</div>
+          </div>
+        </section>
         </div>
       </section>

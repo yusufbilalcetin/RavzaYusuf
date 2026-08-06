@@ -144,7 +144,7 @@ function heartIcon(className = "icon-heart") {
  * Özel alanın DOM'unu kurar. Kilit açılmadan çağrılmaz; kilitlenince destroy() ile
  * tüm düğümler ve görsel URL referansları kaldırılır.
  */
-export function createPrivateUI({ wheel, state, onSpin, onChange }) {
+export function createPrivateUI({ wheel, state, onSpin, onChange, returnFocus = null }) {
   const panel = el("section", "private-panel");
 
   // İstatistik kartları — js/app.js'in normal-mod kartlarıyla aynı sınıfları paylaşır (DRY),
@@ -324,6 +324,13 @@ export function createPrivateUI({ wheel, state, onSpin, onChange }) {
     overlay.hidden = true;
     clearImage(); // kilitlenince/kapanınca özel görsel referansı kalmasın
     currentCode = null;
+    if (returnFocus?.isConnected) {
+      try {
+        returnFocus.focus({ preventScroll: true });
+      } catch {
+        returnFocus.focus();
+      }
+    }
   }
 
   favorite.addEventListener("click", () => {

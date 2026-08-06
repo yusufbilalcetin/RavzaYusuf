@@ -1,5 +1,8 @@
 import { pbnLog } from "./pbn-debug.js?v=alan-bulmacasi-20260710-1";
+import { getThemeColor, onThemeChange } from "../core/theme.js";
 
+// Bunlar yazdırılabilir/export edilen boyama şablonunun gerçek mürekkebidir;
+// ekran overlay paleti aşağıda semantik tema tokenlarından ayrı okunur.
 const OUTLINE_RGB = [70, 70, 78];
 const OUTLINE_CSS = `rgb(${OUTLINE_RGB[0]},${OUTLINE_RGB[1]},${OUTLINE_RGB[2]})`;
 const MIN_SCALE = 0.5;
@@ -77,6 +80,12 @@ export function createPbnEngine({ canvas, viewport, stage }) {
   let overlayRafId = null;
   let gestureActive = false;
   let gestureSettleTimer = null;
+  let overlayInk = getThemeColor("--number-color", "rgb(70,70,78)");
+
+  const stopThemeSync = onThemeChange(() => {
+    overlayInk = getThemeColor("--number-color", "rgb(70,70,78)");
+    scheduleOverlayDraw();
+  });
 
   function scheduleOverlayDraw() {
     if (overlayRafId != null) return;
@@ -174,14 +183,16 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     }
 
     octx.lineWidth = 1;
+    octx.strokeStyle = overlayInk;
     if (fullGrid) {
-      octx.strokeStyle = "rgba(70,70,78,0.16)";
+      octx.globalAlpha = 0.16;
       octx.stroke(hairPath);
-      octx.strokeStyle = "rgba(70,70,78,0.45)";
+      octx.globalAlpha = 0.45;
     } else {
-      octx.strokeStyle = "rgba(70,70,78,0.35)";
+      octx.globalAlpha = 0.35;
     }
     octx.stroke(boundPath);
+    octx.globalAlpha = 1;
 
     /* numaralar */
     const numberThreshold = visibleUnpainted > LOD_NUMBER_BUDGET ? LOD_NUMBER_PX_BUSY : LOD_NUMBER_PX;
@@ -192,7 +203,8 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     octx.font = `600 ${fontSize}px 'Segoe UI', Arial, sans-serif`;
     octx.textAlign = "center";
     octx.textBaseline = "middle";
-    octx.fillStyle = "rgba(70,70,78,0.85)";
+    octx.fillStyle = overlayInk;
+    octx.globalAlpha = 0.85;
 
     for (let row = row0; row <= row1; row++) {
       for (let col = col0; col <= col1; col++) {
@@ -206,6 +218,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
         octx.fillText(String(n), cx, cy);
       }
     }
+    octx.globalAlpha = 1;
   }
 
   function drawOverlayNumbersLegacy(vw, vh) {
@@ -213,7 +226,8 @@ export function createPbnEngine({ canvas, viewport, stage }) {
     octx.font = `600 ${fontSize}px 'Segoe UI', Arial, sans-serif`;
     octx.textAlign = "center";
     octx.textBaseline = "middle";
-    octx.fillStyle = "rgba(70,70,78,0.85)";
+    octx.fillStyle = overlayInk;
+    octx.globalAlpha = 0.85;
     for (const region of regions) {
       if (paintedSet.has(region.id)) continue;
       const cx = offsetX + region.labelX * scale;
@@ -221,6 +235,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       if (cx < -20 || cy < -20 || cx > vw + 20 || cy > vh + 20) continue;
       octx.fillText(String(region.paletteNumber), cx, cy);
     }
+    octx.globalAlpha = 1;
   }
 
   /* ---------- yeniden sığdırma ---------- */
@@ -1116,6 +1131,7 @@ export function createPbnEngine({ canvas, viewport, stage }) {
       viewport.removeEventListener("contextmenu", preventCanvasContextMenu);
       document.removeEventListener("gesturestart", preventNativeGesture);
       document.removeEventListener("gesturechange", preventNativeGesture);
+      stopThemeSync();
       resizeObserver.disconnect();
       overlay.remove();
     }

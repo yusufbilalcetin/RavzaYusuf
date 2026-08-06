@@ -20,26 +20,128 @@
   --exam: #7c3aed;
   --sidebar-w: 278px;
   --radius: 22px;
-  --shadow: 0 14px 38px rgba(18, 29, 58, .10);
-  --shadow-xs: 0 4px 12px rgba(15,23,42,.05);
-  --shadow-sm: 0 8px 20px rgba(15,23,42,.08);
-  --shadow-md: 0 14px 34px rgba(15,23,42,.10);
-  --shadow-lg: 0 20px 54px rgba(15,23,42,.14);
   --glass-light: rgba(255,255,255,.74);
   --glass-dark: rgba(23,27,37,.76);
 
+  /* Hareket sistemi. Kullanıcı tetiklemeli her geçiş ease-out olmalı: hareket
+     hızlı başlar, yavaşça durur - Apple'ın arayüz hissi bundan gelir. Simetrik
+     `ease` (tarayıcı varsayılanı) başlangıcı da yavaşlattığı için ağır durur.
+     --ease-inout SADECE sonsuz nabız/salınım döngüleri içindir. */
+  --ease-out: cubic-bezier(.32, .72, 0, 1);
+  --ease-emphasis: cubic-bezier(.22, 1, .36, 1);
+  --ease-inout: cubic-bezier(.65, 0, .35, 1);
+  --dur-fast: 160ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+
+  /* Tipografik ölçek. Apple boyut büyüdükçe harf aralığını sıkar (optik
+     düzeltme): büyük puntoda harfler arası boşluk göz için zaten genişler. */
+  --fs-display: clamp(30px, 3.4vw, 48px);
+  --fs-title1: clamp(24px, 2.4vw, 34px);
+  --fs-title2: clamp(19px, 1.7vw, 24px);
+  --fs-title3: clamp(16px, 1.3vw, 19px);
+  --fs-body: 15px;
+  --fs-caption: 12px;
+  --track-display: -.035em;
+  --track-title: -.02em;
+  --track-body: 0;
+
+}
+
+/* ---------------------------------------------------------------------------
+   Semantik tasarım tokenları (tek kaynak).
+
+   HEPSİ `body` üzerinde tanımlıdır, `:root` üzerinde DEĞİL. Sebep: var()
+   bildirildiği elemanda çözülür. `:root { --text-primary: var(--text) }`
+   yazarsan --text'in :root (açık) değeriyle çözülür ve `body.dark`'ın
+   --text'i geç kalır - token açık modda kalıcı olarak DONAR. Palet
+   (--text/--bg/--card-border...) body.dark ve body[data-theme-style] üstünde
+   flip ettiği için, body'de tanımlanan türevler 6 preset x 2 modun 12
+   kombinasyonunu da bedavaya alır.
+
+   Aynı gerekçe aşağıdaki --search-* bloğu için de geçerli (zaten body'deydi).
+--------------------------------------------------------------------------- */
+body {
+  /* Native form kontrolleri, kaydırma çubuğu, autofill ve <select> açılır
+     listesi buna bakar. Sabit `light dark` yazılırsa OS'u izler ve site
+     toggle'ından bağımsız kalır. */
+  color-scheme: light;
+
+  --text-primary: var(--text);
+  --text-secondary: var(--text-light);
+  /* Altı preset üzerinde gerçek computed-color denetimiyle en düşük 4.6:1
+     sağlayan oran; koyu modda da ayrı override gerektirmez. */
+  --text-muted: color-mix(in srgb, var(--text) 72%, var(--white));
+  --text-disabled: color-mix(in srgb, var(--text) 46%, var(--white));
+  --text-inverse: #ffffff;
+  --text-on-accent: var(--accent-contrast);
+  /* Skor, sayaç, timer, sudoku/bulmaca rakamları, sayfa no. Canvas çizen JS
+     bu tokenı getComputedStyle ile okur - tek isim, tek kaynak. */
+  --number-color: var(--text);
+
+  /* iOS katmanlı yüzey: yükseklik arttıkça açılır. Açık modda --white'tan
+     daha açığa gidilemediği için yüksekliği gölge taşır; koyu modda
+     --bg-elevated gerçekten açılır (bkz. tipografi.css body.dark). */
+  --bg-base: var(--bg);
+  --bg-surface: var(--white);
+  --bg-surface-secondary: var(--table-row);
+  --bg-elevated: var(--white);
+  --bg-overlay: color-mix(in srgb, var(--white) 94%, transparent);
+  --bg-input: var(--input-bg);
+  --bg-disabled: color-mix(in srgb, var(--input-bg) 72%, var(--bg) 28%);
+
+  --border: var(--card-border);
+  --border-subtle: color-mix(in srgb, var(--card-border) 70%, transparent);
+  --border-strong: color-mix(in srgb, var(--card-border) 50%, var(--text) 50%);
+
+  --accent: var(--pink);
+  /* Altı açık presetin accent'i üzerinde beyaz metin 2.48–3.96:1 arasında
+     kalıyor. Ortak koyu mürekkep normal metinde AA kontrastını korur. */
+  --accent-contrast: #17111a;
+  --accent-hover: color-mix(in srgb, var(--accent) 88%, var(--text) 12%);
+  --accent-active: color-mix(in srgb, var(--accent) 78%, var(--text) 22%);
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, var(--bg-surface));
+
+  /* Tek renk kaynağı: 5 gölge de bunun üzerine kurulu, böylece koyu modda
+     tek satır override yetiyor. Eskiden --shadow-xs/sm/md/lg :root'ta sabitti
+     ve koyu zeminde tamamen görünmez kalıyordu. */
+  --shadow-color: rgba(15, 23, 42, .12);
+  --shadow: 0 14px 38px var(--shadow-color);
+  --shadow-xs: 0 4px 12px var(--shadow-color);
+  --shadow-sm: 0 8px 20px var(--shadow-color);
+  --shadow-md: 0 14px 34px var(--shadow-color);
+  --shadow-lg: 0 20px 54px var(--shadow-color);
+
   /* Apple/iOS incelme geçişi: ince ayraçlar ve hafif yüzey katmanları.
-     Mevcut --card-border/--text tonlarından türetilir, böylece 6 tema
-     presetinin + açık/koyu modun hepsinde otomatik doğru renkte kalır. */
+     :root'tan buraya taşındı - orada --card-border/--text'in açık moddaki
+     değerine donuyor ve koyu modda hiç kararmıyorlardı. */
   --separator: color-mix(in srgb, var(--card-border) 70%, transparent);
   --separator-strong: color-mix(in srgb, var(--card-border) 100%, black 6%);
   --surface-hover: color-mix(in srgb, var(--text) 6%, transparent);
   --surface-active: color-mix(in srgb, var(--text) 10%, transparent);
-}
+  --surface-selected: var(--accent-soft);
+  /* Açık temada Gece Mavisi accent'i beyaz yüzeyde 2.48:1 kalır; koyu
+     preset ana rengi tüm açık yüzeylerde 3:1 UI sınırını rahatça geçer. */
+  --focus-ring: var(--navy);
+  --selection-bg: var(--accent);
+  --selection-text: var(--text-on-accent);
 
-/* Shared search surface tokens. They are declared on body so every existing
-   theme preset can resolve them from its own --input/--text/--pink palette. */
-body {
+  /* Durum çiftleri: --text ve --bg-surface flip ettiği için otomatik dönerler.
+     color-mix iç içeliği tek seviye tutuldu (Safari 16.4 iç içe karışımı
+     şeffafa düşürebiliyor; esbuild target'ı safari16.4). */
+  --success-fg: color-mix(in srgb, var(--success) 48%, var(--text) 52%);
+  --success-bg: color-mix(in srgb, var(--success) 12%, var(--white));
+  --success-border: color-mix(in srgb, var(--success) 46%, var(--card-border));
+  --warning-fg: color-mix(in srgb, var(--warning) 48%, var(--text) 52%);
+  --warning-bg: color-mix(in srgb, var(--warning) 12%, var(--white));
+  --warning-border: color-mix(in srgb, var(--warning) 46%, var(--card-border));
+  --error-fg: color-mix(in srgb, var(--error) 48%, var(--text) 52%);
+  --error-bg: color-mix(in srgb, var(--error) 12%, var(--white));
+  --error-border: color-mix(in srgb, var(--error) 46%, var(--card-border));
+  --exam-fg: color-mix(in srgb, var(--exam) 48%, var(--text) 52%);
+  --exam-bg: color-mix(in srgb, var(--exam) 12%, var(--white));
+  --exam-border: color-mix(in srgb, var(--exam) 46%, var(--card-border));
+
   --search-color-scheme: light;
   --search-bg: var(--input-bg);
   --search-text: var(--text);

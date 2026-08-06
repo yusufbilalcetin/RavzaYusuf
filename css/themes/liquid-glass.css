@@ -6,7 +6,8 @@
    ====================================================================== */
 
 html.theme-liquid-glass {
-  color-scheme: light dark;
+  /* color-scheme head bootstrap/runtime tema yöneticisi tarafından light veya
+     dark olarak atanır; OS tercihi manuel modu ezmemelidir. */
 
   --glass-app-bg: #f5f4fb;
   --glass-surface-base: rgba(255, 255, 255, .84);
@@ -48,8 +49,8 @@ html.theme-liquid-glass {
     0 24px 64px rgba(28, 18, 42, .22),
     inset 0 1px 0 rgba(255, 255, 255, .54);
 
-  --glass-transition: 180ms ease;
-  --glass-spring: 220ms cubic-bezier(.22, 1, .36, 1);
+  --glass-transition: var(--dur-base) var(--ease-out);
+  --glass-spring: 220ms var(--ease-emphasis);
 }
 
 html.theme-liquid-glass body.dark {
@@ -373,10 +374,14 @@ html.theme-liquid-glass .theme-sheet.glass-surface {
   border-radius: var(--glass-radius-hero);
   box-shadow: var(--glass-shadow-overlay);
   transition:
-    opacity 200ms ease-out,
-    visibility 200ms ease-out,
-    transform 200ms ease-out;
+    opacity var(--dur-base) ease-out,
+    visibility 0s linear var(--dur-base),
+    transform var(--dur-base) ease-out;
   transform-origin: top right;
+}
+
+html.theme-liquid-glass .theme-sheet.glass-surface.open {
+  transition-delay: 0s, 0s, 0s;
 }
 
 html.theme-liquid-glass :is(

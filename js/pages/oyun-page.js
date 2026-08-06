@@ -21,12 +21,23 @@ const CANDIES = ["\u{1F353}", "\u{1F34B}", "\u{1F347}", "\u{1F36C}", "\u{1F36D}"
 const BOARD_SIZE = 7;
 const CANDY_CRUSH_APP_URL = "./games/candy-crush/dist/index.html";
 const FRUIT_MATCH_APP_URL = "./games/meyve-eslestirme/dist/index.html";
+const GAME_THEME_MESSAGE = "RAVZAYUSUF_THEME";
+const GAME_THEME_MODES = Object.freeze(["light", "dark", "system"]);
+const GAME_THEME_STYLES = Object.freeze([
+  "noel-ask",
+  "gece-mavisi",
+  "orman-yesili",
+  "mor-isik",
+  "klasik-koyu",
+  "pembe-tema"
+]);
 
 let candyState = null;
 let flappyState = null;
 let sudokuState = null;
 let boyamaState = null;
 let renkSiralamaState = null;
+let iframeThemeCleanup = null;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -218,6 +229,68 @@ function renderIframeGame(target, url, title) {
       <a class="candy-crush-game-link" href="${url}" target="_blank" rel="noopener">Tam ekranda ac</a>
     </div>
   `;
+
+  const frame = target.querySelector(".candy-crush-game-frame");
+  if (!frame) return;
+
+  const sendTheme = (detail) => {
+    if (!frame.isConnected || !frame.contentWindow) return;
+    frame.contentWindow.postMessage({
+      type: GAME_THEME_MESSAGE,
+      payload: readParentThemeState(detail)
+    }, window.location.origin);
+  };
+  const handleThemeChange = (event) => sendTheme(event.detail);
+  const handleFrameLoad = () => sendTheme();
+
+  frame.addEventListener("load", handleFrameLoad);
+  window.addEventListener("app:theme-change", handleThemeChange);
+  iframeThemeCleanup = () => {
+    frame.removeEventListener("load", handleFrameLoad);
+    window.removeEventListener("app:theme-change", handleThemeChange);
+    iframeThemeCleanup = null;
+  };
+  sendTheme();
+}
+
+function readParentThemeState(detail) {
+  let apiState = null;
+  try {
+    apiState = window.__RAVZA_THEME__?.getState?.() || null;
+  } catch {
+    apiState = null;
+  }
+  const candidate = detail && typeof detail === "object" ? detail : apiState;
+
+  let storedMode = null;
+  let storedStyle = null;
+  try {
+    storedMode = localStorage.getItem("eul_theme");
+    storedStyle = localStorage.getItem("eul_theme_style");
+  } catch {
+    // Tema API'si hazır değilse DOM ve sistem tercihi güvenli geri dönüş sağlar.
+  }
+
+  const mode = GAME_THEME_MODES.includes(candidate?.mode)
+    ? candidate.mode
+    : GAME_THEME_MODES.includes(storedMode) ? storedMode : "system";
+  const styleCandidate = candidate?.style || document.body?.dataset.themeStyle || storedStyle;
+  const style = GAME_THEME_STYLES.includes(styleCandidate) ? styleCandidate : "noel-ask";
+  const domResolvedMode = document.body?.dataset.resolvedTheme
+    || document.documentElement.dataset.resolvedTheme;
+  const fallbackResolvedMode = mode === "system"
+    ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    : mode;
+  const resolvedMode = ["light", "dark"].includes(candidate?.resolvedMode)
+    ? candidate.resolvedMode
+    : ["light", "dark"].includes(domResolvedMode) ? domResolvedMode : fallbackResolvedMode;
+
+  return {
+    mode,
+    resolvedMode,
+    style,
+    reason: typeof candidate?.reason === "string" ? candidate.reason : "parent-sync"
+  };
 }
 
 export function closeGame(root = document.getElementById("games"), options = {}) {
@@ -248,6 +321,7 @@ function returnToGameLauncher() {
 }
 
 function destroyActiveGame() {
+  iframeThemeCleanup?.();
   if (flappyState) {
     flappyState.cleanup();
     flappyState = null;
@@ -644,6 +718,16 @@ function renderFlappyBird(target) {
     width: 0,
     height: 0
   };
+  const scorePalette = { fill: "#ffffff", outline: "rgba(0, 0, 0, .35)" };
+
+  function syncScorePalette() {
+    scorePalette.fill = window.getThemeColor?.("--text", "#ffffff") || "#ffffff";
+    scorePalette.outline = window.getThemeColor?.("--bg", "rgba(0, 0, 0, .35)") || "rgba(0, 0, 0, .35)";
+  }
+
+  function handleFlappyThemeChange() {
+    syncScorePalette();
+  }
 
   if (!readFlappyOwned().includes(state.character)) state.character = "klasik";
   if (!readFlappyOwnedBackgrounds().includes(state.background)) state.background = "klasik";
@@ -1448,8 +1532,8 @@ function renderFlappyBird(target) {
     drawBird();
 
     if (state.phase === "playing") {
-      context.fillStyle = "#ffffff";
-      context.strokeStyle = "rgba(0, 0, 0, .35)";
+      context.fillStyle = scorePalette.fill;
+      context.strokeStyle = scorePalette.outline;
       context.lineWidth = 5;
       context.font = "700 46px 'Segoe UI', Arial, sans-serif";
       context.textAlign = "center";
@@ -1669,7 +1753,9 @@ function renderFlappyBird(target) {
   menu.addEventListener("click", onMenuClick);
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("app:theme-change", handleFlappyThemeChange);
 
+  syncScorePalette();
   resizeCanvas();
   showMenu();
   state.rafId = requestAnimationFrame((time) => {
@@ -1685,6 +1771,7 @@ function renderFlappyBird(target) {
       menu.removeEventListener("click", onMenuClick);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("app:theme-change", handleFlappyThemeChange);
     }
   };
 }

@@ -33,7 +33,7 @@
   border-radius: 26px;
   background:
     linear-gradient(135deg, rgba(72, 16, 58, .84), rgba(18, 8, 42, .82)),
-    url("../../assets/oyun-bolumu/optimized/oyun-merkezi-desktop.webp");
+    url("/assets/oyun-bolumu/optimized/oyun-merkezi-desktop.webp");
   background-size: cover;
   background-position: center;
   box-shadow:
@@ -85,7 +85,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, .80), rgba(255, 247, 251, .92));
   box-shadow: 0 18px 42px rgba(69, 16, 46, .10);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
 
 .school-card:hover {
@@ -146,7 +146,7 @@
   color: var(--navy);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background .22s ease, transform .22s ease;
+  transition: background var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
   text-decoration: none;
 }
 
@@ -179,7 +179,7 @@
   box-shadow:
     0 12px 28px rgba(40, 20, 60, .28),
     0 3px 8px rgba(40, 20, 60, .18);
-  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), filter var(--dur-base) var(--ease-out);
 }
 
 .game-tile-img {
@@ -491,7 +491,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;
-  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
 
 .candy-crush-game-link:hover {
@@ -551,7 +551,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   color: #fff;
   font-weight: 800;
   cursor: pointer;
-  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
 
 .game-close-btn {
@@ -680,7 +680,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
     0 10px 18px rgba(0, 0, 0, .18);
   font-size: clamp(22px, 4.2vw, 38px);
   cursor: pointer;
-  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
 
 .candy-cell:hover {
@@ -833,7 +833,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   font-weight: 800;
   cursor: pointer;
   backdrop-filter: blur(8px);
-  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 
 .flappy-menu-btn small {
@@ -1220,7 +1220,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
     inset 0 -7px 0 rgba(0, 0, 0, .18),
     0 7px 0 rgba(5, 42, 84, .40),
     0 15px 28px rgba(0, 67, 129, .24);
-  transition: transform .16s ease, filter .16s ease;
+  transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out);
 }
 
 .flappy-main-btn:hover {
@@ -1422,7 +1422,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   color: #fff;
   cursor: pointer;
   backdrop-filter: blur(8px);
-  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 
 .flappy-shop-card:hover {
@@ -2561,7 +2561,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background .12s ease;
+  transition: background .12s var(--ease-out);
 }
 
 .sudoku-cell:nth-child(9n) {
@@ -2633,7 +2633,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   background: transparent;
   color: #7286a2;
   cursor: pointer;
-  transition: color .15s ease, background .15s ease;
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
 
 .sudoku-tool-btn svg {
@@ -2683,7 +2683,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   border-radius: 10px;
   background: transparent;
   cursor: pointer;
-  transition: background .15s ease, transform .12s ease;
+  transition: background var(--dur-fast) var(--ease-out), transform .12s var(--ease-out);
 }
 
 .sudoku-num span {
@@ -2753,7 +2753,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
-  transition: transform .15s ease, background .15s ease;
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
 
 .sudoku-panel-btn:hover {

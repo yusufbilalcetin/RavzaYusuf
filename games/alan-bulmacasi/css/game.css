@@ -1053,3 +1053,105 @@ a:focus-visible {
     transition: none;
   }
 }
+
+/* Oyun bölgelerinin ayırt edici renkleri değişmez; koyu temada yalnızca
+   uygulama yüzeyleri, metinler ve etkileşim durumları tema köprüsünü izler. */
+html[data-resolved-theme="dark"] {
+  --page: #14101c;
+  --surface: #211923;
+  --surface-soft: #2c1e29;
+  --ink: #f8edf4;
+  --muted: #c5afbc;
+  --accent: #ed86b2;
+  --accent-dark: #f2a0c2;
+  --line: rgba(240, 160, 195, .22);
+  --shadow: 0 20px 58px rgba(0, 0, 0, .38);
+}
+
+html[data-resolved-theme="dark"] body {
+  background:
+    radial-gradient(circle at 10% 8%, rgba(197, 68, 126, .14), transparent 23rem),
+    radial-gradient(circle at 90% 92%, rgba(78, 104, 172, .13), transparent 25rem),
+    var(--page);
+}
+
+html[data-resolved-theme="dark"] :is(.icon-button, .game-shell, .stat, .board, .modal) {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+html[data-resolved-theme="dark"] :is(
+  .level-button,
+  .delete-button,
+  .control-button,
+  .modal-button,
+  .result-stats div,
+  .chapter-tab,
+  .level-choice
+) {
+  border-color: var(--line);
+  background: var(--surface-soft);
+  color: var(--accent-dark);
+}
+
+html[data-resolved-theme="dark"] :is(.progress-track, .control-button small) {
+  background: #382631;
+}
+
+html[data-resolved-theme="dark"] :is(
+  .control-button--primary,
+  .modal-button--primary,
+  .chapter-tab.is-active,
+  .level-choice.is-current
+) {
+  border-color: #963b64;
+  background: #963b64;
+  color: #fff;
+}
+
+html[data-resolved-theme="dark"] :is(.control-button:disabled, .chapter-tab:disabled, .level-choice:disabled) {
+  border-color: rgba(197, 175, 188, .12);
+  background: #29242b;
+  color: #8f828a;
+}
+
+html[data-resolved-theme="dark"] .level-choice.is-boss:not(:disabled):not(.is-current) {
+  border-color: #b98720;
+  background: #332c1d;
+  color: #f2d989;
+}
+
+html[data-resolved-theme="dark"] .modal-backdrop {
+  background: rgba(8, 5, 12, .72);
+}
+
+html[data-resolved-theme="dark"] :is(.tutorial-list li, .board-status) {
+  color: var(--muted);
+}
+
+html[data-resolved-theme="dark"] .board-status.is-error {
+  color: #ff9cad;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-resolved-theme="dark"] :is(
+    .icon-button:hover,
+    .control-button:not(:disabled):hover,
+    .level-button:hover,
+    .delete-button:hover,
+    .modal-button:hover,
+    .level-choice:not(:disabled):hover
+  ) {
+    border-color: rgba(242, 160, 194, .46);
+    background-color: #382531;
+  }
+
+  html[data-resolved-theme="dark"] :is(
+    .control-button--primary:not(:disabled):hover,
+    .modal-button--primary:hover,
+    .level-choice.is-current:hover
+  ) {
+    border-color: #ae4774;
+    background-color: #ae4774;
+  }
+}

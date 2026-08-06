@@ -136,7 +136,42 @@ async function runBrowser(browserConfig) {
       width, height, deviceScaleFactor: 1, mobile: width < 768,
       screenWidth: width, screenHeight: height
     });
-    await delay(260);
+    // Launcher, viewport degisimini 180 ms debounce ile isler ve o is sirasinda
+    // ACIK OVERLAY'LERI KAPATIR (js/core/launcher.js handleViewportResize).
+    // Onceki sabit delay(260) yetmiyordu: `resize` olayi
+    // setDeviceMetricsOverride dondukten birkac kare sonra tetiklenebiliyor,
+    // debounce penceresi kayiyor ve testin hemen ardindan actigi klasor
+    // kapatiliyordu (dark/768/games'te deterministik olarak boyleydi).
+    //
+    // launcherState.viewportWidth debounce isinin sonunda guncellenir; esitlik
+    // saglandiginda kapatma asamasi kesinlikle gecmistir. Sinyal gelmezse
+    // (launcher henuz yuklenmemis olabilir) testi patlatmak yerine debounce
+    // penceresinden genis bir sureyle beklenir.
+    await settleAfterResize(width);
+  }
+
+  // Viewport degisiminin launcher tarafinda tamamen oturmasini bekler.
+  //
+  // Iki asama sarttir. Once metriklerin sayfaya YANSIMASI beklenir: aksi halde
+  // innerWidth hala eski degerdedir, launcherState.viewportWidth de ona esittir
+  // ve "oturdu" sinyali yanlislikla saglanmis gorunur - bekleme erken biter,
+  // debounce sonradan atesler ve testin actigi klasoru kapatir.
+  // Ardindan debounce isinin bittigi gercek sinyali beklenir.
+  //
+  // Sinyal gelmezse test patlatilmaz: bu bir bekleme yardimcisi, dogrulanan
+  // davranis degil. Tavan sure sonunda devam edilir.
+  async function settleAfterResize(width, timeout = 3000) {
+    const startedAt = Date.now();
+    while (Date.now() - startedAt < timeout) {
+      if (await evaluate(`window.innerWidth === ${width}`)) break;
+      await delay(60);
+    }
+    while (Date.now() - startedAt < timeout) {
+      if (await evaluate("!window.__LAUNCHER_STATE__ || window.__LAUNCHER_STATE__.viewportWidth === window.innerWidth")) break;
+      await delay(60);
+    }
+    // Debounce, sinyal gorulduktan sonra re-render'i bitiriyor olabilir.
+    await delay(240);
   }
 
   async function waitFor(expression, timeout = 12000) {
@@ -303,7 +338,19 @@ async function runBrowser(browserConfig) {
         for (const [folderId, expectedCount, label] of [["preparation", 8, "Hazırlık"], ["games", 9, "Oyun Alanı"]]) {
           await evaluate(`window.openLauncherFolder('${folderId}', document.querySelector('[data-launcher-folder=${folderId}]'), false)`);
           await waitFor("document.querySelector('#launcherFolderLayer').classList.contains('is-open')")
-            .catch((error) => { throw new Error(`${tag}/${folderId}: klasör açılamadı (${error.message})`); });
+            .catch(async (error) => {
+              // Bu adim daha once sessizce zaman asimina dusuyordu; katman
+              // durumunu yaziyoruz ki bir daha olursa sebep hemen gorunsun.
+              const diag = await evaluate(`JSON.stringify({
+                hidden: document.querySelector('#launcherFolderLayer').hidden,
+                isOpen: document.querySelector('#launcherFolderLayer').classList.contains('is-open'),
+                openFolderId: window.__LAUNCHER_STATE__?.openFolderId,
+                device: window.__LAUNCHER_STATE__?.device,
+                viewportWidth: window.__LAUNCHER_STATE__?.viewportWidth,
+                innerWidth: window.innerWidth
+              })`);
+              throw new Error(`${tag}/${folderId}: klasör açılamadı (${error.message}) DURUM=${diag}`);
+            });
           const probedFolder = await evaluate(probeFolderExpr());
           if (folderId === "preparation") folder = probedFolder;
           assert.equal(probedFolder.count, expectedCount, `${tag}: ${label} klasörü ${expectedCount} uygulama içermiyor`);

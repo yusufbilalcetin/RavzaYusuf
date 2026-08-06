@@ -184,14 +184,36 @@ async function runBrowser(browserConfig) {
 
       // 4) Gerçek dokunmatik swipe (CDP Input.dispatchTouchEvent) boş alanda
       // sayfa değiştirmeli; grid ile dock arasındaki güvenli boşluğu hedefler.
+      // Sayfa kaydirma yalnizca BOS alandan baslatilabilir: launcher, bir
+      // uygulama ikonu veya slot uzerinden baslayan hareketi bilerek reddeder
+      // (bkz. swipePointerDown), yoksa ikon suruklemeyle catisirdi.
+      // "grid.bottom + 16" bu bosluga her zaman denk gelmiyordu; iki sayfali
+      // duzende nokta son ikon sirasinin uzerine dusuyor ve swipe hic
+      // baslamiyordu. Bu yuzden nokta varsayilmak yerine ARANIR.
+      // Sayfa gorunumunun dikey ortasindan yatay kaydirma. Ikonlarin uzerinden
+      // gecmesi sorun degil: launcher artik iOS gibi ikon uzerinden de
+      // kaydirmaya izin veriyor (bkz. swipePointerDown). Dar ekranda ikonlar
+      // tum alani doldurdugu icin "bos nokta" aramak zaten guvenilir degildi.
       const viewportBox = await evaluate(`(() => {
         const viewport = document.querySelector('#launcherPagesViewport').getBoundingClientRect();
-        const grid = document.querySelector('.launcher-grid').getBoundingClientRect();
-        const emptyY = Math.min(Math.max(grid.bottom + 16, viewport.top + 16), viewport.bottom - 16);
-        return { left: viewport.left, right: viewport.right, emptyY };
+        return {
+          startX: viewport.right - 16,
+          endX: viewport.left + 16,
+          midY: Math.round(viewport.top + viewport.height / 2)
+        };
       })()`);
-      await touchSwipe(viewportBox.right - 16, viewportBox.emptyY, viewportBox.left + 16, viewportBox.emptyY);
-      assert.equal(await evaluate("window.__LAUNCHER_STATE__.layout.activePage"), 1, `${tag}: gerçek touch swipe ikinci sayfaya geçmedi`);
+      // Swipe baslamazsa sebebi hata mesajindan gorulebilsin.
+      await evaluate(`window.__swipeStart = null;
+        document.addEventListener('pointerdown', (e) => {
+          window.__swipeStart = e.target.tagName + '.' + String(e.target.className || '').split(' ')[0];
+        }, true);
+        true`);
+      await touchSwipe(viewportBox.startX, viewportBox.midY, viewportBox.endX, viewportBox.midY);
+      const swipeStartTarget = await evaluate("window.__swipeStart");
+      assert.equal(
+        await evaluate("window.__LAUNCHER_STATE__.layout.activePage"), 1,
+        `${tag}: gerçek touch swipe ikinci sayfaya geçmedi (dokunulan öğe ${swipeStartTarget})`
+      );
       assert.equal(await evaluate("document.querySelector('[data-launcher-page-go=\"1\"]').classList.contains('is-active')"), true, `${tag}: swipe sonrası aktif nokta güncellenmedi`);
 
       // 5) Gerçek fare/dokunma tıklaması (CDP Input.dispatchMouseEvent) nokta

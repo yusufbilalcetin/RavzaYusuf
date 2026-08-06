@@ -70,6 +70,12 @@ export default function GameScreen({
     };
   }, [callbacks, level, reducedMotion]);
 
+  useEffect(() => {
+    const handleThemeChange = () => sceneRef.current?.refreshTheme();
+    window.addEventListener("app:theme-change", handleThemeChange);
+    return () => window.removeEventListener("app:theme-change", handleThemeChange);
+  }, []);
+
   const progressItems = stats?.goalProgress || [];
   const earnedStars = stats?.stars || 0;
   const meterPct = Math.min(100, Math.max(4, ((stats?.score || 0) / (level.moves * 180)) * 100));
