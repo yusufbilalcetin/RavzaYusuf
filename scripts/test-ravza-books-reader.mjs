@@ -964,6 +964,45 @@ try {
     assert.ok(g.scrollWidth <= g.scrollerWidth + 2, "sayfaya sığdırda yatay taşma olmamalı");
   });
 
+  await testCase("Ekranı Doldur yüksekliği doldurur, oranı korur, kırpmayı pan ile telafi eder", async () => {
+    assert.ok(await applyZoom("fill"), "Ekranı Doldur seçilebilmeli");
+    const g = await browser.evaluate(`(() => {
+      const base = ${ZOOM_GEOMETRY};
+      const root = document.getElementById('reader-inner');
+      const style = getComputedStyle(root);
+      base.chrome = (parseFloat(style.getPropertyValue('--reader-chrome-top')) || 0)
+        + (parseFloat(style.getPropertyValue('--reader-chrome-bottom')) || 0);
+      return base;
+    })()`);
+    const opening = g.scrollerHeight - g.chrome;
+    // Sayfa yuksekligi gorunur acikligi DOLDURMALI.
+    assert.ok(
+      Math.abs(g.pageHeight - opening) <= 3,
+      `Ekranı Doldur yüksekliği doldurmuyor (${g.pageHeight.toFixed(0)} / ${opening.toFixed(0)})`,
+    );
+    // Kirpma OLABILIR ama gezilebilir olmali - icerik erisilemez kalmamali.
+    if (g.pageWidth > g.scrollerWidth + 2) {
+      assert.equal(g.zoomed, "true", "kırpılmışsa yatay pan açık olmalı");
+      assert.ok(g.scrollWidth > g.scrollerWidth + 2, "kırpılan genişlik kaydırılabilir olmalı");
+    }
+    // Tuval yine gercek cozunurlukte cizilmeli (CSS germe yok).
+    const pixelRatio = g.canvasAttrWidth / Math.max(1, g.canvasCssWidth);
+    assert.ok(pixelRatio >= Math.min(g.dpr, 2) - 0.15, `Ekranı Doldur'da çözünürlük düştü (${pixelRatio.toFixed(2)})`);
+  });
+
+  await testCase("varsayılan kipler sayfadan içerik kırpmaz", async () => {
+    // §2.2: KIRPMA yalnizca kullanici acikca sectiginde olur.
+    for (const zoom of ["fit-page", "fit-width"]) {
+      assert.ok(await applyZoom(zoom), `${zoom} seçilebilmeli`);
+      const g = await browser.evaluate(ZOOM_GEOMETRY);
+      assert.ok(
+        g.pageWidth <= g.scrollerWidth + 2,
+        `${zoom} sayfayı yatayda kırpıyor (${g.pageWidth.toFixed(0)} > ${g.scrollerWidth})`,
+      );
+      assert.equal(g.zoomed, "false", `${zoom} sessizce yakınlaştırma yapmamalı`);
+    }
+  });
+
   await testCase("yakınlaştırma kalıcıdır ve bozuk değer güvenle düşer", async () => {
     assert.ok(await applyZoom(1.5), "%150 seçilebilmeli");
     const stored = await browser.evaluate("JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}').zoom");

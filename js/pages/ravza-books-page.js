@@ -81,10 +81,35 @@ const READER_MODES = Object.freeze(['page', 'scroll']);
  * GENISLIGE SIGDIR temel alinarak verilir: %100 === Genisliğe Sığdır, o da
  * ayri bir secenek olarak zaten listede.
  */
-const READER_ZOOMS = Object.freeze(['fit-page', 'fit-width', 1.25, 1.5, 2]);
+/*
+ * DEGERLENDIRILDI VE REDDEDILDI: PINCH VE CIFT DOKUNUS (§2.3 / §2.4).
+ *
+ * PINCH — kendi pinch'imizi yazmak, iki isaretciyi yakalamak demek; bu da
+ * yuzeye `touch-action: none` (ya da en azindan pan disi bir kisit) koymayi
+ * gerektirir. §2.5 bunu acikca yasakliyor ve hakli: dikey okuma kaydirmasi
+ * boylece olur. Alternatif olan NATIF pinch (`touch-action: pinch-zoom`)
+ * PDF'i degil TUM SAYFAYI (visual viewport) olceklendirir; okuyucu kabugu ve
+ * ortalanmis dialoglar bu projede VisualViewport olculerine bagli oldugu icin
+ * (centered-dialogs.css, --visual-viewport-*) natif pinch popup geometrisini
+ * de kaydirir. Iki yol da mevcut, calisan bir davranisi bozuyor.
+ *
+ * CIFT DOKUNUS — sahne zaten TEK dokunusta kontrolleri acip kapatiyor ve bu
+ * davranisin testi var ("kabuk dokunusla gizlenip geri gelir"). Cift dokunus
+ * eklemek, tek dokunusu ~300ms geciktirip "ikinci dokunus gelecek mi"
+ * beklemeyi zorunlu kilar; bu da calisan bir etkilesimi gozle gorulur sekilde
+ * hantallastirir. Gecikmesiz kurgu ise once kontrolleri acip hemen ardindan
+ * yakinlastirmak olurdu - goz alici bir zipzip.
+ *
+ * KARAR: ikisi de yok. Yakinlastirma acik, kesfedilebilir ve KLAVYEYLE de
+ * erisilebilir dugmelerden yapilir; jest destegi "olabilir" diye eklenip
+ * guvenilmez hale getirilmez. Platform destegi degisirse bu blok yeniden
+ * degerlendirilebilir.
+ */
+const READER_ZOOMS = Object.freeze(['fit-page', 'fit-width', 'fill', 1.25, 1.5, 2]);
 const ZOOM_LABELS = Object.freeze({
   'fit-page': 'Sayfaya Sığdır',
   'fit-width': 'Genişliğe Sığdır',
+  fill: 'Ekranı Doldur',
   1.25: '%125',
   1.5: '%150',
   2: '%200',
@@ -1122,14 +1147,17 @@ function buildReaderShell(book) {
         <button class="reader-action glass-surface${bookmarked ? ' is-active' : ''}" id="rdr-bookmark" type="button" aria-label="Yer imi" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}<span>Yer imi</span></button>
       </div>
 
+      <!-- Surukleme onizlemesi. Yalnizca ZATEN onbellekte olan kucuk resmi
+           gosterir; surukleme sirasinda YENI render tetiklenmez (§2.8).
+           Kabugun DISINDA, dock'un ustunde durur: scrubber'in hemen ustune
+           konumlandirildiginda aksiyon dugmelerinin uzerine biniyordu. -->
+      <span class="reader-scrub-preview" id="rdr-scrub-bubble" aria-hidden="true" hidden>
+        <img id="rdr-scrub-thumb" alt="" decoding="async" hidden />
+        <span id="rdr-scrub-text"></span>
+      </span>
+
       <label class="reader-scrubber">
         <span class="sr-only">Okuma ilerlemesi</span>
-        <!-- Surukleme onizlemesi. Yalnizca ZATEN onbellekte olan kucuk resmi
-             gosterir; surukleme sirasinda YENI render tetiklenmez (§2.8). -->
-        <span class="reader-scrub-preview" id="rdr-scrub-bubble" aria-hidden="true" hidden>
-          <img id="rdr-scrub-thumb" alt="" decoding="async" hidden />
-          <span id="rdr-scrub-text"></span>
-        </span>
         <input class="progress-range" id="rdr-progress" type="range" min="0" max="0" value="0" step="1" />
       </label>
       <p class="reader-position" id="rdr-progress-label">1 / 1</p>
@@ -1363,7 +1391,11 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
 function zoomFactor() {
   if (state.zoom === 'fit-width') return 1;
   if (typeof state.zoom === 'number') return state.zoom;
-  // fit-page
+  // fit-page ve fill AYNI olcuyu kullanir, yalnizca sinirlari farklidir:
+  //   fit-page -> yukseklige sigdir, ama 1'i ASMA (hicbir sey kirpilmaz)
+  //   fill     -> yukseklige sigdir, sinir YOK (genislik tasar, kirpilir)
+  // Kirpma yalnizca kullanici "Ekranı Doldur"u SECTIGINDE olur; varsayilan
+  // kiplerde sayfadan tek piksel gizlenmez (§2.2).
   const scroller = document.getElementById('rdr-flipbook');
   const root = document.getElementById('reader-inner');
   if (!scroller || !root) return 1;
@@ -1378,7 +1410,11 @@ function zoomFactor() {
   const ratio = Number.isFinite(pdfPageAspectRatio) && pdfPageAspectRatio > 0 ? pdfPageAspectRatio : 3 / 4;
   if (width < 2 || height < 2) return 1;
   // Sayfa yuksekligi = genislik / ratio. Yukseklige sigmasi icin gereken oran:
-  return clamp((height * ratio) / width, 0.2, 1);
+  const heightFit = (height * ratio) / width;
+  // En-boy orani her iki kipte de KORUNUR (tek bir carpan, gerilme yok).
+  return state.zoom === 'fill'
+    ? clamp(heightFit, 0.2, 4)
+    : clamp(heightFit, 0.2, 1);
 }
 
 /**

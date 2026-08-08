@@ -1303,12 +1303,12 @@ button {
   padding: 0 0.35rem;
 }
 
-/* Surukleme onizlemesi: slider'in ustunde, tutamagi izleyen kucuk balon.
-   `clamp` ile kenarlara yapismasi engellenir, boylece dar telefonda da
-   tamamen gorunur kalir. */
+/* Surukleme onizlemesi: DOCK'un ustunde yuzen, tutamagi yatayda izleyen balon.
+   Dock `position: fixed` oldugu icin kapsayici blok odur. `clamp` ile
+   kenarlara yapismasi engellenir, boylece dar telefonda da tamamen gorunur. */
 .reader-scrub-preview {
   position: absolute;
-  bottom: calc(100% + 0.35rem);
+  bottom: calc(100% + 0.5rem);
   left: clamp(2.6rem, var(--scrub-pct, 50%), calc(100% - 2.6rem));
   z-index: 2;
   display: grid;
