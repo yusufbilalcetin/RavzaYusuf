@@ -19,7 +19,7 @@
  *    geri getirilmedi. Spotlight henuz yok, olu dugme konmadi.
  */
 import { claimOverlay, registerOverlay, releaseOverlay } from "../core/overlay-manager.js";
-import { openWallpaperPanel, wallpaperModeLabel } from "./wallpaper-panel.js";
+import { openWallpaperPanel, wallpaperModeShortLabel } from "./wallpaper-panel.js";
 import { openThemeSheet } from "../core/theme.js";
 
 const DIALOG_ID = "control-center";
@@ -66,28 +66,33 @@ function markup() {
       <div class="cc-body">
         <section class="cc-group">
           <h3 class="cc-group-title" id="cc-system-title">Sistem</h3>
-          <div class="cc-tiles" role="group" aria-labelledby="cc-system-title">
-            <button class="cc-tile cc-tile--stacked" type="button" data-cc-action="wallpaper">
+          <!-- Sistem ve Hizli Uygulamalar AYRI gridlerdir: ikisi ayni sinifi
+               paylastiginda masaustundeki 4 sutunluk sablon iki sistem kartini
+               satirin sol yarisina sikistiriyordu. -->
+          <div class="cc-tiles cc-tiles--system" role="group" aria-labelledby="cc-system-title">
+            <button class="cc-tile cc-tile--system" type="button" data-cc-action="wallpaper">
               <span class="cc-tile-icon" aria-hidden="true">${ICONS.wallpaper}</span>
               <span class="cc-tile-text">
                 <span class="cc-tile-label">Arka Plan</span>
                 <!-- Ikincil etiket mevcut modu soyler: kullanici arka planin
                      neden degistigini (ya da degismedigini) anlar. -->
-                <span class="cc-tile-sub" id="cc-wallpaper-mode">${wallpaperModeLabel()}</span>
+                <span class="cc-tile-sub" id="cc-wallpaper-mode">${wallpaperModeShortLabel()}</span>
               </span>
             </button>
-            <button class="cc-tile" type="button" data-cc-action="settings">
+            <button class="cc-tile cc-tile--system" type="button" data-cc-action="settings">
               <span class="cc-tile-icon" aria-hidden="true">${ICONS.settings}</span>
-              <span class="cc-tile-label">Görünüm Ayarları</span>
+              <span class="cc-tile-text">
+                <span class="cc-tile-label">Görünüm Ayarları</span>
+              </span>
             </button>
           </div>
         </section>
 
         <section class="cc-group">
           <h3 class="cc-group-title" id="cc-apps-title">Hızlı Uygulamalar</h3>
-          <div class="cc-tiles" role="group" aria-labelledby="cc-apps-title">
+          <div class="cc-tiles cc-tiles--apps" role="group" aria-labelledby="cc-apps-title">
             ${QUICK_APPS.map((app) => `
-              <button class="cc-tile" type="button" data-cc-route="${app.route}">
+              <button class="cc-tile cc-tile--app" type="button" data-cc-route="${app.route}">
                 <span class="cc-tile-icon" aria-hidden="true">${ICONS[app.icon]}</span>
                 <span class="cc-tile-label">${app.label}</span>
               </button>`).join("")}
@@ -107,7 +112,7 @@ function markup() {
  */
 function syncControls() {
   const label = document.getElementById("cc-wallpaper-mode");
-  if (label) label.textContent = wallpaperModeLabel();
+  if (label) label.textContent = wallpaperModeShortLabel();
 }
 
 function ensureDialog() {
@@ -115,7 +120,9 @@ function ensureDialog() {
   if (existing) return existing;
   const node = document.createElement("dialog");
   node.id = DIALOG_ID;
-  node.className = "ui-sheet ui-dialog--medium control-center";
+  // --large (560px) sistem paneli olcusudur; --medium (420px) kartlari
+  // oyuncak boyutuna dusuruyordu. Genislik hala centered-dialogs'un isi.
+  node.className = "ui-sheet ui-dialog--large control-center";
   node.setAttribute("aria-labelledby", "cc-title");
   node.innerHTML = markup();
   document.body.appendChild(node);

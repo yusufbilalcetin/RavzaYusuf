@@ -61,6 +61,17 @@ export function wallpaperModeLabel() {
   return MODE_LABELS[getWallpaperState().mode] || MODE_LABELS.fixed;
 }
 
+/**
+ * Kutucuk icin KISA karsilik. Panelde "Her Ziyarette Rastgele" acikca yazar,
+ * ama Kontrol Merkezi kartinda bu ifade iki satira tasip kutuyu bozuyordu.
+ * Ayni duruma bakar - ikinci bir durum kaynagi degildir.
+ */
+const SHORT_MODE_LABELS = Object.freeze({ fixed: "Sabit", "random-session": "Rastgele" });
+
+export function wallpaperModeShortLabel() {
+  return SHORT_MODE_LABELS[getWallpaperState().mode] || SHORT_MODE_LABELS.fixed;
+}
+
 function markup() {
   const state = getWallpaperState();
   const current = currentTheme();

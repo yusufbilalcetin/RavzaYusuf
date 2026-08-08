@@ -2,34 +2,54 @@
    KONTROL MERKEZI
 
    Konum/genislik/VisualViewport davranisi components/centered-dialogs.css'ten
-   gelir (.ui-sheet + .ui-dialog--medium). Burada YALNIZCA panel ici duzen ve
+   gelir (.ui-sheet + .ui-dialog--large). Burada YALNIZCA panel ici duzen ve
    renk vardir - ikinci bir geometri sistemi yok.
 
-   Cam yalnizca DIS kabukta (.cc-panel .glass-surface--overlay). Ic gruplar
-   tonal/opak yuzeydir: cam icinde cam yok.
+   CAM YALNIZCA DIS KABUKTA (.cc-panel .glass-surface--overlay). Ic kartlar
+   tonal yuzeydir: hicbir kartta backdrop-filter yok, cam icinde cam yok.
+
+   RADIUS HIYERARSISI mevcut tokenlardan gelir, yeni deger uydurulmaz:
+     panel  --r-xl (30px)  >  sistem karti --r-lg (22px)  >  hizli app --r-md (18px)
    ========================================================================== */
 
 .control-center .cc-panel {
+  /* Panel dolgusu tek yerden: header ve govde ayni optik kenari paylasir. */
+  --cc-pad: 1.25rem;
+  --cc-tile-border: 1px solid color-mix(in srgb, var(--glass-text-primary, #1c1c1e) 8%, transparent);
+  /* Kart dolgusu panelden BIR KADEME belirgin. Metin renginden turetildigi
+     icin her iki temada da dogru yone gider: koyu temada kart aydinlanir,
+     acik temada koyulasir. Paylasilan --glass-bg-soft (%4) her ikisinde de
+     panelin icinde kayboluyordu. */
+  --cc-tile-bg: color-mix(in srgb, var(--glass-text-primary, #1c1c1e) 7%, transparent);
+  --cc-tile-bg-hover: color-mix(in srgb, var(--glass-text-primary, #1c1c1e) 12%, transparent);
+
   display: flex;
   flex-direction: column;
   max-height: 100%;
-  border-radius: var(--r-xl, 20px);
+  /* .ui-sheet-panel 24px dolgu verir; head/body kendi dolgusunu tasidigi icin
+     bu sifirlanir - aksi halde iki dolgu toplanip 56px'lik kenar olusuyordu. */
+  padding: 0;
+  border-radius: var(--r-xl, 30px);
 }
 
+/* --- Baslik --- */
 .control-center .cc-head {
   display: flex;
   flex: 0 0 auto;
   gap: 0.75rem;
   align-items: center;
   justify-content: space-between;
-  padding: 0.9rem 0.85rem 0.6rem 1.15rem;
+  /* Kapatma dugmesi 44px'lik hedefiyle sagda; optik hizasi icin sag dolgu
+     dugmenin gorsel dairesi kadar kisilir. */
+  padding: var(--cc-pad) var(--cc-pad) 0;
 }
 
 .control-center .cc-head h2 {
   margin: 0;
   color: var(--glass-text-primary, var(--text));
-  font: 600 1.12rem/1.2 var(--ui-font, system-ui);
-  letter-spacing: -0.02em;
+  /* Sistem UI fontu - Playfair gibi display font BURADA kullanilmaz. */
+  font: 600 1.4rem/1.2 var(--ui-font, system-ui);
+  letter-spacing: -0.022em;
 }
 
 .control-center .cc-close {
@@ -40,224 +60,226 @@
   height: 44px;
   padding: 0;
   color: var(--glass-text-secondary, var(--text-soft));
-  border: 0;
+  border: var(--cc-tile-border);
   border-radius: 50%;
-  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.12));
+  background: var(--cc-tile-bg);
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast, 150ms) var(--ease-out, ease),
+    transform var(--dur-fast, 150ms) var(--ease-out, ease);
+}
+
+.control-center .cc-close:hover {
+  background: var(--cc-tile-bg-hover);
+}
+
+.control-center .cc-close:active {
+  transform: scale(0.94);
 }
 
 .control-center .cc-close svg {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
 }
 
+/* --- Govde --- */
 .control-center .cc-body {
   display: grid;
   flex: 1 1 auto;
-  gap: 1.05rem;
+  /* Bolumler arasi nefes: baslik -> bolum ve bolum -> bolum ritmi. */
+  gap: 1.75rem;
   min-height: 0;
-  padding: 0.25rem 1.15rem 1.15rem;
+  padding: 1.5rem var(--cc-pad) var(--cc-pad);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
 .control-center .cc-group-title {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.7rem;
   color: var(--glass-text-secondary, var(--text-soft));
-  font: 600 0.72rem/1.2 var(--ui-font, system-ui);
-  letter-spacing: 0.05em;
+  font: 600 0.75rem/1.2 var(--ui-font, system-ui);
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
-/* --- Segmented (Tema / Liquid Glass) --- */
-.control-center .cc-segmented {
-  display: grid;
-  grid-auto-columns: 1fr;
-  grid-auto-flow: column;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 13px;
-  /* Tonal ic yuzey - cam DEGIL. */
-  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
-}
-
-.control-center .cc-segment {
-  min-height: 44px;
-  padding: 0 0.6rem;
-  color: var(--glass-text-secondary, var(--text-soft));
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  font: 600 0.88rem/1 var(--ui-font, system-ui);
-  cursor: pointer;
-  transition: background-color var(--dur-fast, 150ms) var(--ease-out, ease),
-    color var(--dur-fast, 150ms) var(--ease-out, ease);
-}
-
-.control-center .cc-segment.is-selected {
-  color: var(--glass-text-primary, var(--text));
-  background: var(--glass-bg-strong, rgba(255, 255, 255, 0.5));
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
-}
-
-/* --- Anahtar satiri --- */
-.control-center .cc-row {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  min-height: 52px;
-  padding: 0 0.85rem;
-  border-radius: 13px;
-  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
-}
-
-.control-center .cc-row-icon {
-  display: inline-grid;
-  flex: 0 0 auto;
-  place-items: center;
-  color: var(--glass-text-secondary, var(--text-soft));
-}
-
-.control-center .cc-row-icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.control-center .cc-row-label {
-  flex: 1 1 auto;
-  color: var(--glass-text-primary, var(--text));
-  font: 600 0.94rem/1.25 var(--ui-font, system-ui);
-}
-
-/* Dokunma hedefi 44px; gorsel ray 30px ve dikeyde ortalanir. */
-.control-center .cc-switch {
-  position: relative;
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  width: 52px;
-  min-height: 44px;
-  cursor: pointer;
-}
-
-.control-center .cc-switch input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-}
-
-.control-center .cc-switch-track {
-  position: relative;
-  width: 52px;
-  height: 30px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--glass-text-secondary, #6b7280) 32%, transparent);
-  transition: background-color var(--dur-fast, 150ms) var(--ease-out, ease);
-}
-
-.control-center .cc-switch-track::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
-  transition: transform var(--dur-fast, 150ms) var(--ease-out, ease);
-}
-
-.control-center .cc-switch input:checked + .cc-switch-track {
-  background: var(--glass-accent, var(--accent, #d4669c));
-}
-
-.control-center .cc-switch input:checked + .cc-switch-track::after {
-  transform: translateX(22px);
-}
-
-.control-center .cc-note {
-  margin: 0.4rem 0 0;
-  color: var(--glass-text-tertiary, var(--text-soft));
-  font: 500 0.76rem/1.35 var(--ui-font, system-ui);
-}
-
-/* --- Kutucuklar (sistem + hizli uygulamalar) --- */
+/* --- Kutucuk gridleri --- */
 .control-center .cc-tiles {
   display: grid;
+  gap: 0.75rem;
+}
+
+/* Sistem: HER ZAMAN iki genis kart. */
+.control-center .cc-tiles--system {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
 }
 
-.control-center .cc-tiles--wide {
-  grid-template-columns: minmax(0, 1fr);
+/* Hizli uygulamalar: mobilde 2x2, genis ekranda tek sirada dort. */
+.control-center .cc-tiles--apps {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
 }
 
+/* --- Ortak kart govdesi --- */
 .control-center .cc-tile {
   display: flex;
-  gap: 0.7rem;
+  flex-direction: column;
+  gap: 0.55rem;
   align-items: center;
-  min-height: 56px;
-  padding: 0 0.85rem;
+  /* Icerik dikeyde ortalanir. Metin alani her kartta ayni yuksekligi ayirdigi
+     icin ortalamak ikon ve baslik hizasini BOZMAZ, sadece alttaki olu bosluğu
+     ust ve alta esit dagitir. */
+  justify-content: center;
   color: var(--glass-text-primary, var(--text));
-  border: 0;
-  border-radius: 13px;
-  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
-  font: 600 0.88rem/1.25 var(--ui-font, system-ui);
-  text-align: left;
+  /* Kartlarin kendi golgesi YOK: derinlik yalnizca panelde. */
+  border: var(--cc-tile-border);
+  background: var(--cc-tile-bg);
+  font: 600 0.9rem/1.3 var(--ui-font, system-ui);
+  text-align: center;
   cursor: pointer;
-  transition: background-color var(--dur-fast, 150ms) var(--ease-out, ease);
+  transition:
+    background-color var(--dur-fast, 150ms) var(--ease-out, ease),
+    border-color var(--dur-fast, 150ms) var(--ease-out, ease),
+    transform var(--dur-fast, 150ms) var(--ease-out, ease);
 }
 
 .control-center .cc-tile:hover {
-  background: var(--glass-bg-hover, rgba(120, 120, 130, 0.16));
+  border-color: color-mix(in srgb, var(--glass-text-primary, #1c1c1e) 14%, transparent);
+  background: var(--cc-tile-bg-hover);
+  transform: translateY(-1px);
+}
+
+.control-center .cc-tile:active {
+  transform: scale(0.985);
+}
+
+/* Halka kartin GERCEK gorsel sahibine cizilir; radius kartin radiusunu izler. */
+.control-center .cc-tile:focus-visible,
+.control-center .cc-close:focus-visible {
+  outline: 2px solid var(--focus-ring, var(--accent, #d4669c));
+  outline-offset: 2px;
 }
 
 .control-center .cc-tile-icon {
   display: inline-grid;
   flex: 0 0 auto;
   place-items: center;
+  /* Accent YALNIZCA ikonda - kart yuzeyi pembeye boyanmaz. */
   color: var(--glass-accent, var(--accent, #d4669c));
 }
 
-.control-center .cc-tile-icon svg {
-  width: 21px;
-  height: 21px;
+.control-center .cc-tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .control-center .cc-tile-label {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 
-/* Tablet/masaustunde daha kompakt: dort sutun hizli uygulama. */
+.control-center .cc-tile-sub {
+  color: var(--glass-text-secondary, var(--text-soft));
+  font: 500 0.78rem/1.25 var(--ui-font, system-ui);
+}
+
+/* --- Sistem karti --- */
+.control-center .cc-tile--system {
+  min-height: 124px;
+  padding: 1.05rem 0.85rem;
+  border-radius: var(--r-lg, 22px);
+}
+
+.control-center .cc-tile--system .cc-tile-icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+.control-center .cc-tile--system .cc-tile-label {
+  font-size: 0.95rem;
+}
+
+/* Ikincil satir HER IKI kartta da yer kaplar: boylece iki kartin basliklari
+   ayni taban cizgisinde durur, "Sabit" etiketi digerini asagi kaydirmaz. */
+.control-center .cc-tile--system .cc-tile-text {
+  min-height: 2.55em;
+}
+
+/* --- Hizli uygulama karti --- */
+.control-center .cc-tile--app {
+  gap: 0.45rem;
+  min-height: 88px;
+  padding: 0.85rem 0.5rem;
+  border-radius: var(--r-md, 18px);
+  /* Cok hafif kenar: hizli uygulamalar hiyerarsinin en altinda. */
+  border-color: color-mix(in srgb, var(--glass-text-primary, #1c1c1e) 5%, transparent);
+  font-size: 0.82rem;
+}
+
+.control-center .cc-tile--app .cc-tile-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+/* Iki satirlik sabit baslik alani: "Ravza Books" iki satira, "Oyun Alanı"
+   tek satira dustugunde kartlar ayni yukseklikte ve ikonlar ayni hizada kalir. */
+.control-center .cc-tile--app .cc-tile-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.6em;
+}
+
 @media (min-width: 720px) {
-  .control-center .cc-tiles {
+  .control-center .cc-panel {
+    --cc-pad: 2rem;
+  }
+
+  .control-center .cc-tiles--apps {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  /* Tek ogeli grup dort sutuna DUSMEZ: aksi halde "Duvar Kağıdı ve Tema"
-     dar bir kutuya sikisip uc satira kiriliyordu. */
-  .control-center .cc-tiles--wide {
-    grid-template-columns: minmax(0, 1fr);
+  .control-center .cc-tile--system {
+    min-height: 132px;
+  }
+}
+
+/* Acilis: opaklik + cok kucuk olcek. Yay/asma (overshoot) yok. */
+@keyframes cc-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
   }
 
-  .control-center .cc-tiles--wide .cc-tile {
-    flex-direction: row;
-    justify-content: flex-start;
-    min-height: 56px;
-    text-align: left;
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.control-center[open] .cc-panel {
+  animation: cc-enter var(--dur-base, 220ms) var(--ease-out, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control-center[open] .cc-panel {
+    animation-name: none;
   }
 
-  .control-center .cc-tile {
-    flex-direction: column;
-    gap: 0.4rem;
-    justify-content: center;
-    min-height: 84px;
-    padding: 0.7rem 0.5rem;
-    text-align: center;
+  /* Hareket kisitliyken kartlar yer degistirmez; tonal geri bildirim kalir. */
+  .control-center .cc-tile:hover,
+  .control-center .cc-tile:active,
+  .control-center .cc-close:active {
+    transform: none;
+  }
+}
+
+/* Zorlanmis renklerde kartlarin sinirlari sistem renginden gorunsun. */
+@media (forced-colors: active) {
+  .control-center .cc-tile,
+  .control-center .cc-close {
+    border: 1px solid ButtonBorder;
   }
 }
 

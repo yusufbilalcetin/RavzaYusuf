@@ -35,6 +35,7 @@
     "test:wallpaper": "node ./scripts/test-wallpaper.mjs",
     "test:spotlight": "node ./scripts/test-spotlight.mjs",
     "test:control-center": "node ./scripts/test-control-center.mjs",
+    "test:control-center:visual": "node ./scripts/test-control-center-visual.mjs",
     "test:overlay-manager": "node ./scripts/test-overlay-manager.mjs",
     "test:ui-primitives": "node ./scripts/test-ui-primitives.mjs",
     "test:home-hero": "node ./js/pages/ana-sayfa-rastgele-gorsel.test.mjs",
