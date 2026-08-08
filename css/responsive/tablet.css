@@ -93,10 +93,13 @@
 
   .source-table { min-width: 440px; }
 
+  /* Ortalanmis diyalog (eskiden alttan sheet). */
   .theme-sheet {
-    left: 6px !important;
-    right: 6px !important;
-    bottom: 6px !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: min(calc(100vw - 12px), 460px) !important;
     padding: 14px;
     border-radius: 18px;
   }
@@ -118,10 +121,11 @@
 @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
   .hero { padding: 18px; }
   .hero h1 { font-size: 20px; }
+  /* Alcak yatay ekran: yine ortalanmis, yalnizca yukseklik tavani daralir. */
   .theme-sheet {
-    top: 10px !important;
-    bottom: 10px !important;
-    max-height: calc(100vh - 20px);
+    top: 50% !important;
+    bottom: auto !important;
+    max-height: calc(var(--visual-viewport-height, 100dvh) - 20px);
     overflow-y: auto;
   }
 }
@@ -237,12 +241,6 @@
   .primary-btn,
   .secondary-btn,
   .ghost-btn { padding: 10px 14px; font-size: 13px; }
-}
-
-@media (max-width: 360px) {
-  .theme-sheet-grid {
-    grid-template-columns: 1fr !important;
-  }
 }
 
 @media (min-width: 720px) {

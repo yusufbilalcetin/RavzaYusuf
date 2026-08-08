@@ -52,6 +52,12 @@ async function runBrowser(browserConfig) {
   const profile = join(tmpdir(), `ravza-launcher-mobile-nav-${browserConfig.name}-${Date.now()}`);
   const browserProcess = spawn(browserConfig.path, [
     "--headless=new", "--disable-gpu", "--no-first-run",
+    // Tarayici uzantilari devre disi: Edge kendi Copilot/Assistant uzantisini
+    // enjekte ediyor ve onun hatalari ("AssistantLoadState already declared",
+    // "runtime.lastError") uygulama hatasi sayilip testi dusuruyordu.
+    // Ayni bayrak scripts/lib/theme-test-runtime.mjs ve test-all-applications
+    // icinde zaten var; bu dosyalarda eksik kalmisti.
+    "--disable-extensions", "--disable-background-networking", "--no-default-browser-check",
     `--remote-debugging-port=${browserConfig.port}`, `--user-data-dir=${profile}`, "about:blank"
   ], { stdio: "ignore" });
 

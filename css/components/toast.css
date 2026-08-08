@@ -1,1 +1,97 @@
-/* components/toast.css */
+/* =========================================================================
+   TOAST — kisa, engellemeyen bildirim
+
+   Bu dosya daha once 28 bayttan ibaretti (yalniz bir yorum satiri); projede
+   paylasilan bir toast yoktu ve basari mesajlari native alert() ile
+   gosteriliyordu. js/ui/sheet.js showToast() bu siniflari kullanir.
+
+   Toast BUTON ICERMEZ. Bu bilincli: test-launcher.mjs gorunur her
+   button/a[href] elemaninin >= 43.5px olmasini sart kosuyor; metin-only bir
+   bildirim o taramaya hic girmez ve boyut kisiti yaratmaz.
+   ========================================================================= */
+
+.ui-toast-host {
+  position: fixed;
+  /* Dock ana ekranda altta duruyor; toast onun ustunde kalmali. Diger
+     route'larda dock gizli, fazladan bosluk zararsiz. */
+  bottom: calc(var(--launcher-bottom, 14px) + 84px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+
+  width: max-content;
+  max-width: min(92vw, 420px);
+  /* Host hicbir zaman tiklamayi yakalamaz; icerik akisini engellememeli. */
+  pointer-events: none;
+}
+
+.ui-toast {
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, .18));
+
+  background: var(--liquid-tinted-fill, rgba(24, 16, 32, .88));
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: 0 12px 34px var(--liquid-depth-shadow, rgba(7, 3, 14, .3));
+
+  color: var(--text-primary);
+  font-size: var(--font-subheadline-size);
+  line-height: var(--font-subheadline-line);
+  letter-spacing: var(--font-subheadline-track);
+  font-weight: 500;
+  text-align: center;
+  text-wrap: balance;
+
+  opacity: 0;
+  transform: translateY(12px) scale(.96);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.ui-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* --- Erisilebilirlik geri cekilmeleri ------------------------------------ */
+
+@media (prefers-reduced-transparency: reduce) {
+  .ui-toast {
+    background: var(--glass-surface-base) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .ui-toast {
+    background: var(--glass-surface-base) !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-toast {
+    color: CanvasText !important;
+    background: Canvas !important;
+    border: 1px solid CanvasText !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* base/animasyonlar.css'teki kanonik blok zaten tum gecisleri .01ms'e
+   indiriyor; burada ayrica transform'u sifirliyoruz ki hareket hic olmasin. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-toast,
+  .ui-toast.is-visible {
+    transform: none;
+  }
+}

@@ -5,6 +5,7 @@ import {
   saveCompleted, readCompletedIndex, loadCompleted, deleteCompleted
 } from "../utils/pbn-store.js?v=alan-bulmacasi-20260710-1";
 import { pbnLog } from "../utils/pbn-debug.js?v=alan-bulmacasi-20260710-1";
+import { uiAlert, showToast } from "../ui/sheet.js";
 
 // Eski detay oranı korunur: 128 -> 5000px. Diğer seviyeler de aynı
 // oranla büyütülür: 32 -> 1250px, 56 -> 2188px, 88 -> 3438px.
@@ -228,7 +229,7 @@ const TEMPLATE = `
     <div class="pbn-inline-toast pbn-app-error-toast" id="pbnAppErrorToast"></div>
     <div class="pbn-screen pbn-screen-home is-active" data-pbn-screen="home">
       <div class="pbn-hero">
-        <img class="pbn-brand-logo" src="./assets/icons/games/boyama.png" alt="Boyama logosu" width="1024" height="1024" loading="eager" decoding="async" />
+        <img class="pbn-brand-logo" src="./assets/icons/games/128/boyama.png" srcset="./assets/icons/games/128/boyama.png 1x, ./assets/icons/games/256/boyama.png 2x" alt="Boyama logosu" width="1024" height="1024" loading="eager" decoding="async" />
         <div class="pbn-hero-copy">
           <span class="unit-badge">Boyama stüdyosu</span>
           <h2>Numaraya Göre Boyama</h2>
@@ -338,7 +339,7 @@ const TEMPLATE = `
       <div class="pbn-paint-header">
         <button type="button" class="pbn-tool-btn" id="pbnBackBtn" title="Ana ekrana dön">←</button>
         <span class="pbn-paint-logo" aria-hidden="true">
-          <img src="./assets/icons/games/boyama.png" alt="" width="1024" height="1024" loading="eager" decoding="async" />
+          <img src="./assets/icons/games/128/boyama.png" srcset="./assets/icons/games/128/boyama.png 1x, ./assets/icons/games/256/boyama.png 2x" alt="" width="1024" height="1024" loading="eager" decoding="async" />
         </span>
         <div class="pbn-paint-progress">
           <div class="pbn-paint-progress-track">
@@ -1443,7 +1444,7 @@ export function renderBoyamaApp(target, options = {}) {
     }
     downloadBlob(blob, filename);
     if (options.galleryIntent) {
-      alert(phoneSaveCopy.fallbackMessage);
+      uiAlert(phoneSaveCopy.fallbackMessage, { title: "Kaydetme" });
     }
     return false;
   }

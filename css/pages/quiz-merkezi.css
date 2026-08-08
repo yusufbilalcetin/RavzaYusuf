@@ -28,6 +28,10 @@
 
 #quizhub .quiz-badge {
   background: linear-gradient(135deg, #f06f9e, #ff9fc0);
+  /* Taban .quiz-badge mor gradyan + beyaz metin; buradaki override zemini açık
+     pembeye çevirdiği halde rengi devralıyordu -> 2.46-3.08:1. Koyu mürekkep
+     bu pembelerde 6.60-9.70:1. (Mor tabanda beyaz doğru, ona dokunulmadı.) */
+  color: var(--text-on-accent);
 }
 
 #quizhub .hub-search::placeholder {
@@ -72,17 +76,24 @@
 }
 
 #quizhub .primary-btn {
-  background: linear-gradient(135deg, #7b1731, #a51f4a);
+  /* iOS butonu duz dolgudur; gradyan web dili. Iki durak arasindaki
+     duz ton secildi: beyaz metinle kontrast korunuyor (~8:1) ve
+     noel-ask bordo kimligi ayni kaliyor. */
+  background: #8d1b3c;
+  /* Bkz. calisma-merkezi.css - aynı koyu bordo gradyan, aynı gerekçe. */
+  color: var(--text-inverse);
 }
 
 #quizhub .mark-btn,
 #quizhub .mark-btn.done {
-  background: #10b981;
-  color: #fff;
-  border-color: #10b981;
+  /* Beyaz metin --success üstünde 2.54:1. Koyu mürekkep: 7.32:1. */
+  background: var(--success);
+  color: var(--text-on-accent);
+  border-color: var(--success);
 }
 
 #quizhub .helper-line {
-  color: rgba(240, 220, 232, 0.70);
+  /* .70 alfa mor kart zemininde 2.90:1 veriyordu. */
+  color: rgb(248, 238, 245);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }

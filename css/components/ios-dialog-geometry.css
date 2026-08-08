@@ -1,0 +1,263 @@
+/* =========================================================================
+   iOS SHEET GEOMETRISI — MEVCUT DIYALOGLAR
+
+   Projedeki 4 eski diyalog web tarzi "ekranin ortasinda kutu" seklindeydi.
+   iPhone'da dogal olan alttan gelen sheet'tir. Bu dosya YALNIZCA GEOMETRI
+   degistirir - renk, cam malzemesi, gecis suresi ve DOM'a dokunmaz. Cam
+   malzemesi themes/liquid-glass-optics.css'te tanimli kalir.
+
+   NEDEN AYRI DOSYA VE NEDEN EN SONDA:
+   Bu 4 diyalogun konumu 4-6 ayri dosyaya dagilmis durumda (tipografi.css,
+   pages/*.css, responsive/mobil.css, responsive/tablet.css, launcher.css).
+   Ozellikle .pbn-modal'i layout/launcher.css (import 47) da bicimlendiriyor,
+   yani duzen-son.css (46) bile geride kalirdi. Manifestin en sonuna alinan
+   bu dosya, hiçbir !important'a ihtiyac duymadan son sozu soyleyebiliyor.
+
+   YALNIZCA MOBILDE (<640px): masaustunde ortalanmis panel zaten dogru
+   davranis, orada sheet'e cevirmek kazanc saglamaz.
+
+   Iki farkli yapi var, ikisi de kendi dogal yolundan cozuluyor:
+     A) Flex ile ortalanan cocuk (.kahoot-modal, .pbn-modal)
+        -> backdrop'un align-items'i flex-end yapilir. Transform cerrahisi yok.
+     B) position:fixed + translate(-50%,-50%) ile ortalanan
+        (.exam-cancel-dialog, .exam-history-modal)
+        -> hem kapali hem .open transform'u ezilir.
+   ========================================================================= */
+
+/* =========================================================================
+   TEMA PANELİ → iOS AYARLAR (inset-grouped)
+
+   DOM'a HİÇ dokunulmuyor. theme.js şu kancalara bağlı ve hepsi aynen kalıyor:
+   #theme-sheet, #theme-sheet-backdrop, [data-theme-sheet-close],
+   .theme-mode-control [data-theme-mode], .theme-choice-card[data-theme-id],
+   .mode-toggle-icon, .open/.active/aria-pressed/aria-selected.
+
+   Şans eseri mevcut işaretleme zaten bir iOS ayar satırının tam karşılığı:
+   .theme-choice-preview (renk örneği) + .theme-choice-meta (başlık + açıklama)
+   + .theme-choice-check (onay işareti). 2 kolonlu kart ızgarası tek kolonlu
+   listeye çevrilince gerçek Ayarlar görünümü çıkıyor.
+   ========================================================================= */
+
+/* Tema listesi: 2 kolon kart → tek kolon satır listesi. */
+.theme-sheet-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-radius: var(--r-md);
+  border: 1px solid var(--separator);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.theme-choice-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: var(--tap);
+  padding: var(--s-3) var(--s-4);
+  border: 0;
+  /* Ayırıcı yalnızca satır ARASINDA; grup kenarlığı listede. */
+  border-bottom: 1px solid var(--separator);
+  border-radius: 0;
+  background: none;
+  text-align: left;
+}
+
+.theme-choice-card:last-child { border-bottom: 0; }
+
+/* tema-paneli.css satirlari tek tek "kart" gibi gosteriyordu: hover'da
+   translateY + accent kenarlik, secilide 2px'lik accent halkasi ve shadow-md.
+   Gruplanmis listede satir yukselmez, yalnizca zemini degisir. */
+.theme-choice-card:hover {
+  background: var(--surface-hover);
+  transform: none;
+  border-color: var(--separator);
+  box-shadow: none;
+}
+
+.theme-choice-card.active {
+  background: var(--surface-selected);
+  border-color: var(--separator);
+  box-shadow: none;
+}
+
+/* Onay isareti dolgulu bir rozet degil, sade bir accent tik olmali. */
+.theme-choice-card.active .theme-choice-check {
+  background: none;
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+/* Renk örneği: iOS ayar satırındaki ikon yuvası ölçüsünde. */
+.theme-choice-preview {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--separator);
+}
+
+.theme-choice-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.theme-choice-meta strong {
+  font-size: var(--font-callout-size);
+  line-height: var(--font-callout-line);
+  letter-spacing: var(--font-callout-track);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.theme-choice-meta small {
+  font-size: var(--font-footnote-size);
+  line-height: var(--font-footnote-line);
+  color: var(--text-secondary);
+  /* Ayar satırı tek satırlık kalmalı; uzun Türkçe açıklamalar sarmasın. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Onay işareti iOS'ta seçili satırın SAĞINDA, aksan renginde, kutusuz durur. */
+.theme-choice-card .theme-choice-check {
+  position: static;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: none;
+  color: var(--accent-ink);
+  opacity: 0;
+}
+
+.theme-choice-card.active .theme-choice-check { opacity: 1; }
+
+.theme-choice-card .theme-choice-check svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Grup başlığı (iOS'ta grubun ÜSTÜNDE, küçük ve geniş aralıklı). */
+.theme-mode-section {
+  border-radius: var(--r-md);
+  border: 1px solid var(--separator);
+  background: var(--bg-surface);
+}
+
+@media (max-width: 639px) {
+
+  /* --- A) Flex ile ortalananlar ----------------------------------------- */
+
+  .kahoot-modal-backdrop,
+  .pbn-modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .kahoot-modal,
+  .pbn-modal {
+    width: 100%;
+    max-width: none;
+    /* Alttan gelen sheet: yalniz ust koseler yuvarlak. */
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    /* Home indicator bolgesine denk gelmesin. */
+    padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+    max-height: 88dvh;
+    overflow-y: auto;
+  }
+
+  /* --- B) translate ile ortalananlar ------------------------------------ */
+
+  .exam-cancel-dialog,
+  .exam-history-modal {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: none;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
+    /* Kapali durum: ekranin altinda bekler. scale KULLANILMAZ - alttan gelen
+       bir sheet'te olcek degisimi yapay durur, iOS yalnizca kaydirir. */
+    transform: translateY(100%);
+  }
+
+  .exam-cancel-dialog.open,
+  .exam-history-modal.open {
+    transform: translateY(0);
+  }
+
+  .exam-history-modal {
+    /* Grid satirlari (baslik + kaydirilabilir govde) korunur; yalnizca
+       yukseklik tavani sheet'e gore ayarlanir. */
+    max-height: 88dvh;
+  }
+
+  /* Hareket azaltma istendiginde kaydirma da olmamali: panel oldugu yerde
+     belirsin. base/animasyonlar.css sureyi zaten .01ms'e indiriyor, burada
+     transform'u notr birakiyoruz ki sheet ekran disinda takili kalmasin. */
+  @media (prefers-reduced-motion: reduce) {
+    .exam-cancel-dialog,
+    .exam-history-modal {
+      transform: translateY(100%);
+    }
+
+    .exam-cancel-dialog.open,
+    .exam-history-modal.open {
+      transform: translateY(0);
+    }
+  }
+
+  /* --- Tema paneli de alttan gelen bir sheet olur --------------------- */
+
+  .theme-sheet {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    max-height: 86dvh;
+    padding: var(--s-3) var(--s-4) max(var(--s-5), env(safe-area-inset-bottom));
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    border-bottom: 0;
+    /* Kapali durum: asagida bekler (kaybolarak degil, kayarak). */
+    transform: translateY(100%);
+  }
+
+  .theme-sheet.open { transform: translateY(0); }
+
+  /* Suruklenebilirlik ipucu (drag indicator). Yalnizca gorsel; panel zaten
+     [data-theme-sheet-close] ve Escape ile kapaniyor. */
+  .theme-sheet .theme-sheet-head::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 36px;
+    height: 5px;
+    border-radius: var(--r-pill);
+    background: var(--separator-strong);
+    transform: translateX(-50%);
+  }
+
+  .theme-sheet .theme-sheet-head {
+    position: relative;
+    padding-top: var(--s-4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-sheet { transform: translateY(100%); }
+    .theme-sheet.open { transform: translateY(0); }
+  }
+}

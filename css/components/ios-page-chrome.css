@@ -1,0 +1,512 @@
+/* =========================================================================
+   iOS SAYFA KABUĞU — içerik sayfalarının ortak görünümü
+
+   Launcher (ana ekran) zaten iOS dilinde. Bu dosya AYNI dili içerik
+   sayfalarına taşır: başlık hiyerarşisi, kart yüzeyleri, araç çubuğu, liste
+   satırları, boş/yükleniyor/hata durumları.
+
+   TEMEL İLKE (brief §55): cam malzeme içerikten daha dikkat çekici olmamalı.
+   iOS'ta cam YALNIZCA kabuğundur - navigation bar, dock, sheet. İçerik ise
+   sakin, opak yüzeylerde durur. Bu projede tam tersi olmuştu: sayfalar
+   tam-ekran bir illüstrasyonun üstünde duruyor ve .topic-card'ın HİÇ zemini
+   yoktu (background: rgba(0,0,0,0)), yani rozet/başlık/açıklama doğrudan
+   fotoğrafın üstüne düşüyordu. Okunabilirlik kadraja göre değişiyordu; kontrast
+   raporundaki 4825 hatanın büyük bölümü buradan geliyor.
+
+   Manifestin sonunda import edilir: bu kuralların üzerine yazması gereken
+   dosyalar (tipografi.css, pages/*, responsive/*, duzen-son.css) daha önce
+   gelir. Böylece !important'a ihtiyaç duyulmuyor.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   1) SAYFA ZEMİNİ — illüstrasyonun üstüne sakinleştirici katman
+
+   Sayfa illüstrasyonları #<id>.active::before ile z-index:-3'te, fixed olarak
+   çiziliyor (tipografi.css). Aralarına ::after ile bir scrim koyuyoruz:
+   fotoğraf kimliği korunuyor ama içerik okunabilir bir zemine oturuyor.
+   Aynı teknik launcher'da .launcher-home-scrim ile zaten kullanılıyor.
+   ------------------------------------------------------------------------- */
+
+#studyhub.active::after,
+#quizhub.active::after,
+#studydetail.active::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2; /* illüstrasyon -3, içerik 0+ */
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 6, 14, .58) 0%,
+    rgba(10, 6, 14, .48) 38%,
+    rgba(10, 6, 14, .56) 70%,
+    rgba(10, 6, 14, .70) 100%
+  );
+}
+
+body:not(.dark) :is(#studyhub, #quizhub, #studydetail).active::after {
+  background: linear-gradient(
+    180deg,
+    rgba(18, 10, 20, .46) 0%,
+    rgba(18, 10, 20, .36) 38%,
+    rgba(18, 10, 20, .44) 70%,
+    rgba(18, 10, 20, .58) 100%
+  );
+}
+
+/* -------------------------------------------------------------------------
+   2) SAYFA BAŞLIĞI — iOS large title
+   ------------------------------------------------------------------------- */
+
+.page.active > .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  /* Eskiden altında ayırıcı çizgi vardı; iOS large title'ın altında çizgi
+     olmaz, boşluk yeter. */
+  margin-bottom: var(--s-6);
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.page-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.page-header-left h2,
+.page .hub-title {
+  font-family: var(--font-ui);
+  font-size: var(--font-large-title-size);
+  line-height: var(--font-large-title-line);
+  letter-spacing: var(--font-large-title-track);
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.page-header .subtitle {
+  max-width: 62ch;
+  font-size: var(--font-subheadline-size);
+  line-height: var(--font-subheadline-line);
+  letter-spacing: var(--font-subheadline-track);
+  text-wrap: pretty;
+}
+
+/* Bölüm etiketi (STUDY HUB / QUIZ HUB ...) - iOS'ta bu bir "eyebrow"dur:
+   küçük, geniş harf aralıklı, ikincil. Kutu gibi görünmemeli. */
+.page-header .unit-badge {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  font-size: var(--font-caption2-size);
+  letter-spacing: .1em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* -------------------------------------------------------------------------
+   3) KART YÜZEYLERİ — en önemli düzeltme
+
+   .topic-card'ın zemini yoktu. iOS'ta içerik kartı opak bir "grouped"
+   yüzeydir; arkasındaki fotoğraf kartın ETRAFINDA görünür, İÇİNDEN değil.
+   Bilerek backdrop-filter KULLANILMIYOR: bir ızgarada 20+ kartın her birine
+   blur koymak performansı düşürür (brief §36) ve zaten okunabilirlik için
+   gereken şey opaklık.
+   ------------------------------------------------------------------------- */
+
+/* Seçici ağırlığı bilinçli: tipografi.css'te `#studyhub .topic-card` (1,1,0)
+   ve `!important` ile `rgba(16, 9, 23, .58)` veriliyordu - koyu illüstrasyon
+   üzerinde koyu-üstüne-koyu %58 olduğu için kartın sınırı hiç görünmüyordu.
+   `#page-root .page.active` (1,3,0) o kuralı ID'siz aşmanın en ucuz yolu. */
+#page-root .page.active :is(.topic-card, .content-card, .quiz-card, .sinav-karti, .side-card) {
+  background: color-mix(in srgb, var(--bg-surface) 97%, transparent) !important;
+  border: 1px solid var(--separator) !important;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+#page-root .page.active :is(.topic-card, .content-card):hover {
+  border-color: var(--separator-strong) !important;
+  box-shadow: var(--shadow-md);
+}
+
+/* Kart içi tipografi + mürekkep.
+
+   ÖNEMLİ: kart metinleri `#studyhub .topic-card h3 { color: #f8eaf0 }` gibi
+   SABİT açık renklerle ve koyu text-shadow'larla yazılmıştı, çünkü kart eskiden
+   her iki modda da koyu yarı saydam bir dolguydu. Kart artık `--bg-surface`
+   ile tema ile birlikte döndüğü için o sabit renkler açık modda beyaz-üstüne-
+   beyaz veriyor. Mürekkep de tokena bağlanmalı.
+
+   text-shadow da kaldırılıyor: opak bir kart yüzeyinde gölgenin işlevi yok,
+   yalnızca metni kirletiyor (aynı gerekçe launcher etiketlerinde de geçerliydi). */
+#page-root .page.active :is(.topic-card, .content-card) {
+  color: var(--text-primary) !important;
+}
+
+#page-root .page.active :is(.topic-card, .content-card) :is(h3, .topic-title) {
+  color: var(--text-primary) !important;
+  font-size: var(--font-headline-size);
+  line-height: var(--font-headline-line);
+  letter-spacing: var(--font-headline-track);
+  font-weight: var(--font-headline-weight);
+  text-shadow: none !important;
+}
+
+#page-root .page.active :is(.topic-card, .content-card) :is(p, .topic-desc, .topic-sub) {
+  color: var(--text-secondary) !important;
+  font-size: var(--font-footnote-size);
+  line-height: var(--font-footnote-line);
+  text-shadow: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   4) ARAÇ ÇUBUĞU / ARAMA / GÖSTERGE
+   ------------------------------------------------------------------------- */
+
+.page.active .hub-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.page.active .hub-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  font-size: var(--font-footnote-size);
+  color: var(--text-secondary);
+}
+
+.page.active .hub-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* İllüstrasyonlu sayfalarda KART DIŞINDA kalan metin (başlık, alt başlık,
+   gösterge) doğrudan fotoğrafın üstünde duruyor. Launcher etiketleriyle aynı
+   dil: geniş yarıçaplı, düşük alfalı yumuşak hale - siyah kontur değil.
+   Kart İÇİ metinler bunun dışında; onların arkasında opak yüzey var. */
+:is(#studyhub, #quizhub, #studydetail).active
+  :is(.page-header .subtitle, .hub-legend, .hub-legend span) {
+  color: rgba(255, 255, 255, .88);
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, .34),
+    0 2px 12px rgba(0, 0, 0, .24);
+}
+
+:is(#studyhub, #quizhub, #studydetail).active .page-header-left h2 {
+  text-shadow:
+    0 1px 4px rgba(0, 0, 0, .32),
+    0 3px 18px rgba(0, 0, 0, .26);
+}
+
+/* -------------------------------------------------------------------------
+   5) BOŞ / YÜKLENİYOR / HATA DURUMLARI
+
+   Brief §43-45: "Veri yok" yazıp geçmek yerine ikon + başlık + açıklama.
+   .empty-grid ve .empty-state projede zaten üretiliyor (app.js, router.js,
+   compatibility.js, legacy-app.js), bu yüzden yeni sınıf uydurulmadı -
+   var olanlar iOS görünümüne çekildi.
+   ------------------------------------------------------------------------- */
+
+.page.active :is(.empty-grid, .empty-state, .exam-empty-state) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 220px;
+  padding: var(--s-6) var(--s-5);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--separator);
+  background: color-mix(in srgb, var(--bg-surface) 82%, transparent);
+  color: var(--text-secondary);
+  font-size: var(--font-subheadline-size);
+  line-height: var(--font-subheadline-line);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.page.active :is(.empty-grid, .empty-state) strong {
+  color: var(--text-primary);
+  font-size: var(--font-headline-size);
+  font-weight: var(--font-headline-weight);
+}
+
+/* -------------------------------------------------------------------------
+   6) DOKUNMA HEDEFLERİ
+
+   Kart içi aksiyonlar telefonda parmakla kullanılıyor. duzen-son.css bunu
+   yalnızca <=768px'te uyguluyordu; iOS'ta 44pt her yerde geçerlidir.
+   ------------------------------------------------------------------------- */
+
+.page.active :is(.topic-actions > button, .topic-actions > a) {
+  min-height: var(--tap);
+}
+
+/* -------------------------------------------------------------------------
+   6b) ÖZET DEĞER KUTULARI (Sınav Merkezi istatistikleri)
+
+   5 kart tam genişlikte alt alta diziliyordu: telefonda ~550px'lik bir blok
+   ve asıl içeriğe (sınav kategorileri) ulaşmak için uzun bir kaydırma.
+   iOS'ta bu tür özet değerler kompakt kutucuk ızgarasında durur (Sağlık/
+   Fitness özet kartları gibi): aynı bilgi, yarı yer.
+   ------------------------------------------------------------------------- */
+
+.page.active .exam-pro-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+@media (min-width: 768px) {
+  .page.active .exam-pro-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1200px) {
+  .page.active .exam-pro-stats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+#page-root .page.active .exam-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--separator);
+  background: color-mix(in srgb, var(--bg-surface) 97%, transparent);
+  box-shadow: none;
+}
+
+#page-root .page.active .exam-stat-card > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#page-root .page.active .exam-stat-card .exam-stat-icon {
+  width: 30px;
+  height: 30px;
+  margin-bottom: var(--s-2);
+  border-radius: 8px;
+}
+
+#page-root .page.active .exam-stat-card small {
+  order: -1;
+  font-size: var(--font-caption1-size);
+  line-height: var(--font-caption1-line);
+  color: var(--text-secondary);
+}
+
+#page-root .page.active .exam-stat-card strong {
+  font-size: var(--font-title2-size);
+  line-height: var(--font-title2-line);
+  letter-spacing: var(--font-title2-track);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+#page-root .page.active .exam-stat-card em {
+  font-size: var(--font-caption2-size);
+  line-height: var(--font-caption2-line);
+  font-style: normal;
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------------------
+   7) İKONOGRAFİ
+
+   Arayüz ikonları emoji ile yapılmıyor (brief §21): emoji platforma göre
+   değişiyor, renkleri temayla uyuşmuyor ve tek tip çizgi kalınlığı tutmuyor.
+   partials/pages/*.html içindeki ⏱📋🏆📈🎯✏️🎧📄✅❌🔥✕ satır içi SVG'ye
+   çevrildi - satır içi olmaları önemli: test-launcher.mjs ikon isteklerini
+   SAYIYOR, ayrı dosyalar bütçeyi bozardı.
+
+   Prozadaki emoji (✨, ★, 💪 gibi motivasyon cümlelerinde) içeriktir, arayüz
+   ikonu değildir; bilerek korundu.
+   ------------------------------------------------------------------------- */
+
+.ui-icon {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  vertical-align: -.125em;
+}
+
+.ui-icon--success { color: var(--success-fg); }
+.ui-icon--error { color: var(--error-fg); }
+.ui-icon--warning { color: var(--warning-fg); }
+
+/* İkon taşıyan kutular ikonu punto ile ölçekler. */
+.exam-stat-icon,
+.exam-category-visual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exam-stat-icon .ui-icon { width: 1.15em; height: 1.15em; }
+.exam-category-visual .ui-icon { width: 1.4em; height: 1.4em; }
+
+.matching-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Sekme ikonları: emoji yerine SVG. Emoji platforma göre değişiyor, temaya
+   uymuyor ve çizgi kalınlığı diğer ikonlarla tutmuyordu. */
+.memory-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memory-tab-icon .ui-icon { width: 1.25em; height: 1.25em; }
+
+/* Metin + ikon taşıyan butonlarda ikon ile yazı arasında düzgün boşluk. */
+:is(.primary-btn, .ghost-btn, .secondary-btn, .exam-history-btn) .ui-icon {
+  margin-inline-end: 6px;
+}
+
+.exam-history-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: var(--tap);
+}
+
+.exam-history-btn small .ui-icon {
+  width: .85em;
+  height: .85em;
+  margin-inline-end: 0;
+}
+
+/* -------------------------------------------------------------------------
+   8) BUTON DİLİ
+
+   iOS butonu düz dolgudur: renkli hale, dış parıltı ve hover'da yükselme yok.
+   Projede .primary-btn'in altında `0 6px 18px <pembe>` bir parıltı ve
+   hover'da translateY(-1px) vardı - ikisi de web/SaaS dili. Basma geri
+   bildirimi ölçek ve dolgu tonuyla verilir.
+   ------------------------------------------------------------------------- */
+
+:is(.primary-btn, .secondary-btn, .ghost-btn, .check-btn, .mark-btn) {
+  min-height: var(--tap);
+  border-radius: var(--r-pill);
+  font-family: var(--font-ui);
+  font-size: var(--font-callout-size);
+  line-height: var(--font-callout-line);
+  letter-spacing: var(--font-callout-track);
+  font-weight: 600;
+  /* Parıltı yok. Yalnızca basmada geri bildirim. */
+  box-shadow: none;
+}
+
+:is(.primary-btn, .secondary-btn, .ghost-btn, .check-btn, .mark-btn):hover {
+  /* iOS'ta buton hover'da yükselmez. */
+  transform: none;
+}
+
+:is(.primary-btn, .secondary-btn, .ghost-btn, .check-btn, .mark-btn):active {
+  transform: scale(.98);
+}
+
+/* İkincil ve üçüncül: sessiz olmalı, birincil aksiyonu bastırmamalı. */
+.secondary-btn {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--separator);
+}
+
+.ghost-btn {
+  background: none;
+  color: var(--accent-ink);
+  border: 1px solid var(--separator);
+}
+
+.ghost-btn:hover { background: var(--surface-hover); }
+
+/* Yıkıcı aksiyon semantik kırmızı kullanır. */
+:is(.primary-btn, .secondary-btn, .ghost-btn).is-destructive,
+[data-destructive] {
+  background: var(--error-bg);
+  color: var(--error-fg);
+  border-color: var(--error-border);
+}
+
+:is(.primary-btn, .secondary-btn, .ghost-btn):disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* -------------------------------------------------------------------------
+   9) ROZETLER
+
+   Sayfa başlığındaki rozet (STUDY HUB / MEMORY HUB) illüstrasyonun üstünde
+   durduğu için OPAK kalır - okunabilirliği zemine bırakamayız.
+   Kart İÇİNDEKİ rozetler ise tonal olur: Ezber Merkezi'nde MEMORY HUB →
+   MEMORY PRACTICE → PRACTICE diye üç kat doygun mor rozet üst üste biniyordu
+   ve hiyerarşi yerine gürültü üretiyordu.
+   ------------------------------------------------------------------------- */
+
+/* Seçici ağırlığı: sayfa kimliği (#studyhub/#quizhub) rozetlere kendi pembe
+   gradyanını ID özgüllüğüyle veriyor. Daha zayıf bir kural yalnızca RENGİ
+   değiştirip zemini bırakıyordu; ortaya --accent-ink + eski gradyan gibi
+   eşleşmeyen bir çift çıkıyor ve kontrast 2.57:1'e düşüyordu. İkisi de
+   aynı kaynaktan gelmeli. */
+#page-root .page.active
+  :is(.topic-card, .content-card, .memory-section-shell, .exam-pro-panel)
+  :is(.unit-badge, .panel-badge, .quiz-badge, .exam-badge) {
+  background: var(--accent-soft) !important;
+  color: var(--accent-ink) !important;
+  border: 1px solid var(--separator);
+  font-size: var(--font-caption2-size);
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+
+/* -------------------------------------------------------------------------
+   10) ARAMA ALANI
+
+   Tek dil: yükseklik --tap, pill yarıçap, semantik --search-* tokenları.
+   components/search-clear.css zaten token güdümlü; burada yalnızca ölçü ve
+   tipografi hizalanıyor.
+   ------------------------------------------------------------------------- */
+
+.page.active :is(.hub-search, input[type="search"]) {
+  min-height: var(--tap);
+  border-radius: var(--r-pill);
+  font-family: var(--font-ui);
+  /* 16px altı iOS Safari'de otomatik zoom tetikler. */
+  font-size: max(16px, var(--font-callout-size));
+}
+
+/* -------------------------------------------------------------------------
+   11) ERİŞİLEBİLİRLİK GERİ ÇEKİLMELERİ
+   ------------------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .page.active :is(.topic-card, .content-card, .empty-grid, .empty-state) {
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+
+  #studyhub.active::after,
+  #quizhub.active::after,
+  #studydetail.active::after {
+    background: none;
+  }
+}

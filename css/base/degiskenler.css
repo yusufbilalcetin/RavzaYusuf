@@ -8,7 +8,11 @@
   --bg: #f5f4fb;
   --white: #ffffff;
   --text: #2d3748;
-  --text-light: #64748b;
+  /* #64748b --bg (#f5f4fb) üzerinde 4.35:1 veriyordu - AA normal metin (4.5)
+     altında. --text-secondary buradan türediği için gece-mavisi, orman-yesili,
+     mor-isik ve klasik-koyu açık presetlerinin dördü birden kalıyordu (noel-ask
+     ve pembe-tema kendi --text-light'ını tanımlar, etkilenmez). 4.73:1. */
+  --text-light: #5f6e84;
   --card-border: #e7ebf7;
   --input-bg: #f8f9fe;
   --input-brd: #e8eaf6;
@@ -92,7 +96,19 @@ body {
 
   --border: var(--card-border);
   --border-subtle: color-mix(in srgb, var(--card-border) 70%, transparent);
-  --border-strong: color-mix(in srgb, var(--card-border) 50%, var(--text) 50%);
+  /* 50/50 karışım --bg üzerinde 2.90:1 kalıyordu; UI bileşeni için AA sınırı
+     3:1. Metne doğru kaydırıldı - 3.26:1. Koyu modun kendi override'ı var
+     (bkz. tipografi.css body.dark), oradan etkilenmez. */
+  --border-strong: color-mix(in srgb, var(--card-border) 45%, var(--text) 55%);
+
+  /* Accent RENGİNDE METİN (başlık, sayaç, rozet yazısı) için. --accent'in
+     kendisi açık modda zemin rengi olarak tasarlandı; metin olarak kullanılınca
+     kırık beyaz üstünde ~3.5:1'de kalıyor. Bu token accent tonunu koruyup
+     mürekkebe doğru karışıyor: yedi açık presetin hepsinde en az 4.72:1.
+     Koyu modda override ediliyor (bkz. tipografi.css body.dark) - orada
+     --accent zaten --pink-bright, koyu zeminde okunur.
+     TEK seviye color-mix: Safari 16.4 iç içe color-mix'te hatalı. */
+  --accent-ink: color-mix(in srgb, var(--accent) 50%, var(--text));
 
   --accent: var(--pink);
   /* Altı açık presetin accent'i üzerinde beyaz metin 2.48–3.96:1 arasında

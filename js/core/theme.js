@@ -131,6 +131,38 @@ function emitThemeChange(reason) {
   window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT, { detail }));
 }
 
+/* Tema geçişi cross-fade'i.
+
+   Kalıcı bir global `transition` iki nedenle yanlış olurdu: her renk
+   değişiminde (hover, aktif durum, canlı skor) bedel ödenir ve ilk yüklemede
+   tema attribute'u yazılırken görünür bir flash yaratır. Onun yerine sınıf
+   YALNIZCA gerçek bir tema değişimi süresince duruyor.
+
+   themeTransitionsEnabled ilk boyamadan sonra açılır; böylece açılıştaki
+   attribute yazımı asla animasyona girmez (FOUC yok). */
+const THEME_TRANSITION_MS = 220;
+let themeTransitionsEnabled = false;
+let themeTransitionTimer = 0;
+
+function runThemeCrossfade() {
+  if (!themeTransitionsEnabled) return;
+  const root = document.documentElement;
+  if (!root) return;
+  root.classList.add("theme-switching");
+  clearTimeout(themeTransitionTimer);
+  themeTransitionTimer = setTimeout(() => {
+    root.classList.remove("theme-switching");
+  }, THEME_TRANSITION_MS);
+}
+
+function enableThemeTransitions() {
+  if (themeTransitionsEnabled) return;
+  // İki kare bekle: ilki stilin uygulandığı, ikincisi boyandığı kare.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    themeTransitionsEnabled = true;
+  }));
+}
+
 function applyThemeState(nextState, options = {}) {
   const mode = normalizeThemeMode(nextState?.mode ?? themeState.mode);
   const style = normalizeThemeStyle(nextState?.style ?? themeState.style);
@@ -145,6 +177,7 @@ function applyThemeState(nextState, options = {}) {
     if (safeStorageGet(THEME_STORAGE_KEYS.style) !== style) safeStorageSet(THEME_STORAGE_KEYS.style, style);
   }
 
+  if (changed) runThemeCrossfade();
   setElementTheme(document.documentElement, themeState);
   setElementTheme(document.body, themeState);
   document.documentElement.style.colorScheme = resolvedMode;
@@ -482,5 +515,8 @@ export function initThemeSystem() {
   installSystemAndStorageSync();
   applyThemeState(readStoredThemeState(), { force: true, reason: "init" });
   bindThemeControls();
+  // Açılış boyaması bittikten SONRA aç: init sırasındaki attribute yazımı
+  // animasyona girmemeli.
+  enableThemeTransitions();
   return getThemeState();
 }

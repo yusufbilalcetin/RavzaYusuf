@@ -1,0 +1,659 @@
+/* ==========================================================================
+   RAVZA BOOKS · OKUYUCU SAYFALARI VE SÜREKLİ KAYDIRMA MODU
+
+   Neden ayrı dosya: ravza-books.css'in tamamı `.ravza-books-page { ... }`
+   içine iç içe yazılmış tek bir blok. Buradaki kuralların bir kısmı <dialog>
+   hedefliyor ve tam seçici yazmak gerekiyor; iç içe bloğa sıkıştırmak yerine
+   ayrı dosya hem okunur hem de import sırası netleşiyor.
+
+   <dialog> NOTU: showModal() elemanı "top layer"a çizer. Bu YALNIZCA boyama ve
+   yığılma sırasını değiştirir - eleman DOM'da hâlâ .ravza-books-page altında
+   durur. Dolayısıyla hem bu seçiciler eşleşir hem de --ink / --control-bg gibi
+   OKUMA TEMASI değişkenleri kalıtımla sayfaya ulaşır. Sonuç: sayfa global
+   uygulama temasını değil, kullanıcının seçtiği okuma temasını izler (§26).
+   ========================================================================== */
+
+/* GEOMETRİ BURADA TANIMLANMAZ.
+   Konum, genişlik ve yükseklik components/centered-dialogs.css'in tekelinde.
+   Daha önce burada duran `width: min(560px,100%)` ve `max-height: 92dvh`
+   ortalamayı bozuyordu: dialog kutusu 560px'e kilitlenip sola yaslanıyor
+   (masaüstünde merkez 440px kayıyor) ve 92dvh'lik kutu içinde ortalanan panel
+   görünür alanın 34px yukarısına düşüyordu. Burada yalnızca RENK kalır. */
+.ravza-books-page .reader-sheet {
+  padding: 0;
+  color: var(--ink);
+  border: 0;
+  background: transparent;
+}
+
+.ravza-books-page .reader-sheet::backdrop {
+  background: rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* Panel: yalnızca iç düzen. Genişlik/yükseklik centered-dialogs.css'te. */
+.ravza-books-page .reader-sheet-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0.35rem 0 1rem;
+  isolation: isolate;
+}
+
+/* Konum/boyut kuralları components/centered-dialogs.css'te tek noktada:
+   her ekran boyutunda ekranın ortasında açılır. Burada mobil için ayrı bir
+   geometri YOK - eskiden alttan gelen sheet vardı, ürün kararı değişti. */
+
+.ravza-books-page .reader-sheet-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem 0.5rem 1.1rem;
+}
+
+.ravza-books-page .reader-sheet-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 1.06rem/1.25 var(--ui-font);
+  letter-spacing: -0.02em;
+}
+
+.ravza-books-page .reader-sheet-close {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--ink-muted);
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.ravza-books-page .reader-sheet-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ravza-books-page .reader-sheet-close:active {
+  transform: scale(0.94);
+}
+
+.ravza-books-page .reader-sheet-body {
+  flex: 1 1 auto;
+  padding: 0 1.1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ravza-books-page .reader-sheet-section + .reader-sheet-section {
+  margin-top: 1.35rem;
+}
+
+.ravza-books-page .reader-sheet-subtitle {
+  margin: 0 0 0.5rem;
+  color: var(--ink-muted);
+  font: 600 0.74rem/1.2 var(--ui-font);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ravza-books-page .reader-sheet-progress {
+  margin: 0 0 0.75rem;
+  color: var(--ink-muted);
+  font: 500 0.82rem/1.35 var(--ui-font);
+}
+
+.ravza-books-page .reader-sheet-empty {
+  margin: 0;
+  padding: 0.9rem 0;
+  color: var(--ink-muted);
+  font: 400 0.86rem/1.5 var(--ui-font);
+}
+
+/* --------------------------------------------------------------------------
+   İçindekiler / yer imi listesi
+-------------------------------------------------------------------------- */
+
+.ravza-books-page .reader-toc {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ravza-books-page .reader-toc-item {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 46px;
+  padding: 0.5rem 0.7rem;
+  color: var(--ink);
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  font: 500 0.92rem/1.35 var(--ui-font);
+  text-align: left;
+}
+
+/* Alt seviye outline girdileri girintili: hiyerarşi görünür kalsın. */
+.ravza-books-page .reader-toc-item[data-level="1"] {
+  padding-left: 1.7rem;
+  color: var(--ink-muted);
+  font-size: 0.86rem;
+}
+
+.ravza-books-page .reader-toc-item:hover {
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+.ravza-books-page .reader-toc-item.is-current {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  font-weight: 600;
+}
+
+.ravza-books-page .reader-toc-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ravza-books-page .reader-toc-page {
+  flex: 0 0 auto;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ravza-books-page .reader-toc-page svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   Sayfaya git
+-------------------------------------------------------------------------- */
+
+.ravza-books-page .reader-goto {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ravza-books-page .reader-goto input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  color: var(--ink);
+  border: 1px solid var(--control-border);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  /* 17px: 16px altındaki input iOS Safari'de otomatik zoom tetikler. */
+  font: 400 17px/1 var(--ui-font);
+}
+
+.ravza-books-page .reader-goto button {
+  flex: 0 0 auto;
+  min-width: 64px;
+  min-height: 44px;
+  padding: 0 1rem;
+  color: #fff;
+  border: 0;
+  border-radius: 11px;
+  background: var(--accent);
+  font: 600 0.9rem/1 var(--ui-font);
+}
+
+/* --------------------------------------------------------------------------
+   Kitapta ara
+-------------------------------------------------------------------------- */
+
+.ravza-books-page .reader-search-field {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  margin: 0 1.1rem 0.5rem;
+  padding: 0 0.8rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.ravza-books-page .reader-search-field svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: var(--ink-muted);
+}
+
+/* Paylaşılan temizleme bileşeni input'un etrafına bir sarmalayıcı ekler;
+   esnek yerleşimin bozulmaması için sarmalayıcı da esner. */
+.ravza-books-page .reader-search-field .search-clear-control {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+}
+
+.ravza-books-page .reader-search-field input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0;
+  color: var(--ink);
+  border: 0;
+  background: transparent;
+  font: 400 17px/1.2 var(--ui-font);
+}
+
+.ravza-books-page .reader-search-field input:focus {
+  outline: none;
+}
+
+.ravza-books-page .reader-search-state {
+  min-height: 1.1em;
+  margin: 0 1.1rem 0.5rem;
+  color: var(--ink-muted);
+  font: 500 0.78rem/1.3 var(--ui-font);
+}
+
+.ravza-books-page .reader-search-list {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ravza-books-page .reader-search-item {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  min-height: 46px;
+  padding: 0.6rem 0.7rem;
+  color: var(--ink);
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  text-align: left;
+}
+
+.ravza-books-page .reader-search-item:hover {
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+.ravza-books-page .reader-search-snippet {
+  color: var(--ink);
+  font: 400 0.88rem/1.45 var(--ui-font);
+}
+
+.ravza-books-page .reader-search-snippet mark {
+  padding: 0 0.1em;
+  color: inherit;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  font-weight: 600;
+}
+
+.ravza-books-page .reader-search-page {
+  color: var(--ink-muted);
+  font: 500 0.74rem/1.2 var(--ui-font);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Ayarlar
+-------------------------------------------------------------------------- */
+
+.ravza-books-page .reader-settings-group + .reader-settings-group {
+  margin-top: 1.4rem;
+}
+
+.ravza-books-page .reader-settings-label {
+  margin: 0 0 0.55rem;
+  color: var(--ink-muted);
+  font: 600 0.74rem/1.2 var(--ui-font);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ravza-books-page .reader-settings-note {
+  margin: 0.55rem 0 0;
+  color: var(--ink-muted);
+  font: 400 0.78rem/1.45 var(--ui-font);
+}
+
+/* Tema seçici: her düğme temsil ettiği temanın gerçek rengini gösterir. */
+.ravza-books-page .reader-sheet .theme-controls {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.ravza-books-page .reader-sheet .theme-btn {
+  display: grid;
+  gap: 0.35rem;
+  place-items: center;
+  /* Eski tema düğmeleri 40px'lik renk NOKTALARIYDI ve o kural hâlâ genişliği
+     40px'e kilitliyordu: ızgara hücresi doluyor ama düğme dolmuyor, "Beyaz"
+     kelime ortasından bölünüyordu. Burada genişlik serbest bırakılır. */
+  width: auto;
+  min-width: 0;
+  min-height: 62px;
+  padding: 0.5rem 0.25rem;
+  border: 2px solid transparent;
+  border-radius: 13px;
+  box-shadow: inset 0 0 0 1px var(--control-border);
+  font: 600 0.7rem/1 var(--ui-font);
+}
+
+/* Düğmenin KENDİSİ artık renk örneği; ayrıca nokta göstermek gereksiz. */
+.ravza-books-page .reader-sheet .theme-btn::before {
+  display: none;
+}
+
+.ravza-books-page .reader-sheet .theme-btn span {
+  font: inherit;
+  white-space: nowrap;
+}
+
+.ravza-books-page .reader-sheet .theme-btn--light { color: #1f1a16; background: #f4ead7; }
+.ravza-books-page .reader-sheet .theme-btn--sepia { color: #2b2118; background: #ead8b9; }
+.ravza-books-page .reader-sheet .theme-btn--dark { color: #e9e2d7; background: #24211c; }
+.ravza-books-page .reader-sheet .theme-btn--black { color: #dcdcdc; background: #000; }
+
+.ravza-books-page .reader-sheet .theme-btn.selected {
+  border-color: var(--accent);
+}
+
+.ravza-books-page .reader-sheet .segmented {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.ravza-books-page .reader-sheet .setting-btn {
+  min-height: 40px;
+  padding: 0 0.6rem;
+  color: var(--ink);
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: 600 0.85rem/1 var(--ui-font);
+}
+
+.ravza-books-page .reader-sheet .setting-btn.selected {
+  background: var(--control-bg);
+  box-shadow: 0 1px 3px var(--control-shadow);
+}
+
+/* Desteklenmeyen ayar gizlenmez, dürüstçe soluklaştırılır (§42). */
+.ravza-books-page .reader-sheet .settings-row.is-unavailable {
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   SÜREKLİ KAYDIRMA MODU
+
+   Sayfa çevirme motoru bu modda hiç kurulmaz; aynı .pdf-page DOM'u dikey bir
+   kaydırıcıya yerleşir ve render penceresi kaydırma konumundan sürülür.
+   ========================================================================== */
+
+/* Beşik MUTLAK konumlanır.
+   NEDEN: sahne `display:grid; place-items:center` ve satırı içerik boyutlu.
+   Beşiğe `height:100%` vermek döngüsel bir çözüme düşüyordu - yüzde, içeriğe
+   göre boyutlanan bir satıra karşı çözülünce satır 12 sayfa kadar uzuyor ve
+   kaydırıcı hiç taşmıyordu (clientHeight === scrollHeight). `inset:0` ile
+   yükseklik KESİN hâle gelir ve overflow gerçekten devreye girer. */
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .book-cradle {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+}
+
+/* Sahne dokunuşu sayfa çevirme jesti için yakalıyordu; sürekli modda bu
+   dikey kaydırmayı tamamen engeller. pan-y kaydırmayı geri verir. */
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .reader-stage,
+.ravza-books-page .reader-root[data-reader-mode="scroll"] #rdr-flipbook,
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .pdf-page {
+  touch-action: pan-y;
+}
+
+/* Sürekli modda metin seçilebilir kalmalı (§54).
+   Ayrıca sahnenin DİKEY kabuk payı burada geri alınır: sürekli okumada
+   kaydırıcı tüm yüksekliği kullanmalı, yoksa okunabilir alan dock kadar
+   kısalır. İlk/son sayfanın kabuk altında kalmaması ::before/::after
+   ara boşluklarıyla çözülür (aşağıda). */
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .reader-stage {
+  padding-top: max(6px, env(safe-area-inset-top));
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+  overflow: hidden;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* scroll-snap "proximity": sayfa başına yumuşakça oturur ama serbest
+   kaydırmayı engellemez (uzun sayfada kullanıcıyı hapsetmez). */
+.ravza-books-page .reader-root[data-reader-mode="scroll"] #rdr-flipbook {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  align-content: start;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y proximity;
+  /* Sayfaya atlarken hedef, üst şeridin ALTINA hizalansın. */
+  scroll-padding-top: var(--reader-chrome-top, 0px);
+  scroll-padding-bottom: var(--reader-chrome-bottom, 0px);
+  -webkit-overflow-scrolling: touch;
+}
+
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .pdf-page,
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .pdf-back-cover {
+  position: relative;
+  /* Sürekli okuma = genişliğe sığdır. Yükseklik en-boy oranından türer.
+     Eskiden `min(100%, (100dvh - 2rem) * aspect)` vardı: 100dvh mobilde
+     tarayıcı çubuklarıyla değişen BÜYÜK viewport'u verir ve kaydırıcının
+     gerçek yüksekliğiyle ilgisi yoktur (§23: dvh'ye gereksiz bağlanma). */
+  width: 100%;
+  aspect-ratio: var(--pdf-page-aspect, 0.75);
+  transform: none;
+  /* "start": sayfaya git işlemi sayfanın ÜSTÜNÜ hizalar, snap de aynı noktaya
+     oturur. "center" olsaydı programatik kaydırmadan sonra tarayıcı sayfayı
+     ortalamak için komşuya kaydırabilirdi. */
+  scroll-snap-align: start;
+}
+
+/* İlk ve son sayfa kabuğun altında kalmasın: ara boşluklar GERÇEK kabuk
+   yüksekliğinden gelir, sabit 3.5rem'den değil (§52). */
+.ravza-books-page .reader-root[data-reader-mode="scroll"] #rdr-flipbook::before {
+  content: "";
+  display: block;
+  height: var(--reader-chrome-top, 3.5rem);
+}
+
+.ravza-books-page .reader-root[data-reader-mode="scroll"] #rdr-flipbook::after {
+  content: "";
+  display: block;
+  height: var(--reader-chrome-bottom, 3.5rem);
+}
+
+/* Sayfa çevirme moduna özgü sahne süslemeleri süreklide anlamsız. */
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .book-cradle::before,
+.ravza-books-page .reader-root[data-reader-mode="scroll"] .book-cradle::after {
+  display: none;
+}
+
+/* Sayfaya git: satır içi hata ve "baştan başla". */
+.ravza-books-page .reader-goto-error {
+  margin: 0.5rem 0 0;
+  color: #b3261e;
+  font: 500 0.8rem/1.35 var(--ui-font);
+}
+
+.ravza-books-page[data-reader-theme="dark"] .reader-goto-error,
+.ravza-books-page[data-reader-theme="black"] .reader-goto-error {
+  color: #ff9d94;
+}
+
+.ravza-books-page .reader-restart {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 0.6rem;
+  padding: 0 1rem;
+  color: var(--ink);
+  border: 1px solid var(--control-border);
+  border-radius: 11px;
+  background: transparent;
+  font: 600 0.88rem/1 var(--ui-font);
+}
+
+.ravza-books-page .reader-restart:hover {
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Gezinme sekmeleri + sayfa küçük resimleri
+-------------------------------------------------------------------------- */
+
+.ravza-books-page .reader-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.25rem;
+  margin: 0 0 0.9rem;
+  padding: 0.2rem;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.ravza-books-page .reader-tab {
+  min-height: 40px;
+  padding: 0 0.6rem;
+  color: var(--ink-muted);
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font: 600 0.85rem/1 var(--ui-font);
+}
+
+.ravza-books-page .reader-tab.is-active {
+  color: var(--ink);
+  background: var(--control-bg);
+  box-shadow: 0 1px 3px var(--control-shadow);
+}
+
+.ravza-books-page .reader-tab-panel.is-hidden {
+  display: none;
+}
+
+/* Küçük resim ızgarası. Kendi içinde kayar; popup büyümez. */
+.ravza-books-page .reader-thumbs {
+  max-height: min(46dvh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ravza-books-page .reader-thumb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 0.7rem 0.6rem;
+  margin: 0;
+  padding: 0.2rem;
+  list-style: none;
+}
+
+.ravza-books-page .reader-thumb {
+  display: grid;
+  gap: 0.3rem;
+  justify-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Sabit en-boy kutusu: küçük resimler yüklenirken ızgara zıplamaz. */
+.ravza-books-page .reader-thumb-frame {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: var(--pdf-page-aspect, 0.72);
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
+  box-shadow: 0 1px 4px var(--control-shadow);
+}
+
+.ravza-books-page .reader-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.ravza-books-page .reader-thumb.is-loaded img {
+  opacity: 1;
+}
+
+.ravza-books-page .reader-thumb.has-error .reader-thumb-frame {
+  background: color-mix(in srgb, #b3261e 14%, transparent);
+}
+
+.ravza-books-page .reader-thumb.is-current .reader-thumb-frame {
+  border-color: var(--accent);
+}
+
+.ravza-books-page .reader-thumb-number {
+  color: var(--ink-muted);
+  font: 500 0.72rem/1 var(--ui-font);
+  font-variant-numeric: tabular-nums;
+}
+
+.ravza-books-page .reader-thumb.is-current .reader-thumb-number {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Koyu/siyah okuma temasinda kucuk resimler de okuma yuzeyiyle uyumlu olsun. */
+.ravza-books-page[data-reader-theme="dark"] .reader-thumb img {
+  filter: invert(0.9) hue-rotate(180deg) brightness(0.82) contrast(0.94);
+}
+
+.ravza-books-page[data-reader-theme="black"] .reader-thumb img {
+  filter: invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.02);
+}
+
+.ravza-books-page[data-reader-theme="sepia"] .reader-thumb img {
+  filter: sepia(0.38) saturate(0.78) brightness(0.97) contrast(0.96);
+}
+
+/* Outline yoksa gosterilen aciklama: bilgilendirici ama kucuk resimleri
+   asagi itmemeli. Ekran goruntusu incelemesinde ilk satirlarin yarisini
+   yiyordu; kompakt bir nota indirildi. */
+.ravza-books-page #rdr-no-outline {
+  padding: 0 0 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}

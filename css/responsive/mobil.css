@@ -224,7 +224,6 @@
   .premium-result-main,
   .topic-score-grid,
   .review-grid,
-  .theme-sheet-grid,
   .memory-option-list,
   .exam-options {
     grid-template-columns: 1fr !important;
@@ -380,18 +379,21 @@
   .source-table th,
   .source-table td { padding: 10px 12px; }
 
-  /* TEMA SHEET → BOTTOM SHEET */
+  /* TEMA SHEET → ORTALANMIŞ DİYALOG
+     Urun karari: tum popup'lar ekranin ortasinda acilir (bkz.
+     components/centered-dialogs.css). Konum burada da !important ile
+     yaziliyor cunku bu blogun eski hali de oyleydi; birakilirsa alttan
+     yaslama geri gelir. */
   .theme-sheet {
     position: fixed !important;
-    top: auto !important;
-    left: 10px !important;
-    right: 10px !important;
-    bottom: 10px !important;
-    width: auto !important;
-    max-height: calc(100vh - 20px);
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: min(calc(100vw - 20px), 460px) !important;
+    max-height: calc(var(--visual-viewport-height, 100dvh) - 20px);
     border-radius: 22px;
     padding: 18px;
-    padding-bottom: calc(18px + env(safe-area-inset-bottom));
   }
   .theme-sheet-head h3 { font-size: 22px; }
   .theme-choice-preview { height: 80px; }
@@ -619,12 +621,9 @@
   .search-bar input:focus { outline: none; }
 }
 
-@media (max-width: 480px) {
-  .theme-sheet-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px;
-  }
-}
+/* .theme-sheet-grid'in 480px altinda 2 kolona zorlanmasi kaldirildi: tema
+   listesi artik her genislikte tek kolonlu iOS Ayarlar satir listesi
+   (bkz. components/ios-dialog-geometry.css). */
 
 @media (max-width: 768px) {
   .memory-grid {
@@ -884,13 +883,14 @@
 }
 
 @media (max-width: 768px) {
+  /* Ortalanmis diyalog (eskiden alttan sheet). */
   .theme-sheet {
-    top: auto !important;
-    right: 12px !important;
-    left: 12px !important;
-    bottom: max(12px, env(safe-area-inset-bottom)) !important;
-    width: auto !important;
-    max-height: min(82vh, 720px) !important;
+    top: 50% !important;
+    right: auto !important;
+    left: 50% !important;
+    bottom: auto !important;
+    width: min(calc(100vw - 24px), 460px) !important;
+    max-height: min(calc(var(--visual-viewport-height, 100dvh) - 24px), 720px) !important;
     border-radius: 26px !important;
     overflow-y: auto !important;
   }

@@ -79,14 +79,24 @@
 }
 
 #studyhub .primary-btn {
-  background: linear-gradient(135deg, #7b1731, #a51f4a);
+  /* iOS butonu duz dolgudur; gradyan web dili. Iki durak arasindaki
+     duz ton secildi: beyaz metinle kontrast korunuyor (~8:1) ve
+     noel-ask bordo kimligi ayni kaliyor. */
+  background: #8d1b3c;
+  /* Gradyan koyu bordo; --text-on-accent koyu mürekkep olduğu için üstünde
+     2.24:1 kalıyordu. Zemin temayla değişmediğinden ters metin her iki modda
+     da güvenli: 7.25-10.45:1. */
+  color: var(--text-inverse);
 }
 
 #studyhub .mark-btn,
 #studyhub .mark-btn.done {
-  background: #10b981;
-  color: #fff;
-  border-color: #10b981;
+  /* Beyaz metin --success üstünde 2.54:1 veriyordu. body.dark .mark-btn.done
+     zaten --text-on-accent kullanıyordu (tipografi.css); açık moddaki bu kural
+     tek istisnaydı. Koyu mürekkep: 7.32:1. */
+  background: var(--success);
+  color: var(--text-on-accent);
+  border-color: var(--success);
 }
 
 #quizhub .topic-card::before {

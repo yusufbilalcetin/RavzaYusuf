@@ -3,7 +3,10 @@ const reducedMotionQuery = matchMedia("(prefers-reduced-motion: reduce)");
 // base/degiskenler.css'teki --ease-emphasis ile ayni egri. Web Animations API
 // custom property cozemedigi icin deger burada birebir tekrarlanir.
 const EASE_EMPHASIS = "cubic-bezier(.22, 1, .36, 1)";
-const MORPH_DURATION = 420;
+// iOS uygulama acilis gecisi ~350ms; 420ms olcusunde bir gecikme "web" gibi
+// hissettiriyordu. Sayfa solmasi (280ms, tipografi.css) ile birlikte
+// tasarim dilinin 180-350ms araligina oturur.
+const MORPH_DURATION = 340;
 
 // Acilirken sayfa ikonun bulundugu noktadan buyur, kapanirken ana ekran ayni
 // noktanin etrafinda hafifce genisleyerek yerine oturur - yon boylece

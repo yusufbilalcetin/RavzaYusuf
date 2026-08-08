@@ -441,7 +441,7 @@ body.dark .pbn-app {
 .pbn-menu-item:hover { background: var(--input-bg); }
 .pbn-menu-item--primary {
   background: var(--pbn-selected-bg);
-  font-weight: 800;
+  font-weight: 700;
 }
 .pbn-menu-item--primary:hover {
   background: color-mix(in srgb, var(--pbn-selected-bg) 78%, var(--pink-bright));
@@ -546,7 +546,7 @@ body.dark .pbn-app {
   transition: transform .4s var(--pbn-ease-pop), box-shadow .4s var(--pbn-ease), opacity .4s var(--pbn-ease);
 }
 .pbn-swatch-num {
-  font-weight: 800; font-size: 1.02rem; color: #fff;
+  font-weight: 700; font-size: 1.02rem; color: #fff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, .35);
 }
 .pbn-swatch--dark-ink .pbn-swatch-num {
@@ -564,7 +564,7 @@ body.dark .pbn-app {
 .pbn-swatch-check {
   position: absolute; inset: 0; display: grid; place-items: center;
   border-radius: 50%; background: rgba(255, 255, 255, .5);
-  color: var(--success); font-weight: 900; font-size: 1.15rem;
+  color: var(--success); font-weight: 700; font-size: 1.15rem;
   opacity: 0; transform: scale(.4);
   transition: opacity .4s var(--pbn-ease-pop), transform .4s var(--pbn-ease-pop);
 }
@@ -966,7 +966,7 @@ body.dark .pbn-canvas-stage canvas {
   flex: 0 0 auto;
   color: var(--text-light);
   font-size: .76rem;
-  font-weight: 800;
+  font-weight: 700;
   padding: 7px 10px;
   border: 1px solid var(--pbn-control-border);
   border-radius: 999px;
@@ -1078,7 +1078,7 @@ body.dark .pbn-canvas-stage canvas {
   margin: 0 4px 3px;
   color: var(--text-light);
   font-size: .7rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .2px;
 }
 
@@ -1127,7 +1127,7 @@ body.dark .pbn-canvas-stage canvas {
 .pbn-recent-progress {
   color: var(--success);
   font-size: .72rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
 }
 
@@ -1137,7 +1137,7 @@ body.dark .pbn-canvas-stage canvas {
   border-radius: 12px;
   background: linear-gradient(135deg, var(--pink), var(--pink-bright));
   color: #fff;
-  font-weight: 800;
+  font-weight: 700;
   font-size: .78rem;
   cursor: pointer;
   transition: transform .35s var(--pbn-ease), box-shadow .35s var(--pbn-ease);
@@ -1342,7 +1342,7 @@ body.dark .pbn-canvas-stage canvas {
   padding: 4px 10px;
   border-radius: 999px;
   font-size: .72rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .2px;
   color: #fff;
   background: linear-gradient(135deg, var(--success, #10b981), #34d399);

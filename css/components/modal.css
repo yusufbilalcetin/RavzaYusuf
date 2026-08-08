@@ -1,3 +1,171 @@
+/* =========================================================================
+   iOS SHEET / ALERT / ACTION SHEET
+
+   js/ui/sheet.js tarafindan kullanilir. Native <dialog> + showModal():
+   odak tuzagi, Escape, arka planin inert olmasi ve ::backdrop tarayicidan
+   gelir. z-index YOK - <dialog> "top layer"a cizilir ve projedeki
+   z-index yarisina hic katilmaz.
+
+   GEOMETRI: HER EKRAN BOYUTUNDA ORTALANMIS.
+   Daha once mobilde alttan gelen sheet vardi; urun karari degisti - tum
+   popup'lar ekranin ortasinda acilir. Ortalama "gorunur alana" gore yapilir,
+   bkz. components/centered-dialogs.css.
+   ========================================================================= */
+
+.ui-sheet {
+  /* <dialog> varsayilanlarini sifirla: kendi konumlandirmamizi kuruyoruz. */
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-sheet::backdrop {
+  background: rgba(8, 5, 13, .42);
+}
+
+.ui-sheet-panel {
+  width: min(calc(100vw - 2 * var(--dialog-gutter, 16px)), var(--dialog-width, 420px));
+  max-width: 520px;
+  padding: var(--s-5);
+  /* Ortalanmis panel: dort kose de yuvarlak. */
+  border-radius: var(--r-xl);
+  border: 1px solid var(--liquid-edge, rgba(255, 255, 255, .22));
+
+  /* Cam malzemesi themes/liquid-glass-optics.css'teki "Tinted" listesinden
+     gelir - orada tanimli oldugu icin @supports/reduced-transparency/
+     forced-colors geri cekilmelerini de bedavaya aliyoruz. */
+  background: var(--glass-surface-base);
+  color: var(--text-primary);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+
+  /* Ortalanmis diyalog girisi: hafif olcek + kayma. Alttan kayma YOK. */
+  opacity: 0;
+  transform: translateY(12px) scale(.97);
+  transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out);
+}
+
+.ui-sheet[open] .ui-sheet-panel { opacity: 1; transform: translateY(0) scale(1); }
+.ui-sheet.is-closing .ui-sheet-panel { opacity: 0; transform: translateY(8px) scale(.98); }
+
+.ui-sheet-title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--font-headline-size);
+  line-height: var(--font-headline-line);
+  letter-spacing: var(--font-headline-track);
+  font-weight: var(--font-headline-weight);
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.ui-sheet-message {
+  margin: 0;
+  font-size: var(--font-subheadline-size);
+  line-height: var(--font-subheadline-line);
+  letter-spacing: var(--font-subheadline-track);
+  color: var(--text-secondary);
+  /* Mesajlar \n icerebiliyor (ornegin sinav bitirme uyarisi). */
+  white-space: pre-line;
+  text-wrap: pretty;
+}
+
+.ui-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+}
+
+.ui-sheet-btn {
+  min-height: var(--tap);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-family: var(--font-ui);
+  font-size: var(--font-body-size);
+  line-height: var(--font-body-line);
+  letter-spacing: var(--font-body-track);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.ui-sheet-btn:active { transform: scale(.98); }
+
+.ui-sheet-btn--primary {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.ui-sheet-btn--primary:hover { background: var(--accent-hover); }
+
+.ui-sheet-btn--destructive {
+  background: var(--error-bg);
+  color: var(--error-fg);
+  border-color: var(--error-border);
+}
+
+.ui-sheet-btn--normal,
+.ui-sheet-btn--cancel {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--separator);
+}
+
+.ui-sheet-btn--cancel { font-weight: 500; }
+
+.ui-sheet-btn--normal:hover,
+.ui-sheet-btn--cancel:hover { background: var(--surface-active); }
+
+/* Genis ekran: yalnizca buton siralamasi degisir - geometri artik her yerde
+   ortalanmis oldugu icin konum kuralinin tekrar edilmesine gerek yok. */
+@media (min-width: 640px) {
+  /* Onay diyalogunda iptal solda, onay sagda (yatay siralama). */
+  .ui-sheet-actions { flex-direction: row; justify-content: flex-end; }
+  .ui-sheet-btn { min-width: 104px; }
+}
+
+/* test-launcher.mjs reduced-motion altinda transitionDuration <= 0.001s
+   bekliyor; base/animasyonlar.css kanonik blogu bunu zaten sagliyor. Burada
+   yalnizca transform'u sifirliyoruz ki panel aninda yerinde belirsin. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-sheet-panel,
+  .ui-sheet[open] .ui-sheet-panel,
+  .ui-sheet.is-closing .ui-sheet-panel {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-sheet-panel {
+    color: CanvasText !important;
+    background: Canvas !important;
+    border: 1px solid CanvasText !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .ui-sheet-btn { border: 1px solid CanvasText !important; }
+}
+
 /* ================= CANCEL EXAM DIALOG ================= */
 
 .exam-cancel-dialog.open {

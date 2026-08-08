@@ -82,7 +82,14 @@
   <meta name="kahoot-public-url" content="https://ravza-yusuf63.vercel.app/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!--
+    Arayüz metni artık cihazın kendi sistem fontunu kullanıyor (iOS'ta SF Pro,
+    Windows'ta Segoe UI) - bkz. css/base/ios-tokens.css --font-ui. SF dosyaları
+    lisans gereği projeye gömülmez, sistem yığını üzerinden gelir.
+    Google Fonts'tan yalnızca marka imzası olan Playfair Display çekilir;
+    Plus Jakarta Sans kaldırıldı (daha az istek, daha hızlı ilk boyama).
+  -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <!--
     Tek paket: css/style.css 50 dosyalik @import manifestidir ve kaynak
     dogrulugu odur; gelistirme yine ayri dosyalarda yapilir. Servis edilen

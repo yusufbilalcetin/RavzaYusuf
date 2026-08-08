@@ -71,8 +71,12 @@
 
     try {
       const legacyValue = valueAtPath(JSON.parse(legacyJson), script.dataset.legacyJsonPath);
-      if (typeof legacyValue !== "boolean") return null;
-      const migratedMode = legacyValue ? "dark" : "light";
+      // İki eski biçim: boolean bayrak (ok-bulmacasi "settings.dark") veya
+      // çözülmüş mod dizesi (oyun-platformu "theme": "dark"/"light").
+      const migratedMode = typeof legacyValue === "boolean"
+        ? (legacyValue ? "dark" : "light")
+        : (RESOLVED_MODES.includes(legacyValue) ? legacyValue : null);
+      if (!migratedMode) return null;
       safeStorageSet(STORAGE_KEYS.mode, migratedMode);
       return migratedMode;
     } catch {

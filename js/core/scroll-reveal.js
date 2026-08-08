@@ -108,7 +108,19 @@ export function initScrollReveal() {
       clearTimeout(livenessTimer);
       livenessTimer = 0;
     }
-  }, { root, rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    // threshold BILEREK 0: "goruntuye girdi mi" kapisini zaten rootMargin
+    // kuruyor (kokun alt kenari %8 yukari cekilir, yani blok ekranin son
+    // %8'ine degdiginde degil, gercekten icine girdiginde acilir).
+    //
+    // Ustune bir de threshold: .08 koymak orani HEDEFIN kendi yuksekligine
+    // gore olcuyordu ve cok uzun bloklarda saglanamiyordu: orn. Sinav
+    // Merkezi'ndeki .exam-pro-main-grid 2300px, gorunur alan 484px. En dibe
+    // kaydirildiginda bloktan geriye 153px kaliyor = %6.6 < %8, dolayisiyla
+    // gozlemci hic tetiklenmiyor ve blok kalici opacity:0'da kaliyordu.
+    // Hedef yuksekligi viewport'un ~12 katini asinca esik matematiksel olarak
+    // ulasilamaz hale geliyor. rootMargin tek basina yeterli ve yukseklikten
+    // bagimsiz.
+  }, { root, rootMargin: "0px 0px -8% 0px", threshold: 0 });
 
   watchedElements = targets;
   targets.forEach((element, index) => {

@@ -7,7 +7,12 @@
 
   <div class="game-tile-grid" data-game-catalog aria-label="Oyun listesi"></div>
 
-  <div class="game-stage" id="gameStage" hidden>
+  <!-- data-reveal-skip sart: bu tam ekran katman position:fixed. Scroll-reveal
+       gozlemcisi ozel bir root (uygulama kaydirma elemani) kullaniyor ve fixed
+       eleman onunla hic kesismiyor, yani .is-revealed hicbir zaman eklenmiyor.
+       Emniyet zamanlayicisi da ilk hedef acilir acilmaz iptal edildigi icin
+       sahne kalici olarak opacity:0'da kaliyordu - oyun gorunmuyordu. -->
+  <div class="game-stage" id="gameStage" hidden data-reveal-skip>
     <div class="game-stage-head">
       <div>
         <span class="unit-badge" id="gameStageBadge">OYUN</span>

@@ -58,7 +58,14 @@ const gameItems = Object.freeze(ACTIVE_GAMES.map((game) => app({
     : { route: "oyun", gameId: game.handlerId || game.id }),
   ...(game.appIcon
     ? { appIcon: game.appIcon }
-    : { asset: `./${game.icon}`, assetWidth: 1024, assetHeight: 1024 }),
+    : {
+      // 1024 master yalnız bağımsız oyun sayfalarının favicon'u; arayüz 128/256
+      // varyantlarını yükler. Bildirilen 1024×1024 kutusu yerleşimi aynen korur.
+      asset: `./assets/icons/games/128/${game.id}.png`,
+      asset2x: `./assets/icons/games/256/${game.id}.png`,
+      assetWidth: 1024,
+      assetHeight: 1024
+    }),
   tone: game.tone || "game",
   category: "Oyunlar",
   keywords: game.keywords

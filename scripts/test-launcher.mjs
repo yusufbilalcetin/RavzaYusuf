@@ -71,6 +71,12 @@ async function runBrowser(browserConfig) {
   const profile = join(tmpdir(), `ravza-launcher-${browserConfig.name}-${Date.now()}`);
   const browserProcess = spawn(browserConfig.path, [
     "--headless=new", "--disable-gpu", "--no-first-run",
+    // Tarayici uzantilari devre disi: Edge kendi Copilot/Assistant uzantisini
+    // enjekte ediyor ve onun hatalari ("AssistantLoadState already declared",
+    // "runtime.lastError") uygulama hatasi sayilip testi dusuruyordu.
+    // Ayni bayrak scripts/lib/theme-test-runtime.mjs ve test-all-applications
+    // icinde zaten var; bu dosyalarda eksik kalmisti.
+    "--disable-extensions", "--disable-background-networking", "--no-default-browser-check",
     `--remote-debugging-port=${browserConfig.port}`, `--user-data-dir=${profile}`, "about:blank"
   ], { stdio: "ignore" });
 
@@ -200,10 +206,16 @@ async function runBrowser(browserConfig) {
     assert.ok(!loadedLocalResources.has("/js/pages/boyama-page.js"), "Boyama modülü oyun açılmadan yüklendi");
     assert.ok(!loadedLocalResources.has("/js/games/renk-siralama.js"), "Renk Sıralama modülü oyun açılmadan yüklendi");
     assert.ok(![...loadedLocalResources].some((url) => url.startsWith("/games/candy-crush/dist/assets/")), "Candy Crush paketi oyun açılmadan yüklendi");
+    // Oyun ikonları 128/256 görüntüleme varyantlarından gelir; 1024 master yalnız
+    // bağımsız oyun sayfalarının favicon'u içindir ve launcher'da hiç istenmemelidir.
+    const gameIconRequests = (icon) => (initialRequestCounts.get(`/assets/icons/games/128/${icon}.png`) || 0)
+      + (initialRequestCounts.get(`/assets/icons/games/256/${icon}.png`) || 0);
     for (const icon of ["candy-crush", "meyve-eslestirme", "flappy-bird", "boyama"]) {
-      assert.equal(initialRequestCounts.get(`/assets/icons/games/${icon}.png`), 1, `${icon}: kritik ikon ilk açılışta tam bir istek oluşturmadı`);
+      assert.equal(gameIconRequests(icon), 1, `${icon}: kritik ikon ilk açılışta tam bir istek oluşturmadı`);
+      assert.equal(initialRequestCounts.get(`/assets/icons/games/${icon}.png`) || 0, 0, `${icon}: 1024 master launcher açılışında gereksiz yüklendi`);
     }
     for (const icon of ["renk-siralama", "sudoku", "sans-carki", "alan-bulmacasi", "ok-bulmacasi"]) {
+      assert.equal(gameIconRequests(icon), 0, `${icon}: ekran dışı ikon launcher açılışında gereksiz yüklendi`);
       assert.equal(initialRequestCounts.get(`/assets/icons/games/${icon}.png`) || 0, 0, `${icon}: ekran dışı ikon launcher açılışında gereksiz yüklendi`);
     }
     for (const icon of ["ravzalingo", "kahoot", "calisma-merkezi", "ezber-merkezi"]) {

@@ -68,7 +68,7 @@ function renderGameCatalog(root) {
           width: 128,
           height: 128
         })
-      : `<img class="game-tile-img" src="./${escapeHtml(game.icon)}" alt="" width="1024" height="1024" loading="${isPriority ? "eager" : "lazy"}" decoding="async" fetchpriority="${isPriority ? "high" : "low"}">`;
+      : `<img class="game-tile-img" src="./assets/icons/games/128/${escapeHtml(game.id)}.png" srcset="./assets/icons/games/128/${escapeHtml(game.id)}.png 1x, ./assets/icons/games/256/${escapeHtml(game.id)}.png 2x" alt="" width="1024" height="1024" loading="${isPriority ? "eager" : "lazy"}" decoding="async" fetchpriority="${isPriority ? "high" : "low"}">`;
     const content = `<span class="game-tile-art game-tile-art--icon" aria-hidden="true">${image}<span class="game-tile-fallback">${escapeHtml(game.name.charAt(0))}</span></span><span class="game-tile-copy"><strong>${escapeHtml(game.name)}</strong></span>`;
     if (game.launchMode === "link") {
       return `<a class="game-tile is-live" href="./${escapeHtml(game.path)}" aria-label="${escapeHtml(game.name)} oyununu aç">${content}</a>`;

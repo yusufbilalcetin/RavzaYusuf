@@ -1,0 +1,136 @@
+/* =========================================================================
+   iOS TASARIM TOKENLARI
+
+   Bu dosya degiskenler.css'ten HEMEN SONRA import edilir. Buradaki tokenlar
+   paletten türemez (renk yok), bu yüzden `body` değil `:root` üzerinde
+   durabilirler - degiskenler.css'teki "semantik tokenlar body'de" kuralı
+   yalnızca tema flip'inden etkilenen renkler için geçerlidir.
+
+   Kapsam bilinçli olarak dar tutuldu:
+     1. Font yığınları
+     2. iOS semantik tipografi ölçeği
+     3. Katman (z-index) ölçeği
+
+   Boşluk (--s-*) ve köşe (--r-*) ölçekleri BURADA TANIMLANMAZ; onlar zaten
+   layout/duzen-son.css içinde var ve tek kaynak orasıdır. Custom property'ler
+   @import sırasından bağımsız çözüldüğü için, bu dosyadan sonra gelen
+   bileşenler duzen-son.css'teki ölçeği sorunsuz kullanabilir.
+   ========================================================================= */
+
+:root {
+  /* -----------------------------------------------------------------------
+     1) FONT YIĞINLARI
+
+     Apple cihazlarda gerçek SF Pro sistem fontu kullanılır; SF dosyaları
+     projeye GÖMÜLMEZ (lisans). Diğer platformlarda kendi sistem fontuna
+     düşer: Windows -> Segoe UI, Android -> Roboto.
+
+     --font-display yalnızca marka imzası içindir (Yusuf ♥ Ravza kelime
+     markası ve birkaç görsel başlık). Arayüz metni ASLA display font
+     kullanmaz - okunabilirlik ve iOS hissi bundan gelir.
+  ----------------------------------------------------------------------- */
+  --font-ui:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    system-ui,
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+
+  /* Sayısal hizalama gereken yerler (skor, süre, istatistik) için. */
+  --font-numeric: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* -----------------------------------------------------------------------
+     2) TİPOGRAFİ ÖLÇEĞİ
+
+     iOS "Text Styles" ölçeği, varsayılan (Large) Dynamic Type boyutunda.
+     Her stil bir boyut + satır yüksekliği + harf aralığı üçlüsüdür.
+
+     Apple punto büyüdükçe harf aralığını SIKAR (optik düzeltme): büyük
+     puntoda harfler arası boşluk göz için zaten genişler. degiskenler.css
+     içindeki --track-* tokenları aynı mantığın eski adlarıdır.
+
+     Not: gövde metni 17px. Bu tesadüf değil - iOS Safari 16px ALTINDAKİ
+     input'larda otomatik zoom yapar; 17px gövde ölçeği bu tuzağı baştan
+     kapatır.
+  ----------------------------------------------------------------------- */
+  --font-caption2-size: 11px;
+  --font-caption2-line: 13px;
+  --font-caption2-track: .006em;
+
+  --font-caption1-size: 12px;
+  --font-caption1-line: 16px;
+  --font-caption1-track: 0;
+
+  --font-footnote-size: 13px;
+  --font-footnote-line: 18px;
+  --font-footnote-track: -.006em;
+
+  --font-subheadline-size: 15px;
+  --font-subheadline-line: 20px;
+  --font-subheadline-track: -.012em;
+
+  --font-callout-size: 16px;
+  --font-callout-line: 21px;
+  --font-callout-track: -.02em;
+
+  --font-body-size: 17px;
+  --font-body-line: 22px;
+  --font-body-track: -.024em;
+
+  --font-headline-size: 17px;
+  --font-headline-line: 22px;
+  --font-headline-track: -.024em;
+  --font-headline-weight: 600;
+
+  --font-title3-size: 20px;
+  --font-title3-line: 25px;
+  --font-title3-track: -.026em;
+
+  --font-title2-size: 22px;
+  --font-title2-line: 28px;
+  --font-title2-track: -.026em;
+
+  --font-title1-size: 28px;
+  --font-title1-line: 34px;
+  --font-title1-track: -.028em;
+
+  --font-large-title-size: clamp(30px, 3.2vw, 34px);
+  --font-large-title-line: 1.21;
+  --font-large-title-track: -.031em;
+
+  /* -----------------------------------------------------------------------
+     3) KATMAN ÖLÇEĞİ
+
+     Değerler UYDURULMADI: projede halihazırda bilinçli olarak seçilmiş
+     katmanlar var ve bu ölçek onları OLDUĞU GİBİ isimlendirir. Yani bu
+     tokenları benimsemek saf bir yeniden adlandırmadır, hiçbir şeyin
+     yığılma sırası değişmez:
+
+       dock            20    (launcher.css .launcher-dock)
+       topbar          40    (launcher.css #topbar-root)
+       launcher dialog 90    (launcher.css .launcher-dialog-layer)
+       tema sayfası  3010    (tema-paneli.css .theme-sheet)
+
+     Yeni eklenen tek katman --z-toast: tema sayfasının da üstünde olmalı,
+     çünkü bir sheet açıkken "Kaydedildi" bildirimi görünmek zorunda.
+
+     Kural: yeni kod ASLA çıplak sayı yazmaz. 999999 gibi değerler ölçeğin
+     olmadığının kanıtıdır, çözümü değil.
+  ----------------------------------------------------------------------- */
+  --z-content: 0;
+  --z-sticky: 10;
+  --z-dock: 20;
+  --z-nav: 40;
+  --z-dropdown: 60;
+  --z-overlay: 80;
+  --z-sheet: 90;
+  --z-modal: 3010;
+  --z-toast: 3400;
+}

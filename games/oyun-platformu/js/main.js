@@ -69,7 +69,17 @@ function refreshMenu() {
 
 /* ------------------------------ tema ------------------------------ */
 
+/* Tema kaynagi: varsa paylasilan kopru (js/game-theme-bridge.js), yoksa yerel
+   ayar. Kopru varken data-theme'i DOGRUDAN yazmayiz - yoksa kopru bir sonraki
+   senkronda (pageshow, matchMedia, sekmeler arasi storage) geri alir ve ikisi
+   birbiriyle kavga eder. setMode kanonik depoya yazar, kopru de attribute'u
+   kendi koyar; boylece secim sitenin geri kalaniyla ve yenilemeyle korunur. */
 function applyTheme() {
+  const bridge = window.RavzaGameTheme;
+  if (bridge?.setMode) {
+    bridge.setMode(settings.theme);
+    return;
+  }
   document.documentElement.dataset.theme = settings.theme;
 }
 
@@ -295,7 +305,17 @@ window.addEventListener("pointerdown", () => {
   audio.syncMusic();
 }, { once: false });
 
-applyTheme();
+/* Acilista yon TERS: kopru kazanir. applyTheme() cagirmak yerel ayari sitenin
+   temasinin uzerine yazardi; oysa kullanici temayi ay/gunes toggle'iyla
+   sitede secmis olabilir. Kopru zaten dogru attribute'u yazdi - biz sadece
+   yerel ayari ona esitleyip ayar ekranini tutarli tutuyoruz. */
+const bridgeState = window.RavzaGameTheme?.getState?.();
+if (bridgeState) {
+  settings.theme = bridgeState.resolvedMode;
+  saveSettings(settings);
+} else {
+  applyTheme();
+}
 syncAudioButtons();
 syncSettingsUI();
 refreshMenu();

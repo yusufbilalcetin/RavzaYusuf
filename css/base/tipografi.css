@@ -6,6 +6,9 @@
   --bg-elevated: color-mix(in srgb, var(--white) 90%, #ffffff 10%);
   --border-strong: color-mix(in srgb, var(--card-border) 55%, var(--text) 45%);
   --accent: var(--pink-bright);   /* açık moddaki --pink koyu zeminde sönük kalıyor */
+  /* Koyu modda accent zaten açık bir pembe; mürekkebe karıştırmak gereksiz
+     yere söndürürdü. Doğrudan accent kullanılıyor. */
+  --accent-ink: var(--accent);
   --accent-contrast: #14090f;     /* 6 presetin de koyu accent'i pastel: koyu mürekkep */
   --focus-ring: var(--accent);
   --shadow-color: rgba(0, 0, 0, .55);
@@ -56,7 +59,10 @@ body[data-theme-style="noel-ask"] {
   --bg: #fff6f8;
   --white: #fffafc;
   --text: #41222e;
-  --text-light: #8b6171;
+  /* #8b6171 sayfa zemininde geçiyordu (4.89) ama cam tema panelinin üstünde
+     2.5-3.4:1'e düşüyordu. Cam alfası tek başına yetmiyor (.94'te bile 3.87);
+     mürekkep de koyulaştı. Şimdi: sayfa 6.55, panel 4.89, seçim kartı 4.52. */
+  --text-light: #72505d;
   --card-border: #f3d7df;
   --input-bg: #fff4f7;
   --input-brd: #f0d0da;
@@ -189,7 +195,7 @@ html { scroll-behavior: smooth; }
 html, body { max-width: 100%; overflow-x: hidden; }
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   background:
     radial-gradient(circle at 12% 12%, rgba(212,102,156,.06), transparent 26%),
     radial-gradient(circle at 88% 18%, rgba(124,58,237,.05), transparent 22%),
@@ -284,12 +290,28 @@ body::-webkit-scrollbar-track {
   background: transparent;
 }
 
+/* iOS Safari, punto 16px'in ALTINDA olan bir alana odaklanınca sayfayı
+   otomatik yakınlaştırır ve kullanıcı elle geri uzaklaştırmak zorunda kalır.
+   Liste eskiden yalnızca text/search/email + iki sınıfı kapsıyordu; textarea,
+   select ve number/tel/password/url/date alanları açıkta kalmıştı. Bu dosyanın
+   2971. satırındaki "input/select/textarea minimum 16px" yorumu da kuralsız
+   kalmış, kapsadığını iddia ettiği şeyi kapsamıyordu. */
 input[type="text"],
 input[type="search"],
 input[type="email"],
+input[type="number"],
+input[type="tel"],
+input[type="password"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input:not([type]),
+textarea,
+select,
 .hub-search,
 .search-bar input {
-  font-size: 16px;
+  font-size: max(16px, 1em);
 }
 
 .sidebar {
@@ -334,7 +356,7 @@ input[type="email"],
 }
 
 .logo h2 {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 25px;
   margin-bottom: 4px;
   letter-spacing: -.02em;
@@ -654,7 +676,7 @@ body.dark .theme-sheet-head h3 { color: var(--pink-bright); }
   background: rgba(255,255,255,.16);
   color: transparent;
   border: 1px solid rgba(255,255,255,.28);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .theme-choice-check svg {
@@ -703,7 +725,12 @@ body.dark[data-theme-style="noel-ask"] .memory-back {
     linear-gradient(145deg, #5f1028, #8e2141 58%, #4d111f);
 }
 
-.page { display: none; animation: fadeUp var(--dur-slow) var(--ease-out) both; }
+/* 420ms (--dur-slow) sayfa girisi icin agir kaciyordu; iOS navigasyon gecisleri
+   180-350ms araliginda. 280ms ayni sakinligi koruyup daha "native" hissettiriyor.
+   DIKKAT: buraya transform EKLENMEZ - yukaridaki nota bakin: .page uzerindeki
+   transform, fixed konumlu alt ogeler icin iceren blok olusturur ve sayfa
+   arka planlari (#studyhub.active::before vb.) tam da fixed. */
+.page { display: none; animation: fadeUp 280ms var(--ease-out) both; }
 
 /* Sayfa ici kademe: baslik once yerine oturur, icerik 70ms sonra takip eder.
    Ayni anda gelen iki blok yerine sirali gelis, sayfaya sakin bir ritim verir. */
@@ -787,7 +814,11 @@ body.dark[data-theme-style="noel-ask"] .memory-back {
 #studyhub .topic-card {
   min-height: auto;
   text-align: center;
-  background: transparent !important;
+  /* Kart tamamen saydamdı ve açık metni doğrudan hero FOTOĞRAFININ üstüne
+     bırakıyordu; parlak kadrajlarda 2.57:1'e düşüyordu. Okunabilirlik katmanı
+     olarak koyu yarı saydam dolgu: en parlak fotoğrafta bile 5.9:1, kartın
+     "cam" görünümü ve ince açık kenarlığı korunuyor. */
+  background: rgba(16, 9, 23, .58) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 20px;
   box-shadow: none;
@@ -808,7 +839,9 @@ body.dark[data-theme-style="noel-ask"] .memory-back {
 }
 
 #studyhub .topic-card p {
-  color: rgba(240, 220, 232, 0.88);
+  /* Mor konu kartı zemininde .88 alfa 3.63:1 veriyordu. Pembe tonu korunarak
+     tam opaklığa çekildi: 4.81:1. */
+  color: rgb(248, 238, 245);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
@@ -890,7 +923,11 @@ body.dark:has(#studyhub.active) .topbar {
 #quizhub .topic-card {
   min-height: auto;
   text-align: center;
-  background: transparent !important;
+  /* Kart tamamen saydamdı ve açık metni doğrudan hero FOTOĞRAFININ üstüne
+     bırakıyordu; parlak kadrajlarda 2.57:1'e düşüyordu. Okunabilirlik katmanı
+     olarak koyu yarı saydam dolgu: en parlak fotoğrafta bile 5.9:1, kartın
+     "cam" görünümü ve ince açık kenarlığı korunuyor. */
+  background: rgba(16, 9, 23, .58) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   border-radius: 20px;
   box-shadow: none;
@@ -911,7 +948,9 @@ body.dark:has(#studyhub.active) .topbar {
 }
 
 #quizhub .topic-card p {
-  color: rgba(240, 220, 232, 0.88);
+  /* Mor konu kartı zemininde .88 alfa 3.63:1 veriyordu. Pembe tonu korunarak
+     tam opaklığa çekildi: 4.81:1. */
+  color: rgb(248, 238, 245);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
@@ -1119,7 +1158,7 @@ body.dark .result-title { color: var(--pink-bright); }
   justify-content: center;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .4px;
   padding: 6px 12px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
@@ -1449,7 +1488,7 @@ body.dark .recap-option-count { color: #d8c6ff; }
 .topic-title {
   font-size: 19px;
   color: var(--navy);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.4;
   letter-spacing: -.03em;
 }
@@ -1648,7 +1687,7 @@ body.dark .empty-state h3 { color: var(--pink-bright); }
   border-radius: 999px;
   background: rgba(124,58,237,.12);
   color: #6d28d9;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 body.dark .timer-pill { color: #c4b5fd; }
@@ -1737,7 +1776,7 @@ body.dark .flashcard strong { color: #fff; }
   background: var(--pink-pale);
   color: var(--navy);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -1763,7 +1802,7 @@ body.dark .fc-formula { color: #d8c6ff; }
 
 .fc-label {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .4px;
   text-transform: uppercase;
   color: var(--text-light);
@@ -1839,7 +1878,7 @@ body.dark .fc-trap { color: #facc15; }
 .source-table th {
   background: linear-gradient(180deg, color-mix(in srgb, var(--input-bg) 72%, white 28%), var(--input-bg));
   color: var(--navy);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 body.dark .source-table th { color: var(--pink-bright); }
@@ -1850,7 +1889,7 @@ body.dark .source-table th { color: var(--pink-bright); }
   font-size: 15px;
   margin: 16px 0 10px;
   color: var(--navy-mid);
-  font-weight: 800;
+  font-weight: 700;
 }
 
 body.dark .mini-title { color: var(--pink-bright); }
@@ -1923,7 +1962,7 @@ body.dark .memory-back {
 
 .memory-face small {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--text-light);
@@ -2001,7 +2040,7 @@ body.dark .memory-prompt-box { background: rgba(15,23,42,.34); }
 
 .memory-prompt-label {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--text-light);
@@ -2026,7 +2065,7 @@ body.dark .memory-prompt-text { color: #fff; }
   display: block;
   margin-bottom: 8px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--text-light);
@@ -2118,7 +2157,7 @@ body.dark .memory-feedback.error { background: rgba(239,68,68,.12); color: #fca5
   border: 1.5px solid var(--card-border);
   background: #ffffff;
   color: #334155;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--dur-base) var(--ease-out);
   box-shadow: var(--shadow-xs);
@@ -2144,13 +2183,13 @@ body.dark .exam-focus-card {
   background: linear-gradient(135deg, var(--navy), var(--navy-light));
   color: #fff;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .exam-question-title {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.4;
   letter-spacing: -.02em;
   margin-bottom: 16px;
@@ -2191,7 +2230,7 @@ body.dark .exam-option-btn {
   place-items: center;
   background: color-mix(in srgb, var(--navy) 10%, white);
   color: var(--navy);
-  font-weight: 800;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
@@ -2290,7 +2329,7 @@ body.dark .exam-option-btn {
   padding: 7px 12px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   border: 1px solid transparent;
 }
 
@@ -2354,7 +2393,7 @@ body.dark .mode-top strong { color: #fff; }
   border-color: color-mix(in srgb, var(--pink) 30%, var(--card-border) 70%);
   color: var(--navy);
   font-size: 20px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -2386,7 +2425,7 @@ body.dark .exam-nav-btn.exam-nav-arrow {
   border: 1.5px solid rgba(239, 68, 68, .28);
   background: rgba(239, 68, 68, .08);
   color: #dc2626;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 14px;
   cursor: pointer;
   transition: var(--dur-base) var(--ease-out);
@@ -2470,7 +2509,7 @@ body.dark .exam-cancel-dialog h3 { color: var(--pink-bright); }
 
 .exam-cancel-dialog p strong {
   color: #dc2626;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 body.dark .exam-cancel-dialog p strong { color: #fca5a5; }
@@ -2488,7 +2527,7 @@ body.dark .exam-cancel-dialog p strong { color: #fca5a5; }
   min-height: 48px;
   background: linear-gradient(135deg, #dc2626, #ef4444);
   color: #fff;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--dur-base) var(--ease-out);
   box-shadow: 0 14px 30px rgba(239, 68, 68, .28);
@@ -2532,7 +2571,11 @@ body.dark .memory-tab-bar {
   transition: transform var(--dur-fast) var(--ease-out), background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
 }
 
-body.dark .memory-tab-btn { color: #f4f6ff; }
+/* :not(.active) şart: bu kuralın özgüllüğü (0,2,1), aktif sekmenin kendi rengini
+   veren .memory-tab-btn.active'ten (0,2,0) yüksek. Onsuz koyu modda aktif
+   sekmenin metni accent gradyanı üstünde kırık beyaz kalıyor (2.57:1).
+   Kardeş kural body.dark .memory-mode-btn:not(.active) zaten böyleydi. */
+body.dark .memory-tab-btn:not(.active) { color: #f4f6ff; }
 
 body.dark .memory-tab-btn:hover { background: rgba(255, 255, 255, 0.06); }
 
@@ -3079,7 +3122,7 @@ body.dark .memory-question-card {
 
 .memory-question-label {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .14em;
   color: var(--pink);
   text-transform: uppercase;
@@ -3133,7 +3176,7 @@ body.dark .memory-question-text { color: #fff; }
 
 .memory-option-tag {
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .12em;
   color: var(--pink);
   background: rgba(212, 102, 156, .12);
@@ -3170,7 +3213,7 @@ body.dark .memory-feedback.error { color: #fecaca; }
 .memory-next-btn {
   width: 100%;
   min-height: 52px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -.01em;
   font-size: 15px;
 }
@@ -3215,7 +3258,7 @@ body.dark .memory-search-sticky {
   background: linear-gradient(135deg, var(--pink), var(--pink-bright));
   color: #fff;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 12px 28px rgba(212, 102, 156, .35);
@@ -3418,7 +3461,7 @@ body.dark .memory-favorite-btn {
   border: 1px solid rgba(212,102,156,.24);
   background: rgba(255,255,255,.78);
   color: var(--navy);
-  font-weight: 800;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3507,13 +3550,13 @@ body.theme-sheet-open .scroll-top-btn {
 }
 
 .exam-pro-header h2 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   font-size: clamp(28px, 3vw, 42px);
   line-height: 1.05;
   color: #071329;
   letter-spacing: -.045em;
   margin: 8px 0 8px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .exam-pro-header p {
@@ -3532,7 +3575,7 @@ body.theme-sheet-open .scroll-top-btn {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-weight: 800;
+  font-weight: 700;
   box-shadow: 0 16px 32px rgba(2, 6, 23, .16);
   cursor: pointer;
   white-space: nowrap;
@@ -3584,7 +3627,7 @@ body.theme-sheet-open .scroll-top-btn {
   font-size: clamp(24px, 2vw, 34px);
   line-height: 1;
   letter-spacing: -.04em;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .exam-pro-main-grid {
@@ -3604,10 +3647,10 @@ body.theme-sheet-open .scroll-top-btn {
 
 .exam-pro-panel h3,
 .exam-panel-head h3 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   color: #071329;
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -.03em;
   margin: 0;
 }
@@ -3617,7 +3660,7 @@ body.theme-sheet-open .scroll-top-btn {
   background: transparent;
   color: #4f46e5;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -3644,14 +3687,14 @@ body.theme-sheet-open .scroll-top-btn {
   display: grid;
   place-items: center;
   font-size: 36px;
-  font-weight: 900;
+  font-weight: 700;
   color: #6d28d9;
 }
 
 .exam-category-card h4 {
   color: #0f172a;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   margin: 0;
 }
 
@@ -3672,7 +3715,7 @@ body.theme-sheet-open .scroll-top-btn {
 .exam-category-footer span {
   color: #64748b;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .exam-category-footer button {
@@ -3682,7 +3725,7 @@ body.theme-sheet-open .scroll-top-btn {
   background: #7c3aed;
   padding: 8px 12px;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -3714,7 +3757,7 @@ body.theme-sheet-open .scroll-top-btn {
   border-radius: 50%;
   display: grid; place-items: center;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   color: #0f172a;
   background: conic-gradient(#22c55e calc(var(--p, 0) * 1%), #e5e7eb 0);
   position: relative;
@@ -3732,7 +3775,7 @@ body.theme-sheet-open .scroll-top-btn {
   color: #16a34a;
   background: #dcfce7;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .exam-action-grid {
@@ -3762,7 +3805,7 @@ body.theme-sheet-open .scroll-top-btn {
   font-size: 18px;
 }
 
-.exam-action-grid strong { font-size: 13px; font-weight: 900; }
+.exam-action-grid strong { font-size: 13px; font-weight: 700; }
 
 .exam-action-grid small { font-size: 11px; color: #64748b; }
 
@@ -3780,7 +3823,7 @@ body.theme-sheet-open .scroll-top-btn {
 
 .exam-chart-label { fill: #64748b; font-size: 12px; font-weight: 700; }
 
-.exam-chart-score { fill: #4f46e5; font-size: 12px; font-weight: 900; }
+.exam-chart-score { fill: #4f46e5; font-size: 12px; font-weight: 700; }
 
 .exam-goals-panel,
 .exam-tips-panel { display: grid; gap: 14px; }
@@ -3798,7 +3841,7 @@ body.theme-sheet-open .scroll-top-btn {
 
 .exam-goal-item small { color: #64748b; font-size: 11px; }
 
-.exam-goal-item > span { justify-self: end; color: #0f172a; font-size: 13px; font-weight: 900; }
+.exam-goal-item > span { justify-self: end; color: #0f172a; font-size: 13px; font-weight: 700; }
 
 .exam-tip-item {
   display: flex;
@@ -3913,7 +3956,7 @@ body.dark .exam-history-btn { background: #f8eaf0; color: #120712; }
   background: color-mix(in srgb, var(--white) 92%, transparent);
   color: var(--text);
   font-size: .96rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
   padding: 0 16px;
   cursor: pointer;
@@ -3985,7 +4028,7 @@ body.dark .result-question-detail-head h4 {
 .result-question-text {
   color: var(--text);
   font-size: clamp(1rem, 1.6vw, 1.12rem);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.7;
   padding: 16px 18px;
   border-radius: 18px;
@@ -4017,7 +4060,7 @@ body.dark .result-question-detail-head h4 {
   border-radius: 12px;
   display: grid;
   place-items: center;
-  font-weight: 900;
+  font-weight: 700;
   background: var(--input-bg);
   color: var(--navy);
   border: 1px solid var(--card-border);
@@ -4177,7 +4220,7 @@ body.dark .detailed-explanation-box p {
   background: color-mix(in srgb, var(--pink-pale) 68%, var(--white) 32%);
   color: var(--navy);
   border: 1px solid color-mix(in srgb, var(--pink) 22%, var(--card-border));
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .option-explanation-head strong {
@@ -4189,7 +4232,7 @@ body.dark .detailed-explanation-box p {
 .option-explanation-head em {
   font-style: normal;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 6px 9px;
   border-radius: 999px;
   background: rgba(148, 163, 184, .12);
@@ -4339,7 +4382,7 @@ body.dark .result-option-explanation-item.is-selected-wrong .option-explanation-
   background: var(--input-bg);
   color: var(--text);
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .exam-history-modal-list {
@@ -4374,7 +4417,7 @@ body.dark .result-option-explanation-item.is-selected-wrong .option-explanation-
   place-items: center;
   background: color-mix(in srgb, var(--pink) 14%, var(--white));
   color: var(--navy);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .exam-history-info,
@@ -4386,7 +4429,7 @@ body.dark .result-option-explanation-item.is-selected-wrong .option-explanation-
 .exam-history-info strong,
 .exam-history-score strong {
   color: var(--text);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .exam-history-info small,
@@ -4442,7 +4485,7 @@ body.dark .exam-recent-item:hover {
 .exam-history-open-label {
   color: var(--pink-bright);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -4486,7 +4529,7 @@ body.dark .exam-chart-panel .exam-chart-box {
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--white) 92%, transparent), color-mix(in srgb, var(--input-bg) 92%, transparent));
   color: var(--text);
-  font-weight: 800;
+  font-weight: 700;
   padding: 0 38px 0 14px;
   box-shadow: 0 10px 24px rgba(15,23,42,.06);
   outline: none;
@@ -4549,7 +4592,7 @@ body.dark .exam-chart-panel .exam-chart-box::before {
   border: 1px solid color-mix(in srgb, var(--card-border) 78%, var(--pink) 22%);
   background: color-mix(in srgb, var(--input-bg) 88%, var(--white) 12%);
   color: var(--text);
-  font-weight: 900;
+  font-weight: 700;
   font-size: 12.5px;
   padding: 0 34px 0 12px;
   outline: none;
@@ -4578,7 +4621,7 @@ body.dark .exam-chart-panel .exam-chart-box::before {
 .exam-chart-mini-card span {
   color: var(--text-light);
   font-size: 10.5px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .05em;
   text-transform: uppercase;
 }
@@ -4843,7 +4886,7 @@ body.dark #examcenter #examPerformanceSvg text[fill="#3f1f2d"] {
   background: rgba(255,255,255,.14);
   color: rgba(255,255,255,.88);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
@@ -4907,7 +4950,7 @@ body.dark #examcenter #examPerformanceSvg text[fill="#3f1f2d"] {
   min-height: 44px;
   white-space: nowrap;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   transition: var(--dur-base) var(--ease-out);
   box-shadow: var(--shadow-xs);
@@ -4958,7 +5001,7 @@ body.dark #examcenter #examPerformanceSvg text[fill="#3f1f2d"] {
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .03em;
 }
 
@@ -4974,7 +5017,7 @@ body.dark .fill-gap-card h3 { color: var(--pink-bright); }
 
 .fill-gap-card p { color: var(--text-light); line-height: 1.7; font-size: 14px; }
 
-.fill-gap-card-meta { color: var(--text-light); font-size: 12.5px; font-weight: 800; }
+.fill-gap-card-meta { color: var(--text-light); font-size: 12.5px; font-weight: 700; }
 
 .fill-gap-start-btn { justify-self: start; margin-top: 4px; }
 
@@ -5088,7 +5131,7 @@ body.dark .fill-gap-wordbox-title strong { color: var(--pink-bright); }
   background: var(--input-bg);
   color: var(--text);
   padding: 10px 15px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: grab;
   transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
   touch-action: manipulation;
@@ -5138,7 +5181,7 @@ body.dark .fill-gap-wordbox-title strong { color: var(--pink-bright); }
   color: #fff;
   background: linear-gradient(135deg, var(--navy), var(--navy-light));
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .fill-gap-question-line p {
@@ -5159,7 +5202,7 @@ body.dark .fill-gap-wordbox-title strong { color: var(--pink-bright); }
   border: 2px dashed color-mix(in srgb, var(--pink) 38%, var(--card-border));
   background: var(--white);
   color: var(--text-light);
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
   vertical-align: middle;
@@ -5306,7 +5349,7 @@ body.dark .fill-gap-explanation.wrong { background: rgba(239,68,68,.12); color: 
 
 .fill-gap-filter-label {
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .03em;
   color: var(--navy);
 }
@@ -5327,7 +5370,7 @@ body.dark .fill-gap-explanation.wrong { background: rgba(239,68,68,.12); color: 
   background: var(--white);
   color: var(--text);
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   outline: none;
   appearance: none;
   -webkit-appearance: none;
@@ -5359,7 +5402,7 @@ body.dark .fill-gap-explanation.wrong { background: rgba(239,68,68,.12); color: 
   background: color-mix(in srgb, var(--pink-pale) 72%, var(--white));
   color: var(--navy);
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -5434,7 +5477,7 @@ body.dark .fill-gap-explanation.wrong { background: rgba(239,68,68,.12); color: 
   color: var(--pink);
   border: 1px solid color-mix(in srgb, var(--pink) 18%, var(--card-border));
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .fill-gap-wordbox {
@@ -5582,7 +5625,7 @@ body.dark .streak-main-info h3 {
   color: var(--text-light);
   border: 1px solid var(--card-border);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -5634,7 +5677,7 @@ body.dark .streak-week-head strong {
   place-items: center;
   color: var(--text-light);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   transition: var(--dur-base) var(--ease-out);
 }
 
@@ -5765,7 +5808,7 @@ body:not(.dark) #fillgaphub.fill-gap-focus-mode #fillGapWordBox {
 #fillgaphub.fill-gap-focus-mode .fill-gap-wordbar-title strong {
   color: var(--pink-bright) !important;
   font-size: 13px !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   letter-spacing: .04em !important;
   text-transform: uppercase !important;
 }
@@ -5796,7 +5839,7 @@ body:not(.dark) #fillgaphub.fill-gap-focus-mode #fillGapWordBox {
   padding: 10px 24px !important;
   min-height: 44px !important;
   font-size: 0.9rem !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
   color: var(--text) !important;
   border: 1px solid var(--card-border) !important;
   background: rgba(255, 255, 255, 0.03) !important;
@@ -5827,7 +5870,7 @@ body:not(.dark) #fillgaphub.fill-gap-focus-mode .fill-gap-word {
   background: linear-gradient(135deg, #ff512f, #dd2476) !important;
   color: #ffffff !important;
   border-color: transparent !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   box-shadow: 0 6px 20px rgba(255, 81, 47, 0.40) !important;
   transform: translateY(-2px) !important;
 }
@@ -6014,7 +6057,7 @@ body.dark .device-permission-card {
   background: linear-gradient(135deg, rgba(124,58,237,.16), rgba(212,102,156,.16));
   color: var(--navy);
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .08em;
   margin-bottom: 10px;
 }
@@ -6062,7 +6105,7 @@ body.dark .device-detected-box strong {
 }
 
 .device-detected-box span {
-  font-weight: 900;
+  font-weight: 700;
   color: var(--text);
   line-height: 1.35;
 }
@@ -6070,7 +6113,7 @@ body.dark .device-detected-box strong {
 .device-select-label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 13px;
   color: var(--navy);
 }
@@ -6108,7 +6151,7 @@ body.dark .device-select-label {
   border-radius: 999px;
   border: none;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 700;
   padding: 12px 16px;
   transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out);
 }
@@ -6168,7 +6211,7 @@ body.dark .device-select-label {
   background: rgba(255,255,255,.14);
   color: #fff;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -6219,7 +6262,7 @@ body.dark .visual-note strong {
   background: var(--white);
   border: 1px solid var(--card-border);
   text-align: center;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.35;
 }
 
@@ -6323,7 +6366,7 @@ body.dark .love-brand-main {
   display: inline-block;
   margin: 0 .12em;
   color: #ff3f72;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   font-size: .82em;
   filter: drop-shadow(0 0 7px rgba(255, 63, 114, .48));
   animation: loveHeartPulse 2.6s ease-in-out infinite;
@@ -6332,7 +6375,7 @@ body.dark .love-brand-main {
 .love-brand-sub {
   position: relative;
   font-size: clamp(11px, 1.25vw, 16px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .015em;
   color: var(--pink-bright);
   white-space: nowrap;
@@ -6660,7 +6703,7 @@ body.rlz5-page-active .page.ravzalingo-page.active::after {
   border-radius:7px;
   background:linear-gradient(135deg,#7c2cff,#ec4899);
   color:#fff;
-  font-weight:900;
+  font-weight:700;
   font-size:11px!important;
   box-shadow:0 8px 18px rgba(168,85,247,.28);
 }
@@ -6696,7 +6739,7 @@ body.rlz5-page-active .page.ravzalingo-page.active::after {
 
 .kahoot-top-stats strong{font-size:16px;color:var(--pink-bright)}
 
-.kahoot-top-stats small{display:block;font-size:10px;text-transform:uppercase;font-weight:800;color:var(--text-light)}
+.kahoot-top-stats small{display:block;font-size:10px;text-transform:uppercase;font-weight:700;color:var(--text-light)}
 
 .kahoot-hero-card{
   position:relative;
@@ -6735,7 +6778,7 @@ body.dark .kahoot-hero-card{
   font-size:54px;
   line-height:1;
   color:#fff;
-  font-weight:1000;
+  font-weight:700;
   letter-spacing:-.08em;
   background:linear-gradient(135deg,#7c2cff,#ec4899);
   box-shadow:0 22px 52px rgba(168,85,247,.36);
@@ -6751,7 +6794,9 @@ body.dark .kahoot-hero-card{
 
 .kahoot-hero-copy h2{
   font-size:22px;
-  color:var(--pink-bright);
+  /* --pink-bright KOYU modun accent'i; burada kapsamsiz kullanildigi icin
+     acik modda kirik beyaz uzerinde 1.37-2.18:1 veriyordu. */
+  color:var(--accent-ink);
   margin:0;
 }
 
@@ -6786,18 +6831,18 @@ body.dark[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
   border-radius:16px;
   padding:13px 18px;
   color:#fff;
-  font-weight:900;
+  font-weight:700;
   cursor:pointer;
   background:linear-gradient(135deg,#ec4899,#7c2cff);
   box-shadow:0 14px 30px rgba(236,72,153,.22);
   transition:transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out),filter var(--dur-base) var(--ease-out);
 }
 
-.kahoot-device strong{display:block;text-align:center;color:#fff;font-size:36px;margin:0 0 18px;font-weight:1000}
+.kahoot-device strong{display:block;text-align:center;color:#fff;font-size:36px;margin:0 0 18px;font-weight:700}
 
 .kahoot-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 
-.kahoot-mini-grid span{display:grid;place-items:center;min-height:45px;border-radius:8px;color:#fff;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.kahoot-mini-grid span{display:grid;place-items:center;min-height:45px;border-radius:8px;color:#fff;font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
 
 .kahoot-trophy{position:absolute;right:8%;bottom:6%;font-size:88px;filter:drop-shadow(0 18px 24px rgba(0,0,0,.28))}
 
@@ -6815,7 +6860,7 @@ body.dark[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
 }
 
 .kahoot-section-head h3,
-.kahoot-panel h3{margin:0;color:var(--pink-bright);font-size:18px}
+.kahoot-panel h3{margin:0;color:var(--accent-ink);font-size:18px}
 
 .kahoot-category-grid{
   display:grid;
@@ -6852,13 +6897,13 @@ body.dark[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
 
 .kahoot-category-text small{font-size:12px;color:var(--text-light);line-height:1.45}
 
-.kahoot-category-text em{font-style:normal;font-size:12px;font-weight:900;color:var(--pink-bright);padding:6px 10px;border-radius:999px;background:color-mix(in srgb,var(--pink-pale) 70%,transparent);width:max-content;max-width:100%}
+.kahoot-category-text em{font-style:normal;font-size:12px;font-weight:700;color:var(--accent-ink);padding:6px 10px;border-radius:999px;background:color-mix(in srgb,var(--pink-pale) 70%,transparent);width:max-content;max-width:100%}
 
 .kahoot-arrow{font-size:20px;color:var(--text-light)}
 
 .kahoot-bottom-grid{display:grid;grid-template-columns:1.6fr .9fr;gap:16px}
 
-.kahoot-panel-head button{border:1px solid var(--card-border);border-radius:999px;background:var(--input-bg);color:var(--text);padding:8px 12px;font-weight:800;cursor:pointer}
+.kahoot-panel-head button{border:1px solid var(--card-border);border-radius:999px;background:var(--input-bg);color:var(--text);padding:8px 12px;font-weight:700;cursor:pointer}
 
 .kahoot-recent-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
@@ -6876,7 +6921,7 @@ body.dark[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
   cursor:pointer;
 }
 
-.kahoot-k-badge{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,#7c2cff,#ec4899);color:#fff;font-weight:1000;box-shadow:0 12px 26px rgba(124,44,255,.22)}
+.kahoot-k-badge{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,#7c2cff,#ec4899);color:#fff;font-weight:700;box-shadow:0 12px 26px rgba(124,44,255,.22)}
 
 .kahoot-recent-item span:not(.kahoot-k-badge){display:flex;flex-direction:column;gap:4px}
 
@@ -6888,21 +6933,21 @@ body.dark[data-theme-style] .kahoot-hero-copy h2{color:#ff8fc2}
 
 .kahoot-play-top{border:1px solid var(--card-border);background:var(--white);border-radius:20px;padding:16px 18px}
 
-.kahoot-play-top button{border:0;background:var(--input-bg);color:var(--text);border-radius:14px;padding:10px 14px;font-weight:900;cursor:pointer}
+.kahoot-play-top button{border:0;background:var(--input-bg);color:var(--text);border-radius:14px;padding:10px 14px;font-weight:700;cursor:pointer}
 
 .kahoot-play-top div{display:flex;flex-direction:column;text-align:center}
 
 .kahoot-play-top small{color:var(--text-light)}
 
-.kahoot-play-top>span{font-weight:1000;color:var(--pink-bright)}
+.kahoot-play-top>span{font-weight:700;color:var(--pink-bright)}
 
-.kahoot-question-meta{display:inline-flex;align-items:center;gap:10px;margin-bottom:14px;color:var(--text-light);font-weight:900}
+.kahoot-question-meta{display:inline-flex;align-items:center;gap:10px;margin-bottom:14px;color:var(--text-light);font-weight:700}
 
 .kahoot-question-card h2{font-size:28px;line-height:1.35;color:var(--text);margin:0}
 
 .kahoot-answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
-.kahoot-answer{min-height:112px;border:0;border-radius:20px;color:#fff;display:flex;align-items:center;gap:16px;padding:20px;text-align:left;cursor:pointer;font-size:18px;font-weight:900;box-shadow:0 18px 36px rgba(15,23,42,.16);transition:.2s ease}
+.kahoot-answer{min-height:112px;border:0;border-radius:20px;color:#fff;display:flex;align-items:center;gap:16px;padding:20px;text-align:left;cursor:pointer;font-size:18px;font-weight:700;box-shadow:0 18px 36px rgba(15,23,42,.16);transition:.2s ease}
 
 .kahoot-answer span{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.22);font-size:22px}
 
@@ -6961,7 +7006,7 @@ body.dark .kahoot-room-launch-card{
 .kahoot-room-tag{
   display:inline-flex;align-items:center;
   padding:6px 12px;border-radius:999px;
-  font-size:11px;font-weight:900;letter-spacing:.18em;
+  font-size:11px;font-weight:700;letter-spacing:.18em;
   background:linear-gradient(135deg,#22c55e,#16a34a);
   color:#fff;margin-bottom:10px;
   box-shadow:0 8px 18px rgba(34,197,94,.30);
@@ -7009,7 +7054,7 @@ body.dark .kahoot-room-history li strong{color:#f8eafd}
   position:relative;z-index:1;display:grid;place-items:center;
   width:56px;height:56px;border-radius:16px;
   background:linear-gradient(135deg,#ec4899,#7c2cff);
-  color:#fff;font-weight:1000;font-size:24px;
+  color:#fff;font-weight:700;font-size:24px;
   box-shadow:0 14px 26px rgba(124,44,255,.45);
 }
 
@@ -7059,7 +7104,7 @@ body.dark[data-theme-style] .kahoot-host-info-card h2{color:#f8eafd}
 .kahoot-host-info-card p{color:var(--text-light);line-height:1.6;margin-bottom:14px}
 
 .kahoot-pin-block small{
-  display:block;font-size:11px;font-weight:900;letter-spacing:.14em;
+  display:block;font-size:11px;font-weight:700;letter-spacing:.14em;
   color:#7c3aed;text-transform:uppercase;margin-bottom:4px;
 }
 
@@ -7068,7 +7113,7 @@ body.dark[data-theme-style] .kahoot-pin-block small{color:#c4b5fd}
 
 .kahoot-pin-value{
   font-size:clamp(34px,5vw,52px);
-  letter-spacing:.18em;line-height:1;color:var(--text);font-weight:900;
+  letter-spacing:.18em;line-height:1;color:var(--text);font-weight:700;
 }
 
 body.dark .kahoot-pin-value,
@@ -7132,7 +7177,7 @@ body.dark .kahoot-qr-fallback strong{color:#f8eafd}
 .kahoot-qr-fallback span{color:var(--text-light);font-size:12px;font-weight:700}
 
 .kahoot-qr-fallback a{
-  color:#7c2cff;font-weight:800;text-decoration:underline;
+  color:#7c2cff;font-weight:700;text-decoration:underline;
   word-break:break-all;font-size:12.5px;
 }
 
@@ -7148,7 +7193,9 @@ body.dark .kahoot-qr-fallback a{color:#c4b5fd}
 }
 
 .kahoot-localhost-warning code{
-  font-family:'Plus Jakarta Sans',monospace;
+  /* Plus Jakarta Sans monospace DEĞİL ve listede önce geldiği için hep o
+     kazanıyordu: <code> orantılı fontla çiziliyordu. Gerçek mono yığını. */
+  font-family: var(--font-numeric);
   background:rgba(0,0,0,.06);padding:2px 6px;border-radius:6px;font-size:12px;
 }
 
@@ -7185,7 +7232,7 @@ body.dark[data-theme-style] .kahoot-host-players-head h3{color:#f8eafd}
   display:inline-grid;place-items:center;min-width:34px;
   padding:4px 10px;border-radius:999px;
   background:linear-gradient(135deg,#ec4899,#7c2cff);color:#fff;
-  font-weight:900;font-size:13px;
+  font-weight:700;font-size:13px;
 }
 
 .kahoot-players-grid{
@@ -7215,7 +7262,7 @@ body.dark .kahoot-player-chip strong{color:#fff}
 }
 
 .kahoot-countdown-num{
-  font-size:clamp(96px,18vw,180px);line-height:1;font-weight:900;
+  font-size:clamp(96px,18vw,180px);line-height:1;font-weight:700;
   background:linear-gradient(135deg,#7c2cff,#ec4899);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   animation:kahootCountPop .5s cubic-bezier(.18,1.18,.55,1) both;
@@ -7238,7 +7285,7 @@ body.dark .kahoot-player-chip strong{color:#fff}
 
 .kahoot-host-answered{
   display:flex;flex-direction:column;align-items:flex-end;
-  font-weight:900;color:var(--text);
+  font-weight:700;color:var(--text);
 }
 
 .kahoot-host-answered small{font-weight:600;color:var(--text-light)}
@@ -7247,7 +7294,7 @@ body.dark .kahoot-player-chip strong{color:#fff}
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 14px;border-radius:999px;
   background:rgba(124,58,237,.14);color:#7c2cff;
-  font-weight:900;font-size:13px;
+  font-weight:700;font-size:13px;
 }
 
 .kahoot-timer-pill.big{padding:10px 18px;font-size:15px}
@@ -7261,7 +7308,7 @@ body.dark[data-theme-style] .kahoot-timer-pill{color:#c4b5fd;background:rgba(124
   position:absolute;top:10px;right:14px;
   background:rgba(0,0,0,.32);color:#fff;
   border-radius:999px;padding:4px 10px;
-  font-size:12px;font-weight:900;font-style:normal;
+  font-size:12px;font-weight:700;font-style:normal;
 }
 
 .kahoot-host-controls{
@@ -7281,7 +7328,7 @@ body.dark[data-theme-style] .kahoot-timer-pill{color:#c4b5fd;background:rgba(124
 
 .kahoot-host-mini-lb h3{
   margin:0 0 6px;font-size:14px;color:var(--text-light);
-  font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;
 }
 
 .kahoot-lb-row{
@@ -7320,14 +7367,14 @@ body.dark .kahoot-podium-spot.first{background:linear-gradient(180deg,rgba(245,1
 
 body.dark .kahoot-podium-spot strong{color:#f8eafd}
 
-.kahoot-podium-spot span{font-size:18px;font-weight:900;color:var(--pink-bright)}
+.kahoot-podium-spot span{font-size:18px;font-weight:700;color:var(--pink-bright)}
 
 .kahoot-leaderboard-final{
   margin:18px auto 0;max-width:520px;text-align:left;
   display:flex;flex-direction:column;gap:8px;
 }
 
-.kahoot-leaderboard-final h3{margin:0 0 6px;font-size:14px;color:var(--text-light);font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.kahoot-leaderboard-final h3{margin:0 0 6px;font-size:14px;color:var(--text-light);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 
 .kahoot-host-final-actions{
   display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;
@@ -7398,7 +7445,7 @@ body.dark .kahoot-player-error{color:#fca5a5}
   padding:10px 14px;border-radius:14px;
   background:var(--white);border:1px solid var(--card-border);
   margin-bottom:14px;
-  font-weight:900;color:var(--text);font-size:13px;
+  font-weight:700;color:var(--text);font-size:13px;
 }
 
 .kahoot-player-qtext{
@@ -7422,13 +7469,13 @@ body.dark[data-theme-style] .kahoot-player-qtext{color:#f8eafd}
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 16px;border-radius:999px;
   background:rgba(124,58,237,.18);color:#7c2cff;
-  font-weight:900;font-size:13px;margin-top:6px;
+  font-weight:700;font-size:13px;margin-top:6px;
 }
 
 body.dark .kahoot-player-score-pill{color:#c4b5fd}
 
 .kahoot-player-result .kahoot-score-big{
-  font-size:64px;line-height:1;color:var(--pink-bright);font-weight:900;
+  font-size:64px;line-height:1;color:var(--pink-bright);font-weight:700;
 }
 
 /* Setup / Join modals */
@@ -7446,7 +7493,7 @@ body.dark .kahoot-player-score-pill{color:#c4b5fd}
 
 .kahoot-setup-label{
   display:flex;flex-direction:column;gap:6px;
-  font-size:12px;font-weight:900;letter-spacing:.04em;
+  font-size:12px;font-weight:700;letter-spacing:.04em;
   color:var(--text-light);text-transform:uppercase;
 }
 
@@ -7502,7 +7549,7 @@ body.dark .kahoot-host-qr-card {
     linear-gradient(135deg, #7c2cff 0%, #ec4899 55%, #38bdf8 115%);
   color: #fff;
   font-size: 12.5px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -7544,9 +7591,9 @@ body.dark .kahoot-host-qr-card {
 .kahoot-qr-confetti.c2 { top: 56px; right: 10px; background: #38bdf8; transform: rotate(-24deg); }
 
 .kahoot-qr-logo-text {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   font-size: 30px;
-  font-weight: 1000;
+  font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
@@ -7578,7 +7625,7 @@ body.dark[data-theme-style] .kahoot-qr-helper {
   word-break: break-all;
   text-align: center;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.55;
   background:
     linear-gradient(135deg, #c4b5fd 0%, #f9a8d4 55%, #7dd3fc 100%);
@@ -7868,7 +7915,10 @@ body.dark #studydetail .word-card {
   font-size: 16px;
   font-weight: 700;
   border-radius: 16px;
-  background: linear-gradient(135deg, #7b1731, #a51f4a);
+  /* iOS butonu duz dolgudur; gradyan web dili. Iki durak arasindaki
+     duz ton secildi: beyaz metinle kontrast korunuyor (~8:1) ve
+     noel-ask bordo kimligi ayni kaliyor. */
+  background: #8d1b3c;
   color: #fff;
   border: none;
   cursor: pointer;
@@ -8107,7 +8157,7 @@ body:has(#dashboard.active) .content-wrapper {
   align-self: end !important;
   font-size: clamp(19px, 1.35vw, 24px) !important;
   line-height: 1.05 !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
   color: #fff5f8 !important;
   letter-spacing: 0 !important;
 }

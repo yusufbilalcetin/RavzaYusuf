@@ -34,6 +34,16 @@ for (const id of expectedIds) {
   const expectedSize = id === "ok-bulmacasi" ? 128 : 1024;
   assert.equal(metadata.width, expectedSize, `${id}: ikon genişliği ${expectedSize} değil`);
   assert.equal(metadata.height, expectedSize, `${id}: ikon yüksekliği ${expectedSize} değil`);
+
+  // Arayüz 1024 masterı değil 128/256 görüntüleme varyantlarını yükler.
+  if (id === "ok-bulmacasi") continue;
+  for (const size of [128, 256]) {
+    const variantPath = path.join(projectRoot, "assets", "icons", "games", String(size), `${id}.png`);
+    await access(variantPath);
+    const variant = await sharp(variantPath).metadata();
+    assert.equal(variant.width, size, `${id}: ${size}px varyant genişliği hatalı`);
+    assert.equal(variant.height, size, `${id}: ${size}px varyant yüksekliği hatalı`);
+  }
 }
 
 const [gamePage, launcherData, boyamaPage] = await Promise.all([
@@ -45,7 +55,8 @@ const [gamePage, launcherData, boyamaPage] = await Promise.all([
 assert.match(gamePage, /data-game-catalog/, "Oyun Alanı merkezi katalog hedefini içermiyor");
 assert.equal(ACTIVE_GAMES.length, expectedIds.length, "Aktif oyun sayısı ikon sayısıyla eşleşmiyor");
 assert.match(launcherData, /import \{ ACTIVE_GAMES \}/, "Launcher merkezi oyun kataloğunu kullanmıyor");
-assert.ok(boyamaPage.includes(GAME_ICONS.boyama), "Boyama giriş ekranı ortak ikonu kullanmıyor");
+const boyamaDisplayIcon = GAME_ICONS.boyama.replace("/games/", "/games/128/");
+assert.ok(boyamaPage.includes(boyamaDisplayIcon), "Boyama giriş ekranı ortak ikonu kullanmıyor");
 assert.doesNotMatch(`${gamePage}\n${launcherData}\n${boyamaPage}`, /assets\/oyun-bolumu\/optimized\/ikon-/, "Eski oyun ikonu yolu hâlâ kullanılıyor");
 
 process.stdout.write(`[game-icons] Kontrol başarılı — ${expectedIds.length} PNG, merkezi katalog ve giriş ekranı referansları tutarlı.\n`);

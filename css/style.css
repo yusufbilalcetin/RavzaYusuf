@@ -1,8 +1,8 @@
 @import url("./base/degiskenler.css");
+@import url("./base/ios-tokens.css");
 @import url("./base/reset.css");
 @import url("./base/tipografi.css");
 @import url("./base/animasyonlar.css");
-@import url("./layout/sidebar.css");
 @import url("./layout/topbar.css");
 @import url("./layout/ana-yerlesim.css");
 @import url("./layout/tema-paneli.css");
@@ -46,4 +46,18 @@
 @import url("./themes/liquid-glass.css");
 @import url("./layout/launcher.css?v=home-proportions-20260716-1");
 @import url("./pages/ravza-books.css?v=pdf-themes-20260716-1");
+/* Okuyucu sayfalari (<dialog>) ve surekli kaydirma modu. ravza-books.css'ten
+   SONRA: okuma temasi degiskenlerini ve .glass-surface tabanini uzerine yazar. */
+@import url("./pages/ravza-books-reader.css?v=reader-redesign-20260808-1");
 @import url("./themes/liquid-glass-optics.css?v=liquid-optics-20260715-1");
+/* Icerik sayfalarinin ortak iOS kabugu (baslik, kart yuzeyleri, bos/hata
+   durumlari). Sonda: tipografi.css, pages/*, responsive/* ve duzen-son.css
+   uzerine yazmasi gerekiyor. */
+@import url("./components/ios-page-chrome.css");
+/* En sonda: mevcut diyaloglarin mobil sheet geometrisi. Bu 4 diyalogun
+   konumu 4-6 dosyaya dagilmis ve .pbn-modal'i launcher.css de bicimlendiriyor;
+   son sozu soyleyebilmek icin manifestin sonunda olmasi gerekiyor. */
+@import url("./components/ios-dialog-geometry.css");
+/* EN SON: tum popup/modal/dialog pencerelerinin ortalanmis geometrisi.
+   ios-dialog-geometry.css'in mobil "alttan sheet" donusumunu notrler. */
+@import url("./components/centered-dialogs.css?v=centered-dialogs-20260808-1");

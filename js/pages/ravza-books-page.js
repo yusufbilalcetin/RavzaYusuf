@@ -1,4 +1,6 @@
 import { RAVZA_BOOKS } from '../../data/ravza-books.js?v=books-pipeline-20260716-1';
+import { createPageEntry, flattenTextContent, searchBookIndex, isSearchableQuery } from './ravza-books-search.js';
+import { haptics } from '../core/haptics.js';
 
 const PAGE_FLIP_SRC = new URL('../../assets/vendor/page-flip/page-flip.browser.js', import.meta.url).href;
 const PDFJS_MODULE_URL = new URL('../../assets/vendor/pdfjs/pdf.js', import.meta.url).href;
@@ -35,7 +37,33 @@ const STORAGE = {
   progress: 'ravza-books-progress',
   importedBook: 'ravza-books-imported-book',
   lastBook: 'ravza-books-last-book',
+  /**
+   * SON OKUNAN KONUM - YER İMİNDEN AYRI BİR KAVRAM.
+   *
+   * İki ayrı şey saklanır ve BİRBİRİNİ EZMEZ:
+   *
+   *   ravzaBooksProgress:<id>   YER İMİ / "kaydettiğim sayfa"
+   *     Yalnızca kullanıcı yer imi düğmesine bastığında yazılır.
+   *     Gezinmek, arama sonucuna atlamak, ilerleme barını sürüklemek bunu
+   *     DEĞİŞTİRMEZ. Fiziksel bir kitap ayracı gibi davranır.
+   *
+   *   ravza-books-last-read     SON OKUNAN SAYFA / "kaldığım yer"
+   *     Okurken otomatik güncellenir. Kitabı yeniden açınca buraya dönülür.
+   *
+   * Örnek: 25'i yer imlersin, 48'e kadar okursun, kapatıp açarsın ->
+   * kitap 48'de açılır, yer imi hâlâ 25'i gösterir.
+   */
+  lastRead: 'ravza-books-last-read',
 };
+
+/** Okuma temaları. Global uygulama temasından BAĞIMSIZDIR (bkz. §26 kararı). */
+const READER_THEMES = Object.freeze(['light', 'sepia', 'dark', 'black']);
+/** Okuma modları. PDF sabit sayfa düzeni olduğu için ikisi de gerçek sayfadır. */
+const READER_MODES = Object.freeze(['page', 'scroll']);
+/** Kontroller bu kadar hareketsizlikten sonra kaybolur (iOS oynatıcı hissi). */
+const CONTROLS_HIDE_MS = 4000;
+/** Arama indeksi bu büyüklükte parçalar hâlinde kurulur; ana iş parçacığı boğulmasın. */
+const SEARCH_INDEX_CHUNK = 8;
 
 const state = {
   mode: 'library',
@@ -49,12 +77,28 @@ const state = {
   fontSize: 17,
   lineHeight: 1.4,
   theme: 'light',
+  readerMode: 'page',
   accessible: false,
   pageSound: true,
+  hapticsEnabled: true,
   controlsVisible: true,
   bookmarks: {},
   readingProgress: {},
 };
+
+/** Açık kitabın içindekiler tablosu; PDF outline'ı yoksa null kalır. */
+let tableOfContents = null;
+/** Kitap içi arama indeksi: [{pageNumber, text, norm, collapsed, collapsedMap}] */
+let searchIndex = [];
+let searchIndexBookId = null;
+let searchIndexPromise = null;
+let searchIndexAbort = false;
+let searchDebounceTimer = 0;
+/** Sürekli kaydırma modunun gözlemcisi. */
+let scrollObserver = null;
+let scrollSyncFrame = 0;
+/** Programatik kaydırma sürerken scroll dinleyicisi konumu ezmesin. */
+let suppressScrollSync = false;
 
 let BOOKS = [];
 let importedBook = null;
@@ -118,10 +162,20 @@ const escapeHTML = value => String(value ?? '')
   .replaceAll('"', '&quot;')
   .replaceAll("'", '&#039;');
 
+const SVG = (paths, fill = 'none') =>
+  `<svg viewBox="0 0 24 24" fill="${fill}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+
 const ICON = {
-  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',
-  bookmark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z"/></svg>',
+  back: SVG('<path d="m15 18-6-6 6-6"/>'),
+  bookmark: SVG('<path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z"/>'),
   bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z"/></svg>',
+  contents: SVG('<path d="M4 6h16M4 12h16M4 18h10"/>'),
+  search: SVG('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+  share: SVG('<path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M5 14v4.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V14"/>'),
+  close: SVG('<path d="M6 6l12 12M18 6 6 18"/>'),
+  pageMode: SVG('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>'),
+  scrollMode: SVG('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>'),
+  check: SVG('<path d="m5 13 4 4 10-10"/>'),
 };
 
 function readStoredJson(key, fallback) {
@@ -148,9 +202,12 @@ function loadStorage() {
   state.lineHeight = [1.35, 1.4, 1.45].includes(Number(prefs.lineHeight))
     ? Number(prefs.lineHeight)
     : 1.4;
-  state.theme = ['light', 'sepia', 'dark'].includes(prefs.theme) ? prefs.theme : 'light';
+  state.theme = READER_THEMES.includes(prefs.theme) ? prefs.theme : 'light';
+  state.readerMode = READER_MODES.includes(prefs.readerMode) ? prefs.readerMode : 'page';
   state.accessible = Boolean(prefs.accessible);
   state.pageSound = prefs.pageSound !== false;
+  state.hapticsEnabled = prefs.hapticsEnabled !== false;
+  haptics.setEnabled(state.hapticsEnabled);
   state.bookmarks = readStoredRecord(STORAGE.bookmarks);
   state.readingProgress = readStoredRecord(STORAGE.progress);
   const storedImportedBook = readStoredJson(STORAGE.importedBook, null);
@@ -162,8 +219,10 @@ function savePrefs() {
     fontSize: state.fontSize,
     lineHeight: state.lineHeight,
     theme: state.theme,
+    readerMode: state.readerMode,
     accessible: state.accessible,
     pageSound: state.pageSound,
+    hapticsEnabled: state.hapticsEnabled,
   }));
 }
 
@@ -224,6 +283,92 @@ function saveCurrentPage(page, index) {
   try { localStorage.setItem(`${PDF_PROGRESS_PREFIX}${state.bookId}`, JSON.stringify(record)); } catch (_) {}
   const root = document.getElementById('reader-inner');
   if (root) root.dataset.savedPage = String(state.savedPage);
+}
+
+/**
+ * OKUMA KONUMU MODELİ - BİLİNÇLİ OLARAK "ELLE KAYDET".
+ *
+ * Bu projede konum, sayfa çevirdikçe OTOMATİK kaydedilmez. Kayıt yalnızca
+ * kullanıcı yer imi/kaydet düğmesine bastığında oluşur ("Kaldığın sayfa
+ * kaydedildi"). Yani kitapta gezinmek, ilerleme barını sürüklemek veya
+ * içindekilerden atlamak kaydedilmiş sayfayı DEĞİŞTİRMEZ; kitap yeniden
+ * açıldığında kullanıcının kendi işaretlediği sayfaya döner.
+ *
+ * Bu bir eksiklik değil, test edilmiş bir üründür - scripts/test-ravza-books.mjs
+ * içinde en az beş ayrı iddia bu davranışı savunuyor:
+ *   "Sayfa kıvırma kayıtlı sayfayı otomatik oluşturdu"
+ *   "Sayfa barı kaydetmeden ilerleme kaydı oluşturdu"
+ *   "Kaydetmeden 10. sayfaya gitmek savedPage değerini değiştirdi"
+ *   "Yeniden açılışta savedPage korunmadı"
+ *   "Son sayfaya gitmek kitabı kaydetmeden tamamlandı yaptı"
+ *
+ * Fiziksel bir kitap ayracı gibi davranır: sayfaları karıştırmak ayracı
+ * yerinden oynatmaz. Otomatik kayda geçmek istenirse bu bir ÜRÜN kararıdır ve
+ * yukarıdaki iddiaların da birlikte güncellenmesi gerekir - sessizce
+ * değiştirilmemelidir.
+ */
+
+/* ------------------------------------------------------------------------ */
+/* SON OKUNAN KONUM (yer iminden bağımsız)                                    */
+/* ------------------------------------------------------------------------ */
+
+let lastReadSaveTimer = 0;
+
+/** Tüm kitapların son okunan konumları. Bozuk kayıt tüm haritayı düşürmez. */
+function readLastReadMap() {
+  return readStoredRecord(STORAGE.lastRead);
+}
+
+/**
+ * Bir kitabın son okunan konumu; doğrulanmış hâlde döner.
+ * Geçersiz/bozuk değer (NaN, 0, negatif, sayfa sayısını aşan) null verir -
+ * §41 gereği çökme değil, güvenli geri dönüş.
+ */
+function readLastRead(bookId, totalPages = Infinity) {
+  const entry = readLastReadMap()[bookId];
+  if (!isPlainRecord(entry)) return null;
+  const page = Number(entry.page);
+  if (!Number.isFinite(page) || page < 1) return null;
+  const limit = Number.isFinite(totalPages) ? totalPages : page;
+  return {
+    page: clamp(Math.floor(page), 1, Math.max(1, limit)),
+    mode: READER_MODES.includes(entry.mode) ? entry.mode : null,
+    at: Number(entry.at) || 0,
+  };
+}
+
+/** Yazma. Yer imi kaydına (ravzaBooksProgress:*) ASLA dokunmaz. */
+function writeLastRead(bookId, page) {
+  if (!bookId || !Number.isFinite(page)) return;
+  try {
+    const map = readLastReadMap();
+    map[bookId] = { page: Math.floor(page), mode: state.readerMode, at: Date.now() };
+    localStorage.setItem(STORAGE.lastRead, JSON.stringify(map));
+  } catch (_) {
+    // Kota dolu veya depolama kapalı: okuma devam etmeli (§37).
+  }
+}
+
+/**
+ * Gecikmeli kayıt. Her kaydırma pikselinde localStorage'a yazmak yerine
+ * kullanıcı durunca bir kez yazılır (§4).
+ */
+function scheduleLastReadSave() {
+  clearTimeout(lastReadSaveTimer);
+  const bookId = state.bookId;
+  const page = state.currentPage;
+  lastReadSaveTimer = window.setTimeout(() => {
+    lastReadSaveTimer = 0;
+    writeLastRead(bookId, page);
+  }, 600);
+}
+
+/** Bekleyen yazımı hemen diske düşürür (kapanış / sekme gizlenmesi). */
+function flushLastReadSave() {
+  if (!lastReadSaveTimer) return;
+  clearTimeout(lastReadSaveTimer);
+  lastReadSaveTimer = 0;
+  if (state.bookId) writeLastRead(state.bookId, state.currentPage);
 }
 
 function normalizeProgress(book, progress) {
@@ -298,17 +443,25 @@ function buildSampleContent() {
   }
 }
 
+/** Okuma temasının sahne rengi; adres çubuğu da bu rengi alır. */
+const READER_THEME_COLOR = Object.freeze({
+  light: '#F4EAD7',
+  sepia: '#ddc8a5',
+  dark: '#171614',
+  black: '#000000',
+});
+
 function applyTheme(theme) {
-  if (!['light', 'sepia', 'dark'].includes(theme)) return;
+  if (!READER_THEMES.includes(theme)) return;
   state.theme = theme;
   document.getElementById('ravzabooks')?.setAttribute('data-reader-theme', theme);
-  document.querySelectorAll('#reader-inner .theme-btn').forEach(button => {
+  document.querySelectorAll('#reader-inner .theme-btn, .reader-sheet .theme-btn').forEach(button => {
     const selected = button.dataset.theme === theme;
     button.classList.toggle('selected', selected);
     button.setAttribute('aria-pressed', String(selected));
   });
-  const color = theme === 'dark' ? '#171614' : theme === 'sepia' ? '#ddc8a5' : '#F4EAD7';
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color);
+  document.querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', READER_THEME_COLOR[theme] || READER_THEME_COLOR.light);
 }
 
 function applyTypography() {
@@ -345,6 +498,26 @@ function getCurrentPosition() {
   return state.readingProgress[state.bookId] || null;
 }
 
+/**
+ * Kitap hangi sayfadan açılacak?
+ *
+ * Öncelik sırası:
+ *   1. Çağıranın açıkça verdiği konum (arama sonucu, "baştan başla", mod
+ *      değişiminde mevcut konum) - kullanıcı niyeti her şeyin üstünde.
+ *   2. SON OKUNAN sayfa - "kaldığım yerden devam".
+ *   3. YER İMİ kaydı - hiç okunmamışsa ama yer imi varsa.
+ *   4. İlk sayfa.
+ *
+ * 2. ve 3. AYRI kavramlardır (§3): son okunan sayfaya dönmek yer imini
+ * oynatmaz, yer imi düğmesi hâlâ kullanıcının işaretlediği sayfayı gösterir.
+ */
+function resolveStartIndex(book, explicitPosition, totalPages) {
+  if (explicitPosition) return findStartIndex(readerPages, explicitPosition);
+  const lastRead = readLastRead(book.id, totalPages);
+  if (lastRead) return clamp(lastRead.page - 1, 0, Math.max(0, totalPages - 1));
+  return findStartIndex(readerPages, readBookProgress(book.id));
+}
+
 function findStartIndex(pages, progress) {
   if (!pages.length || !progress) return 0;
   if (pages[0]?.type === 'pdf') {
@@ -378,6 +551,7 @@ function cleanupReader() {
   pdfRenderGeneration += 1;
   lastCradleSize = '';
   cancelPdfRenders();
+  teardownScrollReader();
   removeDirectPageCurl?.();
   removeDirectPageCurl = null;
   curlDragging = false;
@@ -390,6 +564,10 @@ function cleanupReader() {
   clearTimeout(repaginateTimer);
   clearTimeout(toastTimer);
   clearTimeout(lugatTimer);
+  clearTimeout(searchDebounceTimer);
+  // Bekleyen "son okunan sayfa" yazımı okuyucu kapanmadan diske düşer,
+  // yoksa son çevrilen sayfa kaybolurdu. Yer imi kaydına dokunmaz.
+  flushLastReadSave();
   if (pageFlip) {
     const pageFlipUI = pageFlip.getUI?.();
     if (typeof pageFlipUI?.removeHandlers === 'function') pageFlipUI.removeHandlers();
@@ -501,6 +679,10 @@ function paintFromPdfBitmapCache(pageNumber, canvas, renderKey) {
 async function destroyPdfDocument() {
   pdfRenderGeneration += 1;
   cancelPdfRenders();
+  clearThumbnailWork();
+  thumbnailCache.clear();
+  resetSearchIndex();
+  tableOfContents = null;
   pdfFetchController?.abort();
   pdfFetchController = null;
   const loadingTask = pdfLoadingTask;
@@ -556,17 +738,30 @@ function cleanupLibrary() {
 
 function bookLibraryState(book) {
   const progress = readBookProgress(book.id) || state.readingProgress[book.id] || null;
-  if (!progress || !progress.lastOpenedAt) {
-    return { progress: null, percentage: 0, label: 'Henüz açılmadı', action: 'Okumaya Başla', completed: false };
+  const totalPages = Number(book.totalPages) || Number(progress?.totalPages) || Infinity;
+  // Son okunan sayfa yer iminden bağımsız; kitaplıkta "Devam Et" bunu izler.
+  const lastRead = readLastRead(book.id, totalPages);
+
+  if (!progress?.lastOpenedAt && !lastRead) {
+    return { progress: null, lastRead: null, percentage: 0, label: 'Henüz açılmadı', action: 'Okumaya Başla', completed: false };
   }
-  const percentage = clamp(Number(progress.progress) || 0, 0, 100);
-  if (progress.completed) {
-    return { progress, percentage: 100, label: 'Tamamlandı', action: 'Tekrar Oku', completed: true };
+  if (progress?.completed) {
+    return { progress, lastRead, percentage: 100, label: 'Tamamlandı', action: 'Tekrar Oku', completed: true };
   }
+
+  // Yüzde, gerçekten görülen en son sayfadan türetilir; yer imi kaydı yoksa
+  // bile "Devam Et" doğru yüzdeyi gösterir.
+  const percentage = lastRead && Number.isFinite(totalPages)
+    ? clamp((lastRead.page / totalPages) * 100, 0, 100)
+    : clamp(Number(progress?.progress) || 0, 0, 100);
+
   return {
     progress,
+    lastRead,
     percentage,
-    label: `%${percentage.toLocaleString('tr-TR', { maximumFractionDigits: 1 })} okundu`,
+    label: lastRead
+      ? `Sayfa ${lastRead.page} · %${percentage.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} okundu`
+      : `%${percentage.toLocaleString('tr-TR', { maximumFractionDigits: 1 })} okundu`,
     action: 'Devam Et',
     completed: false,
   };
@@ -657,10 +852,11 @@ function renderLibrary() {
     card.addEventListener('click', async () => {
       const book = getBook(card.dataset.bookId);
       if (!book || state.mode !== 'library') return;
-      const status = bookLibraryState(book);
+      // "restart" -> açık konum verilir; "resume" -> null verilir ve
+      // resolveStartIndex son okunan sayfayı seçer (§3/§5).
       const position = card.dataset.openPosition === 'restart'
         ? (book.type === 'pdf' ? { pageIndex: 0, pdfPage: 1 } : { absIndex: 0 })
-        : status.progress;
+        : null;
       await openBook(book, position);
     }, { signal });
   });
@@ -859,6 +1055,8 @@ function buildReaderShell(book) {
   root.className = `reader-root${state.accessible ? ' accessible' : ''}`;
   root.dataset.bookType = isPdf ? 'pdf' : 'text';
   root.dataset.spread = shouldUsePortrait() ? 'single' : 'double';
+  // CSS sürekli/sayfa modunu bu öznitelikten okur.
+  root.dataset.readerMode = isPdf ? state.readerMode : 'page';
   root.innerHTML = `
     <div id="rdr-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
@@ -868,89 +1066,42 @@ function buildReaderShell(book) {
       </div>
     </article>
 
-    <header class="reader-controls-top" aria-label="Üst okuyucu kontrolleri">
-      <button class="control-btn" id="rdr-back" type="button" aria-label="Geri">${ICON.back}</button>
-      <div class="control-title" id="rdr-control-title">${escapeHTML(book.title)}</div>
-      <div class="control-actions">
-        <button class="control-btn${bookmarked ? ' active' : ''}" id="rdr-bookmark" type="button" aria-label="Kaldığım sayfayı kaydet ve yer imini değiştir" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}</button>
-        <button class="control-btn control-aa" id="rdr-settings-open" type="button" aria-label="Okuma ayarları" aria-expanded="false">Aa</button>
-      </div>
+    <header class="reader-topbar" aria-label="Okuyucu üst şeridi">
+      <button class="reader-back" id="rdr-back" type="button">${ICON.back}<span>Kitaplar</span></button>
+      <p class="reader-status" id="rdr-status" aria-live="polite"></p>
     </header>
 
-    <nav class="reader-controls-bottom" aria-label="Sayfa kontrolleri">
-      <input class="progress-range" id="rdr-progress" type="range" min="0" max="0" value="0" step="1" aria-label="Okuma ilerlemesi" />
-      <div class="bottom-control-row">
-        <span class="progress-label" id="rdr-progress-label">1 / 1</span>
+    <nav class="reader-dock" id="rdr-dock" aria-label="Okuyucu kontrolleri">
+      <div class="reader-dock-stack">
+        <button class="reader-dock-row glass-surface" id="rdr-contents-open" type="button" aria-haspopup="dialog">
+          <span class="reader-dock-label">İçindekiler</span>
+          <span class="reader-dock-value" id="rdr-contents-value"></span>
+          ${ICON.contents}
+        </button>
+        <button class="reader-dock-row glass-surface" id="rdr-search-open" type="button" aria-haspopup="dialog">
+          <span class="reader-dock-label">Kitapta Ara</span>
+          ${ICON.search}
+        </button>
+        <button class="reader-dock-row glass-surface" id="rdr-settings-open" type="button" aria-haspopup="dialog" aria-expanded="false">
+          <span class="reader-dock-label">Temalar ve Ayarlar</span>
+          <span class="reader-dock-value reader-dock-aa">Aa</span>
+        </button>
       </div>
+
+      <div class="reader-dock-actions">
+        <button class="reader-action glass-surface" id="rdr-share" type="button" aria-label="Kitabı paylaş">${ICON.share}<span>Paylaş</span></button>
+        <button class="reader-action glass-surface" id="rdr-mode" type="button" aria-label="Okuma modunu değiştir">${state.readerMode === 'scroll' ? ICON.scrollMode : ICON.pageMode}<span id="rdr-mode-label">${state.readerMode === 'scroll' ? 'Kaydır' : 'Sayfa'}</span></button>
+        <button class="reader-action glass-surface${bookmarked ? ' is-active' : ''}" id="rdr-bookmark" type="button" aria-label="Yer imi" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}<span>Yer imi</span></button>
+      </div>
+
+      <label class="reader-scrubber">
+        <span class="sr-only">Okuma ilerlemesi</span>
+        <input class="progress-range" id="rdr-progress" type="range" min="0" max="0" value="0" step="1" />
+      </label>
+      <p class="reader-position" id="rdr-progress-label">1 / 1</p>
     </nav>
 
-    <div class="settings-layer" id="rdr-settings" aria-hidden="true">
-      <button class="settings-scrim" id="rdr-settings-close" type="button" aria-label="Okuma ayarlarını kapat"></button>
-      <aside class="settings-popover" role="dialog" aria-modal="false" aria-labelledby="settings-title">
-        <h2 class="settings-title" id="settings-title">Okuma ayarları</h2>
-
-        ${isPdf ? `
-        <section class="settings-section pdf-book-information">
-          <p class="settings-label">Açık kitap</p>
-          <p class="pdf-book-title">${escapeHTML(book.title)}</p>
-          <p class="pdf-book-meta">${escapeHTML(book.author)} · ${escapeHTML(book.translator)}</p>
-          <p class="pdf-book-meta">Orijinal PDF · ${Number(book.totalPages) || 0} sayfa</p>
-        </section>` : `
-        <section class="settings-section">
-          <p class="settings-label">Yazı</p>
-          <div class="settings-row">
-            <span class="setting-name">Yazı boyutu</span>
-            <div class="font-controls">
-              <button class="setting-btn" id="font-dec" type="button" aria-label="Yazıyı küçült">−</button>
-              <span class="font-value" id="font-value">${state.fontSize}px</span>
-              <button class="setting-btn" id="font-inc" type="button" aria-label="Yazıyı büyüt">+</button>
-            </div>
-          </div>
-          <div class="settings-row">
-            <span class="setting-name">Satır aralığı</span>
-            <div class="segmented" aria-label="Satır aralığı seçenekleri">
-              ${[1.35, 1.4, 1.45].map(value => `<button class="setting-btn line-height-btn${state.lineHeight === value ? ' selected' : ''}" type="button" data-line-height="${value}">${value === 1.35 ? 'Dar' : value === 1.4 ? 'Normal' : 'Geniş'}</button>`).join('')}
-            </div>
-          </div>
-        </section>`}
-
-        <section class="settings-section">
-          <p class="settings-label">Tema</p>
-          <div class="settings-row">
-            <span class="setting-name">Sayfa görünümü</span>
-            <div class="theme-controls">
-              ${['light', 'sepia', 'dark'].map(theme => `<button class="theme-btn${state.theme === theme ? ' selected' : ''}" type="button" data-theme="${theme}" aria-label="${theme === 'light' ? 'Açık' : theme === 'sepia' ? 'Sepya' : 'Koyu'} tema" aria-pressed="${state.theme === theme}"></button>`).join('')}
-            </div>
-          </div>
-        </section>
-
-        <section class="settings-section">
-          <p class="settings-label">Okuma</p>
-          ${isPdf ? '' : `<div class="settings-row">
-            <span class="setting-name">Erişilebilir okuma</span>
-            <label class="switch">
-              <input id="accessible-toggle" type="checkbox" ${state.accessible ? 'checked' : ''} />
-              <span class="switch-track" aria-hidden="true"></span>
-              <span class="sr-only">Erişilebilir okuma</span>
-            </label>
-          </div>`}
-          <div class="settings-row">
-            <span class="setting-name">Sayfa sesi</span>
-            <label class="switch">
-              <input id="sound-toggle" type="checkbox" ${state.pageSound ? 'checked' : ''} />
-              <span class="switch-track" aria-hidden="true"></span>
-              <span class="sr-only">Sayfa sesi</span>
-            </label>
-          </div>
-        </section>
-
-        <section class="settings-section">
-          <p class="settings-label">Kitap</p>
-          <label class="file-btn" for="txt-book-input">TXT kitap seç</label>
-          <input class="file-input" id="txt-book-input" type="file" accept=".txt,text/plain" />
-        </section>
-      </aside>
-    </div>
+    ${readerSheetsMarkup(book, isPdf)}
 
     <div class="lugat-popover" id="rdr-lugat" role="tooltip" aria-hidden="true">
       <p class="lugat-word" id="lugat-word"></p>
@@ -961,8 +1112,139 @@ function buildReaderShell(book) {
   return root;
 }
 
+/**
+ * Üç okuyucu sayfası (içindekiler / arama / ayarlar).
+ *
+ * NEDEN <dialog>: js/ui/sheet.js ile aynı gerekçe - "top layer"a çizilir, bu
+ * sayfa z-index 9100'de dururken bile üstünde kalır ve z-index yarışına
+ * girilmez (§48). Odak tuzağı, Escape ve arka planın inert olması tarayıcıdan
+ * gelir. Kapalıyken display:none olduğu için test-launcher'ın "görünür her
+ * buton >= 44px" taramasına da hiç görünmez.
+ */
+function readerSheetsMarkup(book, isPdf) {
+  const themeNames = { light: 'Beyaz', sepia: 'Kâğıt', dark: 'Koyu', black: 'Siyah' };
+  const hapticsSupported = haptics.isSupported();
+  return `
+    <dialog class="reader-sheet ui-dialog--large" id="rdr-contents-sheet" aria-labelledby="rdr-contents-title">
+      <div class="reader-sheet-panel glass-surface glass-surface--overlay">
+        <header class="reader-sheet-head">
+          <h2 id="rdr-contents-title">İçindekiler</h2>
+          <button class="reader-sheet-close" type="button" data-close-sheet aria-label="Kapat">${ICON.close}</button>
+        </header>
+        <div class="reader-sheet-body" id="rdr-contents-body"></div>
+      </div>
+    </dialog>
+
+    <dialog class="reader-sheet reader-sheet--search ui-dialog--large" id="rdr-search-sheet" aria-labelledby="rdr-search-title">
+      <div class="reader-sheet-panel glass-surface glass-surface--overlay">
+        <header class="reader-sheet-head">
+          <h2 id="rdr-search-title">Kitapta Ara</h2>
+          <button class="reader-sheet-close" type="button" data-close-sheet aria-label="Kapat">${ICON.close}</button>
+        </header>
+        <div class="reader-search-field">
+          ${ICON.search}
+          <input id="rdr-search-input" type="search" inputmode="search" autocomplete="off"
+                 enterkeyhint="search" placeholder="${escapeHTML(book.title)} içinde ara"
+                 aria-describedby="rdr-search-state" data-clearable-search />
+        </div>
+        <p class="reader-search-state" id="rdr-search-state" role="status" aria-live="polite"></p>
+        <div class="reader-sheet-body" id="rdr-search-results"></div>
+      </div>
+    </dialog>
+
+    <dialog class="reader-sheet ui-dialog--medium" id="rdr-settings-sheet" aria-labelledby="rdr-settings-title">
+      <div class="reader-sheet-panel glass-surface glass-surface--overlay">
+        <header class="reader-sheet-head">
+          <h2 id="rdr-settings-title">Temalar ve Ayarlar</h2>
+          <button class="reader-sheet-close" type="button" data-close-sheet aria-label="Kapat">${ICON.close}</button>
+        </header>
+        <div class="reader-sheet-body">
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Okuma teması</p>
+            <div class="theme-controls" role="group" aria-label="Okuma teması">
+              ${READER_THEMES.map(theme => `<button class="theme-btn theme-btn--${theme}${state.theme === theme ? ' selected' : ''}" type="button" data-theme="${theme}" aria-pressed="${state.theme === theme}"><span>${themeNames[theme]}</span></button>`).join('')}
+            </div>
+            <p class="reader-settings-note">Okuma teması uygulamanın genel temasından bağımsızdır.</p>
+          </section>
+
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Okuma modu</p>
+            <div class="segmented" role="group" aria-label="Okuma modu">
+              <button class="setting-btn mode-btn${state.readerMode === 'page' ? ' selected' : ''}" type="button" data-mode="page" aria-pressed="${state.readerMode === 'page'}">Sayfa</button>
+              <button class="setting-btn mode-btn${state.readerMode === 'scroll' ? ' selected' : ''}" type="button" data-mode="scroll" aria-pressed="${state.readerMode === 'scroll'}">Kaydırma</button>
+            </div>
+          </section>
+
+          ${isPdf ? `
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Açık kitap</p>
+            <p class="pdf-book-title">${escapeHTML(book.title)}</p>
+            <p class="pdf-book-meta">${escapeHTML(book.author)}${book.translator ? ` · ${escapeHTML(book.translator)}` : ''}</p>
+            <p class="pdf-book-meta">Orijinal PDF · ${Number(book.totalPages) || 0} sayfa</p>
+            <p class="reader-settings-note">Bu kitap sabit sayfa düzenli bir PDF'tir; yazı tipi ve punto kitabın kendi dizgisine aittir, değiştirilemez.</p>
+          </section>` : `
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Yazı</p>
+            <div class="settings-row">
+              <span class="setting-name">Yazı boyutu</span>
+              <div class="font-controls">
+                <button class="setting-btn" id="font-dec" type="button" aria-label="Yazıyı küçült">−</button>
+                <span class="font-value" id="font-value">${state.fontSize}px</span>
+                <button class="setting-btn" id="font-inc" type="button" aria-label="Yazıyı büyüt">+</button>
+              </div>
+            </div>
+            <div class="settings-row">
+              <span class="setting-name">Satır aralığı</span>
+              <div class="segmented" aria-label="Satır aralığı seçenekleri">
+                ${[1.35, 1.4, 1.45].map(value => `<button class="setting-btn line-height-btn${state.lineHeight === value ? ' selected' : ''}" type="button" data-line-height="${value}">${value === 1.35 ? 'Dar' : value === 1.4 ? 'Normal' : 'Geniş'}</button>`).join('')}
+              </div>
+            </div>
+            <div class="settings-row">
+              <span class="setting-name">Erişilebilir okuma</span>
+              <label class="switch">
+                <input id="accessible-toggle" type="checkbox" ${state.accessible ? 'checked' : ''} />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="sr-only">Erişilebilir okuma</span>
+              </label>
+            </div>
+          </section>`}
+
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Geri bildirim</p>
+            <div class="settings-row">
+              <span class="setting-name">Sayfa sesi</span>
+              <label class="switch">
+                <input id="sound-toggle" type="checkbox" ${state.pageSound ? 'checked' : ''} />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="sr-only">Sayfa sesi</span>
+              </label>
+            </div>
+            <div class="settings-row${hapticsSupported ? '' : ' is-unavailable'}">
+              <span class="setting-name">Titreşim</span>
+              <label class="switch">
+                <input id="haptics-toggle" type="checkbox" ${state.hapticsEnabled && hapticsSupported ? 'checked' : ''} ${hapticsSupported ? '' : 'disabled'} />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="sr-only">Titreşim</span>
+              </label>
+            </div>
+            ${hapticsSupported ? '' : '<p class="reader-settings-note">Bu tarayıcı titreşimi desteklemiyor.</p>'}
+          </section>
+
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Kitap</p>
+            <label class="file-btn" for="txt-book-input">TXT kitap seç</label>
+            <input class="file-input" id="txt-book-input" type="file" accept=".txt,text/plain" />
+          </section>
+        </div>
+      </div>
+    </dialog>`;
+}
+
 function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
   if (state.bookType !== 'pdf') return true;
+  // Sürekli modda beşik sabit ölçüye kilitlenmez; sayfalar CSS en-boy oranıyla
+  // akar ve kaydırıcı sahnenin tamamını kaplar.
+  if (state.readerMode === 'scroll') return readerStageHasPositiveSize();
   const stage = document.getElementById('rdr-stage');
   const cradle = document.getElementById('book-cradle');
   const root = document.getElementById('reader-inner');
@@ -1042,19 +1324,75 @@ function waitForReaderStageSize(generation, timeout = 5000) {
  * edilmesine yol açıyordu; bu yüzden ölçüm yalnızca açılışta ve resize
  * bittikten sonra yapılır.
  */
-function measurePdfRenderBox(metrics) {
+/**
+ * Render kutusunun TEK KAYNAĞI.
+ *
+ * Kutu, tuvalin gerçekte içine sığacağı kutudur: sayfa çerçevesinin İÇERİK
+ * kutusu (border-box eksi dolgu).
+ *
+ * NEDEN TEK FONKSİYON: Daha önce iki mod iki ayrı ölçüm kullanıyordu.
+ * Sayfa modu dolguyu çıkarıyordu (doğru), sürekli mod ise
+ * getBoundingClientRect()'i olduğu gibi alıyordu (yanlış). Sonuç 390px'lik
+ * telefonda ölçülebilir bir hataydı:
+ *   pdfRenderBox.width = 390  ->  canvas.style.width = "390px"
+ *   ama çerçevenin içerik kutusu 378px  ->  canvas max-width:100% ile 378'e
+ *   sıkışıyor.
+ * Yani tuval, bildirdiğinden %3 dar gösteriliyor ve çözünürlüğü (780px)
+ * YANLIŞ görüntü genişliğine göre hesaplanıyordu: hem geometri kayması hem
+ * gereksiz yumuşama. Artık iki mod da bu fonksiyonu kullanır.
+ */
+/**
+ * Okuyucu kabuğunun kapladığı dikey alanı ölçüp CSS'e bildirir.
+ *
+ * SORUN: Yüzen kontrol yığını 390x844 telefonda 270px yüksekliğinde ve
+ * sayfanın üstünde duruyordu; sayfa 162-682 arasındayken dock 564'ten
+ * başlıyor, yani her sayfanın alt ~%23'ü cam panellerin arkasında kalıyordu.
+ * "İçerik yuvarlak panellerin arkasına giriyor" görüntüsünün kaynağı buydu.
+ *
+ * ÇÖZÜM: Sahne, kabuk kadar alanı BAŞTAN ayırır; sayfa da bu küçültülmüş
+ * alana sığdırılır. Ölçü sabit kodlanmaz, gerçek kabuktan okunur - dock'un
+ * içeriği değişirse ayrılan alan da kendiliğinden değişir.
+ *
+ * ÖNEMLİ (§26): Kabuk gizlendiğinde yalnızca opacity/transform değişir,
+ * düzen yüksekliği değişmez. Bu yüzden ayrılan alan sabittir ve kontroller
+ * kaybolurken sayfa ölçeği ZIPLAMAZ.
+ */
+function measureReaderChrome() {
+  const root = document.getElementById('reader-inner');
+  if (!root) return;
+  const topbar = root.querySelector('.reader-topbar');
+  const dock = root.querySelector('.reader-dock');
+  // getBoundingClientRect, opacity:0 olsa bile gerçek düzen ölçüsünü verir.
+  const top = topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+  const bottom = dock ? Math.ceil(dock.getBoundingClientRect().height) : 0;
+  // 8px nefes payı: sayfa kenarı kontrolün tam dibine yapışmasın.
+  root.style.setProperty('--reader-chrome-top', `${top + 8}px`);
+  root.style.setProperty('--reader-chrome-bottom', `${bottom + 8}px`);
+}
+
+function measureRenderBox(fallbackMetrics = null) {
   const frame = document.querySelector('.pdf-canvas-frame');
-  let paddingX = 12;
-  let paddingY = 12;
   if (frame) {
     const style = getComputedStyle(frame);
-    paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-    paddingY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const paddingX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const paddingY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const rect = frame.getBoundingClientRect();
+    const width = rect.width - (Number.isFinite(paddingX) ? paddingX : 0);
+    const height = rect.height - (Number.isFinite(paddingY) ? paddingY : 0);
+    if (width >= 2 && height >= 2) {
+      pdfRenderBox = { width, height };
+      return true;
+    }
   }
-  pdfRenderBox = {
-    width: Math.max(1, metrics.pageWidth - (Number.isFinite(paddingX) ? paddingX : 12)),
-    height: Math.max(1, metrics.pageHeight - (Number.isFinite(paddingY) ? paddingY : 12)),
-  };
+  // Çerçeve henüz ölçülemiyorsa (ilk boyamadan önce) düzen ölçüsüne düş.
+  if (fallbackMetrics) {
+    pdfRenderBox = {
+      width: Math.max(1, fallbackMetrics.pageWidth - 12),
+      height: Math.max(1, fallbackMetrics.pageHeight - 12),
+    };
+    return true;
+  }
+  return false;
 }
 
 function getLayoutMetrics() {
@@ -1353,6 +1691,7 @@ async function openTextReader(book, position = null) {
     if (index !== lastFlipIndex) playPageSound();
     lastFlipIndex = index;
     updateReaderUI(index);
+    scheduleLastReadSave();
   });
   pageFlip.on('changeState', event => {
     const flipping = event.data === 'user_fold' || event.data === 'flipping';
@@ -1477,6 +1816,167 @@ async function readPdfPageAspectRatio(document) {
   } catch (_) {
     return 3 / 4;
   }
+}
+
+/* ------------------------------------------------------------------------ */
+/* İÇİNDEKİLER (PDF outline)                                                  */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Outline hedefini sayfa numarasına çevirir.
+ * dest ya adlandırılmış bir hedef (string) ya da doğrudan referans dizisidir.
+ */
+async function resolveOutlineDestination(document, dest) {
+  try {
+    const resolved = typeof dest === 'string' ? await document.getDestination(dest) : dest;
+    const ref = Array.isArray(resolved) ? resolved[0] : null;
+    if (!ref) return null;
+    const index = await document.getPageIndex(ref);
+    return Number.isInteger(index) ? index + 1 : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * Outline'ın kullanılabilir olup olmadığı.
+ *
+ * NEDEN GEREKLİ: Ateşten Gömlek'in PDF outline'ı 5 girdiden oluşuyor ve
+ * HEPSİNİN başlığı "Boş Sayfa". Böyle bir listeyi "içindekiler" diye sunmak
+ * kullanıcıya yalan söylemek olurdu. Kural özel-durum değil geneldir: anlamlı
+ * biçimde ayrışan başlık yoksa outline yok sayılır ve arayüz içindekiler
+ * yerine yer imleri/sayfa atlama sunar.
+ */
+function isUsableOutline(entries) {
+  if (!entries || entries.length < 2) return false;
+  const titles = new Set(entries.map(entry => entry.title.trim().toLocaleLowerCase('tr-TR')));
+  // Tek benzersiz başlık = taşıyıcı bilgi sıfır.
+  if (titles.size < 2) return false;
+  // Girdilerin yarısından fazlası aynı başlıksa da güvenilmez.
+  return titles.size > entries.length / 2;
+}
+
+/** Outline ağacını düz listeye indirger (en fazla 2 seviye; daha derini UI'da gürültü). */
+async function flattenOutline(document, nodes, level, out) {
+  for (const node of nodes) {
+    const title = String(node?.title ?? '').replace(/\s+/g, ' ').trim();
+    if (!title) continue;
+    const page = await resolveOutlineDestination(document, node.dest);
+    if (page) out.push({ title, page, level });
+    if (level < 1 && Array.isArray(node.items) && node.items.length) {
+      await flattenOutline(document, node.items, level + 1, out);
+    }
+  }
+  return out;
+}
+
+/**
+ * Kitabın içindekiler tablosu. Outline yoksa veya kullanılamazsa null.
+ * Bölüm bilgisi UYDURULMAZ - null dönmek doğru cevaptır.
+ */
+async function buildTableOfContents(document) {
+  let outline;
+  try {
+    outline = await document.getOutline();
+  } catch (_) {
+    return null;
+  }
+  if (!Array.isArray(outline) || !outline.length) return null;
+
+  const entries = await flattenOutline(document, outline, 0, []);
+  if (!isUsableOutline(entries)) return null;
+  // Sayfaya göre sırala: bazı PDF'lerde outline sırası fiziksel sırayla uyuşmuyor.
+  entries.sort((a, b) => a.page - b.page);
+  return entries;
+}
+
+/** Verilen sayfanın içinde bulunduğu bölüm ve o bölümdeki ilerleme. */
+function chapterContextFor(pageNumber, totalPages) {
+  if (!tableOfContents?.length) return null;
+  let index = -1;
+  for (let cursor = 0; cursor < tableOfContents.length; cursor += 1) {
+    if (tableOfContents[cursor].page <= pageNumber) index = cursor;
+    else break;
+  }
+  if (index < 0) return null;
+  const entry = tableOfContents[index];
+  const nextPage = tableOfContents[index + 1]?.page ?? totalPages + 1;
+  const chapterLength = Math.max(1, nextPage - entry.page);
+  const readInChapter = clamp(pageNumber - entry.page, 0, chapterLength);
+  return {
+    index,
+    title: entry.title,
+    startPage: entry.page,
+    remainingPages: Math.max(0, nextPage - 1 - pageNumber),
+    percent: Math.round((readInChapter / chapterLength) * 100),
+  };
+}
+
+/**
+ * Üst şeritteki bölüm/ilerleme cümlesi.
+ * Bölüm bilgisi yoksa kitap geneli yüzdesi gösterilir - ikisi de GERÇEK veri.
+ */
+function readingStatusText(pageNumber, totalPages) {
+  const chapter = chapterContextFor(pageNumber, totalPages);
+  if (chapter) {
+    if (chapter.remainingPages <= 0) return 'Bölümün sonu';
+    return `Bölümde ${chapter.remainingPages} sayfa kaldı`;
+  }
+  const percent = Math.round((pageNumber / Math.max(1, totalPages)) * 100);
+  return `%${percent} tamamlandı`;
+}
+
+/* ------------------------------------------------------------------------ */
+/* KİTAP İÇİ ARAMA İNDEKSİ                                                    */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Metin indeksini parça parça kurar.
+ *
+ * Neden tembel ve parçalı: 224 sayfalık bir kitabın tüm metnini tek seferde
+ * çekmek ana iş parçacığını saniyelerce kilitliyor. İndeks yalnızca kullanıcı
+ * aramayı AÇTIĞINDA kurulur ve her SEARCH_INDEX_CHUNK sayfada bir kontrolü
+ * tarayıcıya geri verir. Böylece §56'daki "her tuşta DOM'u tarama" yasağı da
+ * kendiliğinden sağlanır: arama hazır bir dizide çalışır.
+ */
+function ensureSearchIndex(bookId, onProgress) {
+  if (searchIndexBookId === bookId && searchIndexPromise) return searchIndexPromise;
+  searchIndexAbort = false;
+  searchIndexBookId = bookId;
+  searchIndex = [];
+
+  const document_ = pdfDocument;
+  searchIndexPromise = (async () => {
+    if (!document_) return [];
+    const total = document_.numPages;
+    for (let pageNumber = 1; pageNumber <= total; pageNumber += 1) {
+      if (searchIndexAbort || pdfDocument !== document_) break;
+      try {
+        const page = await document_.getPage(pageNumber);
+        const textContent = await page.getTextContent();
+        searchIndex.push(createPageEntry(pageNumber, flattenTextContent(textContent)));
+        // Sayfa nesnesini indeksleme için tutma: render cache'i ayrı yönetiliyor.
+        if (!pdfPageCache.has(pageNumber)) page.cleanup();
+      } catch (_) {
+        // Tek sayfanın metni çıkmadıysa arama o sayfayı atlar; kitap açık kalır.
+      }
+      if (pageNumber % SEARCH_INDEX_CHUNK === 0) {
+        onProgress?.(pageNumber, total);
+        await new Promise(resolve => runWhenIdle(resolve));
+      }
+    }
+    onProgress?.(total, total);
+    return searchIndex;
+  })();
+  return searchIndexPromise;
+}
+
+function resetSearchIndex() {
+  searchIndexAbort = true;
+  searchIndexPromise = null;
+  searchIndexBookId = null;
+  searchIndex = [];
+  clearTimeout(searchDebounceTimer);
 }
 
 function createPdfPageModels(pageCount) {
@@ -1676,7 +2176,8 @@ function pdfWindowPages(pageIndex) {
   const total = pdfDocument.numPages;
   const current = clamp(pageIndex + 1, 1, total);
   const visible = [current];
-  if (!shouldUsePortrait()) {
+  // Sürekli modda sayfalar alt alta; "yan sayfa" kavramı yok.
+  if (!shouldUsePortrait() && state.readerMode === 'page') {
     const partner = pageIndex % 2 === 0 ? current + 1 : current - 1;
     if (partner >= 1 && partner <= total && partner !== current) visible.push(partner);
   }
@@ -1746,6 +2247,119 @@ function flushPdfRenderWindow() {
   void updatePdfRenderWindow(index);
 }
 
+/* ------------------------------------------------------------------------ */
+/* SÜREKLİ KAYDIRMA MODU                                                      */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Sürekli mod, sayfa çevirme motorunu HİÇ kurmaz; aynı .pdf-page DOM'unu
+ * dikey bir kaydırıcıya yerleştirir. renderPdfPage() ve render penceresi
+ * mantığı olduğu gibi yeniden kullanılır - ikinci bir render motoru yazılmaz.
+ */
+function teardownScrollReader() {
+  scrollObserver?.disconnect();
+  scrollObserver = null;
+  if (scrollSyncFrame) cancelAnimationFrame(scrollSyncFrame);
+  scrollSyncFrame = 0;
+  suppressScrollSync = false;
+}
+
+/**
+ * Kaydırıcıda ekranın ortasına en yakın sayfa "geçerli sayfa"dır.
+ *
+ * Ölçüm getBoundingClientRect ile yapılır, offsetTop ile DEĞİL: offsetTop en
+ * yakın konumlanmış ataya göredir (burada .book-cradle), oysa scrollTop
+ * kaydırıcıya aittir. İkisini karıştırmak sayfa dolgusu + ızgara boşluğu
+ * kadar kayma üretiyordu ve mod değişiminde okuma konumu sapıyordu.
+ */
+function activeScrollPage(scroller) {
+  const box = scroller.getBoundingClientRect();
+  const middle = box.top + box.height / 2;
+  let best = 1;
+  let bestDistance = Infinity;
+  for (const element of scroller.querySelectorAll('.pdf-page')) {
+    const rect = element.getBoundingClientRect();
+    const distance = Math.abs(rect.top + rect.height / 2 - middle);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = Number(element.dataset.pdfPage) || 1;
+    }
+  }
+  return best;
+}
+
+/** Sayfanın üstünü kaydırıcının üstüne hizalar. */
+function scrollToPdfPage(scroller, pageNumber, smooth = false) {
+  const target = scroller.querySelector(`.pdf-page[data-pdf-page="${pageNumber}"]`);
+  if (!target) return;
+  const delta = target.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+  scroller.scrollTo({
+    top: scroller.scrollTop + delta,
+    behavior: smooth && !reducedMotionQuery.matches ? 'smooth' : 'auto',
+  });
+}
+
+function setupScrollReader(startIndex) {
+  const scroller = document.getElementById('rdr-flipbook');
+  const cradle = document.getElementById('book-cradle');
+  if (!scroller) return;
+  teardownScrollReader();
+  cradle?.removeAttribute('style');
+  cradle?.style.setProperty('--pdf-page-aspect', String(pdfPageAspectRatio));
+
+  const onScroll = () => {
+    // Programatik kaydırma sırasında geri besleme yapma: aksi hâlde hedef
+    // sayfaya giderken aradan geçilen sayfalar konumu ezerdi.
+    if (scrollSyncFrame || suppressScrollSync) return;
+    scrollSyncFrame = requestAnimationFrame(() => {
+      scrollSyncFrame = 0;
+      const index = activeScrollPage(scroller) - 1;
+      if (index === state.currentIndex) return;
+      updateReaderUI(index);
+      schedulePdfRenderWindow(index);
+      scheduleLastReadSave();
+    });
+  };
+  scroller.addEventListener('scroll', onScroll, { passive: true });
+  scrollObserver = {
+    disconnect: () => scroller.removeEventListener('scroll', onScroll),
+  };
+
+  // Başlangıç konumu, düzen oturduktan SONRA yazılır: canvas'lar en-boy
+  // oranına göre boyutlanmadan ölçmek yanlış ofset veriyordu.
+  suppressScrollSync = true;
+  requestAnimationFrame(() => {
+    scrollToPdfPage(scroller, startIndex + 1, false);
+    // Snap'in yerleşmesi için bir kare daha bekle, sonra dinlemeyi aç.
+    requestAnimationFrame(() => { suppressScrollSync = false; });
+  });
+}
+
+/**
+ * Okuma modunu değiştirir ve okuma konumunu KORUR (§20: gereksiz yere bölüm
+ * başına atlama yok).
+ */
+function switchReaderMode(mode) {
+  if (!READER_MODES.includes(mode) || mode === state.readerMode) return;
+  state.readerMode = mode;
+  savePrefs();
+  haptics.selection();
+  const label = document.getElementById('rdr-mode-label');
+  if (label) label.textContent = mode === 'scroll' ? 'Kaydır' : 'Sayfa';
+  const button = document.getElementById('rdr-mode');
+  if (button) {
+    button.innerHTML = `${mode === 'scroll' ? ICON.scrollMode : ICON.pageMode}<span id="rdr-mode-label">${mode === 'scroll' ? 'Kaydır' : 'Sayfa'}</span>`;
+  }
+  document.querySelectorAll('.mode-btn').forEach(item => {
+    const selected = item.dataset.mode === mode;
+    item.classList.toggle('selected', selected);
+    item.setAttribute('aria-pressed', String(selected));
+  });
+  // Kitabı mevcut konumdan yeniden aç: iki mod farklı sahne kurulumu istiyor.
+  const book = getBook(state.bookId);
+  if (book) void openBook(book, getCurrentPosition());
+}
+
 async function openPdfReader(book, position = null) {
   cleanupReader();
   const generation = renderGeneration;
@@ -1772,9 +2386,19 @@ async function openPdfReader(book, position = null) {
   pdfPageAspectRatio = await readPdfPageAspectRatio(pdfDocument);
   if (generation !== renderGeneration || !pdfDocument) return;
 
+  // İçindekiler PDF outline'ından gelir; yoksa null kalır ve arayüz bunu
+  // dürüstçe söyler. Kitap açılışını bloklamaması için hatası yutulur.
+  tableOfContents = await buildTableOfContents(pdfDocument).catch(() => null);
+  if (generation !== renderGeneration || !pdfDocument) return;
+
   buildReaderShell(book);
   applyTheme(state.theme);
   applyTypography();
+  await nextFrame();
+  if (generation !== renderGeneration || !pdfDocument) return;
+  // Sahne olcusunu ALMADAN ONCE kabuk alanini ayir: aksi halde sayfa,
+  // dock'un arkasinda kalacak sekilde buyuk hesaplanir.
+  measureReaderChrome();
   await nextFrame();
   if (generation !== renderGeneration || !pdfDocument) return;
   if (!await waitForReaderStageSize(generation)) {
@@ -1788,13 +2412,28 @@ async function openPdfReader(book, position = null) {
   }
   lastLayoutKey = metrics.key;
   readerPages = createPdfPageModels(pdfDocument.numPages);
-  const savedPosition = position || readBookProgress(book.id);
-  const startIndex = findStartIndex(readerPages, savedPosition);
+  const startIndex = resolveStartIndex(book, position, pdfDocument.numPages);
   state.currentIndex = startIndex;
   state.pageNum = Math.min(startIndex + 1, pdfDocument.numPages);
   renderPdfPageElements(book, pdfDocument.numPages);
-  measurePdfRenderBox(metrics);
+  measureRenderBox(metrics);
   updateReaderUI(startIndex);
+
+  // Sürekli mod: sayfa çevirme motoru hiç kurulmaz.
+  if (state.readerMode === 'scroll') {
+    setupScrollReader(startIndex);
+    await nextFrame();
+    if (generation !== renderGeneration) return;
+    // Sayfa modu ile AYNI ölçüm: çerçevenin içerik kutusu.
+    measureRenderBox(metrics);
+    bindReaderEvents(book);
+    await pdfRenderDrain;
+    await updatePdfRenderWindow(startIndex, true);
+    document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
+    setAppMode('reading');
+    showControls(true);
+    return;
+  }
 
   const flipbook = document.getElementById('rdr-flipbook');
   pageFlip = new window.St.PageFlip(flipbook, {
@@ -1821,6 +2460,7 @@ async function openPdfReader(book, position = null) {
     if (index !== lastFlipIndex) playPageSound();
     lastFlipIndex = index;
     updateReaderUI(index);
+    scheduleLastReadSave();
     // Ağır render işi çevirme animasyonu bittikten sonra yapılır.
     schedulePdfRenderWindow(index);
   });
@@ -1873,6 +2513,9 @@ function toggleBookmark() {
   saveBookmarks();
   updateReaderUI(state.currentIndex);
   saveCurrentPage(page, state.currentIndex);
+  // Anlamlı bir durum değişimi: haptik burada yerinde (§43).
+  if (existingIndex >= 0) haptics.light();
+  else haptics.success();
   showToast(existingIndex >= 0 ? 'Yer imi kaldırıldı · kaldığın sayfa kaydedildi' : 'Kaldığın sayfa kaydedildi');
 }
 
@@ -1910,14 +2553,28 @@ function updateReaderUI(index) {
   }
   if (bookmark) {
     const active = isBookmarked(page);
-    bookmark.classList.toggle('active', active);
+    bookmark.classList.toggle('is-active', active);
     bookmark.setAttribute('aria-pressed', String(active));
     // SVG'yi yalnızca durum değiştiğinde yeniden ayrıştır.
     const iconState = active ? 'on' : 'off';
     if (bookmark.dataset.iconState !== iconState) {
       bookmark.dataset.iconState = iconState;
-      bookmark.innerHTML = active ? ICON.bookmarkFill : ICON.bookmark;
+      bookmark.innerHTML = `${active ? ICON.bookmarkFill : ICON.bookmark}<span>Yer imi</span>`;
     }
+  }
+
+  // Üst şerit: yalnızca gerçek veriden türetilmiş tek cümle.
+  const totalPages = state.bookType === 'pdf'
+    ? (pdfDocument?.numPages || readerPages.length)
+    : readerPages.length;
+  const status = document.getElementById('rdr-status');
+  if (status) status.textContent = readingStatusText(state.currentPage, totalPages);
+  const contentsValue = document.getElementById('rdr-contents-value');
+  if (contentsValue) {
+    const chapter = chapterContextFor(state.currentPage, totalPages);
+    contentsValue.textContent = chapter
+      ? chapter.title
+      : `%${Math.round((state.currentPage / Math.max(1, totalPages)) * 100)}`;
   }
   if (live) live.textContent = state.bookType === 'pdf'
     ? `${page.type === 'pdf-back-cover' ? 'Arka kapak' : `PDF sayfası ${page.pdfPage} / ${pdfDocument?.numPages || 1}`}`
@@ -1938,19 +2595,32 @@ function setFlipCompositing(active) {
   document.getElementById('rdr-stage')?.classList.toggle('is-flipping', active);
 }
 
+/**
+ * Kontrolleri kilitleyen durumlar. Bunlar varken otomatik gizleme ÇALIŞMAZ
+ * (§23): açık bir sayfa, kontroller içindeki klavye odağı veya aktif arama.
+ */
+function controlsAreLocked() {
+  if (openSheets().length) return true;
+  const active = document.activeElement;
+  return Boolean(active && active !== document.body
+    && active.closest?.('.reader-dock, .reader-topbar, .reader-sheet'));
+}
+
 function showControls(autoHide = true) {
   const root = document.getElementById('reader-inner');
   if (!root) return;
   state.controlsVisible = true;
   root.classList.add('controls-visible');
   clearTimeout(controlsTimer);
-  if (autoHide && !document.getElementById('rdr-settings')?.classList.contains('open')) {
-    controlsTimer = window.setTimeout(hideControls, 3000);
+  if (autoHide && !controlsAreLocked()) {
+    controlsTimer = window.setTimeout(hideControls, CONTROLS_HIDE_MS);
   }
 }
 
 function hideControls() {
   clearTimeout(controlsTimer);
+  // Kullanıcı hâlâ kontrollerle etkileşimdeyse gizleme.
+  if (controlsAreLocked()) return;
   state.controlsVisible = false;
   document.getElementById('reader-inner')?.classList.remove('controls-visible');
 }
@@ -1960,24 +2630,482 @@ function toggleControls() {
   else showControls(true);
 }
 
-function openSettings() {
-  const layer = document.getElementById('rdr-settings');
-  if (!layer) return;
-  clearTimeout(controlsTimer);
-  showControls(false);
-  layer.classList.add('open');
-  layer.setAttribute('aria-hidden', 'false');
-  document.getElementById('rdr-settings-open')?.setAttribute('aria-expanded', 'true');
+/* ------------------------------------------------------------------------ */
+/* OKUYUCU SAYFALARI (dialog)                                                 */
+/* ------------------------------------------------------------------------ */
+
+const SHEET_IDS = Object.freeze(['rdr-contents-sheet', 'rdr-search-sheet', 'rdr-settings-sheet']);
+
+/** Sayfayı açan denetim; kapanışta odak buraya döner. */
+let sheetOpener = null;
+
+function openSheets() {
+  return SHEET_IDS
+    .map(id => document.getElementById(id))
+    .filter(sheet => sheet?.open);
 }
 
-function closeSettings() {
-  const layer = document.getElementById('rdr-settings');
-  if (!layer?.classList.contains('open')) return false;
-  layer.classList.remove('open');
-  layer.setAttribute('aria-hidden', 'true');
-  document.getElementById('rdr-settings-open')?.setAttribute('aria-expanded', 'false');
-  showControls(true);
+/**
+ * Bir sayfa açar. Aynı anda yalnızca bir tanesi açık kalır (§29/§48: tek
+ * sahiplik, üst üste binen overlay yok).
+ */
+function openSheet(id) {
+  const sheet = document.getElementById(id);
+  if (!sheet || sheet.open) return false;
+  for (const other of openSheets()) closeSheet(other);
+  // Sayfa açıkken kontroller kaybolmamalı: kullanıcı hâlâ etkileşimde.
+  clearTimeout(controlsTimer);
+  showControls(false);
+  // Odağı ELLE geri veriyoruz. <dialog> kapanışta odağı kendi geri
+  // yüklemeye çalışır ama açılış programatik olduğunda (ör. bir sonuç
+  // satırından açılan sayfa) güvenilir değil; açanı biz saklıyoruz.
+  sheetOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  try { sheet.showModal(); } catch (_) { return false; }
+  document.getElementById('rdr-settings-open')
+    ?.setAttribute('aria-expanded', String(id === 'rdr-settings-sheet'));
+  haptics.selection();
   return true;
+}
+
+function closeSheet(sheet) {
+  if (!sheet?.open) return false;
+  try { sheet.close(); } catch (_) {}
+  return true;
+}
+
+/** Açık olan her sayfayı kapatır. @returns {boolean} bir şey kapandı mı */
+function closeSettings() {
+  const open = openSheets();
+  if (!open.length) return false;
+  for (const sheet of open) closeSheet(sheet);
+  document.getElementById('rdr-settings-open')?.setAttribute('aria-expanded', 'false');
+  // Odağı açan denetime geri ver (§57). Kontroller o sırada gizlenmiş
+  // olabileceği için önce görünür yapılır, yoksa odak görünmez bir düğmeye gider.
+  showControls(true);
+  const opener = sheetOpener;
+  sheetOpener = null;
+  if (opener?.isConnected) {
+    try { opener.focus({ preventScroll: true }); } catch (_) {}
+  }
+  return true;
+}
+
+function openSettings() {
+  openSheet('rdr-settings-sheet');
+}
+
+/* ------------------------------------------------------------------------ */
+/* İÇİNDEKİLER SAYFASI                                                        */
+/* ------------------------------------------------------------------------ */
+
+function bookmarkedPagesForCurrentBook() {
+  const entries = state.bookmarks[state.bookId] || [];
+  return entries
+    .map(entry => {
+      const match = /^pdf:(\d+)$/.exec(String(entry));
+      if (match) return Number(match[1]);
+      return Number.isFinite(Number(entry)) ? Number(entry) + 1 : null;
+    })
+    .filter(page => Number.isFinite(page))
+    .sort((a, b) => a - b);
+}
+
+/* ------------------------------------------------------------------------ */
+/* SAYFA KÜÇÜK RESİMLERİ (thumbnail navigator)                                */
+/* ------------------------------------------------------------------------ */
+
+/** Küçük resim genişliği (CSS px). Küçük tutulur: 224 sayfa da olsa ucuz. */
+const THUMBNAIL_WIDTH = 108;
+/** LRU sınırı. Kapaklar dataURL olarak tutulur, bellek burada sınırlanır. */
+const THUMBNAIL_CACHE_LIMIT = 80;
+const thumbnailCache = new Map();
+const thumbnailTasks = new Map();
+let thumbnailObserver = null;
+
+function clearThumbnailWork() {
+  thumbnailObserver?.disconnect();
+  thumbnailObserver = null;
+  for (const task of thumbnailTasks.values()) {
+    try { task.cancel(); } catch (_) {}
+  }
+  thumbnailTasks.clear();
+}
+
+function rememberThumbnail(pageNumber, dataUrl) {
+  thumbnailCache.delete(pageNumber);
+  thumbnailCache.set(pageNumber, dataUrl);
+  while (thumbnailCache.size > THUMBNAIL_CACHE_LIMIT) {
+    thumbnailCache.delete(thumbnailCache.keys().next().value);
+  }
+}
+
+/**
+ * Tek bir küçük resmi üretir.
+ *
+ * Ana okuma render'ından TAMAMEN ayrı bir yol: kendi tuvali, kendi ölçeği.
+ * pdf.js "aynı tuval üzerinde eşzamanlı render" hatasını ancak aynı CANVAS
+ * için verir; aynı sayfayı farklı tuvallere çizmek güvenlidir. Bu yüzden
+ * burada page.cleanup() ÇAĞRILMAZ - ana render o sayfayı kullanıyor olabilir.
+ */
+async function renderThumbnail(pageNumber, image) {
+  if (!pdfDocument) return;
+  const cached = thumbnailCache.get(pageNumber);
+  if (cached) {
+    image.src = cached;
+    image.closest('.reader-thumb')?.classList.add('is-loaded');
+    return;
+  }
+  if (thumbnailTasks.has(pageNumber)) return;
+
+  const generation = pdfRenderGeneration;
+  try {
+    const page = await pdfDocument.getPage(pageNumber);
+    if (generation !== pdfRenderGeneration) return;
+    const base = page.getViewport({ scale: 1 });
+    const viewport = page.getViewport({ scale: THUMBNAIL_WIDTH / base.width });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.ceil(viewport.width));
+    canvas.height = Math.max(1, Math.ceil(viewport.height));
+    const canvasContext = canvas.getContext('2d', { alpha: false });
+    const task = page.render({ canvas, canvasContext, viewport, background: 'rgb(255,255,255)' });
+    thumbnailTasks.set(pageNumber, task);
+    await task.promise;
+    if (generation !== pdfRenderGeneration) return;
+    const dataUrl = canvas.toDataURL('image/webp', 0.72);
+    // Tuvali hemen serbest bırak: 224 sayfalık kitapta bu fark yaratır.
+    canvas.width = 0;
+    canvas.height = 0;
+    rememberThumbnail(pageNumber, dataUrl);
+    if (!image.isConnected) return;
+    image.src = dataUrl;
+    image.closest('.reader-thumb')?.classList.add('is-loaded');
+  } catch (error) {
+    if (String(error?.name) === 'RenderingCancelledException') return;
+    // Tek küçük resmin düşmesi gezinmeyi engellemez (§39).
+    image.closest('.reader-thumb')?.classList.add('has-error');
+  } finally {
+    thumbnailTasks.delete(pageNumber);
+  }
+}
+
+/** Küçük resim ızgarası. Yalnızca görünür hücreler render edilir (§6). */
+function renderThumbnailGrid(container, total) {
+  const current = state.currentPage;
+  container.innerHTML = `
+    <ul class="reader-thumb-grid" role="list">
+      ${Array.from({ length: total }, (_, index) => {
+        const page = index + 1;
+        return `
+          <li>
+            <button class="reader-thumb${page === current ? ' is-current' : ''}" type="button"
+                    data-goto-page="${page}" ${page === current ? 'aria-current="true"' : ''}
+                    aria-label="Sayfa ${page}">
+              <span class="reader-thumb-frame"><img alt="" data-thumb-page="${page}" decoding="async" /></span>
+              <span class="reader-thumb-number">${page}</span>
+            </button>
+          </li>`;
+      }).join('')}
+    </ul>`;
+
+  container.querySelectorAll('[data-goto-page]').forEach(button => {
+    button.addEventListener('click', () => {
+      goToPdfPage(Number(button.dataset.gotoPage));
+      closeSettings();
+    });
+  });
+
+  // Tembel render: yalnızca görünür küçük resimler üretilir.
+  clearThumbnailWork();
+  thumbnailObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const image = entry.target;
+      thumbnailObserver?.unobserve(image);
+      void renderThumbnail(Number(image.dataset.thumbPage), image);
+    }
+  }, { root: container, rootMargin: '240px 0px' });
+  container.querySelectorAll('img[data-thumb-page]').forEach(image => thumbnailObserver.observe(image));
+
+  // Geçerli sayfa görünür olsun.
+  container.querySelector('.reader-thumb.is-current')?.scrollIntoView({ block: 'center' });
+}
+
+function renderContentsSheet() {
+  const body = document.getElementById('rdr-contents-body');
+  if (!body) return;
+  const total = pdfDocument?.numPages || readerPages.length || 1;
+  const currentPage = state.currentPage;
+  const chapter = chapterContextFor(currentPage, total);
+  const bookmarks = bookmarkedPagesForCurrentBook();
+
+  const hasChapters = Boolean(tableOfContents?.length);
+
+  const chapterList = hasChapters
+    ? `<ul class="reader-toc" role="list">
+        ${tableOfContents.map((entry, index) => `
+          <li>
+            <button class="reader-toc-item${index === chapter?.index ? ' is-current' : ''}" type="button"
+                    data-goto-page="${entry.page}" data-level="${entry.level}"
+                    ${index === chapter?.index ? 'aria-current="true"' : ''}>
+              <span class="reader-toc-title">${escapeHTML(entry.title)}</span>
+              <span class="reader-toc-page">${entry.page}</span>
+            </button>
+          </li>`).join('')}
+      </ul>`
+    : '';
+
+  const bookmarkList = bookmarks.length
+    ? `<ul class="reader-toc" role="list">
+        ${bookmarks.map(page => `
+          <li>
+            <button class="reader-toc-item" type="button" data-goto-page="${page}">
+              <span class="reader-toc-title">Sayfa ${page}</span>
+              <span class="reader-toc-page">${ICON.bookmarkFill}</span>
+            </button>
+          </li>`).join('')}
+      </ul>`
+    : '<p class="reader-sheet-empty">Henüz yer imi eklemedin. Okurken yer imi düğmesine basarak bu sayfayı işaretleyebilirsin.</p>';
+
+  // Sekmeler. Bölüm verisi olmayan kitapta ÖLÜ bir "Bölümler" sekmesi
+  // gösterilmez (§7); doğrudan Sayfalar açılır.
+  const tabs = [
+    hasChapters ? { id: 'chapters', label: 'Bölümler' } : null,
+    { id: 'pages', label: 'Sayfalar' },
+    { id: 'bookmarks', label: 'Yer İmleri' },
+  ].filter(Boolean);
+  const activeTab = hasChapters ? 'chapters' : 'pages';
+
+  body.innerHTML = `
+    <p class="reader-sheet-progress">${escapeHTML(readingStatusText(currentPage, total))} · ${currentPage} / ${total}</p>
+
+    <div class="reader-tabs" role="tablist" aria-label="Gezinme">
+      ${tabs.map(tab => `
+        <button class="reader-tab${tab.id === activeTab ? ' is-active' : ''}" type="button" role="tab"
+                id="rdr-tab-${tab.id}" data-tab="${tab.id}"
+                aria-selected="${tab.id === activeTab}" aria-controls="rdr-panel-${tab.id}">${tab.label}</button>`).join('')}
+    </div>
+
+    ${hasChapters ? `
+    <section class="reader-tab-panel" id="rdr-panel-chapters" role="tabpanel" aria-labelledby="rdr-tab-chapters">
+      ${chapterList}
+    </section>` : `
+    <p class="reader-sheet-empty" id="rdr-no-outline">Bu kitabın PDF dosyasında bölüm bilgisi yok, bu yüzden içindekiler listesi oluşturulamıyor. Sayfalardan veya yer imlerinden gezinebilirsin.</p>`}
+
+    <section class="reader-tab-panel${activeTab === 'pages' ? '' : ' is-hidden'}" id="rdr-panel-pages" role="tabpanel" aria-labelledby="rdr-tab-pages">
+      <div class="reader-thumbs" id="rdr-thumbs"></div>
+    </section>
+
+    <section class="reader-tab-panel is-hidden" id="rdr-panel-bookmarks" role="tabpanel" aria-labelledby="rdr-tab-bookmarks">
+      ${bookmarkList}
+    </section>
+
+    <section class="reader-sheet-section">
+      <h3 class="reader-sheet-subtitle">Sayfaya git</h3>
+      <form class="reader-goto" id="rdr-goto-form">
+        <label class="sr-only" for="rdr-goto-input">Sayfa numarası</label>
+        <input id="rdr-goto-input" type="number" min="1" max="${total}" inputmode="numeric" placeholder="1 – ${total}" />
+        <button type="submit">Git</button>
+      </form>
+      <p class="reader-goto-error" id="rdr-goto-error" role="alert" hidden></p>
+      <button class="reader-restart" type="button" id="rdr-restart">Baştan başla</button>
+    </section>`;
+
+  const showTab = tabId => {
+    body.querySelectorAll('.reader-tab').forEach(tab => {
+      const active = tab.dataset.tab === tabId;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
+    for (const id of ['chapters', 'pages', 'bookmarks']) {
+      body.querySelector(`#rdr-panel-${id}`)?.classList.toggle('is-hidden', id !== tabId);
+    }
+    // Küçük resimler ancak sekme açıldığında üretilir: 224 sayfalık kitapta
+    // sayfa açılışında hepsini render etmek kabul edilemez (§59).
+    if (tabId === 'pages') {
+      const host = body.querySelector('#rdr-thumbs');
+      if (host && !host.dataset.ready) {
+        host.dataset.ready = '1';
+        renderThumbnailGrid(host, total);
+      }
+    }
+  };
+
+  body.querySelectorAll('.reader-tab').forEach(tab => {
+    tab.addEventListener('click', () => showTab(tab.dataset.tab));
+  });
+  showTab(activeTab);
+
+  body.querySelectorAll('.reader-toc-item[data-goto-page]').forEach(button => {
+    button.addEventListener('click', () => {
+      goToPdfPage(Number(button.dataset.gotoPage));
+      closeSettings();
+    });
+  });
+  body.querySelector('#rdr-goto-form')?.addEventListener('submit', event => {
+    event.preventDefault();
+    const input = body.querySelector('#rdr-goto-input');
+    const error = body.querySelector('#rdr-goto-error');
+    const raw = String(input?.value ?? '').trim();
+    const page = Number(raw);
+    // Satır içi doğrulama; alert() KULLANILMAZ (§53).
+    if (!raw || !Number.isFinite(page) || !Number.isInteger(page) || page < 1 || page > total) {
+      if (error) {
+        error.textContent = `1 ile ${total} arasında bir sayfa numarası gir.`;
+        error.hidden = false;
+      }
+      input?.focus();
+      haptics.warning();
+      return;
+    }
+    if (error) error.hidden = true;
+    goToPdfPage(page);
+    closeSettings();
+  });
+  body.querySelector('#rdr-goto-input')?.addEventListener('input', () => {
+    const error = body.querySelector('#rdr-goto-error');
+    if (error) error.hidden = true;
+  });
+  body.querySelector('#rdr-restart')?.addEventListener('click', () => {
+    goToPdfPage(1);
+    closeSettings();
+  });
+}
+
+/**
+ * Sayfa numarasına gider. Her iki okuma modunda da çalışır ve okuma
+ * konumunu kaydeder.
+ */
+function goToPdfPage(pageNumber) {
+  const total = pdfDocument?.numPages || readerPages.length || 1;
+  const page = clamp(Number(pageNumber) || 1, 1, total);
+  const index = page - 1;
+  if (state.readerMode === 'scroll') {
+    const scroller = document.getElementById('rdr-flipbook');
+    if (scroller) {
+      // Hedefe giderken aradaki sayfalar konumu ezmesin.
+      suppressScrollSync = true;
+      scrollToPdfPage(scroller, page, true);
+      window.setTimeout(() => { suppressScrollSync = false; }, 600);
+    }
+    updateReaderUI(index);
+    schedulePdfRenderWindow(index);
+  } else if (pageFlip?.getState() === 'read') {
+    pageFlip.turnToPage(index);
+  } else {
+    updateReaderUI(index);
+    schedulePdfRenderWindow(index);
+  }
+  scheduleLastReadSave();
+  // YER İMİ bilerek kaydedilmez: içindekilerden/aramadan/ilerleme barından
+  // atlamak kullanıcının işaretlediği sayfayı oynatmamalı (yukarıdaki
+  // "elle kaydet" modeli). Kaydetmek için yer imi düğmesi kullanılır.
+  haptics.light();
+}
+
+/* ------------------------------------------------------------------------ */
+/* KİTAP İÇİ ARAMA SAYFASI                                                    */
+/* ------------------------------------------------------------------------ */
+
+function setSearchState(message) {
+  const element = document.getElementById('rdr-search-state');
+  if (element) element.textContent = message;
+}
+
+function renderSearchResults(results, query) {
+  const container = document.getElementById('rdr-search-results');
+  if (!container) return;
+  if (!results.length) {
+    container.innerHTML = `<p class="reader-sheet-empty">“${escapeHTML(query)}” için sonuç bulunamadı.</p>`;
+    return;
+  }
+  container.innerHTML = `
+    <ul class="reader-search-list" role="list">
+      ${results.map(result => `
+        <li>
+          <button class="reader-search-item" type="button" data-goto-page="${result.pageNumber}">
+            <span class="reader-search-snippet">${result.snippet.truncatedStart ? '…' : ''}${escapeHTML(result.snippet.before)}<mark>${escapeHTML(result.snippet.match)}</mark>${escapeHTML(result.snippet.after)}${result.snippet.truncatedEnd ? '…' : ''}</span>
+            <span class="reader-search-page">Sayfa ${result.pageNumber}</span>
+          </button>
+        </li>`).join('')}
+    </ul>`;
+  container.querySelectorAll('[data-goto-page]').forEach(button => {
+    button.addEventListener('click', () => {
+      goToPdfPage(Number(button.dataset.gotoPage));
+      closeSettings();
+    });
+  });
+}
+
+async function runBookSearch(query) {
+  if (!isSearchableQuery(query)) {
+    setSearchState('En az 2 karakter yaz.');
+    const container = document.getElementById('rdr-search-results');
+    if (container) container.innerHTML = '';
+    return;
+  }
+  setSearchState('Aranıyor…');
+  await ensureSearchIndex(state.bookId, (done, total) => {
+    setSearchState(done < total ? `Kitap taranıyor… %${Math.round((done / total) * 100)}` : 'Aranıyor…');
+  });
+  // İndeksleme sürerken kullanıcı sorguyu değiştirmiş olabilir.
+  const input = document.getElementById('rdr-search-input');
+  if (input && input.value.trim() !== String(query).trim()) return;
+  const results = searchBookIndex(searchIndex, query);
+  setSearchState(results.length ? `${results.length} sonuç` : 'Sonuç yok');
+  renderSearchResults(results, query);
+}
+
+function openSearchSheet() {
+  if (!openSheet('rdr-search-sheet')) return;
+  const input = document.getElementById('rdr-search-input');
+  setSearchState('');
+  // İndeksi arka planda şimdiden kurmaya başla: kullanıcı yazarken hazır olsun.
+  void ensureSearchIndex(state.bookId, (done, total) => {
+    if (done < total) setSearchState(`Kitap taranıyor… %${Math.round((done / total) * 100)}`);
+  });
+  input?.focus();
+}
+
+/* ------------------------------------------------------------------------ */
+/* PAYLAŞ                                                                     */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Gerçek Web Share API kullanılır; yoksa panoya kopyalanır.
+ * Sahte bir "share sheet" ÇİZİLMEZ (§17).
+ */
+async function shareCurrentReading() {
+  const book = getBook(state.bookId);
+  if (!book) return;
+  const total = pdfDocument?.numPages || readerPages.length || 1;
+  const chapter = chapterContextFor(state.currentPage, total);
+  const title = `${book.title} — Ravza Books`;
+  const text = chapter
+    ? `${book.title} · ${chapter.title} (sayfa ${state.currentPage} / ${total})`
+    : `${book.title} · sayfa ${state.currentPage} / ${total}`;
+  // Kitap dosyası yerel; paylaşılan bağlantı yalnızca uygulamanın kendi rotasıdır.
+  const url = new URL(window.location.href);
+  url.hash = '#ravza-books';
+
+  const payload = { title, text, url: url.href };
+  try {
+    if (navigator.canShare ? navigator.canShare(payload) : typeof navigator.share === 'function') {
+      await navigator.share(payload);
+      haptics.success();
+      return;
+    }
+  } catch (error) {
+    // Kullanıcı iptal ettiyse sessiz kal; hata mesajı göstermek yanıltıcı olur.
+    if (error?.name === 'AbortError') return;
+  }
+  try {
+    await navigator.clipboard.writeText(`${text}\n${url.href}`);
+    showToast('Okuma konumu panoya kopyalandı');
+    haptics.success();
+  } catch (_) {
+    showToast('Paylaşım bu tarayıcıda desteklenmiyor');
+    haptics.warning();
+  }
 }
 
 function scheduleRepagination(delay = 260) {
@@ -1991,6 +3119,13 @@ function scheduleRepagination(delay = 260) {
 }
 
 function safeFlip(direction, corner = 'top') {
+  // Sürekli modda "çevirme" yok; komşu sayfaya kaydırılır.
+  if (state.readerMode === 'scroll') {
+    const next = state.currentIndex + (direction === 'next' ? 1 : -1);
+    if (next < 0 || next >= readerPages.length) return;
+    goToPdfPage(next + 1);
+    return;
+  }
   if (!pageFlip || pageFlip.getState() !== 'read') return;
   const index = state.currentIndex;
   if (direction === 'next' && index < readerPages.length - 1) pageFlip.flipNext(corner);
@@ -2198,7 +3333,7 @@ function installDirectPageCurl() {
         const releasePoint = commit ? forcePoint : returnPoint;
         pageFlip.userMove(releasePoint, true);
         pageFlip.userStop(releasePoint, false);
-        if (commit) navigator.vibrate?.(7);
+        if (commit) haptics.selection();
       }
     } catch (_) {}
 
@@ -2258,7 +3393,57 @@ function bindReaderEvents(book) {
   }, { signal });
   document.getElementById('rdr-bookmark')?.addEventListener('click', toggleBookmark, { signal });
   document.getElementById('rdr-settings-open')?.addEventListener('click', openSettings, { signal });
-  document.getElementById('rdr-settings-close')?.addEventListener('click', closeSettings, { signal });
+  document.getElementById('rdr-share')?.addEventListener('click', () => void shareCurrentReading(), { signal });
+  document.getElementById('rdr-mode')?.addEventListener('click', () => {
+    switchReaderMode(state.readerMode === 'page' ? 'scroll' : 'page');
+  }, { signal });
+  document.getElementById('rdr-contents-open')?.addEventListener('click', () => {
+    renderContentsSheet();
+    openSheet('rdr-contents-sheet');
+  }, { signal });
+  document.getElementById('rdr-search-open')?.addEventListener('click', openSearchSheet, { signal });
+
+  // Sayfa kapatma: başlıktaki düğme, backdrop tıklaması ve Escape.
+  for (const id of SHEET_IDS) {
+    const sheet = document.getElementById(id);
+    if (!sheet) continue;
+    sheet.querySelector('[data-close-sheet]')?.addEventListener('click', () => closeSettings(), { signal });
+    sheet.addEventListener('click', event => {
+      // Backdrop, dialog elemanının kendisidir; panel içi tıklamalar paneli verir.
+      if (event.target === sheet) closeSettings();
+    }, { signal });
+    sheet.addEventListener('cancel', event => {
+      event.preventDefault();
+      closeSettings();
+    }, { signal });
+    // Sayfa kapanınca kontroller yeniden görünür ve otomatik gizleme yeniden kurulur.
+    sheet.addEventListener('close', () => showControls(true), { signal });
+  }
+
+  const searchInput = document.getElementById('rdr-search-input');
+  searchInput?.addEventListener('input', event => {
+    // Her tuşta arama YAPILMAZ; hazır indekste debounce ile çalışılır (§56).
+    clearTimeout(searchDebounceTimer);
+    const query = event.target.value;
+    searchDebounceTimer = window.setTimeout(() => void runBookSearch(query), 220);
+  }, { signal });
+  searchInput?.addEventListener('keydown', event => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    clearTimeout(searchDebounceTimer);
+    void runBookSearch(event.target.value);
+  }, { signal });
+
+  document.querySelectorAll('.mode-btn').forEach(button => {
+    button.addEventListener('click', () => switchReaderMode(button.dataset.mode), { signal });
+  });
+  document.getElementById('haptics-toggle')?.addEventListener('change', event => {
+    state.hapticsEnabled = event.target.checked;
+    haptics.setEnabled(state.hapticsEnabled);
+    savePrefs();
+    if (state.hapticsEnabled) haptics.selection();
+  }, { signal });
+
   const progress = document.getElementById('rdr-progress');
   progress?.addEventListener('input', event => {
     const value = Number(event.target.value);
@@ -2268,7 +3453,8 @@ function bindReaderEvents(book) {
     event.target.style.setProperty('--progress', `${pct}%`);
   }, { signal });
   progress?.addEventListener('change', event => {
-    if (pageFlip?.getState() === 'read') pageFlip.turnToPage(Number(event.target.value));
+    // Range değeri sayfa DİZİNİ; goToPdfPage sayfa NUMARASI bekler.
+    goToPdfPage(Number(event.target.value) + 1);
     showControls(true);
   }, { signal });
 
@@ -2309,13 +3495,34 @@ function bindReaderEvents(book) {
     if (word) {
       event.stopPropagation();
       showLugat(word);
+      return;
+    }
+    // Sürekli modda sayfa çevirme jesti yok; kabuk açma/kapama dokunuşu
+    // buradan gelir. Sayfa modunda aynı işi installDirectPageCurl yapar.
+    if (state.readerMode === 'scroll' && !event.target.closest('button, a, input, label')) {
+      toggleControls();
     }
   }, { signal });
+
+  // Sürekli modda kaydırma başlayınca kabuk çekilsin: metin görünürlüğü öncelikli.
+  if (state.readerMode === 'scroll') {
+    document.getElementById('rdr-flipbook')?.addEventListener('scroll', () => {
+      if (state.controlsVisible && !controlsAreLocked()) hideControls();
+    }, { signal, passive: true });
+  }
   document.addEventListener('click', event => {
     if (!event.target.closest('.rd-accent, .lugat-popover')) hideLugat();
   }, { capture: true, signal });
 
   document.addEventListener('keydown', event => readerKeyHandler(event), { signal });
+
+  // Sekme gizlenirse/ kapanırsa son okunan sayfa kaybolmasın (§4).
+  // visibilitychange mobilde "uygulamadan çıkma"nın tek güvenilir sinyalidir;
+  // beforeunload iOS Safari'de tetiklenmeyebiliyor.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushLastReadSave();
+  }, { signal });
+  window.addEventListener('pagehide', flushLastReadSave, { signal });
 
   // Tek bir debounce: resize ve ResizeObserver aynı yolu kullanır, böylece
   // yeniden kurulum en fazla bir kez tetiklenir.
@@ -2356,18 +3563,20 @@ function readerKeyHandler(event) {
     return;
   }
   if (event.target.matches('input, textarea, select, [contenteditable="true"]')) return;
+  // Bir sayfa açıkken kitap gezinme kısayolları devrede olmamalı.
+  if (openSheets().length) return;
   if (event.key === 'ArrowRight' || event.key === 'PageDown') {
     event.preventDefault();
     safeFlip('next');
   } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
     event.preventDefault();
     safeFlip('prev');
-  } else if (event.key === 'Home' && pageFlip) {
+  } else if (event.key === 'Home') {
     event.preventDefault();
-    pageFlip.turnToPage(0);
-  } else if (event.key === 'End' && pageFlip) {
+    goToPdfPage(1);
+  } else if (event.key === 'End') {
     event.preventDefault();
-    pageFlip.turnToPage(readerPages.length - 1);
+    goToPdfPage(readerPages.length);
   } else if (event.key.toLowerCase() === 'b') {
     event.preventDefault();
     toggleBookmark();

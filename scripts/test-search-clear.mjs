@@ -1331,6 +1331,11 @@ try {
     "#launcherEditorAppFilter",
     "#launcherEditorWidgetFilter",
     "#globalSearch",
+    // Kitap içi arama. Davranışı burada değil, okuyucu paketinde doğrulanıyor:
+    // alan bir <dialog> içinde ve ancak kitap açıkken var olduğu için bu
+    // testin akışına uymuyor. Bkz. scripts/test-ravza-books-reader.mjs
+    // "kitap içi arama temizleme düğmesi çalışır".
+    "#rdr-search-input",
     ...adminCases.map((testCase) => testCase[2])
   ].sort();
   const testedDefinitions = testedSelectors.length;

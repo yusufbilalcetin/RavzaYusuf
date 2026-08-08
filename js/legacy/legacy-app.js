@@ -4,6 +4,7 @@ import { loadAllQuizzes } from "../services/quiz-service.js";
 import { safeParse, withTimeout } from "../utils/helpers.js";
 import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
 import { syncSearchClearControl } from "../utils/search-clear.js";
+import { uiAlert, showToast } from "../ui/sheet.js";
 import {
   doc,
   getDoc,
@@ -2189,7 +2190,7 @@ async function startExam(questionCount, durationMinutes) {
     await ensureQuestionBankLoaded();
   } catch (error) {
     console.error(error);
-    alert("Quiz soruları yüklenemedi.");
+    uiAlert("Quiz soruları yüklenemedi.", { title: "Sınav başlatılamadı" });
     return;
   }
   const selectedQuestions = buildExamQuestions(questionCount);
@@ -3422,6 +3423,10 @@ document.addEventListener("keydown", (event) => {
     const blankIndexes = getBlankIndexes();
     if (!autoSubmitted && blankIndexes.length > 0) {
       const confirmMessage = `${blankIndexes.length} soru boş bırakıldı.\n\nTamam dersen sınav bitecek.\nİptal dersen boş sorulara döneceksin.`;
+    // ponytail: bilerek native confirm. Bu fonksiyon senkron akista
+    // dallaniyor; uiConfirm'e gecmek cagriyi async yapardi. Projedeki
+    // diger 13 alert/confirm js/ui/sheet.js'e tasindi, bu 3 tanesi
+    // kullanici karariyla legacy akisi riske atmamak icin birakildi.
       const confirmed = window.confirm(confirmMessage);
       if (!confirmed) {
         activeExam.currentIndex = blankIndexes[0];
@@ -3515,7 +3520,7 @@ document.addEventListener("keydown", (event) => {
     syncExamCancelDialogState();
     const wrongQuestions = lastExamSession.results.filter((item) => item.status !== "correct");
     if (!wrongQuestions.length) {
-      alert("Yanlış veya boş soru bulunmuyor.");
+      showToast("Yanlış veya boş soru bulunmuyor.");
       return;
     }
 
@@ -3584,7 +3589,7 @@ document.addEventListener("keydown", (event) => {
       await ensureQuestionBankLoaded();
     } catch (error) {
       console.error(error);
-      alert("Quiz soruları yüklenemedi.");
+      uiAlert("Quiz soruları yüklenemedi.", { title: "Sınav başlatılamadı" });
       return;
     }
     isExamCancelDialogOpen = false;
@@ -3972,6 +3977,10 @@ document.addEventListener("keydown", (event) => {
   }
 
   function clearMemoryStats() {
+    // ponytail: bilerek native confirm. Bu fonksiyon senkron akista
+    // dallaniyor; uiConfirm'e gecmek cagriyi async yapardi. Projedeki
+    // diger 13 alert/confirm js/ui/sheet.js'e tasindi, bu 3 tanesi
+    // kullanici karariyla legacy akisi riske atmamak icin birakildi.
     if (!confirm("Tüm kelime istatistiklerini sıfırlamak istediğinden emin misin?")) return;
     try { localStorage.removeItem(STATS_KEY); } catch {}
     syncMemoryStatsToFirebase({});
@@ -6627,7 +6636,7 @@ function saveFillGapWrongItems() {
 function startFillGapWrongPractice() {
   const wrongItems = getStoredFillGapWrongItems();
   if (!wrongItems.length) {
-    alert("Henüz tekrar edilecek yanlış boşluk yok. Önce bir egzersiz çözebilirsin.");
+    showToast("Henüz tekrar edilecek yanlış boşluk yok. Önce bir egzersiz çözebilirsin.");
     return;
   }
   fillGapIsWrongPractice = true;
@@ -7813,6 +7822,10 @@ initDeviceAnalyticsConsent();
   }
   function rlz5Quit() {
     if (!RLZ_SESSION) { rlz5Home(); return; }
+    // ponytail: bilerek native confirm. Bu fonksiyon senkron akista
+    // dallaniyor; uiConfirm'e gecmek cagriyi async yapardi. Projedeki
+    // diger 13 alert/confirm js/ui/sheet.js'e tasindi, bu 3 tanesi
+    // kullanici karariyla legacy akisi riske atmamak icin birakildi.
     if (confirm("Dersten çıkmak istediğine emin misin? İlerlemen kaydedilmez.")) {
       RLZ_SESSION = null;
       rlzRenderHome();
@@ -7824,7 +7837,7 @@ initDeviceAnalyticsConsent();
   }
   function rlz5BuyHearts() {
     const state = rlzLoad();
-    if ((state.gems || 0) < 50) { alert("Yeterli kristalin yok. Ders çözerek kristal kazan."); return; }
+    if ((state.gems || 0) < 50) { showToast("Yeterli kristalin yok. Ders çözerek kristal kazan."); return; }
     state.gems -= 50;
     state.hearts = RLZ_MAX_HEARTS;
     state.heartsRefilledAt = Date.now();
@@ -7841,7 +7854,7 @@ initDeviceAnalyticsConsent();
     style.id = "ravzalingo-v5-css-r3";
     style.textContent = `
       .ravzalingo-page{background:#131f24;border-radius:0;overflow:visible;min-height:calc(100vh - 130px);width:100%;max-width:none;margin:0}
-      #ravzaLingoRoot,#ravzaLingoRoot *{box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+      #ravzaLingoRoot,#ravzaLingoRoot *{box-sizing:border-box;font-family:var(--font-ui)}
       .rlz5-shell{min-height:calc(100vh - 130px);padding:20px clamp(18px,4vw,56px) 28px;color:#fff;background:radial-gradient(circle at 0% 38%,rgba(255,77,148,.16),transparent 30%),radial-gradient(circle at 100% 36%,rgba(255,77,148,.16),transparent 30%),linear-gradient(180deg,#1a2a32,#0f1a20);width:100%;max-width:none}
       .rlz5-empty{min-height:calc(100vh - 130px);display:grid;place-items:center;padding:24px}
       .rlz5-empty-card{width:min(100%,440px);padding:30px 24px;border-radius:24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);text-align:center;color:#fff}
@@ -7872,7 +7885,7 @@ initDeviceAnalyticsConsent();
       .rlz5-section-divider>div{text-align:center;padding:13px 30px;border-radius:20px;background:linear-gradient(180deg,#1e2d36,#15222b);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 30px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.07);position:relative}
       .rlz5-section-divider>div::before{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:0 0 20px 20px;background:linear-gradient(90deg,transparent,var(--rlz-main),transparent);opacity:.85}
       .rlz5-section-divider .rlz5-section-kicker{display:block;height:auto;background:none;font-size:11px;letter-spacing:.26em;font-weight:900;color:var(--rlz-main);margin:0 0 7px;text-transform:uppercase;line-height:1}
-      .rlz5-section-divider h2{font-family:'Playfair Display',serif;font-size:23px;letter-spacing:.01em;color:#fff;font-weight:800;line-height:1.15;margin:0}
+      .rlz5-section-divider h2{font-family:var(--font-display);font-size:23px;letter-spacing:.01em;color:#fff;font-weight:800;line-height:1.15;margin:0}
 
       .rlz5-path-track{position:relative;display:grid;gap:18px;padding:8px 0 30px}
       .rlz5-unit-banner{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 10px;padding:10px 12px 10px 18px;border-radius:16px;background:linear-gradient(135deg,var(--rlz-main),var(--rlz-deep));box-shadow:0 6px 0 var(--rlz-deep),0 14px 30px rgba(0,0,0,.25);transition:transform .15s ease,filter .15s ease;-webkit-tap-highlight-color:transparent;outline:none}
@@ -8004,7 +8017,7 @@ initDeviceAnalyticsConsent();
       .rlz5-complete-rays{position:absolute;inset:-80px;background:conic-gradient(from 0deg,transparent,rgba(126,224,0,.18),transparent 25%,rgba(255,255,255,.06),transparent 45%);animation:rlz5Spin 8s linear infinite}
       .rlz5-complete-icon,.rlz5-complete-card h2,.rlz5-complete-card p,.rlz5-complete-stats,.rlz5-btn-primary{position:relative}
       .rlz5-complete-icon{font-size:72px;margin-bottom:8px;animation:rlz5Pop .5s ease}
-      .rlz5-complete-card h2{font-family:'Playfair Display',serif;font-size:28px;letter-spacing:-.02em;margin-bottom:6px}
+      .rlz5-complete-card h2{font-family:var(--font-display);font-size:28px;letter-spacing:-.02em;margin-bottom:6px}
       .rlz5-complete-card p{color:rgba(255,255,255,.65);margin-bottom:20px}
       .rlz5-complete-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
       .rlz5-cs{padding:14px 8px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}

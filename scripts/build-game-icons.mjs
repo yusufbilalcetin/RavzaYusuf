@@ -52,22 +52,41 @@ const vectorIcons = Object.freeze({
 
 await mkdir(outputDir, { recursive: true });
 
+// Arayüzde oyun ikonları en fazla 118 CSS px görünüyor; 128/256 varyantları 2x
+// ekranlarda bile tam keskinliği korurken 1024 masterın ağırlığını taşımıyor.
+const displaySizes = Object.freeze([128, 256]);
+
+async function writeDisplayVariants(id, pipeline, kernel) {
+  for (const size of displaySizes) {
+    await pipeline()
+      .resize({ width: size, height: size, fit: "contain", kernel })
+      .png({ compressionLevel: 9, adaptiveFiltering: true, effort: 10 })
+      .toFile(path.join(outputDir, String(size), `${id}.png`));
+  }
+}
+
+await Promise.all(displaySizes.map((size) => mkdir(path.join(outputDir, String(size)), { recursive: true })));
+
 for (const [id, source] of Object.entries(rasterIcons)) {
   const kernel = id === "flappy-bird" ? sharp.kernel.nearest : sharp.kernel.lanczos3;
   const pngOptions = id === "flappy-bird"
     ? { compressionLevel: 9, adaptiveFiltering: true }
     : { compressionLevel: 9, adaptiveFiltering: true, palette: true, quality: 88, effort: 10, colours: 128, dither: 0.5 };
-  await sharp(path.join(projectRoot, source))
+  const sourcePath = path.join(projectRoot, source);
+  await sharp(sourcePath)
     .resize({ width: iconSize, height: iconSize, fit: "contain", kernel })
     .png(pngOptions)
     .toFile(path.join(outputDir, `${id}.png`));
+  await writeDisplayVariants(id, () => sharp(sourcePath), kernel);
 }
 
 for (const [id, svg] of Object.entries(vectorIcons)) {
-  await sharp(Buffer.from(svg), { density: 256 })
+  const buffer = Buffer.from(svg);
+  await sharp(buffer, { density: 256 })
     .resize(iconSize, iconSize, { fit: "contain" })
     .png({ compressionLevel: 9, adaptiveFiltering: true })
     .toFile(path.join(outputDir, `${id}.png`));
+  await writeDisplayVariants(id, () => sharp(buffer, { density: 256 }), sharp.kernel.lanczos3);
 }
 
-process.stdout.write(`[game-icons] ${Object.keys(rasterIcons).length + Object.keys(vectorIcons).length} ikon hazırlandı: assets/icons/games/\n`);
+process.stdout.write(`[game-icons] ${Object.keys(rasterIcons).length + Object.keys(vectorIcons).length} ikon hazırlandı: assets/icons/games/ (+${displaySizes.join("/")} görüntüleme varyantları)\n`);

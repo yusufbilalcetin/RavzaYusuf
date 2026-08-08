@@ -47,6 +47,10 @@ async function runBrowser(config) {
   const profile = join(tmpdir(), `ravza-launcher-edit-${config.name}-${Date.now()}`);
   const browser = spawn(config.path, [
     "--headless=new", "--no-first-run", `--remote-debugging-port=${config.port}`,
+    // Tarayici uzantilari devre disi: Edge kendi Copilot/Assistant uzantisini
+    // enjekte ediyor ve onun hatalari uygulama hatasi sayilip testi dusuruyordu.
+    // Ayni bayrak scripts/lib/theme-test-runtime.mjs icinde zaten var.
+    "--disable-extensions", "--disable-background-networking", "--no-default-browser-check",
     `--user-data-dir=${profile}`, "about:blank"
   ], { stdio: "ignore" });
 

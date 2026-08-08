@@ -7,6 +7,7 @@ import { withTimeout } from "../utils/helpers.js";
 import { initLauncher } from "./launcher.js?v=home-proportions-20260716-1";
 import { initLiquidGlassSurfaceSystem } from "../services/liquid-glass-service.js?v=liquid-optics-20260715-1";
 import { initSearchClearControls } from "../utils/search-clear.js";
+import { initViewportMetrics } from "../ui/viewport-metrics.js";
 import { bindThemeControls, getThemeState, initThemeSystem } from "./theme.js";
 
 // legacy-app.js normalde çok hızlı yüklenir (yerel/CDN'den tek modül); bu
@@ -109,6 +110,9 @@ export async function initApp() {
     startupState.shellRendered = true;
     bindThemeControls();
     initSearchClearControls();
+    // Ortalanmis diyaloglarin "gorunur alan" olculeri. Klavye acilinca
+    // popup'in klavye arkasinda kalmamasi buna bagli.
+    initViewportMetrics();
     initLiquidGlassSurfaceSystem();
     installAppShellScrollBridge();
     initLauncher();

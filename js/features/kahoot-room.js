@@ -6,6 +6,7 @@
    legacy-app.js icindeki IIFE'den ayrildi; davranis aynidir.
    ========================================================= */
 import { db } from "../config/firebase-config.js";
+import { uiAlert, uiConfirm, showToast } from "../ui/sheet.js";
 import {
   doc,
   getDoc,
@@ -370,6 +371,11 @@ export function initRavzaKahootRoomModule({ topics }) {
       canvas.width = width;
       canvas.height = width;
       ctx.imageSmoothingEnabled = false;
+      /* BU RENKLER BİLEREK SABİT - tokenlaştırmayın, temaya bağlamayın.
+         QR okuyucular açık zemin üzerine koyu modül bekler; koyu temada ters
+         çevirmek (açık modül / koyu zemin) birçok telefon kamerasında taramayı
+         bozar. Sessiz bölge de beyaz kalmalı. Tema duyarlılığı gerekirse
+         canvas'ın kendisine değil, çevresindeki kapsayıcıya uygulanmalı. */
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, width, width);
       ctx.fillStyle = "#1a1330";
@@ -637,7 +643,7 @@ export function initRavzaKahootRoomModule({ topics }) {
   async function hostStartGame() {
     if (!state.roomId) return;
     if (!state.playersData?.length) {
-      alert("Önce en az 1 oyuncunun katılması lazım.");
+      showToast("Önce en az 1 oyuncunun katılması lazım.");
       return;
     }
     const roomRef = doc(db, ROOM_COLLECTION, state.roomId);
@@ -678,7 +684,7 @@ export function initRavzaKahootRoomModule({ topics }) {
       }, COUNTDOWN_MS);
     } catch (e) {
       console.error("[Kahoot] start game error:", e);
-      alert("Oyun başlatılamadı: " + (e?.message || e));
+      uiAlert("Oyun başlatılamadı: " + (e?.message || e), { title: "Oyun başlatılamadı" });
     }
   }
 
@@ -721,7 +727,13 @@ export function initRavzaKahootRoomModule({ topics }) {
 
   async function cancelKahootRoom() {
     if (!state.roomId) return;
-    if (!confirm("Odayı kapatmak istediğine emin misin?")) return;
+    // cancelKahootRoom zaten async; uiConfirm modal oldugu icin arka plan
+    // inert olur ve ikinci bir tiklama gelemez.
+    if (!await uiConfirm("Odayı kapatmak istediğine emin misin?", {
+      title: "Odayı kapat",
+      okLabel: "Kapat",
+      destructive: true,
+    })) return;
     try {
       await updateDoc(doc(db, ROOM_COLLECTION, state.roomId), {
         status: "finished",
@@ -1414,7 +1426,7 @@ export function initRavzaKahootRoomModule({ topics }) {
     } catch (e) {
       console.error("[Kahoot] setup error:", e);
       if (btn) { btn.disabled = false; btn.textContent = "🎉 Odayı Aç"; }
-      alert("Oda oluşturulamadı: " + (e?.message || e) + "\nFirebase Firestore'a erişim olduğundan emin ol.");
+      uiAlert("Oda oluşturulamadı: " + (e?.message || e) + "\nFirebase Firestore'a erişim olduğundan emin ol.", { title: "Oda açılamadı" });
     }
   }
 
@@ -1467,10 +1479,10 @@ export function initRavzaKahootRoomModule({ topics }) {
         openKahootJoinMode(room.roomId || found.docs[0].id);
         return;
       }
-      alert("Bu kod ile aktif bir oda bulunamadı.");
+      showToast("Bu kod ile aktif bir oda bulunamadı.");
     } catch (e) {
       console.error("[Kahoot] join prompt error:", e);
-      alert("Hata: " + (e?.message || e));
+      uiAlert("Hata: " + (e?.message || e), { title: "Odaya katılınamadı" });
     }
   }
 

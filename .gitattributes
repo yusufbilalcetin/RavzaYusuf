@@ -1,0 +1,6 @@
+# esbuild ciktisi olan CSS paketi: satir sonu donusumu YOK.
+# scripts/check-css-bundle.mjs paketi bayt bayt karsilastiriyor. core.autocrlf=true
+# olan Windows makinelerinde git checkout'ta LF -> CRLF cevirdigi icin taze build
+# (LF) ile diskteki dosya (CRLF) hic tutmuyordu; css:check kalici olarak hata
+# veriyordu. Bu satir artefakti oldugu gibi birakir.
+css/style.min.css -text

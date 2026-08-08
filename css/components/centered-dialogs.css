@@ -1,0 +1,211 @@
+/* =========================================================================
+   ORTALANMIŞ DİYALOG GEOMETRİSİ — TEK KAYNAK
+
+   ÜRÜN KURALI: RavzaYusuf'taki TÜM popup/modal/dialog pencereleri ekranın
+   ortasında açılır. Mobilde alttan gelen sheet geometrisi kullanılmaz.
+
+   Bu dosya manifestin EN SONUNDA yüklenir; böylece components/modal.css,
+   components/ios-dialog-geometry.css, layout/launcher.css ve sayfa CSS'leri
+   ne söylerse söylesin son sözü burası söyler ve hiçbir !important gerekmez.
+
+   ---------------------------------------------------------------------
+   "ORTA" NEYE GÖRE?
+
+   Görünür (visual) viewport'a göre. Sanal klavye açıldığında layout viewport
+   -ve dolayısıyla 100dvh- çoğu mobil tarayıcıda DEĞİŞMEZ; yalnızca görünür
+   alan küçülür. Sadece CSS ile ortalanan arama popup'ı bu yüzden klavyenin
+   arkasında kalırdı.
+
+   js/ui/viewport-metrics.js şu değişkenleri yazar:
+     --visual-viewport-height
+     --visual-viewport-top
+   Desteklenmeyen tarayıcıda hiç yazılmaz ve aşağıdaki fallback'ler geçerli
+   olur (100dvh / 0px), yani davranış hiçbir yerde bozulmaz.
+   ---------------------------------------------------------------------
+
+   BOYUT ÖLÇEĞİ (§32): her popup'a rastgele genişlik yazmak yerine
+     --dialog-width  semantik sınıflarla ayarlanır.
+   ========================================================================= */
+
+:root {
+  /* Ekran kenarı ile popup arasındaki en küçük boşluk. */
+  --dialog-gutter: 16px;
+  --dialog-width-small: 340px;
+  --dialog-width-medium: 420px;
+  --dialog-width-large: 560px;
+  --dialog-width-reader: 620px;
+}
+
+/* -------------------------------------------------------------------------
+   Ortalayıcı kabuk.
+   Bir <dialog>'un kendisi tam ekran şeffaf bir katman; panel onun içinde
+   flex ile ortalanır. Yükseklik GÖRÜNÜR alana sabitlenir ve katman görünür
+   alanın üstünden başlar - klavye açılınca merkez yukarı kayar.
+------------------------------------------------------------------------- */
+.ui-sheet,
+.reader-sheet {
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: var(--visual-viewport-top, 0px);
+  bottom: auto;
+  width: 100%;
+  max-width: none;
+  height: var(--visual-viewport-height, 100dvh);
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* -------------------------------------------------------------------------
+   Panel.
+   Genişlik semantik ölçekten, yükseklik görünür alandan türer. İçerik uzunsa
+   popup büyümez - içi kaydırılır (§28: popup ekranın dışına taşmaz).
+------------------------------------------------------------------------- */
+.ui-sheet-panel,
+.reader-sheet-panel {
+  width: min(calc(100% - 2 * var(--dialog-gutter)), var(--dialog-width, var(--dialog-width-medium)));
+  max-width: min(calc(100% - 2 * var(--dialog-gutter)), var(--dialog-width, var(--dialog-width-medium)));
+  max-height: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--dialog-gutter));
+  border-radius: var(--r-xl, 20px);
+}
+
+/* Semantik boyutlar. */
+.ui-dialog--small { --dialog-width: var(--dialog-width-small); }
+.ui-dialog--medium { --dialog-width: var(--dialog-width-medium); }
+.ui-dialog--large { --dialog-width: var(--dialog-width-large); }
+.ui-dialog--reader { --dialog-width: var(--dialog-width-reader); }
+
+/* -------------------------------------------------------------------------
+   Okuyucu sayfaları: ortalanmış, dört köşesi yuvarlak, içi kaydırılır.
+   Pass 1'de bunlar mobilde alttan gelen sheet'ti; ürün kararı değişti.
+------------------------------------------------------------------------- */
+.ravza-books-page .reader-sheet-panel {
+  display: flex;
+  flex-direction: column;
+  /* Alttan sheet'ten kalan güvenli alan dolgusu artık gereksiz: panel
+     ekranın ortasında, home indicator bölgesine hiç değmiyor. */
+  padding: 0.35rem 0 1rem;
+  border-radius: var(--r-xl, 20px);
+}
+
+.ravza-books-page .reader-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* -------------------------------------------------------------------------
+   Eski alttan-sheet dönüşümlerini geri al.
+
+   components/ios-dialog-geometry.css mobilde (<640px) dört eski diyaloğu
+   alttan gelen sheet'e çeviriyordu: backdrop'un align-items'ı flex-end
+   yapılıyor, translate(-50%,-50%) ile ortalananların transform'u eziliyordu.
+   Ürün kararı değiştiği için o dönüşüm burada nötrleniyor - dosyayı silmek
+   yerine nötrlemek, oradaki renk/malzeme düzeltmelerini korur.
+------------------------------------------------------------------------- */
+@media (max-width: 639px) {
+  /* A) Flex ile ortalananlar: flex-end -> center. */
+  .kahoot-modal-backdrop,
+  .pbn-modal-backdrop {
+    align-items: center;
+    padding: var(--dialog-gutter);
+  }
+
+  .kahoot-modal,
+  .pbn-modal {
+    width: min(100%, var(--dialog-width-large));
+    max-width: min(100%, var(--dialog-width-large));
+    max-height: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--dialog-gutter));
+    /* Alttan sheet'e ait home-indicator dolgusu artik gereksiz. */
+    padding-bottom: var(--s-5);
+    border-radius: var(--r-xl, 20px);
+    overflow-y: auto;
+  }
+
+  /* B) translate ile ortalananlar: ekran altindan gelme geri alinir. */
+  .exam-cancel-dialog,
+  .exam-history-modal {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    width: min(calc(100vw - 2 * var(--dialog-gutter)), var(--dialog-width-large));
+    max-width: min(calc(100vw - 2 * var(--dialog-gutter)), var(--dialog-width-large));
+    max-height: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--dialog-gutter));
+    padding-bottom: var(--s-5);
+    border-radius: var(--r-xl, 20px);
+    transform: translate(-50%, -50%) scale(.97);
+    opacity: 0;
+  }
+
+  .exam-cancel-dialog.open,
+  .exam-history-modal.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .exam-cancel-dialog,
+    .exam-cancel-dialog.open,
+    .exam-history-modal,
+    .exam-history-modal.open {
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+  }
+
+  /* Alttan gelen sheet'in surukleme tutamagi: ortalanmis diyalogda anlamsiz. */
+  .theme-sheet .theme-sheet-head::before {
+    content: none;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Tema paneli: alttan gelen panel -> ortalanmış diyalog.
+   theme.js'in bağlı olduğu kancalara (#theme-sheet, .open, aria-*) HİÇ
+   dokunulmuyor; yalnızca geometri değişiyor.
+------------------------------------------------------------------------- */
+.theme-sheet {
+  position: fixed;
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  width: min(calc(100vw - 2 * var(--dialog-gutter)), var(--dialog-width-large));
+  max-width: min(calc(100vw - 2 * var(--dialog-gutter)), var(--dialog-width-large));
+  height: auto;
+  max-height: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--dialog-gutter));
+  border-radius: var(--r-xl, 20px);
+  /* Kapalı durum: ortada, hafif küçük ve saydam. Alttan kayma yok. */
+  transform: translate(-50%, -50%) scale(.97);
+  opacity: 0;
+}
+
+.theme-sheet.open {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-sheet,
+  .theme-sheet.open {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+/* Panel gereksiz uzamasın; uzun tema listesi kendi içinde kayar. */
+.theme-sheet {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

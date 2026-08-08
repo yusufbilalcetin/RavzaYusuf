@@ -398,6 +398,88 @@ async function testPersistenceAndHistory() {
   return { route: quiz.route };
 }
 
+/* Cam yüzeyler backdrop-filter yokken opak zemine düşüyor mu?
+
+   Chrome'a "backdrop-filter'ı desteklemiyormuş gibi yap" dedirtemiyoruz, o
+   yüzden @supports kuralının KENDİSİ doğrulanıyor: (a) her kanonik cam
+   yüzeyi kapsayan bir olumsuzlama bloğu var mı, (b) düştüğü zemin gerçekten
+   opak mı. İkincisi önemli - fallback yarı saydam bir renge düşerse camsız
+   tarayıcıda altındaki içerik metnin arasından okunur ve kontrast çöker.
+
+   Bu test, birisi yeni bir cam yüzey ekleyip fallback'ini unuttuğunda ya da
+   --glass-surface-base'i şeffaflaştırdığında kırılır. */
+async function testGlassFallback() {
+  await browser.setViewport(VIEWPORTS[0]);
+
+  for (const mode of ["light", "dark"]) {
+    await browser.seedTheme(mode, "noel-ask");
+    await browser.navigate("/?page=ana-sayfa", routeReadyExpression(ROUTES[0]));
+
+    const result = await browser.evaluate(`(() => {
+      const NEGATIONS = [];
+      const walk = (rules) => {
+        for (const rule of rules) {
+          if (rule.cssRules) {
+            const text = rule.conditionText || "";
+            if (rule.type === CSSRule.SUPPORTS_RULE && /not\\s*\\(/.test(text) && /backdrop-filter/.test(text)) {
+              NEGATIONS.push(rule);
+            }
+            walk(rule.cssRules);
+          }
+        }
+      };
+      for (const sheet of document.styleSheets) {
+        try { walk(sheet.cssRules); } catch { /* cross-origin */ }
+      }
+
+      // Kural metinlerini birleştir: hangi seçiciler kapsanıyor?
+      const covered = [];
+      const declaredBackgrounds = [];
+      for (const supports of NEGATIONS) {
+        for (const rule of supports.cssRules) {
+          if (!rule.selectorText) continue;
+          covered.push(rule.selectorText);
+          const bg = rule.style.getPropertyValue("background") || rule.style.getPropertyValue("background-color");
+          if (bg) declaredBackgrounds.push(bg.trim());
+        }
+      }
+
+      // Fallback zemininin gerçek alfası: --glass-surface-base'i probe ile çöz.
+      const probe = document.createElement("div");
+      probe.style.cssText = "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px";
+      probe.style.backgroundColor = "var(--glass-surface-base)";
+      document.body.append(probe);
+      const resolved = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+
+      return {
+        supportsBlocks: NEGATIONS.length,
+        covered,
+        declaredBackgrounds,
+        glassSurfaceBase: resolved,
+      };
+    })()`);
+
+    assert.ok(result.supportsBlocks > 0, `${mode}: backdrop-filter olumsuzlama blogu bulunamadi`);
+
+    // Kanonik cam yüzeyler kapsanmali.
+    const joined = result.covered.join(" ");
+    for (const surface of [".glass-surface", ".theme-sheet", ".launcher-topbar", ".launcher-dock"]) {
+      assert.ok(joined.includes(surface), `${mode}: ${surface} icin backdrop-filter fallback'i yok`);
+    }
+
+    // Fallback zemini opak olmali (alfa >= .8), yoksa metin okunmaz.
+    const match = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/i.exec(result.glassSurfaceBase);
+    assert.ok(match, `${mode}: --glass-surface-base cozulemedi (${result.glassSurfaceBase})`);
+    const alpha = match[4] == null ? 1 : Number(match[4]);
+    assert.ok(alpha >= 0.8, `${mode}: --glass-surface-base alfasi ${alpha} - camsiz tarayicida metin okunmaz (>= .8 olmali)`);
+
+    assert.ok(result.declaredBackgrounds.length > 0, `${mode}: fallback bloklarinda background bildirimi yok`);
+  }
+
+  return { checked: ["light", "dark"] };
+}
+
 async function testPresetContract() {
   const home = ROUTES[0];
   await seedAndOpenMain(browser, home, MODE_CASES[0], VIEWPORTS[0]);
@@ -476,6 +558,10 @@ const STANDALONE_GAMES = [
   { name: "Cark Oyunu", path: "/games/cark-oyunu/", ready: ".wheel-app" },
   { name: "Alan Bulmacasi", path: "/games/alan-bulmacasi/", ready: ".game-shell" },
   { name: "Ok Bulmacasi", path: "/games/ok-bulmacasi/", ready: "#screenHome" },
+  /* Oyun Kuresi (Flappy + Sudoku). Siteden link yok, dogrudan URL ile
+     erisilir; <html data-theme="dark"> sabit yazildigi ve kopru hic
+     yuklenmedigi icin site temasindan bagimsiz kalici koyuydu. */
+  { name: "Oyun Kuresi", path: "/games/oyun-platformu/", ready: "#screen-menu" },
 ];
 
 async function testStandaloneBridge(definition) {
@@ -542,6 +628,7 @@ try {
   await runCase("panel", "pointer keyboard focus desktop", () => testPanelPointerAndFocus(VIEWPORTS[0]));
   await runCase("panel", "pointer keyboard focus mobile", () => testPanelPointerAndFocus(VIEWPORTS.find((viewport) => viewport.width === 390) || VIEWPORTS.at(-1)));
   await runCase("presets", "six styles in light and dark", testPresetContract);
+  await runCase("glass", "backdrop-filter fallback is opaque", testGlassFallback);
 
   await runCase("game-bridge", "Candy Crush iframe", () => testEmbeddedBridge("candy-match"));
   if (FULL) await runCase("game-bridge", "Meyve Eslesme iframe", () => testEmbeddedBridge("fruit-match"));

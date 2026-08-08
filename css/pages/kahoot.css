@@ -103,7 +103,7 @@
 
 .kahoot-leaderboard b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:rgba(245,158,11,.2);color:#f59e0b}
 
-.kahoot-leaderboard strong{color:var(--pink-bright)}
+.kahoot-leaderboard strong{color:var(--accent-ink)}
 
 .kahoot-progress{height:13px;border-radius:999px;background:var(--input-bg);overflow:hidden}
 

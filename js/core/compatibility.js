@@ -5,6 +5,7 @@ import { loadQuiz } from "../services/quiz-service.js";
 import { safeText } from "../utils/helpers.js";
 import { formatPercent } from "../utils/format.js";
 import { matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
+import { uiAlert, showToast } from "../ui/sheet.js";
 
 const aliases = {
   unit6b: "ability",
@@ -225,7 +226,7 @@ async function submitTopicQuiz(topicId) {
       syncLegacyTopic(topic, { quiz: questions, quizCount: questions.length });
     } catch (error) {
       console.error(error);
-      alert("Quiz soruları yüklenemedi.");
+      uiAlert("Quiz soruları yüklenemedi.", { title: "Quiz açılamadı" });
       return;
     }
   }

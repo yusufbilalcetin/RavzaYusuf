@@ -343,12 +343,15 @@ try {
     1,
     'StPageFlip script etiketi bir kez yerine birden fazla yüklendi',
   );
+  // Kitap adı artık üst şeritte ORTALANMIŞ bir başlık değil (§6: üst bilgi
+  // minimal olmalı, gövde navbar'ı olmamalı). Açık kitabın kimliği okuma
+  // alanının erişilebilir adından okunur - aynı güçte, doğru yerden.
   const dedeKorkutProbe = await evaluate(`(() => ({
-    title: document.querySelector('#rdr-control-title')?.textContent,
+    title: document.querySelector('#rdr-stage')?.getAttribute('aria-label'),
     pdfPages: document.querySelectorAll('.book-sheet.pdf-page').length,
     allSheets: document.querySelectorAll('.book-sheet').length,
   }))()`);
-  assert.equal(dedeKorkutProbe.title, 'Dede Korkut Hikâyeleri', 'Dede Korkut başlığı yanlış');
+  assert.equal(dedeKorkutProbe.title, 'Dede Korkut Hikâyeleri okuma alanı', 'Dede Korkut başlığı yanlış');
   assert.equal(dedeKorkutProbe.pdfPages, 200, 'Dede Korkut PDF sayfaları eksik');
   assert.equal(dedeKorkutProbe.allSheets, 201, 'Dede Korkut arka kapağı oluşturulmadı');
   await evaluate("document.querySelector('#rdr-back').click()");
@@ -502,17 +505,27 @@ try {
   await command('Page.navigate', { url: `${BASE_URL}/?page=ravza-books` });
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
   await evaluate("document.querySelector('.library-book-card').click()");
-  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] #reader-inner')?.dataset.currentPage === '5'", 30000);
+  // ÜRÜN MODELİ DEĞİŞTİ (V2 §3): "son okunan sayfa" ile "yer imi" artık AYRI
+  // iki kavram ve ayrı anahtarlarda saklanıyor.
+  //   - Kitap, kaldığın yerden (10) açılır -> "Devam Et".
+  //   - Yer imi hâlâ senin işaretlediğin sayfayı (5) gösterir ve gezinmek onu
+  //     ASLA oynatmaz; bu sözleşme aynen korunuyor ve aşağıda hâlâ test ediliyor.
+  await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] #reader-inner')?.dataset.currentPage === '10'", 30000);
   const reopened = await evaluate(`(() => ({
     currentPage: Number(document.querySelector('#reader-inner').dataset.currentPage),
     savedPage: Number(document.querySelector('#reader-inner').dataset.savedPage),
     sliderIndex: Number(document.querySelector('#rdr-progress').value),
     stored: JSON.parse(localStorage.getItem('ravzaBooksProgress:kucuk-prens')),
+    lastRead: JSON.parse(localStorage.getItem('ravza-books-last-read') || '{}')['kucuk-prens'],
   }))()`);
-  assert.equal(reopened.currentPage, 5, 'Uygulama son görüntülenen 10. sayfada açıldı');
+  assert.equal(reopened.currentPage, 10, 'Kitap son okunan sayfadan devam etmedi');
+  assert.equal(reopened.sliderIndex, 9, 'Sayfa barı son okunan 10. sayfayı göstermiyor');
+  // Yer imi sözleşmesi: gezinmek kaydedilen sayfayı değiştirmemeli.
   assert.equal(reopened.savedPage, 5, 'Yeniden açılışta savedPage korunmadı');
-  assert.equal(reopened.sliderIndex, 4, 'Sayfa barı kaydedilen 5. sayfayı göstermiyor');
   assert.equal(reopened.stored.savedPage, 5, 'Kalıcı kayıt yeniden açılışta değişti');
+  assert.equal(reopened.stored.pdfPage, 5, 'Yer imi PDF sayfası değişti');
+  // Son okunan konum AYRI anahtarda tutulmalı.
+  assert.equal(reopened.lastRead?.page, 10, 'Son okunan sayfa ayrı anahtarda saklanmadı');
 
   await evaluate("document.querySelector('#rdr-back').click()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
@@ -594,7 +607,7 @@ try {
     uploadThroughput: -1,
   });
 
-  process.stdout.write(`Ravza Books: ${VIEWPORTS.length} viewport, açık/sepya/koyu PDF görünümü, 5'i kaydet → 10'a git → 5'te aç, curl ve hata durumu doğrulandı.\n`);
+  process.stdout.write(`Ravza Books: ${VIEWPORTS.length} viewport, açık/sepya/koyu PDF görünümü, 5'i yer imle → 10'a git → 10'da devam et (yer imi 5'te kalır), curl ve hata durumu doğrulandı.\n`);
 } finally {
   try { socket.close(); } catch {}
   browser.kill();

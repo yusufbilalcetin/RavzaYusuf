@@ -12,7 +12,12 @@ import {
 } from "./lib/theme-test-runtime.mjs";
 
 const FULL = process.argv.includes("--full");
-const QUICK = process.argv.includes("--quick") || !FULL;
+/* --coverage: kabul olcutunun tam karsiligi - HER uygulama x light/dark x
+   ALTI cozunurluk (tek stil). Tam capraz carpim (--full) ayrica 6 stille
+   carpildigi icin 3600 senaryoya cikiyor ve saatler suruyor; --coverage 300
+   senaryoda her uygulamayi iki modda da gorur. */
+const COVERAGE = process.argv.includes("--coverage");
+const QUICK = process.argv.includes("--quick") || (!FULL && !COVERAGE);
 const ARTIFACT_DIR = join(ROOT, "test-artifacts", "theme");
 const STYLES = ["noel-ask", "gece-mavisi", "orman-yesili", "mor-isik", "klasik-koyu", "pembe-tema"];
 const MODE_CASES = [
@@ -21,7 +26,7 @@ const MODE_CASES = [
   { name: "system-light", mode: "system", system: "light", resolved: "light" },
   { name: "system-dark", mode: "system", system: "dark", resolved: "dark" },
 ];
-const VIEWPORTS = FULL
+const VIEWPORTS = (FULL || COVERAGE)
   ? [
       { name: "desktop-xl", width: 1920, height: 1080 },
       { name: "desktop", width: 1366, height: 768 },
@@ -83,6 +88,11 @@ const TOKEN_PAIRS = [
   { name: "primary/surface", foreground: "--text-primary", background: "--bg-surface", threshold: 4.5 },
   { name: "secondary/surface", foreground: "--text-secondary", background: "--bg-surface", threshold: 4.5 },
   { name: "on-accent/accent", foreground: "--text-on-accent", background: "--accent", threshold: 4.5 },
+  /* Accent renginde metin: --accent zemin icin tasarlandi, metin olarak
+     kullanilinca acik modda ~3.5:1'de kaliyordu. --accent-ink onun okunur
+     karsiligi; hem yuzey hem taban uzerinde denetlenir. */
+  { name: "accent-ink/surface", foreground: "--accent-ink", background: "--bg-surface", threshold: 4.5 },
+  { name: "accent-ink/base", foreground: "--accent-ink", background: "--bg-base", threshold: 4.5 },
   { name: "search-text/search-bg", foreground: "--search-text", background: "--search-bg", threshold: 4.5 },
   { name: "search-placeholder/search-bg", foreground: "--search-placeholder", background: "--search-bg", threshold: 4.5 },
   { name: "search-clear-icon/search-clear-bg", foreground: "--search-clear-icon", background: "--search-clear-bg", threshold: 3 },
@@ -428,6 +438,27 @@ async function removeAuditStyles(browser, definition) {
   })()`).catch(() => {});
 }
 
+/* Metin YALNIZCA piktograf mı (emoji, varyasyon seçiciler ve ZWJ dizileri
+   dahil)? Karışık içerikte ("📝 Not") gerçek harfler CSS rengiyle çizildiği
+   için hesaplanan renk hâlâ doğrudur; bu yüzden yalnız saf piktograf sayılır. */
+function isPictographOnly(text) {
+  const value = String(text ?? "").trim();
+  if (!value) return false;
+  // İzin verilenler: piktograflar + boşluk, ZWJ, VS16 ve ten tonu düzenleyiciler.
+  const allowed = /^(?:\p{Extended_Pictographic}|[\s\u200d\ufe0f\u{1f3fb}-\u{1f3ff}])+$/u;
+  return allowed.test(value) && /\p{Extended_Pictographic}/u.test(value);
+}
+
+/* Bu yordam bir ölçümü PASS/FAIL'den çıkarabildiği için sessizce bozulması
+   gerçek kontrast hatalarını gizler. Aciti her calistirmada dogrulanir. */
+for (const [sample, expected] of [
+  ["📋", true], ["📝", true], ["👍🏽", true], ["👨‍👩‍👧", true], ["📋 📝", true],
+  ["☑️ Tamamlandı", false], ["4 Şıklı Test", false], ["Yakında", false],
+  ["→", false], ["%75", false], ["", false], ["   ", false],
+]) {
+  assert.equal(isPictographOnly(sample), expected, `isPictographOnly(${JSON.stringify(sample)}) === ${expected} olmali`);
+}
+
 function analyzeCandidates(candidates, renderedScreenshot, backgroundScreenshot, context) {
   return candidates.map((candidate) => {
     const glyph = bestGlyphPixel(renderedScreenshot, backgroundScreenshot, candidate.rect);
@@ -444,7 +475,15 @@ function analyzeCandidates(candidates, renderedScreenshot, backgroundScreenshot,
       foregroundSource = "browser-pixel";
     }
     const ratio = contrastRatio(effectiveForeground, sampledBackground);
-    const exempt = candidate.disabled;
+    /* Renkli emoji glifi platform fontunun kendi paletiyle çizilir; CSS `color`
+       ona uygulanmaz. Yani ne hesaplanan renk (yanlış: yeşil rozetteki 📋 için
+       color:#fff okunuyordu) ne de "en güçlü glif pikseli" geçerli bir metin
+       kontrastı ölçüsü - çok renkli bir grafiği tek bir ön plan rengine
+       indirgemek anlamsız. WCAG 1.4.3 yazarın denetlediği metni hedefler;
+       piktogramlar metin dışı içeriktir ve burada hepsi erişilebilir ada
+       sahip düğmelerin dekoratif ikonları. Ölçülür ve raporlanır ama
+       PASS/FAIL'e sayılmaz. */
+    const pictograph = isPictographOnly(candidate.text);
     return {
       kind: "text",
       ...context,
@@ -467,7 +506,11 @@ function analyzeCandidates(candidates, renderedScreenshot, backgroundScreenshot,
       largeText: candidate.large,
       ratio: Math.round(ratio * 100) / 100,
       threshold: candidate.threshold,
-      status: exempt ? "EXEMPT_DISABLED" : ratio + 0.005 >= candidate.threshold ? "PASS" : "FAIL",
+      status: candidate.disabled
+        ? "EXEMPT_DISABLED"
+        : pictograph
+          ? "EXEMPT_PICTOGRAPH"
+          : ratio + 0.005 >= candidate.threshold ? "PASS" : "FAIL",
     };
   });
 }
@@ -611,6 +654,14 @@ function quickVisualMatrix() {
   }));
 }
 
+function coverageVisualMatrix() {
+  const applications = [...MAIN_ROUTES, ...EMBEDDED_GAMES, ...STANDALONE_GAMES];
+  const modes = MODE_CASES.filter((entry) => entry.mode !== "system");
+  return applications.flatMap((definition) => modes.flatMap((modeCase) => (
+    VIEWPORTS.map((viewport) => ({ definition, modeCase, style: STYLES[0], viewport }))
+  )));
+}
+
 function fullVisualMatrix() {
   const applications = [...MAIN_ROUTES, ...EMBEDDED_GAMES, ...STANDALONE_GAMES];
   return applications.flatMap((definition) => MODE_CASES.flatMap((modeCase) => STYLES.flatMap((style) => (
@@ -685,7 +736,7 @@ try {
 
   await runCase("tokens", "6 presets x light/dark semantic pairs", tokenMatrixAudit);
 
-  const visualMatrix = QUICK ? quickVisualMatrix() : fullVisualMatrix();
+  const visualMatrix = QUICK ? quickVisualMatrix() : (COVERAGE ? coverageVisualMatrix() : fullVisualMatrix());
   for (const { definition, modeCase, style, viewport } of visualMatrix) {
     const name = `${definition.name}/${modeCase.name}/${style}/${viewport.name}`;
     await runCase("rendered", name, async () => {
@@ -715,11 +766,11 @@ try {
 const failures = checks.filter((entry) => entry.status === "FAIL");
 const report = {
   generatedAt: new Date().toISOString(),
-  profile: FULL ? "full" : "quick",
+  profile: FULL ? "full" : (COVERAGE ? "coverage" : "quick"),
   methodology: {
     text: "Computed foreground color and cumulative opacity are alpha-composited over a browser screenshot sampled with text hidden. CSS background layers are independently composited and reported for traceability.",
     imageBackgrounds: "Image, gradient, translucent and backdrop-filter surfaces use the browser-rendered background pixel at the strongest glyph sample point.",
-    thresholds: "WCAG AA: 4.5:1 normal text, 3:1 large text and non-text UI tokens. Disabled text is recorded as exempt.",
+    thresholds: "WCAG AA: 4.5:1 normal text, 3:1 large text and non-text UI tokens. Recorded as exempt (measured and reported, but not scored): disabled text, and pictograph-only text (colour emoji are painted by the platform font, so CSS `color` does not apply and no single foreground colour represents the glyph).",
   },
   baseUrl: BASE_URL,
   durationMs: Date.now() - startedAt,
@@ -732,6 +783,8 @@ const report = {
     passedChecks: checks.filter((entry) => entry.status === "PASS").length,
     failedChecks: failures.length,
     exemptChecks: checks.filter((entry) => entry.status.startsWith("EXEMPT")).length,
+    exemptDisabledChecks: checks.filter((entry) => entry.status === "EXEMPT_DISABLED").length,
+    exemptPictographChecks: checks.filter((entry) => entry.status === "EXEMPT_PICTOGRAPH").length,
   },
   matrix: {
     applications: FULL ? [...MAIN_ROUTES, ...EMBEDDED_GAMES, ...STANDALONE_GAMES].map((entry) => entry.name) : MAIN_ROUTES.filter((entry) => entry.critical).map((entry) => entry.name),
@@ -759,7 +812,7 @@ function markdownReport(data) {
     `- Checks: ${data.summary.checks}`,
     `- PASS: ${data.summary.passedChecks}`,
     `- FAIL: ${data.summary.failedChecks}`,
-    `- Exempt disabled: ${data.summary.exemptChecks}`,
+    `- Exempt: ${data.summary.exemptChecks} (disabled ${data.summary.exemptDisabledChecks}, pictograph ${data.summary.exemptPictographChecks})`,
     `- Case errors: ${data.summary.errorCases}`,
     `- Duration: ${data.durationMs} ms`,
     "",

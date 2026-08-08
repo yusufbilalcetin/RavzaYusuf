@@ -31,7 +31,8 @@
     "audit:background-assets": "node ./scripts/audit-background-assets.mjs",
     "security:check": "npm audit --audit-level=high",
     "check:modules": "node ./scripts/check-module-versions.mjs",
-    "check": "npm run check:modules && npm run css:check && npm run icons:audit && npm run audit:assets && npm run audit:background-assets && npm run games:icons:check && npm run books:check && npm run test:search-clear && npm run test:scroll-reveal && npm run test:theme-system && npm run audit:theme-contrast",
+    "check": "npm run check:modules && npm run css:check && npm run icons:audit && npm run audit:assets && npm run audit:background-assets && npm run games:icons:check && npm run books:check && npm run test:search-clear && npm run test:scroll-reveal && npm run test:ui-primitives && npm run test:theme-system && npm run audit:theme-contrast",
+    "test:ui-primitives": "node ./scripts/test-ui-primitives.mjs",
     "test:home-hero": "node ./js/pages/ana-sayfa-rastgele-gorsel.test.mjs",
     "test:home-hero:browser": "node ./js/pages/ana-sayfa-rastgele-gorsel.browser.test.mjs",
     "test:liquid-glass": "node ./scripts/test-launcher.mjs",
@@ -56,6 +57,7 @@
     "test:launcher:v4": "node ./scripts/test-launcher-v4.mjs",
     "test:launcher:audit": "node ./scripts/test-launcher-responsive-modes.mjs --audit",
     "test:ravza-books": "node ./scripts/test-ravza-books.mjs",
+    "test:ravza-books:reader": "node ./scripts/test-ravza-books-reader.mjs",
     "test:ravza-books-performance": "node ./tests/e2e/ravza-books-performance.spec.mjs",
     "audit:ravza-books": "node ./tests/e2e/ravza-books-performance.spec.mjs"
   },

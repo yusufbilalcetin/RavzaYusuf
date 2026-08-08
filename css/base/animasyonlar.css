@@ -138,3 +138,39 @@ html.has-scroll-reveal [data-reveal].is-revealed {
     opacity: 1;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Tema geçişi cross-fade'i.
+
+   .theme-switching sınıfını js/core/theme.js SADECE gerçek bir tema değişimi
+   sırasında ~220ms boyunca <html>'e koyar. Kalıcı global transition yerine
+   böyle yapılmasının sebebi: (1) her hover/aktif durum renk değişiminde bedel
+   ödenmesin, (2) açılışta attribute ilk kez yazılırken flash olmasın - sınıf
+   ilk boyama tamamlanana kadar hiç eklenmez.
+
+   `no-preference` sarmalayıcısı şart: bu kuralın özgüllüğü (0,1,0) yukarıdaki
+   kanonik reduced-motion bloğunun `*` seçicisinden (0,0,0) yüksek olduğu için
+   !important'a rağmen onu ezerdi. Media query ile ayırınca `reduce` altında
+   kural hiç var olmuyor.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-switching,
+  html.theme-switching body,
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after {
+    transition:
+      background-color var(--dur-base, 220ms) var(--ease-out, ease),
+      border-color var(--dur-base, 220ms) var(--ease-out, ease),
+      color var(--dur-base, 220ms) var(--ease-out, ease),
+      fill var(--dur-base, 220ms) var(--ease-out, ease),
+      stroke var(--dur-base, 220ms) var(--ease-out, ease),
+      box-shadow var(--dur-base, 220ms) var(--ease-out, ease) !important;
+  }
+
+  /* Cam yüzeylerde backdrop-filter'ı animasyona sokmak pahalı ve tarayıcıya
+     göre tutarsız; renk cross-fade'i zaten yumuşak geçişi veriyor. */
+  html.theme-switching :is(.glass-surface, .launcher-topbar, .launcher-dock, .theme-sheet) {
+    transition-property: background-color, border-color, color, box-shadow !important;
+  }
+}

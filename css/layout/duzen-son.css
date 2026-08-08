@@ -38,56 +38,24 @@
 
   --tap: 44px;          /* dokunmatik minimum hedef */
   --grid-gap: var(--s-5);
-  --dock-w: var(--sidebar-w);
 }
 
 /* =========================================================================
-   1) SIDEBAR
-   Masaüstünde (>=1024px) sidebar SABİT bir kolon: içeriğin üstüne binmez,
-   karartma yok, hamburger yok. Altında ise çekmece + arka plan perdesi.
+   1) SIDEBAR — KALDIRILDI
+
+   Burada >=1024px icin `#app { padding-left: var(--dock-w) }` (278px) ve bir
+   dizi .sidebar / .menu-toggle / .sidebar-backdrop kurali vardi. Sidebar
+   launcher tarafindan tamamen degistirildi: partials/layout/sidebar.html artik
+   hicbir yerden mount edilmiyor (partial-loader.js yalnizca topbar, tema-paneli
+   ve launcher-shell yukluyor) ve scripts/test-launcher.mjs `.sidebar` ile
+   `#sidebar-root`'un DOM'da OLMAMASINI dogruluyor.
+
+   padding-left'in gorsel etkisi de yoktu: #app'in tek icerik tasiyan cocugu
+   .main-content ve o `position: fixed; inset: 0 !important` (launcher.css)
+   ile akistan cikmis durumda; #topbar-root ve .scroll-top-btn de fixed,
+   #tema-panel-root ile #launcher-shell-root ise display:contents. Yani bu
+   blok olu koddu, canli bir hata degil.
    ========================================================================= */
-
-@media (min-width: 1024px) {
-  /* #app zaten grid; sol boşluk vererek topbar da dahil her şeyi sağa alır. */
-  #app {
-    padding-left: var(--dock-w);
-  }
-
-  .sidebar {
-    transform: none !important;          /* çekmece davranışı iptal */
-    box-shadow: inset -1px 0 0 rgba(255, 255, 255, .08) !important;
-  }
-
-  /* Sabit kolonda bunların işi yok. */
-  .menu-toggle,
-  .sidebar-backdrop {
-    display: none !important;
-  }
-
-  /* Sidebar açıkken gövde kaydırması kilitlenmesin. */
-  body.nav-open {
-    overflow: hidden;
-  }
-
-  /* Oyun tam ekrana geçtiğinde sabit kolon oyunu daraltmasın: gerçekten tam ekran olsun. */
-  body.is-game-fullscreen #app {
-    padding-left: 0;
-  }
-
-  body.is-game-fullscreen .sidebar {
-    transform: translateX(-105%) !important;
-  }
-}
-
-@media (max-width: 1023.98px) {
-  /* Çekmece açıkken arkadaki içerik kaydırılmasın ve perde tıklanabilir olsun. */
-  body.nav-open .sidebar-backdrop {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    z-index: 1150 !important;
-  }
-}
 
 /* Menü öğeleri: eşit yükseklik, ikon + metin dikeyde ortalı, aynı hizada başlar. */
 .nav-links {

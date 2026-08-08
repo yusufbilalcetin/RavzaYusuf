@@ -475,3 +475,40 @@ html.theme-liquid-glass.reduce-transparency :is(.exam-cancel-dialog, .exam-histo
     border-color: Highlight !important;
   }
 }
+
+/* Cam yoksa opak zemine düş.
+   Mevcut @supports blokları (launcher.css, liquid-glass-optics.css) yalnız
+   topbar/dock/dialog/theme-sheet gibi tek tek elemanları kapsıyordu; genel
+   .glass-surface sözleşmesinin fallback'i yoktu. backdrop-filter desteklemeyen
+   tarayıcıda yarı saydam zemin bulanıklaşmadan kaldığı için altındaki içerik
+   metnin arasından okunuyor ve kontrast çöküyordu. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html.theme-liquid-glass .glass-surface,
+  html.theme-liquid-glass :is(.exam-cancel-dialog, .exam-history-modal, .kahoot-modal, .pbn-modal) {
+    background: var(--glass-surface-base) !important;
+  }
+}
+
+/* Yüksek kontrast: şeffaflığı azalt, kenarlıkları belirginleştir.
+   Yukarıdaki bölüm başlığı "yüksek kontrast kaçış kapısı" diyordu ama
+   prefers-contrast bloğu hiç yazılmamıştı - yalnız reduced-transparency ve
+   forced-colors vardı. forced-colors sadece Windows Yüksek Kontrast modunda
+   devreye girer; prefers-contrast ise macOS/iOS "Increase Contrast" ve
+   Android'de de çalışır. */
+@media (prefers-contrast: more) {
+  html.theme-liquid-glass .sidebar.glass-surface,
+  html.theme-liquid-glass .topbar.glass-surface,
+  html.theme-liquid-glass .glass-surface,
+  html.theme-liquid-glass :is(.exam-cancel-dialog, .exam-history-modal, .kahoot-modal, .pbn-modal) {
+    background: var(--glass-surface-base) !important;
+    border-color: var(--border-strong) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+
+  /* Spekülar parlama ve kenar highlight'ı yüksek kontrastta gürültü yaratır. */
+  html.theme-liquid-glass .glass-surface::before,
+  html.theme-liquid-glass .glass-surface::after {
+    opacity: 0 !important;
+  }
+}

@@ -109,7 +109,13 @@ html.launcher-experience body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  background: #100917;
+  /* #100917 sabit kodluydu. .launcher-experience <html>'de HER ZAMAN duruyor,
+     dolayısıyla tüm sitenin gövde zemini temadan bağımsız neredeyse siyahtı.
+     Ana ekranda duvar kâğıdı örttüğü için fark edilmiyordu; ama kendi zeminini
+     boyamayan her içerik sayfasında AÇIK modda koyu zemin + açık-mod koyu
+     mürekkep çıkıyordu (.page-header h2 1.87:1, .recap-option 1.39:1).
+     --bg-base koyu modda zaten ~#0f1117; asıl düzelen açık mod. */
+  background: var(--bg-base);
 }
 
 html.launcher-experience #app {
@@ -194,7 +200,7 @@ html.launcher-experience .launcher-topbar .topbar-theme-btn {
   border: 1px solid rgba(255, 255, 255, .12) !important;
   border-radius: var(--launcher-control-radius) !important;
   box-shadow: none !important;
-  font: 700 12px/1 "Plus Jakarta Sans", sans-serif;
+  font: 700 12px/1 var(--font-ui);
   white-space: nowrap;
   cursor: pointer;
   transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--launcher-ease-out), border-color var(--dur-fast) var(--ease-out);
@@ -265,7 +271,7 @@ html.launcher-experience .launcher-brand::after {
 
 html.launcher-experience .launcher-brand .love-brand-main {
   color: #fff4e8 !important;
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: var(--font-display);
   font-size: var(--launcher-brand-main-size) !important;
   font-weight: 600 !important;
   line-height: 1 !important;
@@ -478,19 +484,34 @@ html.launcher-experience body:has(#dashboard.active) #dashboard.launcher-home .l
   transform: none !important;
 }
 
+/* Duvar kâğıdı karartması.
+   Etiketlerin arkasındaki tek tek "leke"ler kaldırıldığı için okunabilirliği
+   artık bu katman taşıyor (bkz. .launcher-app-label). Orta bant bilerek
+   yükseltildi: uygulama ızgarası tam oraya düşüyor ve eskiden .08 alfa ile
+   neredeyse şeffaftı, yani beyaz etiketler parlak fotoğraflarda dayanaksız
+   kalıyordu. Tek biçimli bir karartma, harf başına leke koymaktan hem daha
+   temiz görünüyor hem de ölçümü kadrajdan bağımsız kılıyor. */
 html.launcher-experience .launcher-home-scrim {
   position: fixed;
   z-index: 1; /* katman: genel scrim */
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(10, 5, 17, .28) 0%, rgba(10, 5, 17, .08) 42%, rgba(10, 5, 17, .34) 100%),
-    linear-gradient(90deg, rgba(10, 5, 17, .30) 0%, transparent 56%);
+    linear-gradient(180deg,
+      rgba(10, 5, 17, .42) 0%,
+      rgba(10, 5, 17, .34) 34%,
+      rgba(10, 5, 17, .38) 64%,
+      rgba(10, 5, 17, .52) 100%),
+    linear-gradient(90deg, rgba(10, 5, 17, .28) 0%, transparent 56%);
 }
 
 html.launcher-experience body:not(.dark) .launcher-home-scrim {
   background:
-    linear-gradient(180deg, rgba(22, 12, 24, .20) 0%, rgba(22, 12, 24, .03) 50%, rgba(22, 12, 24, .24) 100%),
+    linear-gradient(180deg,
+      rgba(22, 12, 24, .52) 0%,
+      rgba(22, 12, 24, .46) 34%,
+      rgba(22, 12, 24, .48) 64%,
+      rgba(22, 12, 24, .58) 100%),
     linear-gradient(90deg, rgba(22, 12, 24, .20) 0%, transparent 58%);
 }
 
@@ -557,13 +578,34 @@ html.launcher-experience .launcher-dialog-kicker {
   margin-bottom: 7px;
   color: var(--launcher-kicker-color, #ffc4d8);
   font-size: 10px;
-  font-weight: 800;
+  /* 800, 10px + .13em harf aralığıyla birlikte tıknaz duruyordu. */
+  font-weight: 700;
   letter-spacing: .13em;
   text-transform: uppercase;
+  /* Etiketlerle aynı yumuşak hale dili. */
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, .32),
+    0 2px 12px rgba(0, 0, 0, .22);
 }
 
-html.launcher-experience body:not(.dark) .launcher-eyebrow {
+/* Açık modda eskiden TÜM .launcher-eyebrow'lar koyu magentaya (#82254d)
+   dönüyordu. Ama "UYGULAMALAR" eyebrow'u bir yüzeyin değil DOĞRUDAN DUVAR
+   KÂĞIDININ üstünde duruyor: zemin rastgele bir fotoğraf olduğu için aynı
+   bildirim kadraja göre 1.94:1 ile 4.19:1 arasında salınıyordu (kontrast
+   raporundaki en kötü vaka). Modun açık olması zeminin açık olduğu anlamına
+   gelmiyor - dolayısıyla duvar kâğıdı üstündeki eyebrow her iki modda da
+   açık pembe + hale ile kalır.
+   Koyu mürekkep yalnızca ARKASINDA gerçek bir yüzey olan yerlerde kullanılır:
+   widget (Regular cam) ve dialog kicker (Tinted cam). */
+html.launcher-experience body:not(.dark) :is(.launcher-widget, .launcher-dialog) .launcher-eyebrow,
+html.launcher-experience body:not(.dark) .launcher-dialog-kicker {
   color: #82254d;
+  text-shadow: none;
+}
+
+html.launcher-experience body.dark :is(.launcher-widget, .launcher-dialog) .launcher-eyebrow,
+html.launcher-experience body.dark .launcher-dialog-kicker {
+  text-shadow: none;
 }
 
 html.launcher-experience .launcher-widget h1,
@@ -571,7 +613,7 @@ html.launcher-experience .launcher-apps h2,
 html.launcher-experience .launcher-dialog h2 {
   margin: 0;
   color: inherit;
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -.035em;
   text-wrap: balance;
@@ -748,7 +790,7 @@ html.launcher-experience kbd {
   background: rgba(255, 255, 255, .08);
   border: 1px solid rgba(255, 255, 255, .10);
   border-radius: 6px;
-  font: 600 9px/1 "Plus Jakarta Sans", sans-serif;
+  font: 600 9px/1 var(--font-ui);
 }
 
 html.launcher-experience .launcher-grid {
@@ -818,6 +860,24 @@ html.launcher-experience .launcher-app-icon > img {
   object-fit: contain;
 }
 
+/* ETİKET OKUNABİLİRLİĞİ — duvar kâğıdı karartması + yumuşak hale
+   ---------------------------------------------------------------------------
+   Eskiden her etiketin arkasında ayrı bir radial-gradient "leke" ve üstüne
+   üç katmanlı sıkı text-shadow (0 0 3px .58 + 0 1px 2px .62 + ...) vardı.
+   İkisi üst üste binince harflerin çevresinde siyah bir kontur ve etiket
+   bloğunun altında kirli bir bant oluşuyordu; iPhone ana ekranında böyle bir
+   şey yok, o görünüm ucuz web tipografisine ait.
+
+   Okunabilirlik artık iOS'un çözdüğü yerden çözülüyor: duvar kâğıdının KENDİSİ
+   .launcher-home-scrim ile hafifçe karartılıyor (tek biçimli, ölçülebilir,
+   "leke" gibi görünmeyen bir katman), etiket ise yalnızca geniş ve düşük alfalı
+   bir hale taşıyor. Aynı dil zaten .launcher-apps h2 (0 3px 22px / .34) ve
+   marka yazısında (0 2px 12px / .30) kullanılıyordu; etiketler artık onlarla
+   tutarlı.
+
+   Kontrast notu: eski yorumun uyardığı "parlak kadrajda 3.15:1" riski, artık
+   leke yerine scrim tarafından karşılanıyor - scrim duvar kâğıdından bağımsız
+   sabit bir zemin sağladığı için ölçüm kadraja göre oynamıyor. */
 html.launcher-experience .launcher-app-label {
   display: -webkit-box;
   max-width: 11ch;
@@ -826,20 +886,51 @@ html.launcher-experience .launcher-app-label {
   overflow: hidden;
   color: #fff;
   font-size: clamp(11px, 1vw, 13px);
-  font-weight: 700;
+  /* 700 fotoğraf üstünde tıknaz duruyordu; iOS etiketleri semibold. */
+  font-weight: 600;
   line-height: 1.3;
+  letter-spacing: -.006em;
   text-align: center;
-  text-shadow: 0 2px 9px rgba(0, 0, 0, .68);
+  /* Tek amaç: harfin kenarını zeminden ayırmak. Geniş yarıçap + düşük alfa =
+     yumuşak hale; dar yarıçap + yüksek alfa = siyah kontur. İkincisi istenmiyor. */
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, .34),
+    0 2px 14px rgba(0, 0, 0, .24);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
 html.launcher-experience .launcher-app-status {
   margin-top: 3px;
-  color: rgba(255, 255, 255, .68);
+  /* İkincil bilgi ana etiketten daha hafif görünmeli - ama bu ALFA ile
+     yapılamıyor: .74 duvar kâğıdının parlak bölgesinde 3.4:1, .84 ise 3.97:1
+     veriyordu ve 9px küçük metin AA için 4.5 istiyor. Saydamlığı düşürmek
+     doğrudan kontrastı düşürüyor.
+     Çözüm iOS'un fotoğraf üstünde yaptığı şey: hiyerarşiyi PUNTO ve KALINLIK
+     kurar, opaklık değil. Renk neredeyse tam beyaz kalır (4.7:1), ama 9px ve
+     500 ağırlıkla ana etiketin (13px/600) açıkça altında okunur. */
+  color: rgba(255, 255, 255, .96);
   font-size: 9px;
-  font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, .70);
+  font-weight: 500;
+  letter-spacing: .01em;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, .30),
+    0 2px 10px rgba(0, 0, 0, .20);
+}
+
+/* Dock ve klasör diyaloğunun ARKASINDA zaten cam yüzey var; orada hale
+   gereksiz ve yüzeyi kirletiyor. Metin token rengine döner. */
+html.launcher-experience :is(.launcher-app--dock, .launcher-app--folder) .launcher-app-label,
+html.launcher-experience :is(.launcher-app--dock, .launcher-app--folder) .launcher-app-status {
+  text-shadow: none;
+}
+
+html.launcher-experience .launcher-app--folder .launcher-app-label {
+  color: var(--launcher-ink);
+}
+
+html.launcher-experience .launcher-app--folder .launcher-app-status {
+  color: var(--launcher-muted);
 }
 
 html.launcher-experience .launcher-folder-preview {
@@ -1141,7 +1232,7 @@ html.launcher-experience .launcher-search-field input {
   -webkit-appearance: none;
   appearance: none;
   color-scheme: var(--launcher-search-color-scheme);
-  font: 500 15px/1.3 "Plus Jakarta Sans", sans-serif;
+  font: 500 15px/1.3 var(--font-ui);
 }
 
 html.launcher-experience .launcher-search-field input::placeholder {
@@ -2364,7 +2455,7 @@ html.launcher-experience .launcher-mini-widget {
 html.launcher-experience .launcher-mini-widget > strong {
   display: block;
   margin-top: 6px;
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(24px, 3vw, 34px);
   font-weight: 600;
   line-height: 1;
@@ -2390,7 +2481,7 @@ html.launcher-experience .launcher-mini-widget > button {
   background: rgba(142, 47, 88, .78);
   border: 1px solid rgba(255, 255, 255, .13);
   border-radius: 13px;
-  font: 700 11px/1 "Plus Jakarta Sans", sans-serif;
+  font: 700 11px/1 var(--font-ui);
   cursor: pointer;
 }
 
@@ -2438,7 +2529,7 @@ html.launcher-experience .launcher-remove-control > span {
   border: 2px solid rgba(255, 255, 255, .88);
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(20, 4, 12, .32);
-  font: 800 21px/1 "Plus Jakarta Sans", sans-serif;
+  font: 700 21px/1 var(--font-ui);
 }
 
 html.launcher-experience .launcher-slot--widget > .launcher-remove-control {
@@ -2582,7 +2673,7 @@ html.launcher-experience .launcher-reset-confirm button {
   background: rgba(255, 255, 255, .075);
   border: 1px solid rgba(255, 255, 255, .13);
   border-radius: 13px;
-  font: 700 10px/1 "Plus Jakarta Sans", sans-serif;
+  font: 700 10px/1 var(--font-ui);
   white-space: nowrap;
   cursor: pointer;
 }
@@ -2937,7 +3028,7 @@ html.launcher-experience .launcher-widget-choice {
 
 html.launcher-experience .launcher-widget-choice small {
   color: var(--launcher-search-focus-border);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
 }

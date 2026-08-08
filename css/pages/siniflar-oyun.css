@@ -18,7 +18,7 @@
 
 .coming-soon-page h2 {
   margin: 0;
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: clamp(54px, 8vw, 118px);
   line-height: .95;
   color: #8f173f;
@@ -57,7 +57,7 @@
 
 .school-hero h2 {
   margin: 12px 0 8px;
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: clamp(36px, 5vw, 64px);
   line-height: .95;
   color: #fff2d8;
@@ -199,7 +199,7 @@
   height: 100%;
   color: #fff;
   background: linear-gradient(145deg, #7b1731, #321347);
-  font: 800 clamp(32px, 6vw, 54px)/1 "Plus Jakarta Sans", sans-serif;
+  font: 700 clamp(32px, 6vw, 54px)/1 var(--font-ui);
 }
 
 .game-tile-art.has-image-error .game-tile-fallback {
@@ -489,7 +489,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   background: rgba(255, 255, 255, .10);
   color: #fff;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
   transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
@@ -530,7 +530,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
 
 .game-stage-head h3 {
   margin: 10px 0 6px;
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: clamp(30px, 4vw, 50px);
   line-height: 1;
   color: #fff2d8;
@@ -549,7 +549,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   border-radius: 14px;
   background: rgba(255, 255, 255, .10);
   color: #fff;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   transition: transform var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
@@ -723,7 +723,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
 }
 
 .game-soon-box strong {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: clamp(42px, 6vw, 74px);
   line-height: 1;
   color: #fff2d8;
@@ -781,7 +781,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
 }
 
 .flappy-overlay strong {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: clamp(34px, 6vw, 58px);
   line-height: 1;
   color: #fff2d8;
@@ -799,7 +799,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   min-height: 20px;
   color: #ffd93d;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .flappy-medal {
@@ -830,7 +830,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   background: rgba(255, 255, 255, .16);
   color: #fff;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   backdrop-filter: blur(8px);
   transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
@@ -1271,7 +1271,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   background: rgba(11, 86, 172, .62);
   color: #ffffff;
   font-size: clamp(15px, 1.35vw, 19px);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
   text-shadow: 0 1px 0 rgba(0, 0, 0, .26);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .36), 0 5px 16px rgba(0, 53, 112, .18);
@@ -1304,7 +1304,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
 .flappy-audio-control > strong {
   color: rgba(12, 38, 72, .78);
   font-size: clamp(13px, 1.25vw, 17px);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
   text-align: center;
   text-shadow: 0 1px 0 rgba(255, 255, 255, .52);
@@ -1323,7 +1323,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   background: linear-gradient(180deg, rgba(90, 220, 55, .96), rgba(21, 170, 24, .96));
   color: #ffffff;
   font-size: clamp(14px, 1.45vw, 18px);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
   text-shadow: 0 1px 0 rgba(0, 0, 0, .24);
   cursor: pointer;
@@ -1453,7 +1453,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
 
 .flappy-shop-label {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .flappy-shop-card small {
@@ -1656,7 +1656,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   background: linear-gradient(180deg, #54c7ff, #0b62bd);
   color: #ffffff;
   font-size: 46px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
   text-shadow: 0 3px 0 rgba(0, 0, 0, .32);
   box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45), inset 0 -4px 0 rgba(0, 0, 0, .22), 0 8px 0 rgba(0, 42, 91, .45);
@@ -1707,7 +1707,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
 .flappy-store-coin::before {
   content: "$";
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
   color: #fff2a4;
   text-shadow: 0 2px 0 #c56a00;
@@ -1733,7 +1733,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   background: linear-gradient(180deg, #9cff34, #31b61e);
   color: #ffffff;
   font-size: 29px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: .8;
   text-shadow: 0 2px 0 rgba(0, 0, 0, .34);
   cursor: pointer;
@@ -1766,7 +1766,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   margin: 4px 0 0;
   color: #ffffff;
   font-size: clamp(17px, 2.1vw, 25px);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.05;
   text-shadow: 0 3px 0 rgba(0, 42, 96, .55);
 }
@@ -1889,7 +1889,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   background: rgba(7, 38, 77, .66);
   color: #fff2a4;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.15;
   text-shadow: 0 2px 0 rgba(0, 0, 0, .32);
   backdrop-filter: blur(8px);
@@ -2494,7 +2494,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .game-stage-head {
   min-width: 0;
   color: #ffffff;
   font-size: clamp(12px, 1.5vw, 17px);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.2;
   text-align: center;
   text-shadow: 0 2px 0 rgba(0, 0, 0, .34);
@@ -2665,7 +2665,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   background: #3a5fd9;
   color: #fff;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .sudoku-numrow {
@@ -2724,7 +2724,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
 }
 
 .sudoku-panel strong {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: clamp(34px, 5vw, 48px);
   line-height: 1;
   color: #344861;
@@ -2751,7 +2751,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   background: #3a5fd9;
   color: #fff;
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
@@ -2781,7 +2781,7 @@ body.is-game-fullscreen .games-page.is-game-fullscreen .flappy-shell {
   margin: 10px 12px 2px;
   color: rgba(255, 232, 244, .58);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
