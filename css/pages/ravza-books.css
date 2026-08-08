@@ -976,6 +976,25 @@ button {
   color: #8f3b42;
 }
 
+/* Sayfaya ozel kurtarma dugmesi: durum metninin hemen altinda durur. */
+.pdf-page-retry {
+  position: absolute;
+  top: calc(50% + 2.2rem);
+  left: 50%;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  transform: translateX(-50%);
+  color: #fff;
+  border: 0;
+  border-radius: 11px;
+  background: var(--accent);
+  font: 600 0.82rem/1 var(--ui-font);
+}
+
+.pdf-page-retry[disabled] {
+  opacity: 0.6;
+}
+
 .pdf-back-cover-inner {
   display: grid;
   place-content: center;
@@ -1279,8 +1298,43 @@ button {
 }
 
 .reader-scrubber {
+  position: relative;
   display: block;
   padding: 0 0.35rem;
+}
+
+/* Surukleme onizlemesi: slider'in ustunde, tutamagi izleyen kucuk balon.
+   `clamp` ile kenarlara yapismasi engellenir, boylece dar telefonda da
+   tamamen gorunur kalir. */
+.reader-scrub-preview {
+  position: absolute;
+  bottom: calc(100% + 0.35rem);
+  left: clamp(2.6rem, var(--scrub-pct, 50%), calc(100% - 2.6rem));
+  z-index: 2;
+  display: grid;
+  gap: 0.3rem;
+  justify-items: center;
+  padding: 0.4rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--control-bg);
+  box-shadow: 0 10px 26px var(--control-shadow);
+  color: var(--ink);
+  font: 600 0.74rem/1.1 var(--ui-font);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.reader-scrub-preview[hidden] {
+  display: none;
+}
+
+.reader-scrub-preview img {
+  width: 52px;
+  height: auto;
+  border-radius: 4px;
+  background: #fff;
 }
 
 .reader-position {
@@ -1463,6 +1517,25 @@ button {
 .theme-controls {
   display: flex;
   gap: 0.35rem;
+}
+
+/* Bes yakinlastirma secenegi dar telefonda tek satira sigmaz; tasmak yerine
+   sarilir. Dokunma hedefi .setting-btn'in min-height'inden gelir. */
+.segmented--wrap {
+  flex-wrap: wrap;
+}
+
+/* Ogeler icerige gore olculur ve BUTUN HALINDE alt satira iner.
+   Varsayilan flex kucultmesi "Sayfaya Sığdır"i kelime ortasindan kirip
+   "Sayfay / a / Sığdır" haline getiriyordu. */
+.segmented--wrap .setting-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Desteklenmeyen/kullanilamaz ayar grubu gizlenmez, durustce soluklastirilir. */
+.reader-settings-group.is-unavailable .segmented {
+  opacity: 0.45;
 }
 
 .setting-btn,

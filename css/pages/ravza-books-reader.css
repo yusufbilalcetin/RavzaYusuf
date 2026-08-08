@@ -437,6 +437,20 @@
   background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 
+/* Cok secenekli grup (yakinlastirma: 5 oge) tek satira ZORLANMAZ.
+   Yukaridaki kural `grid-auto-flow: column` + `1fr` ile hepsini tek satira
+   sikistiriyordu; dar telefonda ogeler ust uste binip "Sayfaya Sığdır"
+   kelimenin ortasindan kiriliyordu. Burada sarilabilir satira geciyoruz. */
+.ravza-books-page .reader-sheet .segmented--wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ravza-books-page .reader-sheet .segmented--wrap .setting-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .ravza-books-page .reader-sheet .setting-btn {
   min-height: 40px;
   padding: 0 0.6rem;
@@ -531,7 +545,12 @@
      Eskiden `min(100%, (100dvh - 2rem) * aspect)` vardı: 100dvh mobilde
      tarayıcı çubuklarıyla değişen BÜYÜK viewport'u verir ve kaydırıcının
      gerçek yüksekliğiyle ilgisi yoktur (§23: dvh'ye gereksiz bağlanma). */
-  width: 100%;
+  /* GOSTERIM olcusu. --reader-zoom JS'te hesaplanir (bkz. zoomFactor):
+     genislige sigdir = 1, sayfaya sigdir <= 1, %125/%150/%200 = dogrudan
+     carpan. Tuval COZUNURLUGU bundan bagimsizdir; renderPdfPage olculen
+     kutuyu devicePixelRatio ile ayrica carpar, yani buyutunce bulaniklasmaz.
+     CSS transform KULLANILMAZ - o, PDF'i olcekler ama piksellerini artirmaz. */
+  width: calc(100% * var(--reader-zoom, 1));
   /* Blok akışında sayfalar kendi aralarında bu boşlukla ayrılır (§7: 8-16px). */
   margin: 0 auto var(--reader-page-gap);
   aspect-ratio: var(--pdf-page-aspect, 0.75);
@@ -554,6 +573,29 @@
   content: "";
   display: block;
   height: var(--reader-chrome-bottom, 3.5rem);
+}
+
+/* YAKINLASTIRILMIS SUREKLI MOD.
+   Sayfa kaydiricidan genisken yatay pan acilir. Bu yalnizca gercekten
+   tasarken devreye girer; aksi halde bos bir yatay kaydirma cubugu kaliyordu.
+   `touch-action` pan-x pan-y olur: dikey okuma kaybolmaz, yatay pan eklenir -
+   hicbir yerde `touch-action: none` yok (§2.5). */
+.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] #rdr-flipbook {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .reader-stage,
+.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] #rdr-flipbook,
+.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .pdf-page {
+  touch-action: pan-x pan-y;
+}
+
+/* Tasan sayfada `margin-inline: auto` tarayiciya gore sol kenari kirpabiliyor;
+   yakinlastirilmisken hizalama basa sabitlenir ve pan tam menzil calisir. */
+.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .pdf-page,
+.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .pdf-back-cover {
+  margin-inline: 0;
 }
 
 /* Sayfa çevirme moduna özgü sahne süslemeleri süreklide anlamsız. */

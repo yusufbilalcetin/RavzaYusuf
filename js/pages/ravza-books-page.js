@@ -60,6 +60,36 @@ const STORAGE = {
 const READER_THEMES = Object.freeze(['light', 'sepia', 'dark', 'black']);
 /** Okuma modları. PDF sabit sayfa düzeni olduğu için ikisi de gerçek sayfadır. */
 const READER_MODES = Object.freeze(['page', 'scroll']);
+
+/**
+ * YAKINLASTIRMA - NEDEN YALNIZCA SUREKLI MODDA.
+ *
+ * Sayfa modunda sayfa, sahnenin icine ZATEN tam sigdirilmis durumda
+ * (fitPdfBookToStage). Oradan buyutmek, sayfayi sahnenin disina tasirir ve
+ * kaydirma/pan katmani gerektirir; ama sayfa modunda yuzey sayfa kivirma
+ * jestinin (`touch-action: none`) tekelinde. Ustune pan eklemek ya jesti
+ * bozar ya da bir jest hakemligi katmani ister. Telefonda ayrica FIT WIDTH ile
+ * FIT PAGE ayni sonucu verir (390x668 alanda 3:4 sayfa zaten genislige
+ * sigiyor), yani sayfa modunda yakinlastirma gercek bir kazanc da saglamaz.
+ *
+ * Surekli modda ise kaydirici gercek: genisleyen sayfa yatayda da dikeyde de
+ * dogal olarak pan edilir. Yakinlastirma bu yuzden orada uygulanir ve sayfa
+ * modunda DURUSTCE "kullanilamaz" olarak gosterilir - sahte bir kontrol degil.
+ *
+ * %100 kavrami: sabit sayfa duzenli bir okuyucuda cihazdan bagimsiz "%100"
+ * yoktur (595pt'lik A4, 390px telefonda neye esittir?). Bu yuzden oranlar
+ * GENISLIGE SIGDIR temel alinarak verilir: %100 === Genisliğe Sığdır, o da
+ * ayri bir secenek olarak zaten listede.
+ */
+const READER_ZOOMS = Object.freeze(['fit-page', 'fit-width', 1.25, 1.5, 2]);
+const ZOOM_LABELS = Object.freeze({
+  'fit-page': 'Sayfaya Sığdır',
+  'fit-width': 'Genişliğe Sığdır',
+  1.25: '%125',
+  1.5: '%150',
+  2: '%200',
+});
+const isValidZoom = value => READER_ZOOMS.some(entry => entry === value);
 /** Kontroller bu kadar hareketsizlikten sonra kaybolur (iOS oynatıcı hissi). */
 const CONTROLS_HIDE_MS = 4000;
 /** Arama indeksi bu büyüklükte parçalar hâlinde kurulur; ana iş parçacığı boğulmasın. */
@@ -78,6 +108,8 @@ const state = {
   lineHeight: 1.4,
   theme: 'light',
   readerMode: 'page',
+  zoom: 'fit-width',
+  keepAwake: false,
   accessible: false,
   pageSound: true,
   hapticsEnabled: true,
@@ -204,6 +236,9 @@ function loadStorage() {
     : 1.4;
   state.theme = READER_THEMES.includes(prefs.theme) ? prefs.theme : 'light';
   state.readerMode = READER_MODES.includes(prefs.readerMode) ? prefs.readerMode : 'page';
+  // Bozuk/eski deger sessizce guvenli varsayilana duser (§ bozuk depo kurtarma).
+  state.zoom = isValidZoom(prefs.zoom) ? prefs.zoom : 'fit-width';
+  state.keepAwake = Boolean(prefs.keepAwake) && wakeLockSupported;
   state.accessible = Boolean(prefs.accessible);
   state.pageSound = prefs.pageSound !== false;
   state.hapticsEnabled = prefs.hapticsEnabled !== false;
@@ -220,6 +255,8 @@ function savePrefs() {
     lineHeight: state.lineHeight,
     theme: state.theme,
     readerMode: state.readerMode,
+    zoom: state.zoom,
+    keepAwake: state.keepAwake,
     accessible: state.accessible,
     pageSound: state.pageSound,
     hapticsEnabled: state.hapticsEnabled,
@@ -547,6 +584,7 @@ function findStartIndex(pages, progress) {
 }
 
 function cleanupReader() {
+  void releaseWakeLock();
   renderGeneration += 1;
   pdfRenderGeneration += 1;
   lastCradleSize = '';
@@ -712,6 +750,9 @@ async function ensurePdfJs() {
 
 function setAppMode(mode) {
   if (!APP_MODES.has(mode)) return;
+  // Ekran kilidi yalnizca GERCEKTEN okurken tutulur; kitapliga donunce birakilir.
+  if (mode === 'reading') void requestWakeLock();
+  else void releaseWakeLock();
   state.mode = mode;
   const page = document.getElementById('ravzabooks');
   const screen = document.getElementById('screen-reader');
@@ -1083,6 +1124,12 @@ function buildReaderShell(book) {
 
       <label class="reader-scrubber">
         <span class="sr-only">Okuma ilerlemesi</span>
+        <!-- Surukleme onizlemesi. Yalnizca ZATEN onbellekte olan kucuk resmi
+             gosterir; surukleme sirasinda YENI render tetiklenmez (§2.8). -->
+        <span class="reader-scrub-preview" id="rdr-scrub-bubble" aria-hidden="true" hidden>
+          <img id="rdr-scrub-thumb" alt="" decoding="async" hidden />
+          <span id="rdr-scrub-text"></span>
+        </span>
         <input class="progress-range" id="rdr-progress" type="range" min="0" max="0" value="0" step="1" />
       </label>
       <p class="reader-position" id="rdr-progress-label">1 / 1</p>
@@ -1163,6 +1210,16 @@ function readerSheetsMarkup(book, isPdf) {
           </section>
 
           ${isPdf ? `
+          <section class="reader-settings-group${state.readerMode === 'scroll' ? '' : ' is-unavailable'}" id="rdr-zoom-group">
+            <p class="reader-settings-label">Yakınlaştırma</p>
+            <div class="segmented segmented--wrap" role="group" aria-label="Yakınlaştırma">
+              ${READER_ZOOMS.map(zoom => `<button class="setting-btn zoom-btn${state.zoom === zoom ? ' selected' : ''}" type="button" data-zoom="${zoom}" aria-pressed="${state.zoom === zoom}"${state.readerMode === 'scroll' ? '' : ' disabled'}>${ZOOM_LABELS[zoom]}</button>`).join('')}
+            </div>
+            <p class="reader-settings-note" id="rdr-zoom-note">${state.readerMode === 'scroll'
+              ? 'Büyütünce sayfa yeniden çizilir, bulanıklaşmaz. Yanlara kaydırarak gezinebilirsiniz.'
+              : 'Yakınlaştırma kaydırma modunda kullanılabilir. Sayfa modunda kitap zaten ekrana tam sığdırılır.'}</p>
+          </section>
+
           <section class="reader-settings-group">
             <p class="reader-settings-label">Açık kitap</p>
             <p class="pdf-book-title">${escapeHTML(book.title)}</p>
@@ -1218,6 +1275,28 @@ function readerSheetsMarkup(book, isPdf) {
           </section>
 
           <section class="reader-settings-group">
+            <p class="reader-settings-label">Okuma ekranı</p>
+            <div class="settings-row${wakeLockSupported ? '' : ' is-unavailable'}">
+              <span class="setting-name">Ekranı Açık Tut</span>
+              <label class="switch">
+                <input id="wake-lock-toggle" type="checkbox" ${state.keepAwake && wakeLockSupported ? 'checked' : ''} ${wakeLockSupported ? '' : 'disabled'} />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="sr-only">Ekranı açık tut</span>
+              </label>
+            </div>
+            ${wakeLockSupported ? '' : '<p class="reader-settings-note">Bu tarayıcı ekranı açık tutmayı desteklemiyor.</p>'}
+            ${fullscreenSupported ? `
+            <div class="settings-row">
+              <span class="setting-name">Tam Ekran</span>
+              <label class="switch">
+                <input id="fullscreen-toggle" type="checkbox" />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="sr-only">Tam ekran</span>
+              </label>
+            </div>` : ''}
+          </section>
+
+          <section class="reader-settings-group">
             <p class="reader-settings-label">Kitap</p>
             <label class="file-btn" for="txt-book-input">TXT kitap seç</label>
             <input class="file-input" id="txt-book-input" type="file" accept=".txt,text/plain" />
@@ -1265,6 +1344,93 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
   }
   if (root) root.dataset.spread = portrait ? 'single' : 'double';
   return true;
+}
+
+/**
+ * Yakinlastirma carpani. TABAN "genislige sigdir" (sayfa kaydiricinin
+ * genisligini kaplar) = 1.
+ *
+ *   fit-width -> 1
+ *   fit-page  -> sayfanin YUKSEKLIGI de kaydiriciya sigsin diye kucultme
+ *                orani; hicbir zaman 1'i asmaz (fit-page buyutme degildir).
+ *   sayisal   -> dogrudan carpan (1.25 / 1.5 / 2).
+ *
+ * §2.2 formulunun surekli moddaki karsiligi: sayfa kutusunun EN-BOY orani
+ * zaten gercek PDF oranidir (--pdf-page-aspect), bu yuzden
+ * min(scaleByWidth, scaleByHeight) tek bir genislik carpanina indirgenir ve
+ * en-boy orani hicbir kosulda bozulmaz.
+ */
+function zoomFactor() {
+  if (state.zoom === 'fit-width') return 1;
+  if (typeof state.zoom === 'number') return state.zoom;
+  // fit-page
+  const scroller = document.getElementById('rdr-flipbook');
+  const root = document.getElementById('reader-inner');
+  if (!scroller || !root) return 1;
+  const width = scroller.clientWidth;
+  // Kaydiricinin ::before/::after ara boslugu kabuk kadar yer tutar; "sayfaya
+  // sigdir" GERCEKTEN gorunen aciklige gore hesaplanmali, yoksa sayfanin alti
+  // dock'un altinda kalir.
+  const style = getComputedStyle(root);
+  const chrome = (parseFloat(style.getPropertyValue('--reader-chrome-top')) || 0)
+    + (parseFloat(style.getPropertyValue('--reader-chrome-bottom')) || 0);
+  const height = scroller.clientHeight - chrome;
+  const ratio = Number.isFinite(pdfPageAspectRatio) && pdfPageAspectRatio > 0 ? pdfPageAspectRatio : 3 / 4;
+  if (width < 2 || height < 2) return 1;
+  // Sayfa yuksekligi = genislik / ratio. Yukseklige sigmasi icin gereken oran:
+  return clamp((height * ratio) / width, 0.2, 1);
+}
+
+/**
+ * Carpani CSS'e yazar. GOSTERIM olcusu buradan gelir; RENDER cozunurlugu
+ * degismez - onu renderPdfPage, olculen kutu x devicePixelRatio ile ayrica
+ * hesaplar. Ikisi bilincli olarak ayri kalir (§2.1).
+ */
+function applyReaderZoom() {
+  const root = document.getElementById('reader-inner');
+  if (!root) return;
+  const zoomable = state.bookType === 'pdf' && state.readerMode === 'scroll';
+  const factor = zoomable ? zoomFactor() : 1;
+  root.style.setProperty('--reader-zoom', String(Number(factor.toFixed(4))));
+  root.dataset.zoom = zoomable ? String(state.zoom) : 'fit-page';
+  // Yatay pan yalnizca sayfa gercekten tasiyorsa acilir; aksi halde
+  // gereksiz bir yatay kaydirma cubugu olusuyordu.
+  root.dataset.zoomed = zoomable && factor > 1.001 ? 'true' : 'false';
+}
+
+/**
+ * Yakinlastirmayi degistirir ve GORUNEN SAYFAYI korur.
+ *
+ * Yeniden render sarti: olcek degisince tuvalin CSS kutusu degisir, dolayisiyla
+ * renderKey de degisir; bitmap onbellegi anahtar bazli oldugu icin eski olcek
+ * kendiliginden gecersizlesir, elle temizlemeye gerek yok.
+ */
+function setReaderZoom(zoom) {
+  if (!isValidZoom(zoom) || zoom === state.zoom) return;
+  state.zoom = zoom;
+  savePrefs();
+  haptics.selection();
+  document.querySelectorAll('.zoom-btn').forEach(item => {
+    const selected = item.dataset.zoom === String(zoom);
+    item.classList.toggle('selected', selected);
+    item.setAttribute('aria-pressed', String(selected));
+  });
+  if (state.bookType !== 'pdf' || state.readerMode !== 'scroll') return;
+
+  const scroller = document.getElementById('rdr-flipbook');
+  const page = state.currentPage;
+  applyReaderZoom();
+  // Olcu degisti: kutuyu yeniden olc, sonra gorunen sayfaya geri don ve
+  // pencereyi yeni cozunurlukte tazele.
+  requestAnimationFrame(() => {
+    measureRenderBox();
+    if (scroller) {
+      suppressScrollSync = true;
+      scrollToPdfPage(scroller, page, false);
+      requestAnimationFrame(() => { suppressScrollSync = false; });
+    }
+    void updatePdfRenderWindow(page - 1, false);
+  });
 }
 
 function readerStageHasPositiveSize() {
@@ -2039,6 +2205,7 @@ function releasePdfPageCanvas(pageNumber) {
     delete canvas.dataset.renderKey;
   }
   element?.classList.remove('is-rendered', 'has-render-error');
+  element?.querySelector('[data-page-retry]')?.remove();
   const status = element?.querySelector('.pdf-page-status');
   if (status) {
     status.textContent = `Sayfa ${pageNumber} hazırlanıyor…`;
@@ -2069,6 +2236,49 @@ function pdfOutputScale(viewport) {
   const area = Math.max(1, viewport.width * viewport.height);
   if (area * base * base <= maxPixels) return base;
   return Math.max(1, Number(Math.sqrt(maxPixels / area).toFixed(3)));
+}
+
+/**
+ * Basarisiz sayfaya kendi kurtarma dugmesini ekler.
+ *
+ * Dugme sayfanin ICINDE durur, global bir hata ekrani acilmaz: 224 sayfalik
+ * bir kitapta tek bir sayfanin cizilememesi butun okumayi bitirmemeli.
+ * Yeniden deneme, o sayfanin onbellegini temizleyip normal render yolunu
+ * yeniden cagirir - ayri bir render yolu YAZILMAZ.
+ */
+function showPageRetry(element, pageNumber) {
+  if (!element || element.querySelector('[data-page-retry]')) return;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'pdf-page-retry';
+  button.dataset.pageRetry = String(pageNumber);
+  button.textContent = 'Tekrar Dene';
+  button.addEventListener('click', async event => {
+    event.stopPropagation();
+    button.disabled = true;
+    button.textContent = 'Deneniyor…';
+    const status = element.querySelector('.pdf-page-status');
+    // Onbellekteki bozuk sayfa nesnesini birak ki yeniden istensin.
+    const cached = pdfPageCache.get(pageNumber);
+    if (cached) {
+      try { cached.cleanup(); } catch (_) {}
+      pdfPageCache.delete(pageNumber);
+    }
+    pdfBitmapCache.delete(pageNumber);
+    const canvas = element.querySelector('canvas');
+    if (canvas) delete canvas.dataset.renderKey;
+    element.classList.remove('has-render-error');
+    pdfActivePages.add(pageNumber);
+    const ok = await renderPdfPage(pageNumber);
+    if (ok) {
+      button.remove();
+      return;
+    }
+    button.disabled = false;
+    button.textContent = 'Tekrar Dene';
+    if (status) status.setAttribute('aria-hidden', 'false');
+  });
+  element.querySelector('.pdf-canvas-frame')?.appendChild(button);
 }
 
 async function renderPdfPage(pageNumber) {
@@ -2137,11 +2347,15 @@ async function renderPdfPage(pageNumber) {
       return true;
     } catch (error) {
       if (String(error?.name) === 'RenderingCancelledException') return false;
+      // TEK SAYFA HATASI OKUYUCUYU DUSURMEZ (§2.11): yalnizca o sayfa hata
+      // durumuna gecer ve kendi "Tekrar Dene" dugmesini gosterir. Kitap,
+      // gezinme, arama ve diger sayfalar calismaya devam eder.
       element.classList.add('has-render-error');
       if (status) {
         status.textContent = pdfErrorMessage(error, 'render');
         status.setAttribute('aria-hidden', 'false');
       }
+      showPageRetry(element, pageNumber);
       return false;
     } finally {
       pdfRenderTasks.delete(pageNumber);
@@ -2293,6 +2507,9 @@ function setupScrollReader(startIndex) {
   teardownScrollReader();
   cradle?.removeAttribute('style');
   cradle?.style.setProperty('--pdf-page-aspect', String(pdfPageAspectRatio));
+  // Olcek, sayfalar olculmeden ONCE yazilmali: measureRenderBox zoomlu kutuyu
+  // gormezse tuval yanlis cozunurlukte cizilir.
+  applyReaderZoom();
 
   const onScroll = () => {
     // Programatik kaydırma sırasında geri besleme yapma: aksi hâlde hedef
@@ -2381,6 +2598,7 @@ async function openPdfReader(book, position = null) {
   buildReaderShell(book);
   applyTheme(state.theme);
   applyTypography();
+  applyReaderZoom();
   await nextFrame();
   if (generation !== renderGeneration || !pdfDocument) return;
   // Sahne olcusunu ALMADAN ONCE kabuk alanini ayir: aksi halde sayfa,
@@ -2513,6 +2731,127 @@ function formatPageLabel(index) {
     return `${page?.pdfPage || 1} / ${pdfDocument?.numPages || 1}`;
   }
   return `${clamp(index, 0, Math.max(0, readerPages.length - 1)) + 1} / ${readerPages.length}`;
+}
+
+/* ------------------------------------------------------------------------ */
+/* EKRANI ACIK TUT (Screen Wake Lock API)                                     */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Wake Lock, okurken ekranin sonmesini engeller.
+ *
+ * DESTEK DURUMU (yetenek tespiti, tarayici adi tahmini DEGIL): Chrome/Edge ve
+ * Safari 16.4+ `navigator.wakeLock.request('screen')` destekliyor; Firefox
+ * desteklemiyor. Bu yuzden tek dogru test `navigator.wakeLock` varliginin
+ * kendisidir - desteklenmeyen tarayicida ayar satiri DURUSTCE kullanilamaz
+ * gorunur, sahte bir anahtar gosterilmez.
+ *
+ * Kilit, sekme gizlenince tarayici tarafindan kendiliginden birakilir; geri
+ * donuldugunde tercih hala aciksa yeniden istenir.
+ */
+const wakeLockSupported = typeof navigator !== 'undefined'
+  && 'wakeLock' in navigator
+  && typeof navigator.wakeLock?.request === 'function';
+let wakeLockSentinel = null;
+
+async function requestWakeLock() {
+  if (!wakeLockSupported || !state.keepAwake || wakeLockSentinel) return;
+  // Yalnizca sayfa gorunurken istenebilir; aksi halde tarayici reddeder.
+  if (document.visibilityState !== 'visible') return;
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener?.('release', () => { wakeLockSentinel = null; });
+  } catch (_) {
+    // Izin/politika reddi okumayi bolmemeli; sessizce vazgec.
+    wakeLockSentinel = null;
+  }
+}
+
+async function releaseWakeLock() {
+  const sentinel = wakeLockSentinel;
+  wakeLockSentinel = null;
+  if (!sentinel) return;
+  try { await sentinel.release(); } catch (_) {}
+}
+
+function handleWakeLockVisibility() {
+  if (document.visibilityState === 'visible') void requestWakeLock();
+  else void releaseWakeLock();
+}
+
+/* ------------------------------------------------------------------------ */
+/* TAM EKRAN (Fullscreen API)                                                 */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * iOS Safari'de iPhone'da `requestFullscreen` YOKTUR (iPad'de vardir). Bu
+ * yuzden destek, element uzerindeki metodun varligiyla olculur; yoksa kontrol
+ * hic gosterilmez - calismayan bir dugme koymaktansa hic koymamak dogru
+ * davranis. PWA "standalone" kurulumu bu platformlarda zaten tam ekran verir.
+ */
+const fullscreenSupported = typeof document !== 'undefined'
+  && (typeof document.documentElement.requestFullscreen === 'function'
+    || typeof document.documentElement.webkitRequestFullscreen === 'function');
+
+async function toggleFullscreen() {
+  if (!fullscreenSupported) return;
+  const root = document.documentElement;
+  try {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      await (document.exitFullscreen?.() ?? document.webkitExitFullscreen?.());
+    } else {
+      await (root.requestFullscreen?.() ?? root.webkitRequestFullscreen?.());
+    }
+  } catch (_) {
+    // Kullanici jesti olmadan reddedilebilir; okuma etkilenmez.
+  }
+  syncFullscreenToggle();
+}
+
+function syncFullscreenToggle() {
+  const toggle = document.getElementById('fullscreen-toggle');
+  if (toggle) toggle.checked = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+/**
+ * SCRUBBER ONIZLEMESI (§2.8).
+ *
+ * Surukleme sirasinda "Sayfa 74 / 224" gosterir. Kucuk resim YALNIZCA
+ * thumbnailCache'te hazir varsa cizilir - surukleme sirasinda pdf.js'e tek bir
+ * yeni render istegi bile gitmez. Boylece slider hicbir kosulda ana is
+ * parcacigini kilitlemez; kullanici Sayfalar sekmesini acmissa onizleme
+ * "bedava" gelir, acmamissa yalnizca sayfa numarasi gorunur.
+ */
+function showScrubPreview(index, percent) {
+  const preview = document.getElementById('rdr-scrub-bubble');
+  if (!preview) return;
+  const page = readerPages[clamp(index, 0, Math.max(0, readerPages.length - 1))];
+  const text = document.getElementById('rdr-scrub-text');
+  const thumb = document.getElementById('rdr-scrub-thumb');
+  if (text) {
+    text.textContent = page?.type === 'pdf-back-cover'
+      ? 'Arka kapak'
+      : `Sayfa ${formatPageLabel(index)}`;
+  }
+  if (thumb) {
+    const cached = state.bookType === 'pdf' && page?.pdfPage
+      ? thumbnailCache.get(page.pdfPage)
+      : null;
+    if (cached) {
+      thumb.src = cached;
+      thumb.hidden = false;
+    } else {
+      thumb.removeAttribute('src');
+      thumb.hidden = true;
+    }
+  }
+  preview.style.setProperty('--scrub-pct', `${clamp(percent, 0, 100)}%`);
+  preview.hidden = false;
+}
+
+function hideScrubPreview() {
+  const preview = document.getElementById('rdr-scrub-bubble');
+  if (preview) preview.hidden = true;
 }
 
 function updateReaderUI(index) {
@@ -3424,6 +3763,25 @@ function bindReaderEvents(book) {
   document.querySelectorAll('.mode-btn').forEach(button => {
     button.addEventListener('click', () => switchReaderMode(button.dataset.mode), { signal });
   });
+  document.querySelectorAll('.zoom-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const raw = button.dataset.zoom;
+      const numeric = Number(raw);
+      setReaderZoom(Number.isFinite(numeric) && String(numeric) === raw ? numeric : raw);
+    }, { signal });
+  });
+  document.getElementById('wake-lock-toggle')?.addEventListener('change', event => {
+    state.keepAwake = event.target.checked && wakeLockSupported;
+    savePrefs();
+    if (state.keepAwake) void requestWakeLock();
+    else void releaseWakeLock();
+  }, { signal });
+  document.getElementById('fullscreen-toggle')?.addEventListener('change', () => {
+    void toggleFullscreen();
+  }, { signal });
+  // Tam ekrandan ESC ile cikilirsa anahtar gercekle uyumlu kalmali.
+  document.addEventListener('fullscreenchange', syncFullscreenToggle, { signal });
+  document.addEventListener('visibilitychange', handleWakeLockVisibility, { signal });
   document.getElementById('haptics-toggle')?.addEventListener('change', event => {
     state.hapticsEnabled = event.target.checked;
     haptics.setEnabled(state.hapticsEnabled);
@@ -3438,12 +3796,18 @@ function bindReaderEvents(book) {
     if (label) label.textContent = formatPageLabel(value);
     const pct = readerPages.length <= 1 ? 100 : (value / (readerPages.length - 1)) * 100;
     event.target.style.setProperty('--progress', `${pct}%`);
+    showScrubPreview(value, pct);
   }, { signal });
   progress?.addEventListener('change', event => {
+    hideScrubPreview();
     // Range değeri sayfa DİZİNİ; goToPdfPage sayfa NUMARASI bekler.
     goToPdfPage(Number(event.target.value) + 1);
     showControls(true);
   }, { signal });
+  // Klavye/dokunma birakilinca da onizleme kapanmali.
+  for (const eventName of ['pointerup', 'pointercancel', 'blur']) {
+    progress?.addEventListener(eventName, hideScrubPreview, { signal });
+  }
 
   const readerRoot = document.getElementById('reader-inner');
   readerRoot?.querySelectorAll('.theme-btn').forEach(button => {

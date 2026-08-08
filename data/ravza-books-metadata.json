@@ -20,5 +20,19 @@
     "description": "Oğuzların kahramanlıklarını, aile bağlarını ve kültürel mirasını anlatan Dede Korkut hikâyeleri.",
     "coverPage": 3,
     "order": 3
+  },
+  "ask-i-memnu": {
+    "title": "Aşk-ı Memnu",
+    "author": "Halit Ziya Uşaklıgil",
+    "description": "Türk edebiyatının ilk modern romanlarından biri; bir konak çevresinde yasak bir aşkın çöküşü.",
+    "coverPage": 1,
+    "order": 4
+  },
+  "atesten-gomlek": {
+    "title": "Ateşten Gömlek",
+    "author": "Halide Edib Adıvar",
+    "description": "Millî Mücadele yıllarını bir aşk ve fedakârlık hikâyesiyle anlatan roman.",
+    "coverPage": 1,
+    "order": 5
   }
 }

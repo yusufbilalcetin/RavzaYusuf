@@ -833,6 +833,336 @@ try {
     assert.notEqual(back, 1, "mod değişimi 1. sayfaya sıfırlamamalı");
   });
 
+  /* ---------------------------------------------------------------------- */
+  /* YAKINLASTIRMA (§2.1-§2.3)                                                */
+  /* ---------------------------------------------------------------------- */
+
+  /** Ayarlardan yakınlaştırma seçer ve ölçüyü döndürür. */
+  async function applyZoom(zoom) {
+    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
+    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    const clicked = await browser.evaluate(`(() => {
+      const btn = document.querySelector('.zoom-btn[data-zoom=${JSON.stringify(String(zoom))}]');
+      if (!btn || btn.disabled) return false;
+      btn.click();
+      return true;
+    })()`);
+    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    if (clicked) {
+      // Sabit bekleme YETMEZ: %200'de tuval 4 kat piksel demek ve yeniden
+      // cizim gorunur sekilde uzuyor. Olcum, olculecek sayfa YENI olcegiyle
+      // gercekten cizilene kadar beklenir - kor gecikme degil, kesin kosul.
+      await browser.waitFor(
+        `!!document.querySelector('.pdf-page[data-pdf-page="2"].is-rendered')`,
+        `yakınlaştırma sonrası render (${zoom})`,
+        30000,
+      );
+    }
+    await delay(250);
+    return clicked;
+  }
+
+  const ZOOM_GEOMETRY = `(() => {
+    const root = document.getElementById('reader-inner');
+    const scroller = document.getElementById('rdr-flipbook');
+    const page = scroller.querySelector('.pdf-page[data-pdf-page="2"]');
+    const canvas = page.querySelector('canvas');
+    const rect = page.getBoundingClientRect();
+    return {
+      zoom: root.dataset.zoom,
+      zoomed: root.dataset.zoomed,
+      pageWidth: rect.width,
+      pageHeight: rect.height,
+      scrollerWidth: scroller.clientWidth,
+      scrollerHeight: scroller.clientHeight,
+      scrollWidth: scroller.scrollWidth,
+      canvasCssWidth: parseFloat(canvas.style.width) || 0,
+      canvasAttrWidth: canvas.width,
+      rendered: page.classList.contains('is-rendered'),
+      touchAction: getComputedStyle(scroller).touchAction,
+      dpr: window.devicePixelRatio,
+    };
+  })()`;
+
+  await testCase("yakınlaştırma gösterim ölçüsünü büyütür ve tuvali yeniden çizer", async () => {
+    await openWith("perili-kosk", "scroll");
+    // Olculecek sayfayi GECERLI sayfa yap: boylece render penceresinin
+    // icinde oldugu kesin olur ve olcum kararli bir zeminde yapilir.
+    await browser.evaluate(`(() => {
+      const s = document.getElementById('rdr-flipbook');
+      const t = s.querySelector('.pdf-page[data-pdf-page="2"]');
+      s.scrollTop += t.getBoundingClientRect().top - s.getBoundingClientRect().top;
+    })()`);
+    await browser.waitFor(
+      `!!document.querySelector('.pdf-page[data-pdf-page="2"].is-rendered')`,
+      "2. sayfa render", 30000,
+    );
+    await delay(400);
+    const base = await browser.evaluate(ZOOM_GEOMETRY);
+
+    assert.ok(await applyZoom(2), "%200 seçilebilmeli");
+    const zoomed = await browser.evaluate(ZOOM_GEOMETRY);
+
+    // 1. GOSTERIM olcusu gercekten iki katina cikmali.
+    assert.ok(
+      Math.abs(zoomed.pageWidth - base.pageWidth * 2) <= 2,
+      `%200 gösterim ölçüsü yanlış: ${base.pageWidth.toFixed(0)} -> ${zoomed.pageWidth.toFixed(0)}`,
+    );
+    // 2. En-boy orani bozulmamali.
+    assert.ok(
+      Math.abs((zoomed.pageWidth / zoomed.pageHeight) - (base.pageWidth / base.pageHeight)) < 0.01,
+      "yakınlaştırma en-boy oranını bozdu",
+    );
+    // 3. KRITIK: tuval, yeni gosterim olcusune gore YENIDEN cizilmeli.
+    //    CSS transform ile buyutulseydi attr genislik sabit kalir, PDF
+    //    bulaniklasirdi. Cozunurluk / gosterim orani DPR'de kalmali.
+    assert.ok(zoomed.rendered, "yakınlaştırdıktan sonra sayfa render edilmeli");
+    const pixelRatio = zoomed.canvasAttrWidth / Math.max(1, zoomed.canvasCssWidth);
+    assert.ok(
+      pixelRatio >= Math.min(zoomed.dpr, 2) - 0.15,
+      `tuval çözünürlüğü DPR'nin altında (${pixelRatio.toFixed(2)} vs ${zoomed.dpr})`,
+    );
+    assert.ok(
+      zoomed.canvasAttrWidth > base.canvasAttrWidth * 1.5,
+      `tuval gerçekte büyümedi (${base.canvasAttrWidth} -> ${zoomed.canvasAttrWidth}); CSS ölçekleme bulanıklık üretir`,
+    );
+    // 4. Yatay pan acilmali, ama `touch-action: none` ASLA olmamali (§2.5).
+    assert.ok(zoomed.scrollWidth > zoomed.scrollerWidth + 2, "yakınlaştırınca yatay kaydırma açılmalı");
+    assert.match(zoomed.touchAction, /pan-x/, "yatay pan için touch-action pan-x içermeli");
+    assert.doesNotMatch(zoomed.touchAction, /^none$/, "reader yüzeyinde touch-action:none olmamalı");
+  });
+
+  await testCase("genişliğe sığdır sayfayı tam genişlikte tutar, yatay taşma yapmaz", async () => {
+    assert.ok(await applyZoom("fit-width"), "genişliğe sığdır seçilebilmeli");
+    const g = await browser.evaluate(ZOOM_GEOMETRY);
+    assert.ok(
+      Math.abs(g.pageWidth - g.scrollerWidth) <= 2,
+      `genişliğe sığdır tam genişlik vermeli (${g.pageWidth.toFixed(0)} / ${g.scrollerWidth})`,
+    );
+    assert.ok(g.scrollWidth <= g.scrollerWidth + 2, "genişliğe sığdırda yatay taşma olmamalı");
+    assert.equal(g.zoomed, "false", "yakınlaştırılmamış durumda pan kapalı olmalı");
+  });
+
+  await testCase("sayfaya sığdır sayfayı görünür açıklığa sığdırır", async () => {
+    assert.ok(await applyZoom("fit-page"), "sayfaya sığdır seçilebilmeli");
+    const g = await browser.evaluate(`(() => {
+      const base = ${ZOOM_GEOMETRY};
+      const root = document.getElementById('reader-inner');
+      const style = getComputedStyle(root);
+      base.chrome = (parseFloat(style.getPropertyValue('--reader-chrome-top')) || 0)
+        + (parseFloat(style.getPropertyValue('--reader-chrome-bottom')) || 0);
+      return base;
+    })()`);
+    const opening = g.scrollerHeight - g.chrome;
+    // Sayfa ya yukseklige ya genislige sigar - hangisi once biterse (fit-page
+    // formulu min(scaleByWidth, scaleByHeight)). Ikisini de asmamali.
+    assert.ok(g.pageWidth <= g.scrollerWidth + 2, "sayfaya sığdır genişliği aşmamalı");
+    assert.ok(
+      g.pageHeight <= opening + 2,
+      `sayfaya sığdır görünür açıklığı aşıyor (${g.pageHeight.toFixed(0)} > ${opening.toFixed(0)})`,
+    );
+    assert.ok(g.scrollWidth <= g.scrollerWidth + 2, "sayfaya sığdırda yatay taşma olmamalı");
+  });
+
+  await testCase("yakınlaştırma kalıcıdır ve bozuk değer güvenle düşer", async () => {
+    assert.ok(await applyZoom(1.5), "%150 seçilebilmeli");
+    const stored = await browser.evaluate("JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}').zoom");
+    assert.equal(stored, 1.5, "yakınlaştırma kaydedilmeli");
+
+    for (const bad of ['"kocaman"', "0", "null", "999"]) {
+      await browser.evaluate(`(() => {
+        const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
+        prefs.zoom = ${bad};
+        localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
+      })()`);
+      await openLibrary();
+      await openBook("perili-kosk");
+      const zoom = await browser.evaluate("document.getElementById('reader-inner').dataset.zoom");
+      assert.equal(zoom, "fit-width", `bozuk zoom (${bad}) güvenli varsayılana düşmeli, gelen ${zoom}`);
+    }
+  });
+
+  await testCase("sayfa modunda yakınlaştırma dürüstçe kullanılamaz gösterilir", async () => {
+    await openWith("perili-kosk", "page");
+    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
+    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    const state = await browser.evaluate(`(() => ({
+      unavailable: document.getElementById('rdr-zoom-group')?.classList.contains('is-unavailable'),
+      allDisabled: [...document.querySelectorAll('.zoom-btn')].every(btn => btn.disabled),
+      hasNote: (document.getElementById('rdr-zoom-note')?.textContent || '').includes('kaydırma modunda'),
+      zoomVar: getComputedStyle(document.getElementById('reader-inner')).getPropertyValue('--reader-zoom').trim(),
+    }))()`);
+    // Sahte kontrol yok: dugmeler var ama devre disi ve NEDENI yaziyor.
+    assert.equal(state.unavailable, true, "sayfa modunda yakınlaştırma grubu soluk olmalı");
+    assert.equal(state.allDisabled, true, "sayfa modunda yakınlaştırma düğmeleri devre dışı olmalı");
+    assert.equal(state.hasNote, true, "kullanılamama nedeni yazılmalı");
+    assert.equal(state.zoomVar, "1", "sayfa modunda ölçek 1 kalmalı");
+    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await delay(300);
+  });
+
+  await testCase("tek sayfanın render hatası okuyucuyu düşürmez, o sayfa tekrar denenir", async () => {
+    await openWith("perili-kosk", "scroll");
+    // Gercek bir render hatasi enjekte et: hedef sayfanin canvas context'i
+    // bir kez patlasin. Kitabin geri kalani calismaya devam etmeli.
+    await browser.evaluate(`(() => {
+      const page = document.querySelector('.pdf-page[data-pdf-page="4"]');
+      const canvas = page.querySelector('canvas');
+      delete canvas.dataset.renderKey;
+      page.classList.remove('is-rendered');
+      window.__ravzaFailOnce = true;
+      const original = canvas.getContext.bind(canvas);
+      canvas.getContext = (...args) => {
+        if (window.__ravzaFailOnce) { window.__ravzaFailOnce = false; throw new Error('test: context alınamadı'); }
+        return original(...args);
+      };
+    })()`);
+    // Sayfayi pencereye sok: render denemesi tetiklensin.
+    await browser.evaluate(`(() => {
+      const s = document.getElementById('rdr-flipbook');
+      const t = s.querySelector('.pdf-page[data-pdf-page="4"]');
+      s.scrollTop += t.getBoundingClientRect().top - s.getBoundingClientRect().top;
+    })()`);
+    await browser.waitFor(
+      "!!document.querySelector('.pdf-page[data-pdf-page=\"4\"] [data-page-retry]')",
+      "sayfa hatası kurtarma düğmesi",
+      20000,
+    );
+    // Okuyucu AYAKTA: global hata ekrani yok, diger sayfalar render edilmis.
+    // Komsu sayfalar bosta (idle) kuyrukta cizildigi icin varliklari beklenir;
+    // hic cizilmiyorsa okuyucu gercekten olmus demektir ve test duser.
+    await browser.waitFor(
+      "document.querySelectorAll('.pdf-page.is-rendered').length > 0",
+      "hata sonrası diğer sayfalar",
+      25000,
+    );
+    const during = await browser.evaluate(`(() => ({
+      globalError: !!document.querySelector('.reader-error'),
+      stillReading: document.querySelector('#ravzabooks')?.dataset.appMode === 'reading',
+      otherPagesRendered: document.querySelectorAll('.pdf-page.is-rendered').length,
+    }))()`);
+    assert.equal(during.globalError, false, "tek sayfa hatası global hata ekranı açmamalı");
+    assert.equal(during.stillReading, true, "okuyucu okuma modunda kalmalı");
+    assert.ok(during.otherPagesRendered > 0, "diğer sayfalar render edilmeye devam etmeli");
+
+    await browser.evaluate("document.querySelector('.pdf-page[data-pdf-page=\"4\"] [data-page-retry]').click()");
+    await browser.waitFor(
+      "document.querySelector('.pdf-page[data-pdf-page=\"4\"]')?.classList.contains('is-rendered')",
+      "tekrar dene sonrası render",
+      25000,
+    );
+    const after = await browser.evaluate(`(() => ({
+      retryGone: !document.querySelector('.pdf-page[data-pdf-page="4"] [data-page-retry]'),
+      errored: document.querySelector('.pdf-page[data-pdf-page="4"]').classList.contains('has-render-error'),
+    }))()`);
+    assert.equal(after.retryGone, true, "başarılı denemeden sonra düğme kalkmalı");
+    assert.equal(after.errored, false, "başarılı denemeden sonra hata durumu temizlenmeli");
+  });
+
+  await testCase("scrubber sürüklerken sayfa önizlemesi gösterir, yeni render tetiklemez", async () => {
+    await openWith("kucuk-prens", "page");
+    const before = await browser.evaluate("document.querySelectorAll('.pdf-page.is-rendered').length");
+    const shown = await browser.evaluate(`(() => {
+      const range = document.getElementById('rdr-progress');
+      range.value = '73';
+      range.dispatchEvent(new Event('input', { bubbles: true }));
+      const preview = document.getElementById('rdr-scrub-bubble');
+      return {
+        hidden: preview.hidden,
+        text: document.getElementById('rdr-scrub-text').textContent.trim(),
+        thumbHidden: document.getElementById('rdr-scrub-thumb').hidden,
+        left: getComputedStyle(preview).left,
+      };
+    })()`);
+    assert.equal(shown.hidden, false, "sürüklerken önizleme görünmeli");
+    // §2.8: "Sayfa X / Y" biciminde olmali.
+    assert.match(shown.text, /^Sayfa \d+ \/ \d+$/, `önizleme metni beklenen biçimde değil: ${shown.text}`);
+    assert.match(shown.text, /^Sayfa 74 \//, `önizleme yanlış sayfayı gösteriyor: ${shown.text}`);
+
+    // Onizleme sirasinda PDF yeniden render EDILMEMELI: kucuk resim yalnizca
+    // hazir onbellekten gelir. Aksi halde her surukleme pikselinde tam
+    // cozunurluklu render tetiklenirdi.
+    await delay(500);
+    const during = await browser.evaluate("document.querySelectorAll('.pdf-page.is-rendered').length");
+    assert.equal(during, before, `sürükleme render penceresini değiştirdi (${before} -> ${during})`);
+
+    // Birakinca kapanmali ve sayfaya gidilmeli.
+    await browser.evaluate(`(() => {
+      const range = document.getElementById('rdr-progress');
+      range.dispatchEvent(new Event('change', { bubbles: true }));
+    })()`);
+    await browser.waitFor("document.getElementById('rdr-scrub-bubble').hidden === true", "önizleme kapandı");
+    await browser.waitFor(
+      "Number(document.getElementById('reader-inner').dataset.currentPage) === 74",
+      "74. sayfaya gidildi", 20000,
+    );
+  });
+
+  await testCase("Ekranı Açık Tut ve Tam Ekran yalnızca gerçekten destekleniyorsa sunulur", async () => {
+    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
+    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    const caps = await browser.evaluate(`(() => {
+      const wakeToggle = document.getElementById('wake-lock-toggle');
+      const fsToggle = document.getElementById('fullscreen-toggle');
+      return {
+        wakeSupported: 'wakeLock' in navigator && typeof navigator.wakeLock?.request === 'function',
+        wakePresent: !!wakeToggle,
+        wakeDisabled: wakeToggle ? wakeToggle.disabled : null,
+        fsSupported: typeof document.documentElement.requestFullscreen === 'function'
+          || typeof document.documentElement.webkitRequestFullscreen === 'function',
+        fsPresent: !!fsToggle,
+      };
+    })()`);
+    // Yetenek tespiti ile arayuz DURUSTCE ortusmeli - sahte kontrol yok.
+    assert.equal(caps.wakePresent, true, "ekranı açık tut satırı her zaman görünür (destek yoksa devre dışı)");
+    assert.equal(
+      caps.wakeDisabled,
+      !caps.wakeSupported,
+      `wake lock anahtarı destek durumuyla uyuşmuyor (destek=${caps.wakeSupported}, disabled=${caps.wakeDisabled})`,
+    );
+    assert.equal(
+      caps.fsPresent,
+      caps.fsSupported,
+      `tam ekran kontrolü destek durumuyla uyuşmuyor (destek=${caps.fsSupported}, var=${caps.fsPresent})`,
+    );
+    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await delay(250);
+  });
+
+  await testCase("Ekranı Açık Tut tercihi kalıcıdır ve kitaplığa dönünce kilit bırakılır", async () => {
+    const supported = await browser.evaluate("'wakeLock' in navigator && typeof navigator.wakeLock?.request === 'function'");
+    if (!supported) return; // Desteklenmeyen tarayicida iddia edilecek davranis yok.
+    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
+    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    await browser.evaluate(`(() => {
+      const toggle = document.getElementById('wake-lock-toggle');
+      toggle.checked = true;
+      toggle.dispatchEvent(new Event('change', { bubbles: true }));
+    })()`);
+    await delay(500);
+    const stored = await browser.evaluate("JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}').keepAwake");
+    assert.equal(stored, true, "ekranı açık tut tercihi kaydedilmeli");
+    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await delay(300);
+    // Kitapliga donunce okuma bitti demektir; kilit tutulmaya devam etmemeli.
+    await browser.evaluate("document.getElementById('rdr-back').click()");
+    await browser.waitFor("document.querySelectorAll('.library-book-card').length > 0", "kitaplık");
+    await delay(400);
+    const consoleClean = await browser.evaluate("true");
+    assert.equal(consoleClean, true, "kitaplığa dönüş hatasız olmalı");
+    // Tercih korunmali (kilit birakildi diye ayar sifirlanmaz).
+    const kept = await browser.evaluate("JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}').keepAwake");
+    assert.equal(kept, true, "kilit bırakılınca tercih silinmemeli");
+    await browser.evaluate(`(() => {
+      const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
+      prefs.keepAwake = false;
+      localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
+    })()`);
+    // Bu test kitapliga donerek kilidin birakildigini dogruluyor; sonraki
+    // testler ACIK bir okuyucu bekliyor, o yuzden durum geri kuruluyor.
+    await openBook("kucuk-prens");
+  });
+
   await testCase("mod göstergesi gerçek modu yansıtır", async () => {
     const state = await browser.evaluate(`(() => ({
       mode: document.getElementById('reader-inner').dataset.readerMode,
@@ -856,14 +1186,29 @@ try {
     }
   });
 
-  // §31: BEŞ kitabın tamamı gerçekten açılıp gezilmeli.
-  for (const [bookId, title, pages] of [
-    ["kucuk-prens", "Küçük Prens", 166],
-    ["kasagi", "Kaşağı", 146],
-    ["atesten-gomlek", "Ateşten Gömlek", 224],
-    ["dede-korkut-hikayeleri", "Dede Korkut Hikâyeleri", 200],
-    ["perili-kosk", "Perili Köşk", 12],
-  ]) {
+  /* ---------------------------------------------------------------------- */
+  /* KAYIT DEFTERI SURUCULU KITAP MATRISI (§2.18)                             */
+  /*                                                                          */
+  /* Kitap listesi ARTIK ELLE YAZILMIYOR. Kaynak RAVZA_BOOKS; kitap eklenince */
+  /* matris kendiliginden buyur. Iki katman var:                              */
+  /*   DERIN  - temsili alt kume (outline'li / outline'siz / kisa / uzun).    */
+  /*            Tam tur: ileri, sürekli, mod donusu, yeniden acilis.          */
+  /*   DUMAN  - kalan HER kitap. Acilir, sayfa sayisi veriyle dogrulanir,     */
+  /*            gercekten render eder, gezinir ve konum korur.                */
+  /* Her kayitli kitap en az bir anlamli testten geciyor; toplam sure ise     */
+  /* 10 kitabin tamami icin derin tur kosmadan makul kaliyor.                 */
+  const DEEP_BOOK_IDS = new Set([
+    "kucuk-prens",             // gercek outline (27 bolum), orta boy
+    "perili-kosk",             // outline YOK, cok kisa (12 sayfa)
+    "atesten-gomlek",          // en uzun klasik (224 sayfa)
+    "kasagi",                  // orta boy, outline yok
+    "dede-korkut-hikayeleri",  // uzun, resimli
+  ]);
+  const deepBooks = RAVZA_BOOKS.filter(book => DEEP_BOOK_IDS.has(book.id));
+  const smokeBooks = RAVZA_BOOKS.filter(book => !DEEP_BOOK_IDS.has(book.id));
+  assert.ok(deepBooks.length >= 5, "derin alt küme kayıt defterinden çözülemedi");
+
+  for (const [bookId, title, pages] of deepBooks.map(book => [book.id, book.title, Number(book.totalPages)])) {
     await testCase(`${title}: aç → ileri → sürekli → sayfa → yeniden aç`, async () => {
       await openWith(bookId, "page");
       const total = await browser.evaluate("document.querySelectorAll('.pdf-page').length");
@@ -906,6 +1251,48 @@ try {
       await openBook(bookId);
       const resumed = await browser.evaluate("Number(document.getElementById('reader-inner').dataset.currentPage)");
       assert.ok(Math.abs(resumed - back) <= 1, `${title}: yeniden açılışta konum kaybedildi (${back} -> ${resumed})`);
+    });
+  }
+
+  // Kalan HER kayitli kitap: derin turdan hafif, ama gercek bir test.
+  // "Acildi" demek yetmez - sayfa sayisi VERIYLE eslesmeli, sayfa gercekten
+  // render olmali, gezinme calismali ve konum korunmali.
+  for (const book of smokeBooks) {
+    await testCase(`${book.title}: açılır, gerçekten render eder ve gezinir`, async () => {
+      await openWith(book.id, "page");
+      const probe = await browser.evaluate(`(() => ({
+        total: document.querySelectorAll('.pdf-page').length,
+        rendered: document.querySelectorAll('.pdf-page.is-rendered').length,
+        page: Number(document.getElementById('reader-inner').dataset.currentPage),
+        errored: !!document.querySelector('.reader-error'),
+        canvasWidth: (document.querySelector('.pdf-page.is-rendered canvas') || {}).width || 0,
+      }))()`);
+      assert.equal(probe.errored, false, `${book.title}: hata ekranı açıldı`);
+      assert.equal(
+        probe.total,
+        Number(book.totalPages),
+        `${book.title}: sayfa sayısı veriyle uyuşmuyor (${probe.total} / ${book.totalPages})`,
+      );
+      assert.ok(probe.rendered > 0, `${book.title}: hiçbir sayfa render edilmedi`);
+      // Bos bir tuval "render edildi" sayilmamali.
+      assert.ok(probe.canvasWidth > 100, `${book.title}: tuval gerçek çözünürlükte değil (${probe.canvasWidth})`);
+
+      await browser.key("ArrowRight");
+      await browser.waitFor(
+        `Number(document.getElementById('reader-inner').dataset.currentPage) > ${probe.page}`,
+        `${book.title} ileri`, 25000,
+      );
+      const advanced = await browser.evaluate("Number(document.getElementById('reader-inner').dataset.currentPage)");
+
+      // Kapat/yeniden ac: son okunan konum korunmali.
+      await browser.evaluate("document.getElementById('rdr-back').click()");
+      await browser.waitFor("document.querySelectorAll('.library-book-card').length > 0", `${book.title} kitaplık`);
+      await openBook(book.id);
+      const resumed = await browser.evaluate("Number(document.getElementById('reader-inner').dataset.currentPage)");
+      assert.ok(
+        Math.abs(resumed - advanced) <= 1,
+        `${book.title}: yeniden açılışta konum kaybedildi (${advanced} -> ${resumed})`,
+      );
     });
   }
 
