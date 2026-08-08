@@ -1250,12 +1250,11 @@ button {
    telefonda 270px, ekranin %32'si. Once tek siraya indi, sonra sadelestirildi:
    "Paylas" gunluk okuma islemi degil, mod degistirme ise ZATEN Ayarlar'daki
    "Okuma modu" segmentinde duruyor - dock'ta ikinci bir kopyasi gereksizdi.
-   Birincil serit bes ogeyle sinirli (§2.1): Bolumler, Ara, Yer imi, Ayarlar
-   ve ikincil islemleri toplayan "Daha". Ileri/geri OK DUGMESI YOK - sayfa
-   gecisi kaydirma, dokunma bolgeleri, klavye ve scrubber ile yapilir. */
+   Kalan dort islem gercekten sik kullanilanlar; her biri de daha genis ve
+   rahat dokunulur oldu. */
 .reader-dock-actions {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.35rem;
 }
 
@@ -1612,18 +1611,11 @@ button {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
-/* Anahtarin GORSEL yuksekligi 24px ama DOKUNMA hedefi 44px olmali (§2.15).
-   Ray, etiketin icinde dikeyde ortalanir; gorunum degismez, hedef buyur. */
 .switch {
   position: relative;
   display: inline-flex;
   flex: 0 0 auto;
-  align-items: center;
   width: 42px;
-  min-height: 44px;
-}
-
-.switch .switch-track {
   height: 24px;
 }
 

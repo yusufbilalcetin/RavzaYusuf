@@ -230,7 +230,6 @@ const ICON = {
   search: SVG('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
   close: SVG('<path d="M6 6l12 12M18 6 6 18"/>'),
   check: SVG('<path d="m5 13 4 4 10-10"/>'),
-  more: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>',
 };
 
 function readStoredJson(key, fallback) {
@@ -1138,7 +1137,6 @@ function buildReaderShell(book) {
         <button class="reader-action reader-dock-row glass-surface" id="rdr-search-open" type="button" aria-haspopup="dialog" aria-label="Kitapta ara">${ICON.search}<span>Ara</span></button>
         <button class="reader-action glass-surface${bookmarked ? ' is-active' : ''}" id="rdr-bookmark" type="button" aria-label="Yer imi" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}<span>Yer imi</span></button>
         <button class="reader-action reader-dock-row glass-surface" id="rdr-settings-open" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Temalar ve ayarlar"><span class="reader-dock-aa" aria-hidden="true">Aa</span><span>Ayarlar</span></button>
-        <button class="reader-action glass-surface" id="rdr-more-open" type="button" aria-haspopup="dialog" aria-label="Daha fazla">${ICON.more}<span>Daha</span></button>
       </div>
 
       <!-- Surukleme onizlemesi. Yalnizca ZATEN onbellekte olan kucuk resmi
@@ -1207,58 +1205,6 @@ function readerSheetsMarkup(book, isPdf) {
       </div>
     </dialog>
 
-    <!-- "… Daha Fazla": ikincil okuma islemlerinin TEK evi (§2.2).
-         Ayni islem birden fazla menude tekrarlanmaz - okuma modu, tam ekran,
-         ekrani acik tut ve kitap bilgisi yalnizca burada durur; Ayarlar
-         yalnizca GORUNUM (tema, yakinlastirma, yazi) tasir. -->
-    <dialog class="reader-sheet ui-dialog--medium" id="rdr-more-sheet" aria-labelledby="rdr-more-title">
-      <div class="reader-sheet-panel glass-surface glass-surface--overlay">
-        <header class="reader-sheet-head">
-          <h2 id="rdr-more-title">Daha Fazla</h2>
-          <button class="reader-sheet-close" type="button" data-close-sheet aria-label="Kapat">${ICON.close}</button>
-        </header>
-        <div class="reader-sheet-body">
-          <section class="reader-settings-group">
-            <p class="reader-settings-label">Okuma modu</p>
-            <div class="segmented" role="group" aria-label="Okuma modu">
-              <button class="setting-btn mode-btn${state.readerMode === 'page' ? ' selected' : ''}" type="button" data-mode="page" aria-pressed="${state.readerMode === 'page'}">Sayfa</button>
-              <button class="setting-btn mode-btn${state.readerMode === 'scroll' ? ' selected' : ''}" type="button" data-mode="scroll" aria-pressed="${state.readerMode === 'scroll'}">Kaydırma</button>
-            </div>
-          </section>
-
-          <section class="reader-settings-group">
-            <p class="reader-settings-label">Okuma ekranı</p>
-            <div class="settings-row${wakeLockSupported ? '' : ' is-unavailable'}">
-              <span class="setting-name">Ekranı Açık Tut</span>
-              <label class="switch">
-                <input id="wake-lock-toggle" type="checkbox" ${state.keepAwake && wakeLockSupported ? 'checked' : ''} ${wakeLockSupported ? '' : 'disabled'} />
-                <span class="switch-track" aria-hidden="true"></span>
-                <span class="sr-only">Ekranı açık tut</span>
-              </label>
-            </div>
-            ${wakeLockSupported ? '' : '<p class="reader-settings-note">Bu tarayıcı ekranı açık tutmayı desteklemiyor.</p>'}
-            ${fullscreenSupported ? `
-            <div class="settings-row">
-              <span class="setting-name">Tam Ekran</span>
-              <label class="switch">
-                <input id="fullscreen-toggle" type="checkbox" />
-                <span class="switch-track" aria-hidden="true"></span>
-                <span class="sr-only">Tam ekran</span>
-              </label>
-            </div>` : ''}
-          </section>
-
-          ${isPdf ? `
-          <section class="reader-settings-group">
-            <p class="reader-settings-label">Kitap bilgileri</p>
-            <p class="pdf-book-title">${escapeHTML(book.title)}</p>
-            <p class="pdf-book-meta">${escapeHTML(book.author)}${book.translator ? ` · ${escapeHTML(book.translator)}` : ''}</p>
-            <p class="pdf-book-meta">Orijinal PDF · ${Number(book.totalPages) || 0} sayfa</p>
-          </section>` : ''}
-        </div>
-      </div>
-    </dialog>
-
     <dialog class="reader-sheet ui-dialog--medium" id="rdr-settings-sheet" aria-labelledby="rdr-settings-title">
       <div class="reader-sheet-panel glass-surface glass-surface--overlay">
         <header class="reader-sheet-head">
@@ -1272,6 +1218,14 @@ function readerSheetsMarkup(book, isPdf) {
               ${READER_THEMES.map(theme => `<button class="theme-btn theme-btn--${theme}${state.theme === theme ? ' selected' : ''}" type="button" data-theme="${theme}" aria-pressed="${state.theme === theme}"><span>${themeNames[theme]}</span></button>`).join('')}
             </div>
             <p class="reader-settings-note">Okuma teması uygulamanın genel temasından bağımsızdır.</p>
+          </section>
+
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Okuma modu</p>
+            <div class="segmented" role="group" aria-label="Okuma modu">
+              <button class="setting-btn mode-btn${state.readerMode === 'page' ? ' selected' : ''}" type="button" data-mode="page" aria-pressed="${state.readerMode === 'page'}">Sayfa</button>
+              <button class="setting-btn mode-btn${state.readerMode === 'scroll' ? ' selected' : ''}" type="button" data-mode="scroll" aria-pressed="${state.readerMode === 'scroll'}">Kaydırma</button>
+            </div>
           </section>
 
           ${isPdf ? `
@@ -1330,6 +1284,27 @@ function readerSheetsMarkup(book, isPdf) {
             </div>
           </section>
 
+          <section class="reader-settings-group">
+            <p class="reader-settings-label">Okuma ekranı</p>
+            <div class="settings-row${wakeLockSupported ? '' : ' is-unavailable'}">
+              <span class="setting-name">Ekranı Açık Tut</span>
+              <label class="switch">
+                <input id="wake-lock-toggle" type="checkbox" ${state.keepAwake && wakeLockSupported ? 'checked' : ''} ${wakeLockSupported ? '' : 'disabled'} />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="sr-only">Ekranı açık tut</span>
+              </label>
+            </div>
+            ${wakeLockSupported ? '' : '<p class="reader-settings-note">Bu tarayıcı ekranı açık tutmayı desteklemiyor.</p>'}
+            ${fullscreenSupported ? `
+            <div class="settings-row">
+              <span class="setting-name">Tam Ekran</span>
+              <label class="switch">
+                <input id="fullscreen-toggle" type="checkbox" />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="sr-only">Tam ekran</span>
+              </label>
+            </div>` : ''}
+          </section>
 
           <section class="reader-settings-group">
             <p class="reader-settings-label">Kitap</p>
@@ -2992,7 +2967,7 @@ function toggleControls() {
 /* OKUYUCU SAYFALARI (dialog)                                                 */
 /* ------------------------------------------------------------------------ */
 
-const SHEET_IDS = Object.freeze(['rdr-contents-sheet', 'rdr-search-sheet', 'rdr-settings-sheet', 'rdr-more-sheet']);
+const SHEET_IDS = Object.freeze(['rdr-contents-sheet', 'rdr-search-sheet', 'rdr-settings-sheet']);
 
 /** Sayfayı açan denetim; kapanışta odak buraya döner. */
 let sheetOpener = null;
@@ -3714,7 +3689,6 @@ function bindReaderEvents(book) {
   }, { signal });
   document.getElementById('rdr-bookmark')?.addEventListener('click', toggleBookmark, { signal });
   document.getElementById('rdr-settings-open')?.addEventListener('click', openSettings, { signal });
-  document.getElementById('rdr-more-open')?.addEventListener('click', () => openSheet('rdr-more-sheet'), { signal });
   document.getElementById('rdr-contents-open')?.addEventListener('click', () => {
     renderContentsSheet();
     openSheet('rdr-contents-sheet');
