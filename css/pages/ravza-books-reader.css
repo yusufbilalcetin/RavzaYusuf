@@ -487,20 +487,6 @@
   background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 
-/* Cok secenekli grup (yakinlastirma: 5 oge) tek satira ZORLANMAZ.
-   Yukaridaki kural `grid-auto-flow: column` + `1fr` ile hepsini tek satira
-   sikistiriyordu; dar telefonda ogeler ust uste binip "Sayfaya Sığdır"
-   kelimenin ortasindan kiriliyordu. Burada sarilabilir satira geciyoruz. */
-.ravza-books-page .reader-sheet .segmented--wrap {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.ravza-books-page .reader-sheet .segmented--wrap .setting-btn {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
 .ravza-books-page .reader-sheet .setting-btn {
   min-height: 40px;
   padding: 0 0.6rem;
@@ -623,29 +609,6 @@
   content: "";
   display: block;
   height: var(--reader-chrome-bottom, 3.5rem);
-}
-
-/* YAKINLASTIRILMIS SUREKLI MOD.
-   Sayfa kaydiricidan genisken yatay pan acilir. Bu yalnizca gercekten
-   tasarken devreye girer; aksi halde bos bir yatay kaydirma cubugu kaliyordu.
-   `touch-action` pan-x pan-y olur: dikey okuma kaybolmaz, yatay pan eklenir -
-   hicbir yerde `touch-action: none` yok (§2.5). */
-.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] #rdr-flipbook {
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-}
-
-.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .reader-stage,
-.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] #rdr-flipbook,
-.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .pdf-page {
-  touch-action: pan-x pan-y;
-}
-
-/* Tasan sayfada `margin-inline: auto` tarayiciya gore sol kenari kirpabiliyor;
-   yakinlastirilmisken hizalama basa sabitlenir ve pan tam menzil calisir. */
-.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .pdf-page,
-.ravza-books-page .reader-root[data-zoomed="true"][data-reader-mode="scroll"] .pdf-back-cover {
-  margin-inline: 0;
 }
 
 /* Sayfa çevirme moduna özgü sahne süslemeleri süreklide anlamsız. */

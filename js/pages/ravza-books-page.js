@@ -80,40 +80,6 @@ const READER_MODES = Object.freeze(['page', 'scroll']);
  * GENISLIGE SIGDIR temel alinarak verilir: %100 === Genisliğe Sığdır, o da
  * ayri bir secenek olarak zaten listede.
  */
-/*
- * DEGERLENDIRILDI VE REDDEDILDI: PINCH VE CIFT DOKUNUS (§2.3 / §2.4).
- *
- * PINCH — kendi pinch'imizi yazmak, iki isaretciyi yakalamak demek; bu da
- * yuzeye `touch-action: none` (ya da en azindan pan disi bir kisit) koymayi
- * gerektirir. §2.5 bunu acikca yasakliyor ve hakli: dikey okuma kaydirmasi
- * boylece olur. Alternatif olan NATIF pinch (`touch-action: pinch-zoom`)
- * PDF'i degil TUM SAYFAYI (visual viewport) olceklendirir; okuyucu kabugu ve
- * ortalanmis dialoglar bu projede VisualViewport olculerine bagli oldugu icin
- * (centered-dialogs.css, --visual-viewport-*) natif pinch popup geometrisini
- * de kaydirir. Iki yol da mevcut, calisan bir davranisi bozuyor.
- *
- * CIFT DOKUNUS — sahne zaten TEK dokunusta kontrolleri acip kapatiyor ve bu
- * davranisin testi var ("kabuk dokunusla gizlenip geri gelir"). Cift dokunus
- * eklemek, tek dokunusu ~300ms geciktirip "ikinci dokunus gelecek mi"
- * beklemeyi zorunlu kilar; bu da calisan bir etkilesimi gozle gorulur sekilde
- * hantallastirir. Gecikmesiz kurgu ise once kontrolleri acip hemen ardindan
- * yakinlastirmak olurdu - goz alici bir zipzip.
- *
- * KARAR: ikisi de yok. Yakinlastirma acik, kesfedilebilir ve KLAVYEYLE de
- * erisilebilir dugmelerden yapilir; jest destegi "olabilir" diye eklenip
- * guvenilmez hale getirilmez. Platform destegi degisirse bu blok yeniden
- * degerlendirilebilir.
- */
-const READER_ZOOMS = Object.freeze(['fit-page', 'fit-width', 'fill', 1.25, 1.5, 2]);
-const ZOOM_LABELS = Object.freeze({
-  'fit-page': 'Sayfaya Sığdır',
-  'fit-width': 'Genişliğe Sığdır',
-  fill: 'Ekranı Doldur',
-  1.25: '%125',
-  1.5: '%150',
-  2: '%200',
-});
-const isValidZoom = value => READER_ZOOMS.some(entry => entry === value);
 /** Kontroller bu kadar hareketsizlikten sonra kaybolur (iOS oynatıcı hissi). */
 const CONTROLS_HIDE_MS = 4000;
 /** Arama indeksi bu büyüklükte parçalar hâlinde kurulur; ana iş parçacığı boğulmasın. */
@@ -134,7 +100,6 @@ const state = {
   lineHeight: 1.4,
   theme: 'light',
   readerMode: 'page',
-  zoom: 'fit-width',
   keepAwake: false,
   accessible: false,
   pageSound: true,
@@ -258,8 +223,6 @@ function loadStorage() {
     : 1.4;
   state.theme = READER_THEMES.includes(prefs.theme) ? prefs.theme : 'light';
   state.readerMode = READER_MODES.includes(prefs.readerMode) ? prefs.readerMode : 'page';
-  // Bozuk/eski deger sessizce guvenli varsayilana duser (§ bozuk depo kurtarma).
-  state.zoom = isValidZoom(prefs.zoom) ? prefs.zoom : 'fit-width';
   state.keepAwake = Boolean(prefs.keepAwake) && wakeLockSupported;
   state.accessible = Boolean(prefs.accessible);
   state.pageSound = prefs.pageSound !== false;
@@ -275,7 +238,6 @@ function savePrefs() {
     lineHeight: state.lineHeight,
     theme: state.theme,
     readerMode: state.readerMode,
-    zoom: state.zoom,
     keepAwake: state.keepAwake,
     accessible: state.accessible,
     pageSound: state.pageSound,
@@ -1229,16 +1191,6 @@ function readerSheetsMarkup(book, isPdf) {
           </section>
 
           ${isPdf ? `
-          <section class="reader-settings-group${state.readerMode === 'scroll' ? '' : ' is-unavailable'}" id="rdr-zoom-group">
-            <p class="reader-settings-label">Yakınlaştırma</p>
-            <div class="segmented segmented--wrap" role="group" aria-label="Yakınlaştırma">
-              ${READER_ZOOMS.map(zoom => `<button class="setting-btn zoom-btn${state.zoom === zoom ? ' selected' : ''}" type="button" data-zoom="${zoom}" aria-pressed="${state.zoom === zoom}"${state.readerMode === 'scroll' ? '' : ' disabled'}>${ZOOM_LABELS[zoom]}</button>`).join('')}
-            </div>
-            <p class="reader-settings-note" id="rdr-zoom-note">${state.readerMode === 'scroll'
-              ? 'Büyütünce sayfa yeniden çizilir, bulanıklaşmaz. Yanlara kaydırarak gezinebilirsiniz.'
-              : 'Yakınlaştırma kaydırma modunda kullanılabilir. Sayfa modunda kitap zaten ekrana tam sığdırılır.'}</p>
-          </section>
-
           <section class="reader-settings-group">
             <p class="reader-settings-label">Açık kitap</p>
             <p class="pdf-book-title">${escapeHTML(book.title)}</p>
@@ -1371,32 +1323,21 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
  * en-boy orani hicbir kosulda bozulmaz.
  */
 function zoomFactor() {
-  if (state.zoom === 'fit-width') return 1;
-  if (typeof state.zoom === 'number') return state.zoom;
-  // fit-page ve fill AYNI olcuyu kullanir, yalnizca sinirlari farklidir:
-  //   fit-page -> yukseklige sigdir, ama 1'i ASMA (hicbir sey kirpilmaz)
-  //   fill     -> yukseklige sigdir, sinir YOK (genislik tasar, kirpilir)
-  // Kirpma yalnizca kullanici "Ekranı Doldur"u SECTIGINDE olur; varsayilan
-  // kiplerde sayfadan tek piksel gizlenmez (§2.2).
+  // Surekli mod TEK bir olcek kullanir: SAYFAYA SIGDIR.
+  // Sayfa, gorunur acikliga (kaydirici yuksekligi eksi kabuk payi) tam sigar;
+  // sigmasi icin gereken carpan 1'i asamaz, yani hicbir kosulda kirpma olmaz
+  // ve yatay tasma cikmaz. En-boy orani tek carpanla korunur (gerilme yok).
   const scroller = document.getElementById('rdr-flipbook');
   const root = document.getElementById('reader-inner');
   if (!scroller || !root) return 1;
   const width = scroller.clientWidth;
-  // Kaydiricinin ::before/::after ara boslugu kabuk kadar yer tutar; "sayfaya
-  // sigdir" GERCEKTEN gorunen aciklige gore hesaplanmali, yoksa sayfanin alti
-  // dock'un altinda kalir.
   const style = getComputedStyle(root);
   const chrome = (parseFloat(style.getPropertyValue('--reader-chrome-top')) || 0)
     + (parseFloat(style.getPropertyValue('--reader-chrome-bottom')) || 0);
   const height = scroller.clientHeight - chrome;
   const ratio = Number.isFinite(pdfPageAspectRatio) && pdfPageAspectRatio > 0 ? pdfPageAspectRatio : 3 / 4;
   if (width < 2 || height < 2) return 1;
-  // Sayfa yuksekligi = genislik / ratio. Yukseklige sigmasi icin gereken oran:
-  const heightFit = (height * ratio) / width;
-  // En-boy orani her iki kipte de KORUNUR (tek bir carpan, gerilme yok).
-  return state.zoom === 'fill'
-    ? clamp(heightFit, 0.2, 4)
-    : clamp(heightFit, 0.2, 1);
+  return clamp((height * ratio) / width, 0.2, 1);
 }
 
 /**
@@ -1407,47 +1348,8 @@ function zoomFactor() {
 function applyReaderZoom() {
   const root = document.getElementById('reader-inner');
   if (!root) return;
-  const zoomable = state.bookType === 'pdf' && state.readerMode === 'scroll';
-  const factor = zoomable ? zoomFactor() : 1;
-  root.style.setProperty('--reader-zoom', String(Number(factor.toFixed(4))));
-  root.dataset.zoom = zoomable ? String(state.zoom) : 'fit-page';
-  // Yatay pan yalnizca sayfa gercekten tasiyorsa acilir; aksi halde
-  // gereksiz bir yatay kaydirma cubugu olusuyordu.
-  root.dataset.zoomed = zoomable && factor > 1.001 ? 'true' : 'false';
-}
-
-/**
- * Yakinlastirmayi degistirir ve GORUNEN SAYFAYI korur.
- *
- * Yeniden render sarti: olcek degisince tuvalin CSS kutusu degisir, dolayisiyla
- * renderKey de degisir; bitmap onbellegi anahtar bazli oldugu icin eski olcek
- * kendiliginden gecersizlesir, elle temizlemeye gerek yok.
- */
-function setReaderZoom(zoom) {
-  if (!isValidZoom(zoom) || zoom === state.zoom) return;
-  state.zoom = zoom;
-  savePrefs();
-  document.querySelectorAll('.zoom-btn').forEach(item => {
-    const selected = item.dataset.zoom === String(zoom);
-    item.classList.toggle('selected', selected);
-    item.setAttribute('aria-pressed', String(selected));
-  });
-  if (state.bookType !== 'pdf' || state.readerMode !== 'scroll') return;
-
-  const scroller = document.getElementById('rdr-flipbook');
-  const page = state.currentPage;
-  applyReaderZoom();
-  // Olcu degisti: kutuyu yeniden olc, sonra gorunen sayfaya geri don ve
-  // pencereyi yeni cozunurlukte tazele.
-  requestAnimationFrame(() => {
-    measureRenderBox();
-    if (scroller) {
-      suppressScrollSync = true;
-      scrollToPdfPage(scroller, page, false);
-      requestAnimationFrame(() => { suppressScrollSync = false; });
-    }
-    void updatePdfRenderWindow(page - 1, false);
-  });
+  const scrollMode = state.bookType === 'pdf' && state.readerMode === 'scroll';
+  root.style.setProperty('--reader-zoom', String(Number((scrollMode ? zoomFactor() : 1).toFixed(4))));
 }
 
 function readerStageHasPositiveSize() {
@@ -3728,13 +3630,6 @@ function bindReaderEvents(book) {
 
   document.querySelectorAll('.mode-btn').forEach(button => {
     button.addEventListener('click', () => switchReaderMode(button.dataset.mode), { signal });
-  });
-  document.querySelectorAll('.zoom-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const raw = button.dataset.zoom;
-      const numeric = Number(raw);
-      setReaderZoom(Number.isFinite(numeric) && String(numeric) === raw ? numeric : raw);
-    }, { signal });
   });
   document.getElementById('wake-lock-toggle')?.addEventListener('change', event => {
     state.keepAwake = event.target.checked && wakeLockSupported;

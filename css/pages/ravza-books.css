@@ -1529,20 +1529,6 @@ button {
   gap: 0.35rem;
 }
 
-/* Bes yakinlastirma secenegi dar telefonda tek satira sigmaz; tasmak yerine
-   sarilir. Dokunma hedefi .setting-btn'in min-height'inden gelir. */
-.segmented--wrap {
-  flex-wrap: wrap;
-}
-
-/* Ogeler icerige gore olculur ve BUTUN HALINDE alt satira iner.
-   Varsayilan flex kucultmesi "Sayfaya Sığdır"i kelime ortasindan kirip
-   "Sayfay / a / Sığdır" haline getiriyordu. */
-.segmented--wrap .setting-btn {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
 /* Desteklenmeyen/kullanilamaz ayar grubu gizlenmez, durustce soluklastirilir. */
 .reader-settings-group.is-unavailable .segmented {
   opacity: 0.45;

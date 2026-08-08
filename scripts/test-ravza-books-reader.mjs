@@ -1061,210 +1061,92 @@ try {
   });
 
   /* ---------------------------------------------------------------------- */
-  /* YAKINLASTIRMA (§2.1-§2.3)                                                */
+  /* SUREKLI MODDA SABIT "SAYFAYA SIGDIR"                                     */
+  /*                                                                          */
+  /* Yakinlastirma arayuzu URUN KARARIYLA kaldirildi: kaydirma modu tek bir   */
+  /* olcek kullanir ve sayfa gorunur acikliga tam sigar. Asagidaki testler o  */
+  /* sozlesmeyi korur - kullaniciya secenek sunulmaz, davranis sabittir.      */
   /* ---------------------------------------------------------------------- */
 
-  /** Ayarlardan yakınlaştırma seçer ve ölçüyü döndürür. */
-  async function applyZoom(zoom) {
-    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
-    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
-    const clicked = await browser.evaluate(`(() => {
-      const btn = document.querySelector('.zoom-btn[data-zoom=${JSON.stringify(String(zoom))}]');
-      if (!btn || btn.disabled) return false;
-      btn.click();
-      return true;
-    })()`);
-    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
-    if (clicked) {
-      // Sabit bekleme YETMEZ: %200'de tuval 4 kat piksel demek ve yeniden
-      // cizim gorunur sekilde uzuyor. Olcum, olculecek sayfa YENI olcegiyle
-      // gercekten cizilene kadar beklenir - kor gecikme degil, kesin kosul.
-      await browser.waitFor(
-        `!!document.querySelector('.pdf-page[data-pdf-page="2"].is-rendered')`,
-        `yakınlaştırma sonrası render (${zoom})`,
-        30000,
-      );
-    }
-    await delay(250);
-    return clicked;
-  }
-
-  const ZOOM_GEOMETRY = `(() => {
-    const root = document.getElementById('reader-inner');
-    const scroller = document.getElementById('rdr-flipbook');
-    const page = scroller.querySelector('.pdf-page[data-pdf-page="2"]');
-    const canvas = page.querySelector('canvas');
-    const rect = page.getBoundingClientRect();
-    return {
-      zoom: root.dataset.zoom,
-      zoomed: root.dataset.zoomed,
-      pageWidth: rect.width,
-      pageHeight: rect.height,
-      scrollerWidth: scroller.clientWidth,
-      scrollerHeight: scroller.clientHeight,
-      scrollWidth: scroller.scrollWidth,
-      canvasCssWidth: parseFloat(canvas.style.width) || 0,
-      canvasAttrWidth: canvas.width,
-      rendered: page.classList.contains('is-rendered'),
-      touchAction: getComputedStyle(scroller).touchAction,
-      dpr: window.devicePixelRatio,
-    };
-  })()`;
-
-  await testCase("yakınlaştırma gösterim ölçüsünü büyütür ve tuvali yeniden çizer", async () => {
+  await testCase("kaydırma modunda yakınlaştırma denetimi SUNULMAZ", async () => {
     await openWith("perili-kosk", "scroll");
-    // Olculecek sayfayi GECERLI sayfa yap: boylece render penceresinin
-    // icinde oldugu kesin olur ve olcum kararli bir zeminde yapilir.
-    await browser.evaluate(`(() => {
-      const s = document.getElementById('rdr-flipbook');
-      const t = s.querySelector('.pdf-page[data-pdf-page="2"]');
-      s.scrollTop += t.getBoundingClientRect().top - s.getBoundingClientRect().top;
-    })()`);
-    await browser.waitFor(
-      `!!document.querySelector('.pdf-page[data-pdf-page="2"].is-rendered')`,
-      "2. sayfa render", 30000,
-    );
-    await delay(400);
-    const base = await browser.evaluate(ZOOM_GEOMETRY);
-
-    assert.ok(await applyZoom(2), "%200 seçilebilmeli");
-    const zoomed = await browser.evaluate(ZOOM_GEOMETRY);
-
-    // 1. GOSTERIM olcusu gercekten iki katina cikmali.
-    assert.ok(
-      Math.abs(zoomed.pageWidth - base.pageWidth * 2) <= 2,
-      `%200 gösterim ölçüsü yanlış: ${base.pageWidth.toFixed(0)} -> ${zoomed.pageWidth.toFixed(0)}`,
-    );
-    // 2. En-boy orani bozulmamali.
-    assert.ok(
-      Math.abs((zoomed.pageWidth / zoomed.pageHeight) - (base.pageWidth / base.pageHeight)) < 0.01,
-      "yakınlaştırma en-boy oranını bozdu",
-    );
-    // 3. KRITIK: tuval, yeni gosterim olcusune gore YENIDEN cizilmeli.
-    //    CSS transform ile buyutulseydi attr genislik sabit kalir, PDF
-    //    bulaniklasirdi. Cozunurluk / gosterim orani DPR'de kalmali.
-    assert.ok(zoomed.rendered, "yakınlaştırdıktan sonra sayfa render edilmeli");
-    const pixelRatio = zoomed.canvasAttrWidth / Math.max(1, zoomed.canvasCssWidth);
-    assert.ok(
-      pixelRatio >= Math.min(zoomed.dpr, 2) - 0.15,
-      `tuval çözünürlüğü DPR'nin altında (${pixelRatio.toFixed(2)} vs ${zoomed.dpr})`,
-    );
-    assert.ok(
-      zoomed.canvasAttrWidth > base.canvasAttrWidth * 1.5,
-      `tuval gerçekte büyümedi (${base.canvasAttrWidth} -> ${zoomed.canvasAttrWidth}); CSS ölçekleme bulanıklık üretir`,
-    );
-    // 4. Yatay pan acilmali, ama `touch-action: none` ASLA olmamali (§2.5).
-    assert.ok(zoomed.scrollWidth > zoomed.scrollerWidth + 2, "yakınlaştırınca yatay kaydırma açılmalı");
-    assert.match(zoomed.touchAction, /pan-x/, "yatay pan için touch-action pan-x içermeli");
-    assert.doesNotMatch(zoomed.touchAction, /^none$/, "reader yüzeyinde touch-action:none olmamalı");
-  });
-
-  await testCase("genişliğe sığdır sayfayı tam genişlikte tutar, yatay taşma yapmaz", async () => {
-    assert.ok(await applyZoom("fit-width"), "genişliğe sığdır seçilebilmeli");
-    const g = await browser.evaluate(ZOOM_GEOMETRY);
-    assert.ok(
-      Math.abs(g.pageWidth - g.scrollerWidth) <= 2,
-      `genişliğe sığdır tam genişlik vermeli (${g.pageWidth.toFixed(0)} / ${g.scrollerWidth})`,
-    );
-    assert.ok(g.scrollWidth <= g.scrollerWidth + 2, "genişliğe sığdırda yatay taşma olmamalı");
-    assert.equal(g.zoomed, "false", "yakınlaştırılmamış durumda pan kapalı olmalı");
-  });
-
-  await testCase("sayfaya sığdır sayfayı görünür açıklığa sığdırır", async () => {
-    assert.ok(await applyZoom("fit-page"), "sayfaya sığdır seçilebilmeli");
-    const g = await browser.evaluate(`(() => {
-      const base = ${ZOOM_GEOMETRY};
-      const root = document.getElementById('reader-inner');
-      const style = getComputedStyle(root);
-      base.chrome = (parseFloat(style.getPropertyValue('--reader-chrome-top')) || 0)
-        + (parseFloat(style.getPropertyValue('--reader-chrome-bottom')) || 0);
-      return base;
-    })()`);
-    const opening = g.scrollerHeight - g.chrome;
-    // Sayfa ya yukseklige ya genislige sigar - hangisi once biterse (fit-page
-    // formulu min(scaleByWidth, scaleByHeight)). Ikisini de asmamali.
-    assert.ok(g.pageWidth <= g.scrollerWidth + 2, "sayfaya sığdır genişliği aşmamalı");
-    assert.ok(
-      g.pageHeight <= opening + 2,
-      `sayfaya sığdır görünür açıklığı aşıyor (${g.pageHeight.toFixed(0)} > ${opening.toFixed(0)})`,
-    );
-    assert.ok(g.scrollWidth <= g.scrollerWidth + 2, "sayfaya sığdırda yatay taşma olmamalı");
-  });
-
-  await testCase("Ekranı Doldur yüksekliği doldurur, oranı korur, kırpmayı pan ile telafi eder", async () => {
-    assert.ok(await applyZoom("fill"), "Ekranı Doldur seçilebilmeli");
-    const g = await browser.evaluate(`(() => {
-      const base = ${ZOOM_GEOMETRY};
-      const root = document.getElementById('reader-inner');
-      const style = getComputedStyle(root);
-      base.chrome = (parseFloat(style.getPropertyValue('--reader-chrome-top')) || 0)
-        + (parseFloat(style.getPropertyValue('--reader-chrome-bottom')) || 0);
-      return base;
-    })()`);
-    const opening = g.scrollerHeight - g.chrome;
-    // Sayfa yuksekligi gorunur acikligi DOLDURMALI.
-    assert.ok(
-      Math.abs(g.pageHeight - opening) <= 3,
-      `Ekranı Doldur yüksekliği doldurmuyor (${g.pageHeight.toFixed(0)} / ${opening.toFixed(0)})`,
-    );
-    // Kirpma OLABILIR ama gezilebilir olmali - icerik erisilemez kalmamali.
-    if (g.pageWidth > g.scrollerWidth + 2) {
-      assert.equal(g.zoomed, "true", "kırpılmışsa yatay pan açık olmalı");
-      assert.ok(g.scrollWidth > g.scrollerWidth + 2, "kırpılan genişlik kaydırılabilir olmalı");
-    }
-    // Tuval yine gercek cozunurlukte cizilmeli (CSS germe yok).
-    const pixelRatio = g.canvasAttrWidth / Math.max(1, g.canvasCssWidth);
-    assert.ok(pixelRatio >= Math.min(g.dpr, 2) - 0.15, `Ekranı Doldur'da çözünürlük düştü (${pixelRatio.toFixed(2)})`);
-  });
-
-  await testCase("varsayılan kipler sayfadan içerik kırpmaz", async () => {
-    // §2.2: KIRPMA yalnizca kullanici acikca sectiginde olur.
-    for (const zoom of ["fit-page", "fit-width"]) {
-      assert.ok(await applyZoom(zoom), `${zoom} seçilebilmeli`);
-      const g = await browser.evaluate(ZOOM_GEOMETRY);
-      assert.ok(
-        g.pageWidth <= g.scrollerWidth + 2,
-        `${zoom} sayfayı yatayda kırpıyor (${g.pageWidth.toFixed(0)} > ${g.scrollerWidth})`,
-      );
-      assert.equal(g.zoomed, "false", `${zoom} sessizce yakınlaştırma yapmamalı`);
-    }
-  });
-
-  await testCase("yakınlaştırma kalıcıdır ve bozuk değer güvenle düşer", async () => {
-    assert.ok(await applyZoom(1.5), "%150 seçilebilmeli");
-    const stored = await browser.evaluate("JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}').zoom");
-    assert.equal(stored, 1.5, "yakınlaştırma kaydedilmeli");
-
-    for (const bad of ['"kocaman"', "0", "null", "999"]) {
-      await browser.evaluate(`(() => {
-        const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
-        prefs.zoom = ${bad};
-        localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
-      })()`);
-      await openLibrary();
-      await openBook("perili-kosk");
-      const zoom = await browser.evaluate("document.getElementById('reader-inner').dataset.zoom");
-      assert.equal(zoom, "fit-width", `bozuk zoom (${bad}) güvenli varsayılana düşmeli, gelen ${zoom}`);
-    }
-  });
-
-  await testCase("sayfa modunda yakınlaştırma dürüstçe kullanılamaz gösterilir", async () => {
-    await openWith("perili-kosk", "page");
     await browser.evaluate("document.getElementById('rdr-settings-open').click()");
     await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
-    const state = await browser.evaluate(`(() => ({
-      unavailable: document.getElementById('rdr-zoom-group')?.classList.contains('is-unavailable'),
-      allDisabled: [...document.querySelectorAll('.zoom-btn')].every(btn => btn.disabled),
-      hasNote: (document.getElementById('rdr-zoom-note')?.textContent || '').includes('kaydırma modunda'),
-      zoomVar: getComputedStyle(document.getElementById('reader-inner')).getPropertyValue('--reader-zoom').trim(),
+    const ui = await browser.evaluate(`(() => ({
+      zoomButtons: document.querySelectorAll('.zoom-btn').length,
+      zoomGroup: !!document.getElementById('rdr-zoom-group'),
+      // "Sayfaya Sığdır" gibi bir etiket hiçbir yerde kalmamalı.
+      zoomText: /Yakınlaştırma|Sığdır|Ekranı Doldur/.test(document.getElementById('rdr-settings-sheet').textContent),
     }))()`);
-    // Sahte kontrol yok: dugmeler var ama devre disi ve NEDENI yaziyor.
-    assert.equal(state.unavailable, true, "sayfa modunda yakınlaştırma grubu soluk olmalı");
-    assert.equal(state.allDisabled, true, "sayfa modunda yakınlaştırma düğmeleri devre dışı olmalı");
-    assert.equal(state.hasNote, true, "kullanılamama nedeni yazılmalı");
-    assert.equal(state.zoomVar, "1", "sayfa modunda ölçek 1 kalmalı");
+    assert.equal(ui.zoomButtons, 0, `${ui.zoomButtons} yakınlaştırma düğmesi kalmış`);
+    assert.equal(ui.zoomGroup, false, "yakınlaştırma grubu kalmış");
+    assert.equal(ui.zoomText, false, "ayarlarda yakınlaştırma metni kalmış");
     await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
-    await delay(300);
+    await delay(250);
+    await browser.evaluate("document.activeElement?.blur?.()");
+  });
+
+  await testCase("kaydırma modu sayfayı görünür açıklığa sığdırır", async () => {
+    // GECERLI sayfa olculur: sabit bir sayfa numarasi render penceresinin
+    // disinda kalabiliyor ve bos tuvalde cozunurluk orani anlamsiz cikiyor
+    // (attr=1, css=0). openWith zaten geçerli sayfanın render'ını bekliyor.
+    await delay(400);
+    const g = await browser.evaluate(`(() => {
+      const root = document.getElementById('reader-inner');
+      const scroller = document.getElementById('rdr-flipbook');
+      const page = scroller.querySelector('.pdf-page[data-pdf-page="' + root.dataset.currentPage + '"]');
+      const rect = page.getBoundingClientRect();
+      const canvas = page.querySelector('canvas');
+      const style = getComputedStyle(root);
+      const chrome = (parseFloat(style.getPropertyValue('--reader-chrome-top')) || 0)
+        + (parseFloat(style.getPropertyValue('--reader-chrome-bottom')) || 0);
+      return {
+        pageWidth: rect.width, pageHeight: rect.height,
+        scrollerWidth: scroller.clientWidth,
+        opening: scroller.clientHeight - chrome,
+        scrollWidth: scroller.scrollWidth,
+        zoomVar: parseFloat(style.getPropertyValue('--reader-zoom')) || 0,
+        canvasCssWidth: parseFloat(canvas.style.width) || 0,
+        canvasAttrWidth: canvas.width,
+        dpr: window.devicePixelRatio,
+      };
+    })()`);
+    // Sayfa TAMAMEN gorunur acikliga sigmali - kirpma yok.
+    assert.ok(
+      g.pageHeight <= g.opening + 2,
+      `sayfa görünür açıklığı aşıyor (${g.pageHeight.toFixed(0)} > ${g.opening.toFixed(0)})`,
+    );
+    assert.ok(g.pageWidth <= g.scrollerWidth + 2, "sayfa genişliği aşıyor");
+    // Olcek asla 1'i asmaz: buyutme yok, dolayisiyla yatay tasma da yok.
+    assert.ok(g.zoomVar > 0 && g.zoomVar <= 1.001, `ölçek 1'i aşıyor: ${g.zoomVar}`);
+    assert.ok(g.scrollWidth <= g.scrollerWidth + 2, "yatay taşma oluştu");
+    // GOSTERIM ile RENDER cozunurlugu hala ayri: tuval DPR'ye gore cizilir.
+    const pixelRatio = g.canvasAttrWidth / Math.max(1, g.canvasCssWidth);
+    assert.ok(
+      pixelRatio >= Math.min(g.dpr, 2) - 0.15,
+      `tuval çözünürlüğü DPR'nin altında (${pixelRatio.toFixed(2)} vs ${g.dpr})`,
+    );
+  });
+
+  await testCase("eski zoom tercihi kalıntısı okuyucuyu etkilemez", async () => {
+    // Onceki surumlerden kalan `zoom` anahtari depoda durabilir; artik
+    // okunmuyor olmali ve olcegi bozmamali.
+    await browser.evaluate(`(() => {
+      const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
+      prefs.zoom = 2;
+      localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
+    })()`);
+    await openWith("perili-kosk", "scroll");
+    const g = await browser.evaluate(`(() => {
+      const root = document.getElementById('reader-inner');
+      const scroller = document.getElementById('rdr-flipbook');
+      return {
+        zoomVar: parseFloat(getComputedStyle(root).getPropertyValue('--reader-zoom')) || 0,
+        overflow: scroller.scrollWidth > scroller.clientWidth + 2,
+      };
+    })()`);
+    assert.ok(g.zoomVar <= 1.001, `kalıntı tercih ölçeği bozdu: ${g.zoomVar}`);
+    assert.equal(g.overflow, false, "kalıntı tercih yatay taşma yarattı");
   });
 
   await testCase("tek sayfanın render hatası okuyucuyu düşürmez, o sayfa tekrar denenir", async () => {
