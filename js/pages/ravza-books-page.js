@@ -8,6 +8,17 @@ const PDFJS_ASSET_ROOT = new URL('../../assets/vendor/pdfjs/', import.meta.url).
 const PDF_PROGRESS_PREFIX = 'ravzaBooksProgress:';
 /** Aynı anda tuvali ayrılmış (canlı) PDF sayfası sayısı. */
 const PDF_WINDOW_SIZE = 5;
+/**
+ * Çift sayfa modunda canlı tutulan sayfa sayısı.
+ *
+ * Neden 6 ve neden AYRI bir sabit: çift sayfada okuma birimi tek sayfa değil
+ * SPREAD'dir. "Önceki + geçerli + sonraki spread" üç spread, yani altı sayfa
+ * eder. Beşle sınırlıyken sonraki spread'in ikinci sayfası pencereye hiç
+ * girmiyordu (ölçüm: ~915ms boş sayfa). Üst sınır bilinçli: bütün kitap
+ * değil, yalnızca komşu iki spread hazır tutulur - uzun PDF'te bellek
+ * sınırsız büyümez. Tuval kopyaları ayrıca pdfBitmapCacheLimit() ile sınırlı.
+ */
+const PDF_SPREAD_WINDOW_SIZE = 6;
 /** Komşu sayfa ön yüklemesi bu kadar sakinlikten sonra başlar. */
 const PDF_NEIGHBOUR_DELAY_MS = 220;
 const APP_MODES = new Set(['library', 'loading-book', 'reading', 'error']);
@@ -2297,24 +2308,56 @@ function pdfWindowPages(pageIndex) {
   const current = clamp(pageIndex + 1, 1, total);
   const visible = [current];
   // Sürekli modda sayfalar alt alta; "yan sayfa" kavramı yok.
-  if (!shouldUsePortrait() && state.readerMode === 'page') {
-    const partner = pageIndex % 2 === 0 ? current + 1 : current - 1;
+  const spread = !shouldUsePortrait() && state.readerMode === 'page';
+  if (spread) {
+    /* EŞ SAYFA YÖNÜ - ÖLÇÜLDÜ, VARSAYILMADI.
+       PageFlip `showCover: true` ile kapağı (indeks 0) TEK gösterir; sonraki
+       spread'ler TEK indeksten başlar: (1,2), (3,4), ... yani sayfa çiftleri
+       (2,3), (4,5) ... (20,21), (22,23).
+       Tarayıcıda ölçülen gerçek görünüm de bunu doğruluyor:
+         currentPage 20 -> [20,21],  22 -> [22,23],  24 -> [24,25]
+       Yani TEK indeks = SOL sayfa, eşi bir SONRAKİ sayfadır.
+       Eski koşul (`pageIndex % 2 === 0 ? current + 1 : current - 1`) tam
+       tersini söylüyordu: 20. sayfa için eşi 21 yerine 19 sayıyordu. Sonuç,
+       ön yüklemenin YANLIŞ komşuyu hazırlaması ve ileri geçildiğinde sağdaki
+       sayfanın ~900ms boş kalmasıydı. */
+    const partner = pageIndex % 2 === 0 ? current - 1 : current + 1;
     if (partner >= 1 && partner <= total && partner !== current) visible.push(partner);
   }
 
   const ordered = [...visible];
   const lowest = Math.min(...visible);
   const highest = Math.max(...visible);
-  const neighbourReach = lowMemoryDevice ? 1 : total;
-  for (let offset = 1; offset <= neighbourReach && ordered.length < PDF_WINDOW_SIZE; offset += 1) {
-    const forward = highest + offset;
-    if (forward <= total && !ordered.includes(forward)) ordered.push(forward);
-    if (ordered.length >= PDF_WINDOW_SIZE) break;
-    const backward = lowest - offset;
-    if (backward >= 1 && !ordered.includes(backward)) ordered.push(backward);
-    if (highest + offset > total && lowest - offset < 1) break;
+  const push = pageNumber => {
+    if (pageNumber >= 1 && pageNumber <= total && !ordered.includes(pageNumber)) ordered.push(pageNumber);
+  };
+
+  /* ÖN YÜKLEME KOMŞU SPREAD'İ BÜTÜN OLARAK ALIR.
+     Ölçülen kusur: pencere 5 sayfayla sınırlıyken çift sayfa modunda
+     20-21 açıkken sıra [20,21,22,19,18] oluyor ve SONRAKİ spread'in ikinci
+     sayfası (23) hiç hazırlanmıyordu. Kullanıcı ileri geçince 23 numaralı
+     sayfa ~915ms boyunca boş kalıyor, "Sayfa hazırlanıyor…" görünüyordu.
+     Çift sayfada birim SAYFA değil SPREAD'dir: üç spread (önceki, geçerli,
+     sonraki) altı sayfa eder, bu yüzden pencere de o modda altıya çıkar. */
+  const limit = spread ? PDF_SPREAD_WINDOW_SIZE : PDF_WINDOW_SIZE;
+
+  if (spread) {
+    // Öncelik sırası: geçerli spread (zaten `visible`), sonra SONRAKİ spread,
+    // sonra ÖNCEKİ spread. updatePdfRenderWindow bu sırayı koruyarak kuyruğa alır.
+    push(highest + 1);
+    push(highest + 2);
+    push(lowest - 2);
+    push(lowest - 1);
+  } else {
+    const neighbourReach = lowMemoryDevice ? 1 : total;
+    for (let offset = 1; offset <= neighbourReach && ordered.length < limit; offset += 1) {
+      push(highest + offset);
+      if (ordered.length >= limit) break;
+      push(lowest - offset);
+      if (highest + offset > total && lowest - offset < 1) break;
+    }
   }
-  return { visible, ordered: ordered.slice(0, PDF_WINDOW_SIZE) };
+  return { visible, ordered: ordered.slice(0, limit) };
 }
 
 async function updatePdfRenderWindow(pageIndex, waitForCurrent = false) {

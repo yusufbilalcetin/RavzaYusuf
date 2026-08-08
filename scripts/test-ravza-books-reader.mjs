@@ -922,6 +922,116 @@ try {
     });
   }
 
+  /* ---------------------------------------------------------------------- */
+  /* KOMŞU SAYFA ÖN YÜKLEME (prefetch)                                        */
+  /* ---------------------------------------------------------------------- */
+
+  /** Görünen HER sayfayı kare kare izler; boş kalan var mı? */
+  const WATCH_BLANK = ms => `(() => new Promise(resolve => {
+    const started = performance.now();
+    let blankFrames = 0;
+    let total = 0;
+    const blankPages = new Set();
+    const tick = () => {
+      const visible = [...document.querySelectorAll('.pdf-page')]
+        .filter(el => el.getBoundingClientRect().width > 1);
+      const blank = visible.filter(el => !el.classList.contains('is-rendered'));
+      total += 1;
+      if (blank.length) {
+        blankFrames += 1;
+        for (const el of blank) blankPages.add(el.dataset.pdfPage);
+      }
+      if (performance.now() - started < ${ms}) requestAnimationFrame(tick);
+      else resolve({ total, blankFrames, blankPages: [...blankPages] });
+    };
+    requestAnimationFrame(tick);
+  }))()`;
+
+  await testCase("çift sayfa modunda önceki ve sonraki SPREAD önceden hazırlanır", async () => {
+    await browser.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await browser.evaluate(`localStorage.setItem('ravza-books-last-read', JSON.stringify({ 'kucuk-prens': { page: 20 } }))`);
+    await openWith("kucuk-prens", "page");
+    await delay(2600); // komşu render'ları boşta kuyrukta çalışır
+
+    const g = await browser.evaluate(`(() => {
+      const root = document.getElementById('reader-inner');
+      return {
+        spread: root.dataset.spread,
+        visible: [...document.querySelectorAll('.pdf-page')]
+          .filter(el => el.getBoundingClientRect().width > 1)
+          .map(el => Number(el.dataset.pdfPage)).sort((a, b) => a - b),
+        rendered: [...document.querySelectorAll('.pdf-page.is-rendered')]
+          .map(el => Number(el.dataset.pdfPage)).sort((a, b) => a - b),
+      };
+    })()`);
+
+    assert.equal(g.spread, "double", "bu genişlikte çift sayfa beklenir");
+    assert.equal(g.visible.length, 2, `spread iki sayfa göstermeli, gelen ${JSON.stringify(g.visible)}`);
+    const [left, right] = g.visible;
+    assert.equal(right, left + 1, `spread ardışık olmalı: ${JSON.stringify(g.visible)}`);
+
+    // §3: geçerli spread + SONRAKİ spread + ÖNCEKİ spread hazır olmalı.
+    for (const page of [left - 2, left - 1, left, right, right + 1, right + 2]) {
+      assert.ok(
+        g.rendered.includes(page),
+        `komşu spread hazırlanmamış: ${page} eksik (hazır: ${g.rendered.join(",")})`,
+      );
+    }
+    // §5: bütün kitap render EDİLMEZ - pencere sınırlı kalmalı.
+    assert.ok(g.rendered.length <= 8, `render penceresi çok geniş: ${g.rendered.length} sayfa canlı`);
+  });
+
+  await testCase("çift sayfada ileri geçişte sayfa boş kalmaz", async () => {
+    // Ölçülen kusur buydu: sonraki spread'in SAĞ sayfası ~915ms boş kalıyor,
+    // "Sayfa hazırlanıyor…" görünüyordu.
+    const watch = browser.evaluate(WATCH_BLANK(1500));
+    await delay(40);
+    await browser.key("ArrowRight");
+    const result = await watch;
+    assert.ok(result.total > 20, `izleme çok kısa sürdü (${result.total} kare)`);
+    assert.equal(
+      result.blankFrames,
+      0,
+      `ileri geçişte ${result.blankFrames}/${result.total} kare boş sayfa gösterdi (${result.blankPages.join(",")})`,
+    );
+  });
+
+  await testCase("çift sayfada geri geçişte de sayfa boş kalmaz", async () => {
+    const watch = browser.evaluate(WATCH_BLANK(1500));
+    await delay(40);
+    await browser.key("ArrowLeft");
+    const result = await watch;
+    assert.equal(
+      result.blankFrames,
+      0,
+      `geri geçişte ${result.blankFrames}/${result.total} kare boş sayfa gösterdi (${result.blankPages.join(",")})`,
+    );
+  });
+
+  await testCase("hızlı çevirme bellek büyütmez ve bayat render bırakmaz", async () => {
+    // §5/§7: hızlı geçişte pencere sınırlı kalmalı, iptal edilen task'lar
+    // konsola hata düşürmemeli.
+    for (let i = 0; i < 6; i += 1) {
+      await browser.key("ArrowRight");
+      await delay(120);
+    }
+    await delay(2500);
+    const after = await browser.evaluate(`(() => ({
+      rendered: document.querySelectorAll('.pdf-page.is-rendered').length,
+      total: document.querySelectorAll('.pdf-page').length,
+      canvasesWithPixels: [...document.querySelectorAll('.pdf-page canvas')]
+        .filter(c => c.width > 1).length,
+    }))()`);
+    assert.ok(after.total >= 160, "Küçük Prens 166 sayfa olmalı");
+    assert.ok(after.rendered <= 8, `hızlı çevirmeden sonra ${after.rendered} sayfa canlı (sınır 8)`);
+    // Uzak sayfaların tuvalleri serbest bırakılmalı; aksi hâlde uzun kitapta
+    // bellek sınırsız büyür.
+    assert.ok(
+      after.canvasesWithPixels <= 8,
+      `${after.canvasesWithPixels} tuval hâlâ piksel tutuyor (sınır 8)`,
+    );
+  });
+
   await browser.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, mobile: true });
 
   await testCase("sayfa modu ileri/geri gezinir ve durum tek kaynaktan gelir", async () => {
