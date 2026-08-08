@@ -3319,3 +3319,24 @@ html.launcher-experience :is(.launcher-editor-choice, .launcher-widget-choice):a
     backdrop-filter: none !important;
   }
 }
+
+/* Spotlight sonuc gruplari: kategori basligi + secili sonuc. */
+html.launcher-experience .launcher-search-group + .launcher-search-group {
+  margin-top: 0.85rem;
+}
+
+html.launcher-experience .launcher-search-group-title {
+  margin: 0 0 0.35rem;
+  padding: 0 0.35rem;
+  color: var(--launcher-muted, #6b5b4b);
+  font: 600 .7rem/1.2 var(--ui-font, system-ui);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* Klavyeyle secili sonuc. Fare odagindan bagimsiz, her zaman gorunur. */
+html.launcher-experience .launcher-search-result.is-active {
+  background: var(--glass-bg-active, rgba(120, 120, 130, .16));
+  outline: 2px solid var(--glass-accent, #d4669c);
+  outline-offset: -2px;
+}

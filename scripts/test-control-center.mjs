@@ -335,6 +335,15 @@ try {
   await runCase("konsol temiz kalir", async () => {
     await assertCleanDiagnostics(browser, "kontrol merkezi");
   });
+
+  // Bu suite temayi ve gorunum tercihlerini degistiriyor. Tarayici profili
+  // testler arasinda yasadigi icin biraktigimiz durum SONRAKI suite'lerin
+  // hangi tema kombinasyonunu ornekledigini degistirebiliyor. Varsayilana don.
+  await browser.evaluate(`(() => {
+    localStorage.removeItem('eul_theme');
+    localStorage.removeItem('eul_glass_level');
+    localStorage.removeItem('eul_motion');
+  })()`);
 } finally {
   await browser.close();
   await server.close();

@@ -535,34 +535,31 @@ html.theme-liquid-glass.reduce-transparency :is(.exam-cancel-dialog, .exam-histo
    Tek carpan kullanilir (--glass-tint-scale / --glass-blur-scale) ki her tema
    ve her yuzey ayni orani izlesin; yuzey yuzey elle deger yazilmaz.
    ========================================================================= */
-html[data-glass-level="clear"] {
-  --glass-tint-scale: 0.6;
-  --glass-blur-scale: 0.75;
+/* Seviye, temanin KENDI --glass-bg degerini olcekler; onu yeniden TANIMLAMAZ.
+   Onceki surum zemini --glass-surface-base'den yeniden kuruyordu: acik temada
+   alfa hafif kayiyor, KOYU temada ise acik tema tabani kullanildigi icin zemin
+   tamamen yanlis cikiyordu. Somut sonuc: Ezber Merkezi'nde bos input
+   placeholder kontrasti 4.5 esiginin altina (2.81) dustu.
+
+   "Dengeli" varsayilandir ve KURALI YOKTUR - yani mevcut gorunum birebir korunur.
+   Yalnizca Clear ve Tinted sapma getirir. Olcek cam KABUGUNA uygulanir. */
+html.theme-liquid-glass[data-glass-level="clear"] .glass-surface {
+  background: color-mix(in srgb, var(--glass-bg) 62%, transparent);
 }
 
-html[data-glass-level="balanced"] {
-  --glass-tint-scale: 1;
-  --glass-blur-scale: 1;
-}
-
-html[data-glass-level="tinted"] {
-  --glass-tint-scale: 1.45;
-  --glass-blur-scale: 1.15;
-}
-
-/* Olcek yalnizca cam KABUGUNA uygulanir (navigasyon, dock, overlay, sistem
-   kontrolleri) - icerik kartlarina degil. */
-html.theme-liquid-glass[data-glass-level] .glass-surface {
-  --glass-bg: color-mix(in srgb, var(--glass-surface-base, rgba(255, 255, 255, .84))
-    calc(28% * var(--glass-tint-scale, 1)), transparent);
+html.theme-liquid-glass[data-glass-level="tinted"] .glass-surface {
+  background: color-mix(in srgb, var(--glass-bg-strong) 78%, var(--glass-bg));
 }
 
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  html.theme-liquid-glass[data-glass-level] .glass-surface {
-    -webkit-backdrop-filter: saturate(var(--glass-sat-lg))
-      blur(calc(var(--glass-blur-lg) * var(--glass-blur-scale, 1)));
-    backdrop-filter: saturate(var(--glass-sat-lg))
-      blur(calc(var(--glass-blur-lg) * var(--glass-blur-scale, 1)));
+  html.theme-liquid-glass[data-glass-level="clear"] .glass-surface {
+    -webkit-backdrop-filter: saturate(var(--glass-sat-lg)) blur(calc(var(--glass-blur-lg) * 0.75));
+    backdrop-filter: saturate(var(--glass-sat-lg)) blur(calc(var(--glass-blur-lg) * 0.75));
+  }
+
+  html.theme-liquid-glass[data-glass-level="tinted"] .glass-surface {
+    -webkit-backdrop-filter: saturate(var(--glass-sat-lg)) blur(calc(var(--glass-blur-lg) * 1.15));
+    backdrop-filter: saturate(var(--glass-sat-lg)) blur(calc(var(--glass-blur-lg) * 1.15));
   }
 }
 

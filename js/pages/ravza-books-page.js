@@ -541,6 +541,21 @@ function getCurrentPosition() {
  * 2. ve 3. AYRI kavramlardır (§3): son okunan sayfaya dönmek yer imini
  * oynatmaz, yer imi düğmesi hâlâ kullanıcının işaretlediği sayfayı gösterir.
  */
+/**
+ * Spotlight'tan gelen kitap istegi. sessionStorage bilincli: tek seferlik bir
+ * niyet, kalici tercih degil - okundugu anda silinir ki yeniden acilista
+ * kullanicinin kendi son kitabi ezilmesin.
+ */
+function takeRequestedBookId() {
+  try {
+    const id = sessionStorage.getItem('ravza-books-open-book');
+    if (id) sessionStorage.removeItem('ravza-books-open-book');
+    return id || null;
+  } catch (_) {
+    return null;
+  }
+}
+
 function resolveStartIndex(book, explicitPosition, totalPages) {
   if (explicitPosition) return findStartIndex(readerPages, explicitPosition);
   const lastRead = readLastRead(book.id, totalPages);
@@ -3970,6 +3985,13 @@ export async function initRavzaBooks() {
     return { skipTopScroll: true };
   }
   renderLibrary();
+  // Spotlight bir kitap istediyse dogrudan onu ac. Gecersiz/eski kimlik
+  // sessizce yok sayilir; kitaplik acik kalir.
+  const requested = takeRequestedBookId();
+  if (requested) {
+    const book = getBook(requested);
+    if (book) void openBook(book);
+  }
   return { skipTopScroll: true };
 }
 

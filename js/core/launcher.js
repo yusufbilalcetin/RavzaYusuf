@@ -7,7 +7,8 @@ import {
   unregisterLauncherEntry
 } from "../data/launcher-navigation.js";
 import { KONU_LISTESI } from "../../data/konu-listesi.js";
-import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
+import { createSearchIndex, matchesSearchIndex, normalizeSearchText, rankSearchEntries } from "../utils/search.js";
+import { RAVZA_BOOKS } from "../../data/ravza-books.js?v=books-pipeline-20260716-1";
 import { syncSearchClearControl } from "../utils/search-clear.js";
 import { appIconPictureMarkup } from "../../data/app-icons.js";
 import { claimOverlay, refreshOverlayState, OVERLAY_IDS } from "./overlay-manager.js";
@@ -644,18 +645,87 @@ export function closeLauncherFolder(useHistory = true, restoreFocus = true) {
   hideLayer(layer, folderTrigger, restoreFocus);
 }
 
+/**
+ * SPOTLIGHT KAYITLARI.
+ *
+ * Kaynak GERCEK uygulama verisidir; DOM taranmaz. Indeks bir kez kurulur ve
+ * her tuslamada yalnizca puanlama calisir.
+ *
+ * KITAPLAR: yalnizca baslik + yazar indekslenir. PDF'lerin TAM METNI bilerek
+ * indekslenmez - on kitabi acilista cozmek hem yavas hem gereksiz; kitap ici
+ * tam metin aramasi Ravza Books icindeki "Kitapta Ara"da kalir. Bolum
+ * basliklari da burada yok, cunku outline ancak PDF yuklendikten sonra
+ * okunabiliyor.
+ */
+function bookSearchEntries() {
+  return RAVZA_BOOKS.map((book) => ({
+    id: `book:${book.id}`,
+    title: book.title,
+    subtitle: book.author || "Kitap",
+    resultType: "Kitap",
+    tone: "amber",
+    bookId: book.id,
+    route: "ravza-books",
+    searchIndex: createSearchIndex(book.title, book.author, book.translator, "kitap", "kitaplik"),
+  }));
+}
+
+/** Gercek ayar yuzeylerine giden kayitlar. Olu kayit yok. */
+function settingsSearchEntries() {
+  return [
+    {
+      id: "settings:theme",
+      title: "Tema ve Duvar Kağıdı",
+      subtitle: "Görünüm ayarları",
+      resultType: "Ayar",
+      tone: "violet",
+      settingsAction: "theme",
+      searchIndex: createSearchIndex("tema", "duvar kagidi", "gorunum", "renk", "acik", "koyu", "ayar"),
+    },
+    {
+      id: "settings:control-center",
+      title: "Kontrol Merkezi",
+      subtitle: "Hızlı sistem ayarları",
+      resultType: "Ayar",
+      tone: "teal",
+      settingsAction: "control-center",
+      searchIndex: createSearchIndex("kontrol merkezi", "ayar", "sistem", "liquid glass", "hareket"),
+    },
+  ];
+}
+
 function searchEntries(query = "") {
   const normalized = normalizeSearchText(query);
   const customFolders = launcherState.layouts.folders.map((folder) => ({ ...folder, searchIndex: createSearchIndex(folder.title, "klasör") }));
   const apps = launcherRegistryEntries(customFolders)
     .filter((item) => item.searchable !== false)
     .map((item) => ({ ...item, resultType: item.type === "game" || item.type === "link" ? "Oyun" : item.type === "folder" ? "Klasör" : "Uygulama", searchIndex: item.searchIndex || createSearchIndex(item.title, item.category, item.keywords) }));
-  const all = [...apps, ...TOPIC_SEARCH_ENTRIES];
+  const all = [...apps, ...TOPIC_SEARCH_ENTRIES, ...bookSearchEntries(), ...settingsSearchEntries()];
   if (!normalized) {
     const recent = readRecent().map(findLauncherItem).filter(Boolean);
     return (recent.length ? recent : apps.slice(0, 8)).map((item) => ({ ...item, resultType: item.resultType || (item.type === "game" || item.type === "link" ? "Oyun" : "Uygulama") }));
   }
-  return all.filter((item) => matchesSearchIndex(item.searchIndex || createSearchIndex(item.title, item.subtitle, item.resultType), normalized)).slice(0, 16);
+  // Siralama: tam eslesme -> prefix -> kelime basi -> substring -> anahtar.
+  return rankSearchEntries(all, query).slice(0, 24);
+}
+
+/** Sonuclarin gosterim sirasi; bos kategori hic cizilmez. */
+const SEARCH_GROUP_ORDER = Object.freeze(["Uygulama", "Kitap", "Ders", "Oyun", "Klasör", "Ayar"]);
+const SEARCH_GROUP_TITLES = Object.freeze({
+  "Uygulama": "Uygulamalar",
+  "Kitap": "Kitaplar",
+  "Ders": "Dersler",
+  "Oyun": "Oyunlar",
+  "Klasör": "Klasörler",
+  "Ayar": "Ayarlar",
+});
+
+/** Kayit tipine gore tiklama davranisi. Navigasyon mantigi TEKRARLANMAZ. */
+function searchResultAttributes(item) {
+  if (item.topicId) return `data-launcher-topic="${escapeHtml(item.topicId)}"`;
+  if (item.bookId) return `data-launcher-book="${escapeHtml(item.bookId)}"`;
+  if (item.settingsAction) return `data-launcher-setting="${escapeHtml(item.settingsAction)}"`;
+  return itemActionAttributes(item);
 }
 
 function renderSearchResults(query = "") {
@@ -663,14 +733,66 @@ function renderSearchResults(query = "") {
   if (!root) return;
   const results = searchEntries(query);
   if (!results.length) {
-    root.innerHTML = '<p class="launcher-search-empty">Bu aramaya uygun uygulama, oyun veya ders bulunamadı.</p>';
+    root.innerHTML = '<p class="launcher-search-empty">Bu aramaya uygun uygulama, kitap, ders veya ayar bulunamadı.</p>';
     return;
   }
-  root.innerHTML = results.map((item, index) => `<button class="launcher-search-result" type="button" ${item.topicId ? `data-launcher-topic="${escapeHtml(item.topicId)}"` : itemActionAttributes(item)}>
-    <span class="launcher-search-result-icon launcher-tone-${escapeHtml(item.tone || "home")}">${iconMarkup(item, index < 4)}</span>
-    <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.subtitle || item.resultType)}</small></span>
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
-  </button>`).join("");
+
+  const grouped = new Map();
+  for (const item of results) {
+    const key = SEARCH_GROUP_ORDER.includes(item.resultType) ? item.resultType : "Uygulama";
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(item);
+  }
+
+  let position = 0;
+  const sections = SEARCH_GROUP_ORDER.filter((key) => grouped.has(key)).map((key) => {
+    const rows = grouped.get(key).map((item) => {
+      const markup = `<button class="launcher-search-result" type="button" role="option" aria-selected="false" ${searchResultAttributes(item)}>
+        <span class="launcher-search-result-icon launcher-tone-${escapeHtml(item.tone || "home")}">${iconMarkup(item, position < 4)}</span>
+        <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.subtitle || item.resultType)}</small></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
+      </button>`;
+      position += 1;
+      return markup;
+    }).join("");
+    return `<section class="launcher-search-group"><h3 class="launcher-search-group-title">${escapeHtml(SEARCH_GROUP_TITLES[key] || key)}</h3>${rows}</section>`;
+  }).join("");
+
+  root.innerHTML = sections;
+  setSearchActiveIndex(0);
+}
+
+/* --- Klavye gezinme (§4.3): ArrowUp / ArrowDown / Enter --- */
+let searchActiveIndex = -1;
+
+function searchResultButtons() {
+  return [...document.querySelectorAll("#launcherSearchResults .launcher-search-result")];
+}
+
+function setSearchActiveIndex(index) {
+  const buttons = searchResultButtons();
+  if (!buttons.length) { searchActiveIndex = -1; return; }
+  searchActiveIndex = Math.max(0, Math.min(index, buttons.length - 1));
+  buttons.forEach((button, position) => {
+    const active = position === searchActiveIndex;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", String(active));
+    // Secili sonuc HER ZAMAN gorunur kalmali.
+    if (active) button.scrollIntoView({ block: "nearest" });
+  });
+}
+
+function moveSearchSelection(step) {
+  const buttons = searchResultButtons();
+  if (!buttons.length) return;
+  const next = searchActiveIndex < 0 ? 0 : (searchActiveIndex + step + buttons.length) % buttons.length;
+  setSearchActiveIndex(next);
+}
+
+function activateSearchSelection() {
+  const buttons = searchResultButtons();
+  const target = buttons[searchActiveIndex] || buttons[0];
+  target?.click();
 }
 
 export function openLauncherSearch(trigger = document.activeElement, pushHistory = true) {
@@ -1001,6 +1123,23 @@ function handleLauncherClick(event) {
   }
   const topicButton = event.target.closest("[data-launcher-topic]");
   if (topicButton) return launcherState.isEditing ? undefined : activateTopic(topicButton.dataset.launcherTopic);
+  const bookButton = event.target.closest("[data-launcher-book]");
+  if (bookButton) {
+    // Aramayi kapat, sonra GERCEK rotayi ac. Kitap kimligi devredilir ki
+    // Ravza Books dogrudan o kitabi acabilsin.
+    closeLauncherSearch(false, false);
+    try { sessionStorage.setItem("ravza-books-open-book", bookButton.dataset.launcherBook); } catch (_) {}
+    return window.navigate?.("ravza-books");
+  }
+  const settingButton = event.target.closest("[data-launcher-setting]");
+  if (settingButton) {
+    closeLauncherSearch(false, false);
+    // Overlay koordinatoru arama katmanini zaten kapatir; burada yalnizca
+    // hedef yuzey acilir.
+    if (settingButton.dataset.launcherSetting === "control-center") window.openControlCenter?.();
+    else window.openThemeSheet?.();
+    return undefined;
+  }
   const itemButton = event.target.closest("[data-launcher-item]");
   if (itemButton) return activateItem(resolveLauncherItem(itemButton.dataset.launcherItem), itemButton);
 }
@@ -1598,6 +1737,28 @@ export function initLauncher() {
   const launcherSearchInput = document.getElementById("launcherSearchInput");
   launcherSearchInput?.addEventListener("input", (event) => {
     renderSearchResults(event.currentTarget.value);
+  });
+  /* §4.3: ArrowUp/ArrowDown secimi gezdirir, Enter acar. Escape'i katmanin
+     kendi kapatma yolu zaten isliyor.
+
+     Dinleyici INPUT'a degil DIYALOGA baglanir: odak bir sonuc dugmesine ya da
+     temizleme dugmesine kaydiginda da ok tuslari calismali. Input'a bagliyken
+     odak input'tan ayrildigi anda tuslar hicbir sey yapmiyordu. */
+  document.getElementById("launcherSearchDialog")?.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") { event.preventDefault(); moveSearchSelection(1); }
+    else if (event.key === "ArrowUp") { event.preventDefault(); moveSearchSelection(-1); }
+    else if (event.key === "Enter") {
+      /* Enter YALNIZCA odak arama alanindayken secili sonucu acar.
+         Odak bir dugmedeyse (temizleme X'i ya da sonucun kendisi) native
+         calistirma korunur; aksi halde preventDefault temizleme dugmesini
+         islevsiz birakiyordu - test-search-clear.mjs bunu koruyor. */
+      // Odak, Enter'in NATIVE anlami olan bir ogedeyse (temizleme X'i ya da
+      // sonucun kendisi) karisma - tarayici onu zaten calistirir. Bunu
+      // ezmek temizleme dugmesini islevsiz birakiyordu.
+      if (event.target instanceof Element && event.target.closest("button, a[href]")) return;
+      event.preventDefault();
+      activateSearchSelection();
+    }
   });
   document.addEventListener("input", (event) => {
     if (event.target.matches?.("[data-launcher-editor-filter]")) filterEditorChoices(event.target.value);
