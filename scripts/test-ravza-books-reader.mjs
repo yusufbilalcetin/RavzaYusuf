@@ -560,6 +560,22 @@ try {
   /* MOBİL GEOMETRİ / SAYFA MODU / SÜREKLİ MOD                               */
   /* ---------------------------------------------------------------------- */
 
+  /**
+   * Okuma modunu GERÇEK kullanıcı yolundan değiştirir.
+   *
+   * Dock'taki mod düğmesi kontroller sadeleştirilirken kaldırıldı; mod artık
+   * yalnızca Ayarlar > Okuma modu segmentinden değişiyor. Test de kullanıcının
+   * gittiği yoldan gider - iddialar aynı kaldı, yalnızca tetikleyici gerçek
+   * kontrol oldu.
+   */
+  async function switchModeFromSettings() {
+    const current = await browser.evaluate("document.getElementById('reader-inner').dataset.readerMode");
+    const next = current === "scroll" ? "page" : "scroll";
+    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
+    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    await browser.evaluate(`document.querySelector('.mode-btn[data-mode="${next}"]').click()`);
+  }
+
   /** Okuma modunu depoya yazıp kitabı temiz açar. */
   async function openWith(bookId, mode) {
     await browser.evaluate(`(() => {
@@ -802,7 +818,7 @@ try {
     await delay(600);
 
     // Sayfa -> sürekli
-    await browser.evaluate("document.getElementById('rdr-mode').click()");
+    await switchModeFromSettings();
     await browser.waitFor(
       "document.getElementById('reader-inner')?.dataset.readerMode === 'scroll' && document.querySelector('#ravzabooks')?.dataset.appMode === 'reading'",
       "sürekli moda geçiş", 60000,
@@ -822,7 +838,7 @@ try {
     assert.ok(Math.abs(scrolled - 9) <= 1, `kaydırma sonrası sayfa yanlış (${scrolled})`);
 
     // Sürekli -> sayfa
-    await browser.evaluate("document.getElementById('rdr-mode').click()");
+    await switchModeFromSettings();
     await browser.waitFor(
       "document.getElementById('reader-inner')?.dataset.readerMode === 'page' && document.querySelector('#ravzabooks')?.dataset.appMode === 'reading'",
       "sayfa moduna dönüş", 60000,
@@ -1203,12 +1219,20 @@ try {
   });
 
   await testCase("mod göstergesi gerçek modu yansıtır", async () => {
+    // Dock'taki mod dugmesi kaldirildi (kontroller sadelestirildi); modun TEK
+    // arayuz gostergesi artik Ayarlar'daki "Okuma modu" segmenti. Iddia ayni:
+    // arayuz, renderer durumundan SAPMAMALI.
+    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
+    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
     const state = await browser.evaluate(`(() => ({
       mode: document.getElementById('reader-inner').dataset.readerMode,
-      label: document.getElementById('rdr-mode-label')?.textContent?.trim(),
+      selected: document.querySelector('.mode-btn.selected')?.dataset.mode,
+      pressed: document.querySelector('.mode-btn[aria-pressed="true"]')?.dataset.mode,
     }))()`);
-    // §20: arayüz etiketi renderer durumundan sapmamalı.
-    assert.equal(state.label, state.mode === "scroll" ? "Kaydır" : "Sayfa", `etiket moddan sapmış: ${JSON.stringify(state)}`);
+    assert.equal(state.selected, state.mode, `seçili mod düğmesi moddan sapmış: ${JSON.stringify(state)}`);
+    assert.equal(state.pressed, state.mode, `aria-pressed moddan sapmış: ${JSON.stringify(state)}`);
+    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await delay(250);
   });
 
   await testCase("bozuk readerMode güvenle sayfa moduna düşer", async () => {
@@ -1262,7 +1286,7 @@ try {
       const advanced = await browser.evaluate("Number(document.getElementById('reader-inner').dataset.currentPage)");
 
       // Sürekli moda geç ve gerçekten kaydırılabilir olduğunu doğrula.
-      await browser.evaluate("document.getElementById('rdr-mode').click()");
+      await switchModeFromSettings();
       await browser.waitFor(
         "document.getElementById('reader-inner')?.dataset.readerMode === 'scroll' && document.querySelector('#ravzabooks')?.dataset.appMode === 'reading'",
         `${title} sürekli`, 90000,
@@ -1275,7 +1299,7 @@ try {
       // 12 sayfalık Perili Köşk dahil her kitap taşmalı.
       assert.equal(scrollable, true, `${title} sürekli modda kaydırılamıyor`);
 
-      await browser.evaluate("document.getElementById('rdr-mode').click()");
+      await switchModeFromSettings();
       await browser.waitFor(
         "document.getElementById('reader-inner')?.dataset.readerMode === 'page' && document.querySelector('#ravzabooks')?.dataset.appMode === 'reading'",
         `${title} sayfa`, 90000,

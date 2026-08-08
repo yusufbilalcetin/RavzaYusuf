@@ -1237,16 +1237,17 @@ button {
   transform: translateY(0);
 }
 
-/* TEK SIRA KONTROL SERIDI.
-   Onceden ucu tam genislik yigilmis satir (3x48px + bosluk) + ayri bir aksiyon
-   satiri vardi: dock 844px'lik telefonda 270px, yani ekranin %32'siydi ve PDF'e
-   yalnizca 502px kaliyordu (§4'teki "dev bos bant"). Ayni alti islem tek
-   siraya inince dock ~104px'e dusuyor, sayfa ~670px'e cikiyor. Islem KAYBI yok;
-   yalnizca yerlesim sikistirildi. */
+/* TEK SIRA, DORT KONTROL.
+   Once uc tam genislik yigilmis satir + ayri aksiyon satiri vardi: dock 844px
+   telefonda 270px, ekranin %32'si. Once tek siraya indi, sonra sadelestirildi:
+   "Paylas" gunluk okuma islemi degil, mod degistirme ise ZATEN Ayarlar'daki
+   "Okuma modu" segmentinde duruyor - dock'ta ikinci bir kopyasi gereksizdi.
+   Kalan dort islem gercekten sik kullanilanlar; her biri de daha genis ve
+   rahat dokunulur oldu. */
 .reader-dock-actions {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.3rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
 }
 
 .reader-action {
@@ -1257,9 +1258,10 @@ button {
   padding: 0.35rem 0.1rem;
   color: var(--ink);
   border-radius: 14px;
-  /* 1.15 satir yuksekligi, `overflow: hidden` ile birlesince Turkce alt
-     uzantilarini (Ayarlar'in "y"si, Paylas'in "s" cengeli) kirpiyordu. */
-  font: 600 0.62rem/1.4 var(--ui-font);
+  /* Alti yerine dort dugme kalinca sutun ~87px'e cikti; etiket kucultmeye
+     gerek yok. 1.4 satir yuksekligi Turkce alt uzantilari (Ayarlar'in "y"si)
+     `overflow: hidden` kutusunda kirpilmasin diye korunuyor. */
+  font: 600 0.68rem/1.4 var(--ui-font);
   letter-spacing: -0.01em;
   text-align: center;
   transition: transform 110ms var(--ease-out), color var(--dur-fast) var(--ease-out);

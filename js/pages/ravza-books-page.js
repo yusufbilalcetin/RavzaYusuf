@@ -1,6 +1,5 @@
 import { RAVZA_BOOKS } from '../../data/ravza-books.js?v=books-pipeline-20260716-1';
 import { createPageEntry, flattenTextContent, searchBookIndex, isSearchableQuery } from './ravza-books-search.js';
-import { haptics } from '../core/haptics.js';
 
 const PAGE_FLIP_SRC = new URL('../../assets/vendor/page-flip/page-flip.browser.js', import.meta.url).href;
 const PDFJS_MODULE_URL = new URL('../../assets/vendor/pdfjs/pdf.js', import.meta.url).href;
@@ -137,7 +136,6 @@ const state = {
   keepAwake: false,
   accessible: false,
   pageSound: true,
-  hapticsEnabled: true,
   controlsVisible: true,
   bookmarks: {},
   readingProgress: {},
@@ -228,10 +226,7 @@ const ICON = {
   bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z"/></svg>',
   contents: SVG('<path d="M4 6h16M4 12h16M4 18h10"/>'),
   search: SVG('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
-  share: SVG('<path d="M12 16V4"/><path d="m8 8 4-4 4 4"/><path d="M5 14v4.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V14"/>'),
   close: SVG('<path d="M6 6l12 12M18 6 6 18"/>'),
-  pageMode: SVG('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>'),
-  scrollMode: SVG('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>'),
   check: SVG('<path d="m5 13 4 4 10-10"/>'),
 };
 
@@ -266,8 +261,6 @@ function loadStorage() {
   state.keepAwake = Boolean(prefs.keepAwake) && wakeLockSupported;
   state.accessible = Boolean(prefs.accessible);
   state.pageSound = prefs.pageSound !== false;
-  state.hapticsEnabled = prefs.hapticsEnabled !== false;
-  haptics.setEnabled(state.hapticsEnabled);
   state.bookmarks = readStoredRecord(STORAGE.bookmarks);
   state.readingProgress = readStoredRecord(STORAGE.progress);
   const storedImportedBook = readStoredJson(STORAGE.importedBook, null);
@@ -284,7 +277,6 @@ function savePrefs() {
     keepAwake: state.keepAwake,
     accessible: state.accessible,
     pageSound: state.pageSound,
-    hapticsEnabled: state.hapticsEnabled,
   }));
 }
 
@@ -1141,10 +1133,8 @@ function buildReaderShell(book) {
       <div class="reader-dock-actions">
         <button class="reader-action reader-dock-row glass-surface" id="rdr-contents-open" type="button" aria-haspopup="dialog" aria-label="İçindekiler">${ICON.contents}<span>Bölümler</span></button>
         <button class="reader-action reader-dock-row glass-surface" id="rdr-search-open" type="button" aria-haspopup="dialog" aria-label="Kitapta ara">${ICON.search}<span>Ara</span></button>
-        <button class="reader-action reader-dock-row glass-surface" id="rdr-settings-open" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Temalar ve ayarlar"><span class="reader-dock-aa" aria-hidden="true">Aa</span><span>Ayarlar</span></button>
-        <button class="reader-action glass-surface" id="rdr-share" type="button" aria-label="Kitabı paylaş">${ICON.share}<span>Paylaş</span></button>
-        <button class="reader-action glass-surface" id="rdr-mode" type="button" aria-label="Okuma modunu değiştir">${state.readerMode === 'scroll' ? ICON.scrollMode : ICON.pageMode}<span id="rdr-mode-label">${state.readerMode === 'scroll' ? 'Kaydır' : 'Sayfa'}</span></button>
         <button class="reader-action glass-surface${bookmarked ? ' is-active' : ''}" id="rdr-bookmark" type="button" aria-label="Yer imi" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}<span>Yer imi</span></button>
+        <button class="reader-action reader-dock-row glass-surface" id="rdr-settings-open" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Temalar ve ayarlar"><span class="reader-dock-aa" aria-hidden="true">Aa</span><span>Ayarlar</span></button>
       </div>
 
       <!-- Surukleme onizlemesi. Yalnizca ZATEN onbellekte olan kucuk resmi
@@ -1185,7 +1175,6 @@ function buildReaderShell(book) {
  */
 function readerSheetsMarkup(book, isPdf) {
   const themeNames = { light: 'Beyaz', sepia: 'Kâğıt', dark: 'Koyu', black: 'Siyah' };
-  const hapticsSupported = haptics.isSupported();
   return `
     <dialog class="reader-sheet ui-dialog--large" id="rdr-contents-sheet" aria-labelledby="rdr-contents-title">
       <div class="reader-sheet-panel glass-surface glass-surface--overlay">
@@ -1291,15 +1280,6 @@ function readerSheetsMarkup(book, isPdf) {
                 <span class="sr-only">Sayfa sesi</span>
               </label>
             </div>
-            <div class="settings-row${hapticsSupported ? '' : ' is-unavailable'}">
-              <span class="setting-name">Titreşim</span>
-              <label class="switch">
-                <input id="haptics-toggle" type="checkbox" ${state.hapticsEnabled && hapticsSupported ? 'checked' : ''} ${hapticsSupported ? '' : 'disabled'} />
-                <span class="switch-track" aria-hidden="true"></span>
-                <span class="sr-only">Titreşim</span>
-              </label>
-            </div>
-            ${hapticsSupported ? '' : '<p class="reader-settings-note">Bu tarayıcı titreşimi desteklemiyor.</p>'}
           </section>
 
           <section class="reader-settings-group">
@@ -1445,7 +1425,6 @@ function setReaderZoom(zoom) {
   if (!isValidZoom(zoom) || zoom === state.zoom) return;
   state.zoom = zoom;
   savePrefs();
-  haptics.selection();
   document.querySelectorAll('.zoom-btn').forEach(item => {
     const selected = item.dataset.zoom === String(zoom);
     item.classList.toggle('selected', selected);
@@ -2583,13 +2562,6 @@ function switchReaderMode(mode) {
   if (!READER_MODES.includes(mode) || mode === state.readerMode) return;
   state.readerMode = mode;
   savePrefs();
-  haptics.selection();
-  const label = document.getElementById('rdr-mode-label');
-  if (label) label.textContent = mode === 'scroll' ? 'Kaydır' : 'Sayfa';
-  const button = document.getElementById('rdr-mode');
-  if (button) {
-    button.innerHTML = `${mode === 'scroll' ? ICON.scrollMode : ICON.pageMode}<span id="rdr-mode-label">${mode === 'scroll' ? 'Kaydır' : 'Sayfa'}</span>`;
-  }
   document.querySelectorAll('.mode-btn').forEach(item => {
     const selected = item.dataset.mode === mode;
     item.classList.toggle('selected', selected);
@@ -2754,9 +2726,6 @@ function toggleBookmark() {
   saveBookmarks();
   updateReaderUI(state.currentIndex);
   saveCurrentPage(page, state.currentIndex);
-  // Anlamlı bir durum değişimi: haptik burada yerinde (§43).
-  if (existingIndex >= 0) haptics.light();
-  else haptics.success();
   showToast(existingIndex >= 0 ? 'Yer imi kaldırıldı · kaldığın sayfa kaydedildi' : 'Kaldığın sayfa kaydedildi');
 }
 
@@ -3025,7 +2994,6 @@ function openSheet(id) {
   try { sheet.showModal(); } catch (_) { return false; }
   document.getElementById('rdr-settings-open')
     ?.setAttribute('aria-expanded', String(id === 'rdr-settings-sheet'));
-  haptics.selection();
   return true;
 }
 
@@ -3316,7 +3284,6 @@ function renderContentsSheet() {
         error.hidden = false;
       }
       input?.focus();
-      haptics.warning();
       return;
     }
     if (error) error.hidden = true;
@@ -3361,7 +3328,6 @@ function goToPdfPage(pageNumber) {
   // YER İMİ bilerek kaydedilmez: içindekilerden/aramadan/ilerleme barından
   // atlamak kullanıcının işaretlediği sayfayı oynatmamalı (yukarıdaki
   // "elle kaydet" modeli). Kaydetmek için yer imi düğmesi kullanılır.
-  haptics.light();
 }
 
 /* ------------------------------------------------------------------------ */
@@ -3431,44 +3397,6 @@ function openSearchSheet() {
 /* ------------------------------------------------------------------------ */
 /* PAYLAŞ                                                                     */
 /* ------------------------------------------------------------------------ */
-
-/**
- * Gerçek Web Share API kullanılır; yoksa panoya kopyalanır.
- * Sahte bir "share sheet" ÇİZİLMEZ (§17).
- */
-async function shareCurrentReading() {
-  const book = getBook(state.bookId);
-  if (!book) return;
-  const total = pdfDocument?.numPages || readerPages.length || 1;
-  const chapter = chapterContextFor(state.currentPage, total);
-  const title = `${book.title} — Ravza Books`;
-  const text = chapter
-    ? `${book.title} · ${chapter.title} (sayfa ${state.currentPage} / ${total})`
-    : `${book.title} · sayfa ${state.currentPage} / ${total}`;
-  // Kitap dosyası yerel; paylaşılan bağlantı yalnızca uygulamanın kendi rotasıdır.
-  const url = new URL(window.location.href);
-  url.hash = '#ravza-books';
-
-  const payload = { title, text, url: url.href };
-  try {
-    if (navigator.canShare ? navigator.canShare(payload) : typeof navigator.share === 'function') {
-      await navigator.share(payload);
-      haptics.success();
-      return;
-    }
-  } catch (error) {
-    // Kullanıcı iptal ettiyse sessiz kal; hata mesajı göstermek yanıltıcı olur.
-    if (error?.name === 'AbortError') return;
-  }
-  try {
-    await navigator.clipboard.writeText(`${text}\n${url.href}`);
-    showToast('Okuma konumu panoya kopyalandı');
-    haptics.success();
-  } catch (_) {
-    showToast('Paylaşım bu tarayıcıda desteklenmiyor');
-    haptics.warning();
-  }
-}
 
 function scheduleRepagination(delay = 260) {
   clearTimeout(repaginateTimer);
@@ -3695,7 +3623,6 @@ function installDirectPageCurl() {
         const releasePoint = commit ? forcePoint : returnPoint;
         pageFlip.userMove(releasePoint, true);
         pageFlip.userStop(releasePoint, false);
-        if (commit) haptics.selection();
       }
     } catch (_) {}
 
@@ -3755,10 +3682,6 @@ function bindReaderEvents(book) {
   }, { signal });
   document.getElementById('rdr-bookmark')?.addEventListener('click', toggleBookmark, { signal });
   document.getElementById('rdr-settings-open')?.addEventListener('click', openSettings, { signal });
-  document.getElementById('rdr-share')?.addEventListener('click', () => void shareCurrentReading(), { signal });
-  document.getElementById('rdr-mode')?.addEventListener('click', () => {
-    switchReaderMode(state.readerMode === 'page' ? 'scroll' : 'page');
-  }, { signal });
   document.getElementById('rdr-contents-open')?.addEventListener('click', () => {
     renderContentsSheet();
     openSheet('rdr-contents-sheet');
@@ -3818,13 +3741,6 @@ function bindReaderEvents(book) {
   // Tam ekrandan ESC ile cikilirsa anahtar gercekle uyumlu kalmali.
   document.addEventListener('fullscreenchange', syncFullscreenToggle, { signal });
   document.addEventListener('visibilitychange', handleWakeLockVisibility, { signal });
-  document.getElementById('haptics-toggle')?.addEventListener('change', event => {
-    state.hapticsEnabled = event.target.checked;
-    haptics.setEnabled(state.hapticsEnabled);
-    savePrefs();
-    if (state.hapticsEnabled) haptics.selection();
-  }, { signal });
-
   const progress = document.getElementById('rdr-progress');
   progress?.addEventListener('input', event => {
     const value = Number(event.target.value);
