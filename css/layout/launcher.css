@@ -3340,3 +3340,74 @@ html.launcher-experience .launcher-search-result.is-active {
   outline: 2px solid var(--glass-accent, #d4669c);
   outline-offset: -2px;
 }
+
+/* -------------------------------------------------------------------------
+   SPOTLIGHT ARAMA ALANI - ODAK HALKASI DIS ALANDA
+
+   KUSUR: alanin ICINDE ikinci bir KARE cerceve gorunuyordu. Kaynak
+   components/formlar.css'teki global kural:
+       :where(button, input, ...):focus-visible {
+         outline: 2px solid var(--focus-ring); outline-offset: 2px;
+       }
+   Katman acilinca input odaklaniyor, `:focus-visible` esleliyor ve halka
+   INPUT'un kutusuna ciziliyor. Input `border-radius: 0` oldugu icin halka
+   kare cikiyor ve yuvarlatilmis alanin icinde ikinci bir dikdortgen gibi
+   duruyordu. (Acik temada belirgin; koyu temada halka rengi zemine yakin
+   oldugu icin fark edilmiyordu.)
+
+   COZUM: gorsel sahiplik DIS alanda toplanir. Halka artik sarmalayiciya
+   cizilir - erisilebilirlik KAYBOLMAZ, yalnizca dogru kutuya tasinir ve
+   alanin kendi yariciapini izler.
+
+   KAPSAM: yalnizca .launcher-search-field. Duzenleyici filtreleri
+   (.launcher-editor-filter) sarmalayici bir yuzeye SAHIP DEGIL; gorselleri
+   input'un kendisinde durur. Onlari da soymak kenarlik, hover ve odak
+   gostergesini yok ediyordu (test-search-clear 16 bulgu bildirdi).
+------------------------------------------------------------------------- */
+html.launcher-experience .launcher-search-field:has(input:focus-visible) {
+  outline: 2px solid var(--launcher-search-focus-border, var(--focus-ring));
+  outline-offset: 2px;
+}
+
+/* Input yalnizca metin/placeholder/caret tasir; kendi cercevesini cizmez.
+   Zemin/kenarlik/golge DIS alanin: paylasilan search-clear bileseni input'a
+   `--search-bg` zemini veriyordu, bu da alan icinde ikinci (gorunmez ama
+   gercek) bir yuzey demekti. Tema degisince o yuzey alandan ayrisabiliyor. */
+html.launcher-experience .launcher-search-field input,
+html.launcher-experience .launcher-search-field input:hover,
+html.launcher-experience .launcher-search-field input:focus {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+html.launcher-experience .launcher-search-field input:focus-visible,
+html.launcher-experience .launcher-search-field input:focus {
+  outline: none;
+}
+
+/* search-clear bileseninin `:focus` kurali
+   (.search-clear-control > input[data-clearable-search]:focus) zemini geri
+   getiriyordu. Ayni zinciri kullanip bir seviye daha ozgul yaziyoruz -
+   !important ile ozgulluk savasi acmak yerine dogru seviyeden eziyoruz. */
+html.launcher-experience .launcher-search-field .search-clear-control > input[data-clearable-search],
+html.launcher-experience .launcher-search-field .search-clear-control > input[data-clearable-search]:hover,
+html.launcher-experience .launcher-search-field .search-clear-control > input[data-clearable-search]:focus {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+
+/* WebKit'in yerlesik arama susleri: alanin icinde ikinci bir kontrol
+   gorunmesin (ozel temizleme dugmesi zaten var). */
+html.launcher-experience .launcher-search-field input::-webkit-search-decoration,
+html.launcher-experience .launcher-search-field input::-webkit-search-cancel-button,
+html.launcher-experience .launcher-search-field input::-webkit-search-results-button,
+html.launcher-experience .launcher-search-field input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}

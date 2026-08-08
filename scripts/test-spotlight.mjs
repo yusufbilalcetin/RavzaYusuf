@@ -266,6 +266,67 @@ try {
     assert.ok(timing < 400, `6 tuşlama ${timing.toFixed(0)}ms sürdü (indeks yerine tarama olabilir)`);
   });
 
+  await runCase("arama alani TEK yuzey: input ikinci cerceve cizmez", async () => {
+    // KUSUR: global `:focus-visible` kurali halkayi INPUT'un kutusuna
+    // ciziyordu; input border-radius:0 oldugu icin yuvarlatilmis alanin
+    // icinde KARE bir cerceve beliriyordu (acik temada belirgin).
+    // Gorsel sahiplik dis alanda olmali.
+    for (const mode of ["light", "dark"]) {
+      await browser.evaluate(`localStorage.setItem('eul_theme', ${JSON.stringify(mode)})`);
+      await browser.navigate("/", "!!document.querySelector('#launcherGrid .launcher-app')");
+      await delay(400);
+      await openSpotlight();
+      await browser.evaluate("document.getElementById('launcherSearchInput').focus()");
+      await delay(300);
+
+      const style = await browser.evaluate(`(() => {
+        const input = document.getElementById('launcherSearchInput');
+        const field = input.closest('.launcher-search-field');
+        const ci = getComputedStyle(input);
+        const cf = getComputedStyle(field);
+        // Kacis dizisi olmadan: tarayicinin saydam icin urettigi iki gosterim
+        // dogrudan karsilastirilir. Regex kacislari dosyaya yanlis yazilinca
+        // saydam renk "gorunur" sayiliyordu ve test yanlis alarm veriyordu.
+        const visible = (color) => {
+          const value = String(color).trim();
+          return value !== "transparent" && value !== "rgba(0, 0, 0, 0)";
+        };
+        return {
+          inputOutlineVisible: ci.outlineStyle !== 'none' && parseFloat(ci.outlineWidth) > 0 && visible(ci.outlineColor),
+          inputBorderWidth: parseFloat(ci.borderTopWidth) || 0,
+          inputShadow: ci.boxShadow,
+          // Ikinci YUZEY olusuyor mu? Olcut "saydam mi" degil, "alandan
+          // AYRISIYOR mu": input alanla ayni zemine sahipse gorsel olarak tek
+          // yuzeydir. Bu, tema/bilesen zemin degerlerinden bagimsiz olarak
+          // dogru olani olcer.
+          inputBg: ci.backgroundColor,
+          fieldBg: cf.backgroundColor,
+          inputBgSeparate: visible(ci.backgroundColor) && ci.backgroundColor !== cf.backgroundColor,
+          inputRadius: ci.borderTopLeftRadius,
+          fieldRadius: parseFloat(cf.borderTopLeftRadius) || 0,
+          fieldBgVisible: visible(cf.backgroundColor),
+        };
+      })()`);
+
+      assert.equal(style.inputOutlineVisible, false, `${mode}: input hâlâ kendi halkasını çiziyor`);
+      assert.equal(style.inputBorderWidth, 0, `${mode}: input kendi kenarlığını çiziyor`);
+      assert.equal(style.inputShadow, "none", `${mode}: input gölgesi ikinci yüzey üretiyor`);
+      assert.equal(
+        style.inputBgSeparate,
+        false,
+        `${mode}: input alandan ayrışan ikinci yüzey çiziyor (input ${style.inputBg} / alan ${style.fieldBg})`,
+      );
+      // Gorsel sahiplik DIS alanda: yuvarlak ve opak.
+      assert.ok(style.fieldRadius >= 8, `${mode}: dış alan yuvarlatılmamış (${style.fieldRadius})`);
+      assert.equal(style.fieldBgVisible, true, `${mode}: dış alan zemin taşımıyor`);
+
+      await browser.key("Escape");
+      await delay(250);
+    }
+    // Sonraki testler icin varsayilan temaya don.
+    await browser.evaluate("localStorage.removeItem('eul_theme')");
+  });
+
   await runCase("konsol temiz kalir", async () => {
     await assertCleanDiagnostics(browser, "spotlight");
   });
