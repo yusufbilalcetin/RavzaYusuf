@@ -502,7 +502,8 @@
 }
 
 .ravza-books-page .reader-sheet .setting-btn {
-  min-height: 40px;
+  /* 40px dokunma hedefi 44px esiginin altindaydi (§2.15). */
+  min-height: 44px;
   padding: 0 0.6rem;
   color: var(--ink);
   border: 0;

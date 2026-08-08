@@ -220,6 +220,87 @@ try {
     assert.deepEqual(small, [], `44px altı hedefler: ${JSON.stringify(small)}`);
   });
 
+  await testCase("birincil şerit sade: en fazla 5 işlem, ileri/geri oku YOK", async () => {
+    const dock = await browser.evaluate(`(() => {
+      const buttons = [...document.querySelectorAll('.reader-dock-actions button')];
+      return {
+        count: buttons.length,
+        ids: buttons.map(b => b.id),
+        labels: buttons.map(b => b.textContent.trim()),
+        arrowLike: buttons.filter(b => {
+          const text = (b.textContent + ' ' + (b.getAttribute('aria-label') || '')).toLowerCase();
+          return /önceki|sonraki|ileri geri|next|prev|←|→|‹|›/.test(text)
+            || /next|prev/i.test(b.id);
+        }).map(b => b.id),
+      };
+    })()`);
+    // §2.1: birincil serit 4-5 islemle sinirli.
+    assert.ok(dock.count <= 5, `birincil şeritte ${dock.count} düğme var (sınır 5): ${dock.labels.join(', ')}`);
+    // §2.1: kalici ileri/geri OK DUGMESI olmamali.
+    assert.deepEqual(dock.arrowLike, [], `şeritte ileri/geri düğmesi var: ${dock.arrowLike.join(', ')}`);
+    assert.ok(dock.ids.includes("rdr-more-open"), "… Daha Fazla düğmesi bulunmalı");
+  });
+
+  await testCase("… Daha Fazla menüsü ikincil işlemleri tek yerde toplar", async () => {
+    // Gercek kullanicida tiklama dugmeyi ODAKLAR; programatik .click() odak
+    // vermez. Odak iadesini olcecegimiz icin once odagi kuruyoruz.
+    await browser.evaluate("document.getElementById('rdr-more-open').focus(); document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
+    const menu = await browser.evaluate(`(() => {
+      const sheet = document.getElementById('rdr-more-sheet');
+      const inMore = sel => !!sheet.querySelector(sel);
+      const settings = document.getElementById('rdr-settings-sheet');
+      return {
+        hasMode: inMore('.mode-btn'),
+        hasWake: inMore('#wake-lock-toggle'),
+        hasBookInfo: inMore('.pdf-book-title'),
+        // AYNI islem iki menude birden DURMAMALI (§2.2: tek kaynak).
+        modeAlsoInSettings: !!settings.querySelector('.mode-btn'),
+        wakeAlsoInSettings: !!settings.querySelector('#wake-lock-toggle'),
+        // Kullanicinin GERCEKTEN dokundugu yuzeyler olculur. Anahtarin
+        // <input>'u gorsel olarak gizli (1px) ve hedef degil - hedef onu saran
+        // <label class="switch">. Gizli input'u olcmek yanlis alarm uretirdi.
+        smallTargets: [...sheet.querySelectorAll('button, label.switch')]
+          .filter(el => el.offsetParent !== null)
+          .map(el => ({ id: el.id || el.className, h: Math.round(el.getBoundingClientRect().height) }))
+          .filter(entry => entry.h > 0 && entry.h < 44),
+      };
+    })()`);
+    assert.equal(menu.hasMode, true, "okuma modu Daha Fazla'da olmalı");
+    assert.equal(menu.hasWake, true, "ekranı açık tut Daha Fazla'da olmalı");
+    assert.equal(menu.hasBookInfo, true, "kitap bilgileri Daha Fazla'da olmalı");
+    assert.equal(menu.modeAlsoInSettings, false, "okuma modu iki menüde birden duruyor");
+    assert.equal(menu.wakeAlsoInSettings, false, "ekranı açık tut iki menüde birden duruyor");
+    assert.deepEqual(menu.smallTargets, [], `44px altı dokunma hedefi: ${menu.smallTargets.join(', ')}`);
+
+    // §2.2: Escape kapatir ve odak "…" dugmesine DONER.
+    await browser.key("Escape");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open !== true", "menü kapandı");
+    await delay(300);
+    const focused = await browser.evaluate("document.activeElement?.id");
+    assert.equal(focused, "rdr-more-open", `odak açan düğmeye dönmeli, gelen ${focused}`);
+  });
+
+  await testCase("aynı anda tek okuyucu popup'ı açık kalır", async () => {
+    // §42: Daha Fazla acikken Ayarlar acilirsa Daha Fazla kapanmali.
+    await browser.evaluate("document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
+    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
+    await delay(400);
+    const open = await browser.evaluate(`(() => ['rdr-contents-sheet','rdr-search-sheet','rdr-settings-sheet','rdr-more-sheet']
+      .filter(id => document.getElementById(id)?.open))()`);
+    assert.deepEqual(open, ["rdr-settings-sheet"], `tek popup beklenirken açık olanlar: ${open.join(', ')}`);
+    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await delay(250);
+    // Popup kapaninca odak, onu acan DOCK dugmesine doner. Bu dogru davranis
+    // ama sonraki test kabugun otomatik gizlenmesini olcuyor ve "odak kabugun
+    // icindeyken gizleme" korumasi (§2.3) haklı olarak devreye giriyor.
+    // Gercek kullanici sayfaya dokundugunda odak kabukta kalmaz; testin
+    // biraktigi odagi temizliyoruz.
+    await browser.evaluate("document.activeElement?.blur?.()");
+    await delay(150);
+  });
+
   await testCase("kabuk dokunuşla gizlenip geri gelir", async () => {
     const visibleFirst = await browser.evaluate("document.querySelector('.reader-root').classList.contains('controls-visible')");
     assert.equal(visibleFirst, true, "kitap açılışında kontroller görünür olmalı");
@@ -506,6 +587,8 @@ try {
 
   await testCase("sürekli kaydırma moduna geçilir ve konum korunur", async () => {
     const before = await browser.evaluate("Number(document.getElementById('reader-inner').dataset.currentPage)");
+    await browser.evaluate("document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
     await browser.evaluate("document.querySelector('.mode-btn[data-mode=\"scroll\"]').click()");
     await browser.waitFor(
       "document.querySelector('#reader-inner')?.dataset.readerMode === 'scroll' && document.querySelector('#ravzabooks')?.dataset.appMode === 'reading'",
@@ -528,8 +611,8 @@ try {
 
   await testCase("yer imi eklenir ve kalıcı olur", async () => {
     // Sayfa moduna geri dön: kalan testler oradan devam etsin.
-    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
-    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar sayfası");
+    await browser.evaluate("document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
     await browser.evaluate("document.querySelector('.mode-btn[data-mode=\"page\"]').click()");
     await browser.waitFor(
       "document.querySelector('#reader-inner')?.dataset.readerMode === 'page' && document.querySelector('#ravzabooks')?.dataset.appMode === 'reading'",
@@ -679,8 +762,9 @@ try {
   async function switchModeFromSettings() {
     const current = await browser.evaluate("document.getElementById('reader-inner').dataset.readerMode");
     const next = current === "scroll" ? "page" : "scroll";
-    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
-    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    // Okuma modu artik "… Daha Fazla" menusunde (§2.1 sadelestirmesi).
+    await browser.evaluate("document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
     await browser.evaluate(`document.querySelector('.mode-btn[data-mode="${next}"]').click()`);
   }
 
@@ -1365,8 +1449,8 @@ try {
   });
 
   await testCase("Ekranı Açık Tut ve Tam Ekran yalnızca gerçekten destekleniyorsa sunulur", async () => {
-    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
-    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    await browser.evaluate("document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
     const caps = await browser.evaluate(`(() => {
       const wakeToggle = document.getElementById('wake-lock-toggle');
       const fsToggle = document.getElementById('fullscreen-toggle');
@@ -1391,15 +1475,15 @@ try {
       caps.fsSupported,
       `tam ekran kontrolü destek durumuyla uyuşmuyor (destek=${caps.fsSupported}, var=${caps.fsPresent})`,
     );
-    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await browser.evaluate("document.querySelector('#rdr-more-sheet [data-close-sheet]').click()");
     await delay(250);
   });
 
   await testCase("Ekranı Açık Tut tercihi kalıcıdır ve kitaplığa dönünce kilit bırakılır", async () => {
     const supported = await browser.evaluate("'wakeLock' in navigator && typeof navigator.wakeLock?.request === 'function'");
     if (!supported) return; // Desteklenmeyen tarayicida iddia edilecek davranis yok.
-    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
-    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    await browser.evaluate("document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
     await browser.evaluate(`(() => {
       const toggle = document.getElementById('wake-lock-toggle');
       toggle.checked = true;
@@ -1408,7 +1492,7 @@ try {
     await delay(500);
     const stored = await browser.evaluate("JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}').keepAwake");
     assert.equal(stored, true, "ekranı açık tut tercihi kaydedilmeli");
-    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await browser.evaluate("document.querySelector('#rdr-more-sheet [data-close-sheet]').click()");
     await delay(300);
     // Kitapliga donunce okuma bitti demektir; kilit tutulmaya devam etmemeli.
     await browser.evaluate("document.getElementById('rdr-back').click()");
@@ -1433,8 +1517,8 @@ try {
     // Dock'taki mod dugmesi kaldirildi (kontroller sadelestirildi); modun TEK
     // arayuz gostergesi artik Ayarlar'daki "Okuma modu" segmenti. Iddia ayni:
     // arayuz, renderer durumundan SAPMAMALI.
-    await browser.evaluate("document.getElementById('rdr-settings-open').click()");
-    await browser.waitFor("document.getElementById('rdr-settings-sheet')?.open === true", "ayarlar");
+    await browser.evaluate("document.getElementById('rdr-more-open').click()");
+    await browser.waitFor("document.getElementById('rdr-more-sheet')?.open === true", "daha fazla");
     const state = await browser.evaluate(`(() => ({
       mode: document.getElementById('reader-inner').dataset.readerMode,
       selected: document.querySelector('.mode-btn.selected')?.dataset.mode,
@@ -1442,7 +1526,7 @@ try {
     }))()`);
     assert.equal(state.selected, state.mode, `seçili mod düğmesi moddan sapmış: ${JSON.stringify(state)}`);
     assert.equal(state.pressed, state.mode, `aria-pressed moddan sapmış: ${JSON.stringify(state)}`);
-    await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
+    await browser.evaluate("document.querySelector('#rdr-more-sheet [data-close-sheet]').click()");
     await delay(250);
   });
 
