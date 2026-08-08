@@ -99,6 +99,43 @@ await testCase("Tek karakterlik sorgu aranmaz", () => {
   assert.deepEqual(searchBookIndex([createPageEntry(1, "aaaa")], "a"), []);
 });
 
+/**
+ * GERÇEK KUSUR REGRESYONU: snippet parçaları birleşince kelimeler yapışıyordu.
+ *
+ * Arayüz `before + <mark>match</mark> + after` biçiminde birleştiriyor. Parçalar
+ * ayrı ayrı trim edilince eşleşmeyi komşu kelimeden ayıran boşluk siliniyor,
+ * ekranda "efendimSermetBey" çıkıyordu. Ham metin Perili Köşk s.6'dan birebir.
+ */
+await testCase("snippet parçaları birleşince kelimeler yapışmaz", () => {
+  const raw = "10\n– Bu ra da otu ra maz sınız efendim\nSermet Bey, gözünü köşkten alamıyordu Her";
+  const [hit] = searchBookIndex([createPageEntry(6, raw)], "Sermet");
+  assert.ok(hit, "eşleşme bulunamadı");
+  const joined = `${hit.snippet.before}${hit.snippet.match}${hit.snippet.after}`;
+  assert.match(joined, /efendim Sermet Bey/, `parçalar yapışık birleşti: ${JSON.stringify(joined)}`);
+  // Vurgu yalnızca kelimeyi kapsamalı; kenarındaki boşluğu boyamamalı.
+  assert.equal(hit.snippet.match, "Sermet", "vurgu kenar boşluğu içeriyor");
+  // Snippet'in DIŞ kenarlarında boşluk kalmamalı (…" Bey" gibi görünmesin).
+  assert.equal(joined, joined.trim(), "snippet dış kenarında boşluk kaldı");
+});
+
+await testCase("satır sonu sınırında da kelimeler ayrı kalır", () => {
+  // Eşleşme satır başındayken önceki satırın son kelimesine yapışmamalı.
+  const [hit] = searchBookIndex([createPageEntry(2, "PERİLİ KÖŞK\nÖMER SEYFETTİN")], "KÖŞK");
+  const joined = `${hit.snippet.before}${hit.snippet.match}${hit.snippet.after}`;
+  assert.match(joined, /PERİLİ KÖŞK ÖMER/, `satır sonunda yapıştı: ${JSON.stringify(joined)}`);
+});
+
+await testCase("boşluksuz kurtarma eşleşmesinde de sınır korunur", () => {
+  // "oturamazsınız" ham metinde "otu ra maz sınız" biçiminde; collapsed yoldan
+  // bulunur. Vurgu çok kelimeli olsa bile komşularından ayrı durmalı.
+  const raw = "– Bu ra da otu ra maz sınız efendim Sermet";
+  const [hit] = searchBookIndex([createPageEntry(6, raw)], "oturamazsınız");
+  assert.ok(hit, "kurtarma eşleşmesi bulunamadı");
+  assert.equal(hit.exact, false, "bu eşleşme loose olmalı");
+  const joined = `${hit.snippet.before}${hit.snippet.match}${hit.snippet.after}`;
+  assert.match(joined, /da otu ra maz sınız efendim/, `kurtarma snippet'i yapıştı: ${JSON.stringify(joined)}`);
+});
+
 await testCase("Snippet kelime sınırına çekilir ve boşlukları sadeleştirir", () => {
   const entries = [createPageEntry(1, "birinci   kelime  aranan  sonraki   kelimeler burada")];
   const [hit] = searchBookIndex(entries, "aranan");

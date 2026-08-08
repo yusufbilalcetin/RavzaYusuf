@@ -118,6 +118,8 @@ const isValidZoom = value => READER_ZOOMS.some(entry => entry === value);
 const CONTROLS_HIDE_MS = 4000;
 /** Arama indeksi bu büyüklükte parçalar hâlinde kurulur; ana iş parçacığı boğulmasın. */
 const SEARCH_INDEX_CHUNK = 8;
+/** Listelenecek en fazla sonuç. Tavana dayanildiginda sayi "80+" gosterilir. */
+const SEARCH_RESULT_LIMIT = 80;
 
 const state = {
   mode: 'library',
@@ -3378,8 +3380,13 @@ async function runBookSearch(query) {
   // İndeksleme sürerken kullanıcı sorguyu değiştirmiş olabilir.
   const input = document.getElementById('rdr-search-input');
   if (input && input.value.trim() !== String(query).trim()) return;
-  const results = searchBookIndex(searchIndex, query);
-  setSearchState(results.length ? `${results.length} sonuç` : 'Sonuç yok');
+  const results = searchBookIndex(searchIndex, query, { limit: SEARCH_RESULT_LIMIT });
+  // Liste tavana dayandiysa "80 sonuç" demek yaniltici olur - kitapta daha
+  // fazlasi olabilir. Tavanda "80+" denir.
+  const capped = results.length >= SEARCH_RESULT_LIMIT;
+  setSearchState(results.length
+    ? `${results.length}${capped ? '+' : ''} sonuç`
+    : 'Sonuç yok');
   renderSearchResults(results, query);
 }
 

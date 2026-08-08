@@ -110,6 +110,24 @@ function snapToWord(text, index, direction) {
   return limit;
 }
 
+/**
+ * Snippet'i üç parçaya böler: eşleşme öncesi, eşleşme, eşleşme sonrası.
+ *
+ * SINIR BOŞLUĞU KORUNUR - ÖNEMLİ.
+ * Parçalar arayüzde `before + <mark>match</mark> + after` biçiminde YAN YANA
+ * birleştiriliyor. Her parça ayrı ayrı trim edilirse, eşleşmeyi komşu
+ * kelimeden ayıran boşluk yok olur ve sonuç yapışık çıkar. Gerçek örnek
+ * (Perili Köşk s.6): ham metin
+ *     "...efendim\nSermet Bey, gözünü..."
+ * üç parçaya bölününce before "…efendim\n", after " Bey, gözünü…" oluyor;
+ * ikisi de trim edilince ekranda
+ *     "efendimSermetBey, gözünü…"
+ * görünüyordu. Aynı hata "PERİLİKÖŞKÖMER SEYFETTİN" ve "PeriliKöşk9" gibi
+ * bütün sonuçları okunmaz yapıyordu.
+ *
+ * Bu yüzden yalnızca snippet'in DIŞ kenarları kırpılır; iç sınırlardaki tek
+ * boşluk olduğu gibi bırakılır.
+ */
 function buildSnippet(text, start, end, radius) {
   const rawFrom = Math.max(0, start - radius);
   const rawTo = Math.min(text.length, end + radius);
@@ -117,11 +135,27 @@ function buildSnippet(text, start, end, radius) {
   const to = rawTo === text.length ? text.length : snapToWord(text, rawTo, -1);
   // Çok boşluklu PDF metnini tek boşluğa indir: snippet tek satırda okunur
   // kalsın. Ofsetler bu noktadan sonra kullanılmıyor, güvenli.
-  const clean = (value) => value.replace(/\s+/g, " ").trim();
+  const collapse = (value) => value.replace(/\s+/g, " ");
+
+  let before = collapse(text.slice(from, start)).replace(/^ /, "");
+  let match = collapse(text.slice(start, end));
+  let after = collapse(text.slice(end, to)).replace(/ $/, "");
+
+  // Vurgunun kenarındaki boşluk komşusuna devredilir: <mark> boşluk boyamasın,
+  // ama boşluk da kaybolmasın.
+  if (match.startsWith(" ")) {
+    match = match.slice(1);
+    if (!before.endsWith(" ")) before += " ";
+  }
+  if (match.endsWith(" ")) {
+    match = match.slice(0, -1);
+    if (!after.startsWith(" ")) after = ` ${after}`;
+  }
+
   return {
-    before: clean(text.slice(from, start)),
-    match: clean(text.slice(start, end)),
-    after: clean(text.slice(end, to)),
+    before,
+    match,
+    after,
     truncatedStart: from > 0,
     truncatedEnd: to < text.length,
   };
