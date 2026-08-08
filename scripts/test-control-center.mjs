@@ -48,17 +48,18 @@ async function openCC() {
 const CC_STATE = `(() => {
   const node = document.getElementById('control-center');
   if (!node) return null;
-  const selected = (attr) => node.querySelector('[data-' + attr + '].is-selected')?.dataset[
-    attr.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] || null;
   return {
     open: node.open === true,
-    mode: selected('cc-mode'),
-    glass: selected('cc-glass'),
-    motion: node.querySelector('#cc-motion')?.checked === true,
-    pressedMode: node.querySelector('[data-cc-mode][aria-pressed="true"]')?.dataset.ccMode || null,
+    // Kaldirilan bloklar: hicbiri DOM'da OLMAMALI (gizli de degil, YOK).
+    themeSegments: node.querySelectorAll('[data-cc-mode]').length,
+    glassSegments: node.querySelectorAll('[data-cc-glass]').length,
+    motionSwitch: node.querySelectorAll('#cc-motion').length,
+    groups: [...node.querySelectorAll('.cc-group-title')].map(n => n.textContent.trim()),
+    emptyGroups: [...node.querySelectorAll('.cc-group')].filter(g => !g.textContent.trim()).length,
+    routes: [...node.querySelectorAll('[data-cc-route]')].map(b => b.dataset.ccRoute),
+    hasBackground: !!node.querySelector('[data-cc-action="wallpaper"]'),
   };
 })()`;
-
 const OPEN_OVERLAYS = `(() => {
   const open = [];
   if (document.getElementById('control-center')?.open) open.push('control-center');
@@ -99,8 +100,6 @@ try {
     await openCC();
     const state = await browser.evaluate(CC_STATE);
     assert.equal(state.open, true, "panel açılmadı");
-    assert.ok(state.mode, "tema segmenti seçili değil");
-    assert.ok(state.glass, "glass segmenti seçili değil");
 
     const content = await browser.evaluate(`(() => {
       const node = document.getElementById('control-center');
@@ -141,101 +140,61 @@ try {
     assert.ok(box.docScrollWidth <= box.vw + 1, "yatay kaydırma oluştu");
   });
 
-  /* ---- STATE SYNC: Kontrol Merkezi -> tema paneli ---- */
-  await runCase("CC'de Koyu secilince tema paneli de Koyu gosterir", async () => {
-    await browser.evaluate(`document.querySelector('[data-cc-mode="dark"]').click()`);
-    await delay(400);
-    const cc = await browser.evaluate(CC_STATE);
-    assert.equal(cc.mode, "dark", "CC segmenti güncellenmedi");
-    assert.equal(cc.pressedMode, "dark", "aria-pressed güncellenmedi");
+  await runCase("Tema / Liquid Glass / Hareket bloklari KALDIRILDI", async () => {
+    const state = await browser.evaluate(CC_STATE);
+    assert.equal(state.themeSegments, 0, "Tema segmenti hâlâ duruyor");
+    assert.equal(state.glassSegments, 0, "Liquid Glass segmenti hâlâ duruyor");
+    assert.equal(state.motionSwitch, 0, "Hareketi Azalt anahtarı hâlâ duruyor");
+    // Sadece gizlenmis olmamali: geride bos kap/dolgu kalmamali.
+    assert.equal(state.emptyGroups, 0, `geride ${state.emptyGroups} boş grup kalmış`);
+    const text = await browser.evaluate("document.getElementById('control-center').textContent");
+    for (const banned of ["Liquid Glass", "Hareketi Azalt", "Dengeli", "Tinted"]) {
+      assert.ok(!text.includes(banned), `panelde hâlâ "${banned}" geçiyor`);
+    }
+  });
 
-    const applied = await browser.evaluate(`(() => ({
-      body: document.body.classList.contains('dark'),
-      stored: localStorage.getItem('eul_theme'),
-    }))()`);
-    assert.equal(applied.body, true, "koyu tema uygulanmadı");
-    assert.equal(applied.stored, "dark", "kanonik anahtar güncellenmedi");
+  await runCase("kisisellestirme ve hizli uygulamalar korunuyor", async () => {
+    const state = await browser.evaluate(CC_STATE);
+    assert.equal(state.hasBackground, true, "arka plan girişi kayboldu");
+    assert.deepEqual(
+      state.routes,
+      ["ravza-books", "ezber-merkezi", "sinav-merkezi", "oyun"],
+      `hızlı uygulamalar bozuldu: ${state.routes.join(", ")}`,
+    );
+  });
 
-    // Tema panelini ac ve GORUNEN secimi dogrula (sadece storage degil).
+  await runCase("tema sistemi SILINMEDI, Ayarlar'da yasiyor", async () => {
+    // Kontrol Merkezi'nden kaldirmak ozelligi kaldirmak DEGIL.
     await browser.evaluate("window.openThemeSheet && window.openThemeSheet()");
     await delay(500);
-    const panel = await browser.evaluate(`(() => {
-      const active = document.querySelector('#theme-sheet [data-theme-mode].active');
-      return { mode: active?.dataset.themeMode || null, ccOpen: document.getElementById('control-center')?.open === true };
-    })()`);
-    assert.equal(panel.mode, "dark", `tema panelinde Koyu seçili değil: ${panel.mode}`);
-    // Tek aktif overlay: tema paneli acilinca CC kapanmis olmali.
+    const panel = await browser.evaluate(`(() => ({
+      modes: [...document.querySelectorAll('#theme-sheet [data-theme-mode]')].map(b => b.dataset.themeMode),
+      active: document.querySelector('#theme-sheet [data-theme-mode].active')?.dataset.themeMode || null,
+      ccOpen: document.getElementById('control-center')?.open === true,
+    }))()`);
+    assert.deepEqual(panel.modes.sort(), ["dark", "light", "system"], `tema seçenekleri eksik: ${panel.modes.join(", ")}`);
+    assert.ok(panel.active, "tema panelinde seçili mod yok");
     assert.equal(panel.ccOpen, false, "tema paneli açılınca Kontrol Merkezi kapanmalıydı");
-  });
-
-  /* ---- STATE SYNC: tema paneli -> Kontrol Merkezi ---- */
-  await runCase("tema panelinde Sistem secilince CC de Sistem gosterir", async () => {
-    await browser.evaluate(`document.querySelector('#theme-sheet [data-theme-mode="system"]').click()`);
-    await delay(400);
     await browser.evaluate("window.closeThemeSheet && window.closeThemeSheet()");
     await delay(300);
-    await openCC();
-    const cc = await browser.evaluate(CC_STATE);
-    assert.equal(cc.mode, "system", `CC'de Sistem seçili değil: ${cc.mode}`);
   });
 
-  await runCase("Liquid Glass secimi iki yonlu tek durumdur", async () => {
-    await browser.evaluate(`document.querySelector('[data-cc-glass="tinted"]').click()`);
-    await delay(350);
-    const applied = await browser.evaluate(`(() => ({
-      cc: document.querySelector('[data-cc-glass].is-selected')?.dataset.ccGlass,
-      attr: document.documentElement.dataset.glassLevel,
-      stored: localStorage.getItem('eul_glass_level'),
-      // Yuzeye ozel ikinci anahtar ACILMAMALI.
-      strays: Object.keys(localStorage).filter(k => /controlCenter|cc_/i.test(k)),
-    }))()`);
-    assert.equal(applied.cc, "tinted", "CC seçimi güncellenmedi");
-    assert.equal(applied.attr, "tinted", "belge özniteliği güncellenmedi");
-    assert.equal(applied.stored, "tinted", "kanonik anahtar yazılmadı");
-    assert.deepEqual(applied.strays, [], `yüzeye özel anahtar açılmış: ${applied.strays.join(", ")}`);
-
-    // Panel kapanip yeniden acilinca ayni durum gorunmeli.
-    await browser.evaluate("window.closeControlCenter && window.closeControlCenter()");
-    await delay(300);
-    await openCC();
-    assert.equal((await browser.evaluate(CC_STATE)).glass, "tinted", "yeniden açılışta glass durumu kaybedildi");
-
-    await browser.evaluate(`document.querySelector('[data-cc-glass="clear"]').click()`);
-    await delay(350);
-    assert.equal(
-      await browser.evaluate("document.documentElement.dataset.glassLevel"),
-      "clear",
-      "Clear uygulanmadı",
-    );
-  });
-
-  await runCase("Hareketi Azalt gercek tercihi degistirir", async () => {
-    await browser.evaluate(`(() => {
-      const input = document.getElementById('cc-motion');
-      input.checked = true;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
+  await runCase("topbar'da eski ay/gunes tema dugmesi YOK", async () => {
+    const topbar = await browser.evaluate(`(() => {
+      const right = document.querySelector('.launcher-topbar-actions');
+      return {
+        ids: [...right.querySelectorAll('button')].map(b => b.id),
+        legacyToggle: !!document.getElementById('topbar-theme-btn'),
+        anyThemeToggle: document.querySelectorAll('[data-theme-toggle]').length,
+      };
     })()`);
-    await delay(350);
-    const on = await browser.evaluate(`(() => ({
-      attr: document.documentElement.dataset.reducedMotion,
-      stored: localStorage.getItem('eul_motion'),
-      checked: document.getElementById('cc-motion').checked,
-    }))()`);
-    assert.equal(on.attr, "true", "reduced-motion özniteliği yazılmadı");
-    assert.equal(on.stored, "reduced", "kanonik anahtar yazılmadı");
-    assert.equal(on.checked, true, "anahtar görünümü güncellenmedi");
-
-    await browser.evaluate(`(() => {
-      const input = document.getElementById('cc-motion');
-      input.checked = false;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-    })()`);
-    await delay(350);
-    assert.equal(
-      await browser.evaluate("document.documentElement.dataset.reducedMotion"),
-      "false",
-      "reduced-motion kapatılamadı",
+    assert.deepEqual(
+      topbar.ids,
+      ["launcherSearchOpen", "control-center-open"],
+      `sağ üstte beklenmeyen düğme: ${topbar.ids.join(", ")}`,
     );
+    assert.equal(topbar.legacyToggle, false, "eski #topbar-theme-btn hâlâ DOM'da");
+    assert.equal(topbar.anyThemeToggle, 0, "launcher'da hâlâ tema toggle var");
   });
 
   /* ---- OVERLAY KURALI ---- */
@@ -301,7 +260,9 @@ try {
       const node = document.getElementById('control-center');
       return [...node.querySelectorAll('button, input')].filter(el => el.offsetParent !== null || el.type === 'checkbox').length;
     })()`);
-    assert.ok(focusable >= 8, `panelde yeterli odaklanabilir öğe yok: ${focusable}`);
+    // Sadelestirmeden sonra beklenen: kapat + Arka Plan + 4 hizli uygulama = 6.
+    // Eski esik (8) tema/glass/motion segmentlerini sayiyordu, onlar kaldirildi.
+    assert.ok(focusable >= 6, `panelde yeterli odaklanabilir öğe yok: ${focusable}`);
     await browser.key("Tab");
     await delay(150);
     const inside = await browser.evaluate("!!document.activeElement?.closest('#control-center')");

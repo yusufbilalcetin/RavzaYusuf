@@ -19,13 +19,7 @@
  *    geri getirilmedi. Spotlight henuz yok, olu dugme konmadi.
  */
 import { claimOverlay, registerOverlay, releaseOverlay } from "../core/overlay-manager.js";
-import { getThemeState, setThemeMode, onThemeChange, openThemeSheet } from "../core/theme.js";
-import {
-  getAppearanceState,
-  setGlassLevel,
-  setReducedMotionEnabled,
-  onAppearanceChange,
-} from "../core/appearance.js";
+import { openThemeSheet } from "../core/theme.js";
 
 const DIALOG_ID = "control-center";
 export const CONTROL_CENTER_OVERLAY_ID = "control-center";
@@ -35,7 +29,6 @@ const ICON = (paths) =>
 
 const ICONS = {
   sliders: ICON('<path d="M4 7h10M18 7h2M4 17h6M14 17h6"/><circle cx="16" cy="7" r="2"/><circle cx="12" cy="17" r="2"/>'),
-  motion: ICON('<path d="M3 12h4l3-7 4 14 3-7h4"/>'),
   wallpaper: ICON('<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/>'),
   books: ICON('<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5Z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5Z"/>'),
   memory: ICON('<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M8 9.5h8M8 13h5"/>'),
@@ -54,27 +47,13 @@ const QUICK_APPS = Object.freeze([
 
 let dialog = null;
 let opener = null;
-let unbindState = null;
 
 function isOpen() {
   return document.getElementById(DIALOG_ID)?.open === true;
 }
 
-function segment(name, label, options, current) {
-  return `
-    <section class="cc-group">
-      <h3 class="cc-group-title" id="cc-${name}-title">${label}</h3>
-      <div class="cc-segmented" role="group" aria-labelledby="cc-${name}-title">
-        ${options.map((option) => `
-          <button class="cc-segment${option.value === current ? " is-selected" : ""}" type="button"
-                  data-cc-${name}="${option.value}" aria-pressed="${option.value === current}">${option.label}</button>`).join("")}
-      </div>
-    </section>`;
-}
 
 function markup() {
-  const theme = getThemeState();
-  const appearance = getAppearanceState();
   return `
     <div class="cc-panel ui-sheet-panel glass-surface glass-surface--overlay">
       <header class="cc-head">
@@ -83,33 +62,6 @@ function markup() {
       </header>
 
       <div class="cc-body">
-        ${segment("mode", "Tema", [
-          { value: "light", label: "Açık" },
-          { value: "dark", label: "Koyu" },
-          { value: "system", label: "Sistem" },
-        ], theme.mode)}
-
-        ${segment("glass", "Liquid Glass", [
-          { value: "clear", label: "Clear" },
-          { value: "balanced", label: "Dengeli" },
-          { value: "tinted", label: "Tinted" },
-        ], appearance.glass)}
-
-        <section class="cc-group">
-          <div class="cc-row">
-            <span class="cc-row-icon" aria-hidden="true">${ICONS.motion}</span>
-            <span class="cc-row-label" id="cc-motion-label">Hareketi Azalt</span>
-            <label class="cc-switch">
-              <input id="cc-motion" type="checkbox" aria-labelledby="cc-motion-label"
-                     ${appearance.reducedMotion ? "checked" : ""} />
-              <span class="cc-switch-track" aria-hidden="true"></span>
-            </label>
-          </div>
-          <p class="cc-note" id="cc-motion-note">${appearance.motion === "system"
-            ? "Cihaz ayarını izliyor."
-            : "Cihaz ayarı geçersiz kılındı."}</p>
-        </section>
-
         <section class="cc-group">
           <h3 class="cc-group-title" id="cc-system-title">Sistem</h3>
           <div class="cc-tiles cc-tiles--wide" role="group" aria-labelledby="cc-system-title">
@@ -134,29 +86,16 @@ function markup() {
     </div>`;
 }
 
-/** Paneli GERCEK duruma gore tazeler. Tek yonlu cizim: state -> UI. */
+/**
+ * Paneli gercek duruma gore tazeler.
+ *
+ * Tema / Liquid Glass / Hareket kontrolleri Kontrol Merkezi'nden KALDIRILDI
+ * (kopyalari Ayarlar'da yasamaya devam ediyor), bu yuzden burada senkronlanacak
+ * bir segment kalmadi. Fonksiyon korunuyor cunku arka plan bilgisi ileride
+ * buradan tazelenecek.
+ */
 function syncControls() {
-  const node = document.getElementById(DIALOG_ID);
-  if (!node) return;
-  const theme = getThemeState();
-  const appearance = getAppearanceState();
-
-  for (const [attribute, value] of [["cc-mode", theme.mode], ["cc-glass", appearance.glass]]) {
-    node.querySelectorAll(`[data-${attribute}]`).forEach((button) => {
-      const selected = button.dataset[attribute.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] === value;
-      button.classList.toggle("is-selected", selected);
-      button.setAttribute("aria-pressed", String(selected));
-    });
-  }
-
-  const motion = node.querySelector("#cc-motion");
-  if (motion) motion.checked = appearance.reducedMotion;
-  const note = node.querySelector("#cc-motion-note");
-  if (note) {
-    note.textContent = appearance.motion === "system"
-      ? "Cihaz ayarını izliyor."
-      : "Cihaz ayarı geçersiz kılındı.";
-  }
+  // Su an tazelenecek dinamik durum yok.
 }
 
 function ensureDialog() {
@@ -180,7 +119,6 @@ function ensureDialog() {
     if (event.target === node) closeControlCenter();
   });
   node.addEventListener("click", handleClick);
-  node.addEventListener("change", handleChange);
   dialog = node;
   return node;
 }
@@ -191,20 +129,6 @@ function handleClick(event) {
 
   if (target.closest("[data-cc-close]")) {
     closeControlCenter();
-    return;
-  }
-
-  const mode = target.closest("[data-cc-mode]");
-  if (mode) {
-    setThemeMode(mode.dataset.ccMode, { reason: "control-center" });
-    syncControls();
-    return;
-  }
-
-  const glass = target.closest("[data-cc-glass]");
-  if (glass) {
-    setGlassLevel(glass.dataset.ccGlass, { reason: "control-center" });
-    syncControls();
     return;
   }
 
@@ -224,11 +148,6 @@ function handleClick(event) {
   }
 }
 
-function handleChange(event) {
-  if (event.target?.id !== "cc-motion") return;
-  setReducedMotionEnabled(event.target.checked, { reason: "control-center" });
-  syncControls();
-}
 
 export function openControlCenter(trigger = document.activeElement) {
   const node = ensureDialog();
@@ -242,18 +161,12 @@ export function openControlCenter(trigger = document.activeElement) {
   } catch (_) {
     return false;
   }
-  // Panel acikken disaridaki degisiklikler (Ayarlar) aninda yansisin.
-  unbindState?.();
-  const offTheme = onThemeChange(syncControls, { immediate: false });
-  const offAppearance = onAppearanceChange(syncControls, { immediate: false });
-  unbindState = () => { offTheme(); offAppearance(); unbindState = null; };
   return true;
 }
 
 export function closeControlCenter({ restoreFocus = true } = {}) {
   const node = document.getElementById(DIALOG_ID);
   if (!node?.open) return false;
-  unbindState?.();
   try { node.close(); } catch (_) {}
   if (restoreFocus && opener?.isConnected) opener.focus({ preventScroll: true });
   opener = null;

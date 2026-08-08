@@ -286,54 +286,47 @@ async function testPanelPointerAndFocus(viewport) {
   const modeCase = MODE_CASES[0];
   await seedAndOpenMain(browser, home, modeCase, viewport);
 
+  /* TOPBAR TEMA DUGMESI KALDIRILDI (urun karari).
+     Launcher sag ustunde artik yalnizca Arama ve Kontrol Merkezi var; tek
+     dokunus/uzun basma/cift tiklama jestleri o dugmeye aitti ve dugme yok.
+     Tema sistemi SILINMEDI - panel hala gercek bir yoldan aciliyor ve panel
+     sozlesmesinin tamami (odak girisi, Escape, odak iadesi, mod ve stil
+     secimi) burada korunuyor; yalnizca ACILIS YOLU gerceklige guncellendi. */
   await setApiState(browser, "light", "noel-ask");
-  await browser.click(TOGGLE_SELECTOR);
-  await browser.waitFor("globalThis.__RAVZA_THEME__.getState().mode === 'dark'", "single click toggles", 2000);
-  await delay(420);
-  assertDomState(await readThemeSnapshot(browser), { mode: "dark", resolvedMode: "dark", style: "noel-ask" }, "single click");
+  assert.equal(
+    await browser.evaluate("!!document.getElementById('topbar-theme-btn')"),
+    false,
+    "eski topbar tema dugmesi hala DOM'da",
+  );
 
-  await setApiState(browser, "light", "noel-ask");
-  await browser.click(TOGGLE_SELECTOR, { holdMs: 675 });
-  await browser.waitFor("globalThis.__RAVZA_THEME__.getState().mode === 'light' && globalThis.__RAVZA_THEME__.openPanel && document.getElementById('theme-sheet')?.classList.contains('open')", "long press opens panel");
+  const CC_ENTRY = "#control-center-open";
+  await browser.focus(CC_ENTRY);
+  await browser.click(CC_ENTRY);
+  await browser.waitFor("document.getElementById('control-center')?.open === true", "kontrol merkezi acildi");
+  await browser.click('[data-cc-action="wallpaper"]');
+  await browser.waitFor("document.getElementById('theme-sheet')?.classList.contains('open')", "panel kontrol merkezinden acildi");
   await delay(430);
   let snapshot = await readThemeSnapshot(browser);
-  assert.equal(snapshot.api.mode, "light", "long press must not toggle mode");
-  assert.equal(snapshot.panelHidden, "false", "long press panel aria-hidden");
-  assert.equal(await browser.evaluate("document.getElementById('theme-sheet').contains(document.activeElement)"), true, "focus must enter panel");
+  assert.equal(snapshot.api.mode, "light", "panel acilisi modu degistirmemeli");
+  assert.equal(snapshot.panelHidden, "false", "panel aria-hidden");
+  assert.equal(
+    await browser.evaluate("document.getElementById('theme-sheet').contains(document.activeElement)"),
+    true,
+    "focus must enter panel",
+  );
+  assert.equal(
+    await browser.evaluate("document.getElementById('control-center')?.open === true"),
+    false,
+    "tek aktif overlay: panel acilinca kontrol merkezi kapanmali",
+  );
+
   await browser.key("Escape");
   await browser.waitFor("!document.getElementById('theme-sheet')?.classList.contains('open')", "Escape closes panel");
-  assert.equal(await browser.evaluate(`document.activeElement?.matches(${JSON.stringify(TOGGLE_SELECTOR)})`), true, "Escape restores toggle focus");
 
-  await setApiState(browser, "light", "noel-ask");
-  await browser.doubleClick(TOGGLE_SELECTOR);
-  await browser.waitFor("document.getElementById('theme-sheet')?.classList.contains('open')", "double click opens panel");
-  await delay(450);
-  snapshot = await readThemeSnapshot(browser);
-  assert.equal(snapshot.api.mode, "light", "double click must not toggle mode");
-  assert.equal(await browser.evaluate("document.getElementById('theme-sheet').contains(document.activeElement)"), true, "double click focus must enter panel");
-  await browser.key("Escape");
-
-  await setApiState(browser, "light", "noel-ask");
-  await browser.focus(TOGGLE_SELECTOR);
-  await browser.key("Enter");
-  await browser.waitFor("globalThis.__RAVZA_THEME__.getState().mode === 'dark'", "Enter toggles theme");
-  await setApiState(browser, "light", "noel-ask");
-  await browser.focus(TOGGLE_SELECTOR);
-  await browser.key(" ");
-  await browser.waitFor("globalThis.__RAVZA_THEME__.getState().mode === 'dark'", "Space toggles theme");
-
-  await setApiState(browser, "light", "noel-ask");
-  await browser.focus(TOGGLE_SELECTOR);
-  await browser.key("Enter", { shift: true });
-  await browser.waitFor("document.getElementById('theme-sheet')?.classList.contains('open')", "Shift+Enter opens panel");
-  await delay(450);
-  assert.equal((await readThemeSnapshot(browser)).api.mode, "light", "Shift+Enter must not toggle mode");
-  await browser.key("Escape");
-
-  await browser.focus(TOGGLE_SELECTOR);
-  await browser.key("ArrowDown");
-  await browser.waitFor("document.getElementById('theme-sheet')?.classList.contains('open')", "ArrowDown opens panel");
-  await browser.waitFor("document.getElementById('theme-sheet')?.contains(document.activeElement)", "ArrowDown focus enters panel", 2000);
+  // Panel yeniden acilsin: mod/stil secimi asagida dogrulanacak.
+  await browser.evaluate("window.openThemeSheet && window.openThemeSheet()");
+  await browser.waitFor("document.getElementById('theme-sheet')?.classList.contains('open')", "panel yeniden acildi");
+  await delay(300);
   await browser.click('.theme-mode-control [data-theme-mode="system"]');
   await browser.waitFor("globalThis.__RAVZA_THEME__.getState().mode === 'system'", "panel mode selection");
   await browser.click('.theme-choice-card[data-theme-id="gece-mavisi"]');
