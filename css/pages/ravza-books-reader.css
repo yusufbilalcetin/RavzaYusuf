@@ -218,21 +218,48 @@
    Kitapta ara
 -------------------------------------------------------------------------- */
 
+/* Cam kabuk + TONAL/OPAK iç yüzey (§12): cam içinde cam istemiyoruz. */
 .ravza-books-page .reader-search-field {
   display: flex;
   gap: 0.55rem;
   align-items: center;
   margin: 0 1.1rem 0.5rem;
   padding: 0 0.8rem;
+  border: 1px solid var(--reader-field-border);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  background: var(--reader-field-bg);
+  /* Mobilde dokunma anında beliren doygun MAVİ dikdörtgenin kaynağı buydu:
+     tarayıcı varsayılanı rgba(51,181,229,0.4). Ravza Books'a ait değil. */
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color var(--dur-fast, 160ms) var(--ease-out, ease),
+    box-shadow var(--dur-fast, 160ms) var(--ease-out, ease);
+}
+
+/* Dokunmatikte de görünür "alan aktif" işareti - ince, tema rengiyle. */
+.ravza-books-page .reader-search-field:focus-within {
+  border-color: var(--reader-field-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--reader-field-focus) 22%, transparent);
+}
+
+/* Klavye odağı AYRICA net bir halka alır (outline:none ile erişilebilirliği
+   kaldırmak yasak, §10). Halka sarmalayıcıya çizilir; input kendi içinde
+   kenarlıksız kalır. */
+.ravza-books-page .reader-search-field:has(input:focus-visible) {
+  outline: 2px solid var(--reader-field-focus);
+  outline-offset: 2px;
 }
 
 .ravza-books-page .reader-search-field svg {
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  color: var(--ink-muted);
+  color: var(--reader-field-placeholder);
+  transition: color var(--dur-fast, 160ms) var(--ease-out, ease);
+}
+
+/* Büyüteç de odakla birlikte tema rengine geçer (§11: rastgele mavi yok). */
+.ravza-books-page .reader-search-field:focus-within svg {
+  color: var(--reader-field-focus);
 }
 
 /* Paylaşılan temizleme bileşeni input'un etrafına bir sarmalayıcı ekler;
@@ -249,14 +276,39 @@
   min-width: 0;
   min-height: 46px;
   padding: 0;
-  color: var(--ink);
+  color: var(--reader-field-text);
   border: 0;
   background: transparent;
   font: 400 17px/1.2 var(--ui-font);
+  caret-color: var(--reader-caret);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.ravza-books-page .reader-search-field input:focus {
+.ravza-books-page .reader-search-field input::placeholder {
+  color: var(--reader-field-placeholder);
+}
+
+/* Odak halkası SARMALAYICIDA çizildiği için input'un kendi outline'ı kapanır.
+   Erişilebilirlik kaybı yok: :has(input:focus-visible) kuralı halkayı verir. */
+.ravza-books-page .reader-search-field input:focus,
+.ravza-books-page .reader-search-field input:focus-visible {
   outline: none;
+}
+
+/* Autofill, WebKit'te alanı kendi mavi/sarı zeminine boyar. Tema zeminine
+   geri çek: iç gölge hilesi, autofill zeminini boyayabilmenin tek yolu. */
+.ravza-books-page .reader-search-field input:-webkit-autofill,
+.ravza-books-page .reader-search-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--reader-field-text);
+  -webkit-box-shadow: 0 0 0 60px var(--reader-field-bg) inset;
+  caret-color: var(--reader-caret);
+}
+
+/* Seçim de okuma temasına ait (§11). Global pembe --selection-bg okuyucuda
+   kâğıt/kahve paletiyle çakışıyordu. Seçim KALDIRILMAZ, yalnızca renklenir. */
+.ravza-books-page ::selection {
+  color: var(--ink);
+  background: var(--reader-field-selection);
 }
 
 .ravza-books-page .reader-search-state {
@@ -449,12 +501,17 @@
 }
 
 /* scroll-snap "proximity": sayfa başına yumuşakça oturur ama serbest
-   kaydırmayı engellemez (uzun sayfada kullanıcıyı hapsetmez). */
+   kaydırmayı engellemez (uzun sayfada kullanıcıyı hapsetmez).
+
+   AKIŞ NEDEN `block`, `grid` DEĞİL: sayfa yüksekliği `aspect-ratio`dan türer
+   (genişliğe sığdır + PDF en-boy oranı). Bir grid/flex parçasında bu türetilmiş
+   yükseklik satır/parça ölçümüne KATILMIYOR: 166 sayfalık kitapta her satır
+   0px ölçülüyor, sayfalar yalnızca `gap` kadar (12px) kayarak üst üste yığılıyor
+   ve kaydırıcı 89.000px yerine 2.576px oluyordu. Sonuç: "9. sayfaya kaydır"
+   22. sayfaya düşüyordu. Normal blok akışında aspect-ratio yüksekliği akışa
+   girer; ölçülen scrollHeight 2.576px -> 89.162px. */
 .ravza-books-page .reader-root[data-reader-mode="scroll"] #rdr-flipbook {
-  display: grid;
-  gap: 0.75rem;
-  justify-items: center;
-  align-content: start;
+  display: block;
   width: 100% !important;
   height: 100% !important;
   padding: 0;
@@ -475,6 +532,8 @@
      tarayıcı çubuklarıyla değişen BÜYÜK viewport'u verir ve kaydırıcının
      gerçek yüksekliğiyle ilgisi yoktur (§23: dvh'ye gereksiz bağlanma). */
   width: 100%;
+  /* Blok akışında sayfalar kendi aralarında bu boşlukla ayrılır (§7: 8-16px). */
+  margin: 0 auto var(--reader-page-gap);
   aspect-ratio: var(--pdf-page-aspect, 0.75);
   transform: none;
   /* "start": sayfaya git işlemi sayfanın ÜSTÜNÜ hizalar, snap de aynı noktaya

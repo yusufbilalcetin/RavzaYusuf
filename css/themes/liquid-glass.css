@@ -128,6 +128,18 @@ html.theme-liquid-glass .glass-surface--overlay {
     background: var(--glass-bg-navigation);
   }
 
+  /* --overlay de burada YENIDEN bildirilmeli.
+     Yukaridaki `.glass-surface--overlay` kurali ile bu blogun icindeki
+     `.glass-surface` kurali AYNI ozgullukte (0,2,1); backdrop-filter destekli
+     tarayicida sonra gelen kazaniyor ve overlay paneller guclu zeminini
+     (--glass-bg-strong) kaybedip %62'lik kabuk tintine dusuyordu. Ust uste
+     binen icerik arama sonuclarinin arkasindan okunuyordu (§12: kabuk cam,
+     IC yuzeyler tonal/opak). --navigation icin ayni yeniden bildirim zaten
+     vardi; --overlay atlanmis. */
+  html.theme-liquid-glass .glass-surface--overlay {
+    background: var(--glass-bg-strong);
+  }
+
   html.theme-liquid-glass .sidebar.glass-surface {
     -webkit-backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;
     backdrop-filter: saturate(var(--glass-sat-lg)) blur(var(--glass-blur-lg)) !important;

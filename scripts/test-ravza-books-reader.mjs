@@ -19,6 +19,7 @@ import {
   searchBookIndex,
   isSearchableQuery,
 } from "../js/pages/ravza-books-search.js";
+import { RAVZA_BOOKS } from "../data/ravza-books.js";
 
 const results = [];
 let failures = 0;
@@ -136,10 +137,15 @@ async function openBook(bookId) {
 try {
   await browser.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
 
-  await testCase("kitaplık açılır ve beş kitap listelenir", async () => {
+  await testCase("kitaplık veri kaynağındaki her kitabı listeler", async () => {
     await openLibrary();
-    const count = await browser.evaluate("document.querySelectorAll('.library-book-card').length");
-    assert.equal(count, 5, `beklenen 5 kitap, gelen ${count}`);
+    // Sabit sayı yazmak, kitap eklendiginde testi kirilgan yapiyordu (HEAD'de
+    // 5 -> 10 oldu). Iddia artik TEK KAYNAKTAN turetiliyor: veri ne diyorsa
+    // kitaplik onu gostermeli - ne eksik ne fazla.
+    const shown = await browser.evaluate(
+      "[...document.querySelectorAll('.library-book-card')].map(node => node.dataset.bookId).sort()",
+    );
+    assert.deepEqual(shown, [...RAVZA_BOOKS.map(book => book.id)].sort(), "kitaplık veriyle birebir olmalı");
   });
 
   await testCase("kitap tam ekran okuyucuya girer, site kabuğu kaybolur", async () => {
@@ -261,6 +267,101 @@ try {
     await browser.evaluate("document.querySelector('#rdr-search-sheet [data-close-sheet]').click()");
     await delay(200);
   });
+
+  /**
+   * §10/§11 - "KITAPTA ARA" ALANINDA TARAYICI MAVISI OLMAMALI.
+   *
+   * Bildirilen kusur: mobilde alana dokununca doygun mavi bir dikdortgen
+   * beliriyordu. Kaynak Ravza Books degil, TARAYICI VARSAYILANIYDI:
+   * -webkit-tap-highlight-color = rgba(51,181,229,0.4). Ayrica caret ve secim
+   * global pembe --selection-bg'yi aliyordu; kahve/kagit paletinde yabanci
+   * duruyordu. Odak da `outline:none` ile tamamen silinmisti.
+   *
+   * Bu test dort okuma temasinin HEPSINDE bakar; birinde gerileme olursa yakalar.
+   */
+  const isBlueish = (color) => {
+    const [r, g, b] = (String(color).match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+    if (![r, g, b].every(Number.isFinite)) return false;
+    // Mavi kanal digerlerini belirgin sekilde asiyorsa "tarayici mavisi".
+    return b > r + 30 && b > g + 12;
+  };
+
+  for (const theme of ["light", "sepia", "dark", "black"]) {
+    await testCase(`kitapta ara alanı ${theme} temasında tarayıcı mavisi göstermez`, async () => {
+      await browser.evaluate(`(() => {
+        const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
+        prefs.theme = ${JSON.stringify(theme)};
+        localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
+      })()`);
+      await openLibrary();
+      await openBook("perili-kosk");
+      await browser.evaluate("document.getElementById('rdr-search-open').click()");
+      await browser.waitFor("document.getElementById('rdr-search-sheet')?.open === true", "arama sayfası");
+      await browser.evaluate(`(() => {
+        const input = document.getElementById('rdr-search-input');
+        input.focus();
+        input.value = 'köşk';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.select();
+      })()`);
+      await delay(400);
+
+      const style = await browser.evaluate(`(() => {
+        const input = document.getElementById('rdr-search-input');
+        const field = input.closest('.reader-search-field');
+        const inputStyle = getComputedStyle(input);
+        const fieldStyle = getComputedStyle(field);
+        return {
+          tapHighlight: inputStyle.getPropertyValue('-webkit-tap-highlight-color'),
+          fieldTapHighlight: fieldStyle.getPropertyValue('-webkit-tap-highlight-color'),
+          caret: inputStyle.caretColor,
+          selectionBg: getComputedStyle(input, '::selection').backgroundColor,
+          fieldBg: fieldStyle.backgroundColor,
+          fieldBorder: fieldStyle.borderTopColor,
+          fieldShadow: fieldStyle.boxShadow,
+          accent: getComputedStyle(document.getElementById('ravzabooks')).getPropertyValue('--accent').trim(),
+          focused: document.activeElement?.id,
+        };
+      })()`);
+
+      assert.equal(style.focused, "rdr-search-input", "alan odakta olmalı");
+      // 1. Dokunma parlamasi tamamen kapali olmali (mavi dikdortgenin kaynagi).
+      for (const [label, value] of [["input", style.tapHighlight], ["alan", style.fieldTapHighlight]]) {
+        assert.match(
+          String(value).replace(/\s/g, ""),
+          /^(rgba\(0,0,0,0\)|transparent)$/,
+          `${label} dokunma parlamasi kapali degil: ${value}`,
+        );
+      }
+      // 2. Hicbir gorunur yuzey tarayici mavisi olmamali.
+      for (const [label, value] of [
+        ["alan zemini", style.fieldBg],
+        ["alan kenarligi", style.fieldBorder],
+        ["caret", style.caret],
+        ["seçim zemini", style.selectionBg],
+      ]) {
+        assert.ok(!isBlueish(value), `${label} mavi: ${value}`);
+      }
+      // 3. Caret ve secim OKUMA temasindan gelmeli, global pembeden degil.
+      assert.ok(!/255,\s*157,\s*184/.test(style.caret), `caret hâlâ global pembe: ${style.caret}`);
+      assert.ok(
+        !/255,\s*157,\s*184/.test(style.selectionBg),
+        `seçim hâlâ global pembe: ${style.selectionBg}`,
+      );
+      // 4. Odak GORUNUR kalmali - erisilebilirlik silinerek "duzeltilmedi".
+      assert.notEqual(style.fieldShadow, "none", "odakta görünür bir işaret kalmalı");
+
+      await browser.evaluate("document.querySelector('#rdr-search-sheet [data-close-sheet]').click()");
+      await delay(200);
+    });
+  }
+
+  // Sonraki testler acik tema bekliyor.
+  await browser.evaluate(`(() => {
+    const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
+    prefs.theme = 'light';
+    localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
+  })()`);
 
   await testCase("okuma teması değişir ve kalıcı olur", async () => {
     await browser.evaluate("document.getElementById('rdr-settings-open').click()");
@@ -468,23 +569,50 @@ try {
     })()`);
     await openLibrary();
     await openBook(bookId);
-    await browser.waitFor("document.querySelectorAll('.pdf-page.is-rendered').length > 0", "sayfa render", 60000);
+    // GECERLI sayfanin kendisi render olana kadar bekle: "herhangi bir sayfa
+    // render oldu" yetmiyor, olculecek olan gorunen sayfa.
+    await browser.waitFor(
+      `(() => { const n = document.getElementById('reader-inner')?.dataset.currentPage;
+        return !!document.querySelector('.pdf-page[data-pdf-page="' + n + '"].is-rendered'); })()`,
+      "geçerli sayfa render",
+      60000,
+    );
     await delay(700);
   }
 
   const READER_GEOMETRY = `(() => {
-    const page = document.querySelector('.pdf-page');
-    const canvas = document.querySelector('.pdf-page.is-rendered canvas') || document.querySelector('.pdf-page canvas');
+    // GECERLI sayfa olculur, DOM'daki ILK sayfa degil. Sayfa modunda cevirme
+    // motoru gorunmeyen sayfalari display:none yapar; ilk .pdf-page kapali
+    // oldugunda 0x0 dikdortgen donuyor ve "ortalanmis mi" olcumu anlamsizlasiyor
+    // (leftGap 0 / rightGap = viewport). Olculecek sey ekranda DURAN sayfadir.
+    const current = Number(document.getElementById('reader-inner').dataset.currentPage);
+    const page = document.querySelector('.pdf-page[data-pdf-page="' + current + '"]');
+    if (!page || page.getBoundingClientRect().width < 1) {
+      throw new Error('geçerli sayfa (' + current + ') ölçülebilir değil');
+    }
+    const canvas = page.querySelector('canvas');
     const dock = document.querySelector('.reader-dock');
     const pr = page.getBoundingClientRect();
     const cr = canvas.getBoundingClientRect();
     const dr = dock.getBoundingClientRect();
     return {
-      page: { left: pr.left, right: pr.right, top: pr.top, bottom: pr.bottom, width: pr.width },
+      page: { left: pr.left, right: pr.right, top: pr.top, bottom: pr.bottom, width: pr.width, height: pr.height },
       canvasStyleWidth: parseFloat(canvas.style.width) || 0,
       canvasRectWidth: cr.width,
       canvasAttrWidth: canvas.width,
       dockTop: dr.top,
+      chromeTop: parseFloat(getComputedStyle(document.getElementById('reader-inner')).getPropertyValue('--reader-chrome-top')) || 0,
+      chromeBottom: parseFloat(getComputedStyle(document.getElementById('reader-inner')).getPropertyValue('--reader-chrome-bottom')) || 0,
+      // Sahnenin ICERIK kutusu = sayfaya gercekten ayrilan alan.
+      stage: (() => {
+        const stage = document.getElementById('rdr-stage');
+        const cs = getComputedStyle(stage);
+        const pad = side => parseFloat(cs['padding' + side]) || 0;
+        return {
+          width: stage.clientWidth - pad('Left') - pad('Right'),
+          height: stage.clientHeight - pad('Top') - pad('Bottom'),
+        };
+      })(),
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
       docScrollWidth: document.documentElement.scrollWidth,
@@ -528,6 +656,42 @@ try {
         `sayfa dock'un arkasına giriyor (sayfa alt ${g.page.bottom.toFixed(1)} > dock üst ${g.dockTop.toFixed(1)})`,
       );
       assert.ok(g.page.top >= -1, `sayfa üstten taşıyor (${g.page.top.toFixed(1)})`);
+
+      /* §4 - DEV BOS BANT KONTROLU.
+
+         "Sayfa ekranin %X'ini kaplasin" demek YANLIS olurdu: 3:4'luk bir PDF
+         sayfasi 390x844 (en-boy 0.46) bir telefonda ZORUNLU olarak genislige
+         sigar ve altta/ustte bos alan kalir. Bu letterbox, hata degil geometri.
+
+         Gercek hata, KABUGUN alani yemesiydi: dock uc yigilmis tam genislik
+         satir tasirken 844px telefonda 270px kapliyor, ayrilan toplam kabuk
+         %40'a cikiyordu. Bu yuzden iki ayri sey olculur:
+           1. ayrilan kabuk ekranin makul bir dilimini gecmemeli,
+           2. sayfa, KALAN alanin en az bir eksenini tam doldurmali (fit-page:
+              scale = min(genislik, yukseklik) - yani bos kalan eksen digerinin
+              zorunlu sonucudur, tembellik degil. */
+      const chromeRatio = (g.chromeTop + g.chromeBottom) / height;
+      assert.ok(
+        chromeRatio <= 0.30,
+        `kabuk ekranin %${Math.round(chromeRatio * 100)}'ini ayiriyor (sinir %30, eski yerlesim %40)`,
+      );
+      const { width: availableWidth, height: availableHeight } = g.stage;
+      // Sahne, kabuk ayrildiktan sonra kalan alani zaten temsil ediyor; ekstra
+      // pay birakilmadigini dogrula.
+      assert.ok(
+        availableHeight >= height - g.chromeTop - g.chromeBottom - 16,
+        `sahne, kabuk disinda fazladan ${(height - g.chromeTop - g.chromeBottom - availableHeight).toFixed(0)}px yiyor`,
+      );
+      assert.ok(
+        g.page.width <= availableWidth + 1 && g.page.height <= availableHeight + 1,
+        `sayfa kullanilabilir alani asiyor (${g.page.width.toFixed(0)}x${g.page.height.toFixed(0)} > ${availableWidth.toFixed(0)}x${availableHeight.toFixed(0)})`,
+      );
+      const fillsWidth = g.page.width >= availableWidth - 2;
+      const fillsHeight = g.page.height >= availableHeight - 2;
+      assert.ok(
+        fillsWidth || fillsHeight,
+        `sayfa hicbir ekseni doldurmuyor (${g.page.width.toFixed(0)}x${g.page.height.toFixed(0)} / kullanilabilir ${availableWidth.toFixed(0)}x${availableHeight.toFixed(0)})`,
+      );
     });
   }
 
@@ -560,8 +724,36 @@ try {
     );
   });
 
-  await testCase("sürekli mod GERÇEKTEN dikey kaydırır", async () => {
+  await testCase("sürekli modda sayfalar üst üste yığılmadan akar", async () => {
     await openWith("kucuk-prens", "scroll");
+    const flow = await browser.evaluate(`(() => {
+      const s = document.getElementById('rdr-flipbook');
+      const rect = n => s.querySelector('.pdf-page[data-pdf-page="' + n + '"]').getBoundingClientRect();
+      const a = rect(1), b = rect(2), c = rect(3);
+      return { h: a.height, gap1: b.top - a.bottom, gap2: c.top - b.bottom,
+               step: b.top - a.top, scrollH: s.scrollHeight, total: s.querySelectorAll('.pdf-page').length };
+    })()`);
+    // Sayfalar aspect-ratio ile boyutlaniyordu ama grid satiri bu yuksekligi
+    // OLCMUYORDU: her satir 0px cikiyor, sayfalar yalnizca gap kadar (12px)
+    // kayarak ust uste biniyordu. Bir sonraki sayfanin ustu, oncekinin ALTINDAN
+    // sonra gelmeli - yigilma bu iddiayi gecemez.
+    assert.ok(
+      flow.step >= flow.h,
+      `sayfalar yığılmış: adım ${flow.step.toFixed(1)}px ama sayfa ${flow.h.toFixed(1)}px yüksek`,
+    );
+    // §7: bosluk kucuk ve tutarli. Yuzlerce piksel asla.
+    for (const [label, gap] of [["1-2", flow.gap1], ["2-3", flow.gap2]]) {
+      assert.ok(gap >= 4 && gap <= 24, `${label} arası sayfa boşluğu makul değil: ${gap.toFixed(1)}px`);
+    }
+    assert.ok(Math.abs(flow.gap1 - flow.gap2) <= 1, "sayfa boşluğu tutarsız");
+    // Toplam yukseklik gercek sayfa sayisiyla orantili olmali.
+    assert.ok(
+      flow.scrollH > flow.total * flow.h * 0.9,
+      `kaydirici toplam yuksekligi cok kucuk: ${flow.scrollH}px (${flow.total} x ${flow.h.toFixed(0)}px)`,
+    );
+  });
+
+  await testCase("sürekli mod GERÇEKTEN dikey kaydırır", async () => {
     const before = await browser.evaluate(`(() => {
       const s = document.getElementById('rdr-flipbook');
       return { top: s.scrollTop, clientH: s.clientHeight, scrollH: s.scrollHeight,

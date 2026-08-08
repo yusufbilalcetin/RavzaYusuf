@@ -909,13 +909,21 @@ html.launcher-experience .launcher-app-status {
      Çözüm iOS'un fotoğraf üstünde yaptığı şey: hiyerarşiyi PUNTO ve KALINLIK
      kurar, opaklık değil. Renk neredeyse tam beyaz kalır (4.7:1), ama 9px ve
      500 ağırlıkla ana etiketin (13px/600) açıkça altında okunur. */
-  color: rgba(255, 255, 255, .96);
+  /* .96 -> tam beyaz ve hale biraz guclendirildi.
+     NEDEN: kapali <dialog>'lar (centered-dialogs.css) yanlislikla tam ekran
+     render ediliyordu ve cam panelleri duvar kagidini hafifce tonluyordu; bu
+     rozet o kazara tonun uzerinde 4.7:1 olcuyordu. Kapali dialog gercekten
+     gizlenince duvar kagidinin acik bolgesi (rgb(133,113,97)) dogrudan
+     arkaya gecti ve oran 4.42'ye dustu - yani okunabilirlik hic deterministik
+     degildi, bir hataya yaslanmisti. Hiyerarsi hala PUNTO/KALINLIK ile kurulur
+     (9px/500 vs 13px/600), opaklikla degil. */
+  color: #fff;
   font-size: 9px;
   font-weight: 500;
   letter-spacing: .01em;
   text-shadow:
-    0 1px 3px rgba(0, 0, 0, .30),
-    0 2px 10px rgba(0, 0, 0, .20);
+    0 1px 3px rgba(0, 0, 0, .42),
+    0 2px 10px rgba(0, 0, 0, .28);
 }
 
 /* Dock ve klasör diyaloğunun ARKASINDA zaten cam yüzey var; orada hale

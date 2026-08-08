@@ -6,8 +6,12 @@ import { readFile, rm, stat } from 'node:fs/promises';
 import { extname, join, resolve, sep } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { RAVZA_BOOKS } from '../data/ravza-books.js';
 
 const ROOT = resolve(fileURLToPath(new URL('../', import.meta.url)));
+/** Kitaplik iddialarinin TEK KAYNAGI. Sabit sayi yazmak, kitap eklendiginde
+ *  (HEAD'de 5 -> 10) alakasiz testleri kiriyordu. */
+const BOOK_COUNT = RAVZA_BOOKS.length;
 const PORT = 8784;
 const BASE_URL = (process.env.RAVZA_BOOKS_URL || `http://127.0.0.1:${PORT}`).replace(/\/$/, '');
 const READER_OVERRIDE = process.env.RAVZA_BOOKS_OVERRIDE_READER === '1'
@@ -207,7 +211,7 @@ try {
   // acilisini cokertmemeli. Bu, gercekte gorulen sonsuz loading regresyonudur.
   await evaluate("localStorage.setItem('ravza-books-progress', 'null'); location.reload()");
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"library\"] .library-book-card')");
-  assert.equal(await evaluate("document.querySelectorAll('.library-book-card').length"), 5, 'null progress storage kitapligi bos birakti');
+  assert.equal(await evaluate("document.querySelectorAll('.library-book-card').length"), BOOK_COUNT, 'null progress storage kitapligi bos birakti');
   assert.equal(await evaluate("Boolean(document.querySelector('.startup-error, .reader-error'))"), false, 'null progress storage hata ekrani uretti');
   await evaluate("localStorage.removeItem('ravza-books-progress')");
 
@@ -267,7 +271,7 @@ try {
   }
 
   await setViewport(390, 844);
-  assert.equal(await evaluate("document.querySelectorAll('.library-book-card').length"), 5, 'Beş PDF kitabın tamamı kitaplıkta görünmüyor');
+  assert.equal(await evaluate("document.querySelectorAll('.library-book-card').length"), BOOK_COUNT, 'PDF kitaplarin tamami kitaplikta gorunmuyor');
   assert.equal(
     [...requestUrls.values()].filter(url => /page-flip/i.test(url)).length,
     0,
@@ -452,6 +456,25 @@ try {
   assert.equal(desktopPdfFit.overflow, 0, 'Çift sayfa PDF yatay taşıyor');
   await setViewport(390, 844);
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] #reader-inner')?.dataset.spread === 'single'", 30000);
+  /* YARIS KAPATILDI (test tarafinda).
+     `spread === 'single'` yalnizca OLCUNUN yazildigini soyler; cevirme motoru
+     yeniden kurulup 'read' durumuna donmeden pointerdown gelirse jest sessizce
+     yok sayilir (onPointerDown: `if (pageFlip.getState() !== 'read') return`)
+     ve surukleme hicbir sey yapmaz. Asagidaki iddia degismedi - yalnizca jest,
+     okuyucu gercekten hazir olduktan sonra gonderiliyor: gecerli sayfa render
+     edilmis VE besik olcusu iki kare boyunca sabit. */
+  await waitFor(`(() => {
+    const root = document.querySelector('#reader-inner');
+    const page = document.querySelector('.pdf-page[data-pdf-page="' + root?.dataset.currentPage + '"]');
+    return !!page?.classList.contains('is-rendered');
+  })()`, 30000);
+  await waitFor(`(() => {
+    const box = document.querySelector('#book-cradle').getBoundingClientRect();
+    const key = Math.round(box.width) + 'x' + Math.round(box.height) + '@' + Math.round(box.left);
+    const stable = window.__ravzaCradleKey === key;
+    window.__ravzaCradleKey = key;
+    return stable;
+  })()`, 30000);
 
   const stage = await evaluate(`(() => { const r = document.querySelector('#book-cradle').getBoundingClientRect(); return { left:r.left, right:r.right, y:r.top+r.height/2 }; })()`);
   await command('Input.dispatchMouseEvent', { type: 'mousePressed', x: stage.right - 3, y: stage.y, button: 'left', buttons: 1, clickCount: 1 });

@@ -64,6 +64,19 @@
   justify-content: center;
 }
 
+/* KAPALI <dialog> GERCEKTEN KAPALI OLMALI.
+   Tarayicinin kendi kurali `dialog:not([open]) { display: none }`; yukaridaki
+   `display: flex` yazar kurali oldugu icin onu EZIYORDU. Sonuc gorunmez bir
+   hata degildi: uc okuyucu sayfasi (icindekiler / arama / ayarlar) kapaliyken
+   de tam ekran, gorunur ve TIKLANABILIR kaliyordu. Okuyucunun uzerinde
+   elementFromPoint(195, 700) sayfa yerine ayarlar panelindeki "TXT kitap sec"
+   etiketini donduruyor, ekran goruntusunde panel icerigi PDF'in altindan
+   sizip gorunuyordu. Kapali dialog artik duzenden tamamen cikar. */
+.ui-sheet:not([open]),
+.reader-sheet:not([open]) {
+  display: none;
+}
+
 /* -------------------------------------------------------------------------
    Panel.
    Genişlik semantik ölçekten, yükseklik görünür alandan türer. İçerik uzunsa

@@ -1072,23 +1072,10 @@ function buildReaderShell(book) {
     </header>
 
     <nav class="reader-dock" id="rdr-dock" aria-label="Okuyucu kontrolleri">
-      <div class="reader-dock-stack">
-        <button class="reader-dock-row glass-surface" id="rdr-contents-open" type="button" aria-haspopup="dialog">
-          <span class="reader-dock-label">İçindekiler</span>
-          <span class="reader-dock-value" id="rdr-contents-value"></span>
-          ${ICON.contents}
-        </button>
-        <button class="reader-dock-row glass-surface" id="rdr-search-open" type="button" aria-haspopup="dialog">
-          <span class="reader-dock-label">Kitapta Ara</span>
-          ${ICON.search}
-        </button>
-        <button class="reader-dock-row glass-surface" id="rdr-settings-open" type="button" aria-haspopup="dialog" aria-expanded="false">
-          <span class="reader-dock-label">Temalar ve Ayarlar</span>
-          <span class="reader-dock-value reader-dock-aa">Aa</span>
-        </button>
-      </div>
-
       <div class="reader-dock-actions">
+        <button class="reader-action reader-dock-row glass-surface" id="rdr-contents-open" type="button" aria-haspopup="dialog" aria-label="İçindekiler">${ICON.contents}<span>Bölümler</span></button>
+        <button class="reader-action reader-dock-row glass-surface" id="rdr-search-open" type="button" aria-haspopup="dialog" aria-label="Kitapta ara">${ICON.search}<span>Ara</span></button>
+        <button class="reader-action reader-dock-row glass-surface" id="rdr-settings-open" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Temalar ve ayarlar"><span class="reader-dock-aa" aria-hidden="true">Aa</span><span>Ayarlar</span></button>
         <button class="reader-action glass-surface" id="rdr-share" type="button" aria-label="Kitabı paylaş">${ICON.share}<span>Paylaş</span></button>
         <button class="reader-action glass-surface" id="rdr-mode" type="button" aria-label="Okuma modunu değiştir">${state.readerMode === 'scroll' ? ICON.scrollMode : ICON.pageMode}<span id="rdr-mode-label">${state.readerMode === 'scroll' ? 'Kaydır' : 'Sayfa'}</span></button>
         <button class="reader-action glass-surface${bookmarked ? ' is-active' : ''}" id="rdr-bookmark" type="button" aria-label="Yer imi" aria-pressed="${bookmarked}">${bookmarked ? ICON.bookmarkFill : ICON.bookmark}<span>Yer imi</span></button>
