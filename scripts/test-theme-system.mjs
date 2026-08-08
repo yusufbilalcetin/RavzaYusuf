@@ -303,7 +303,7 @@ async function testPanelPointerAndFocus(viewport) {
   await browser.focus(CC_ENTRY);
   await browser.click(CC_ENTRY);
   await browser.waitFor("document.getElementById('control-center')?.open === true", "kontrol merkezi acildi");
-  await browser.click('[data-cc-action="wallpaper"]');
+  await browser.click('[data-cc-action="settings"]');
   await browser.waitFor("document.getElementById('theme-sheet')?.classList.contains('open')", "panel kontrol merkezinden acildi");
   await delay(430);
   let snapshot = await readThemeSnapshot(browser);

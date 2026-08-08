@@ -1,0 +1,254 @@
+/* ==========================================================================
+   ARKA PLAN PANELI
+
+   Konum/genislik/VisualViewport davranisi centered-dialogs.css'ten gelir
+   (.ui-sheet + .ui-sheet-panel). Burada yalnizca panel ici duzen ve renk var.
+   Cam yalnizca DIS kabukta; ic yuzeyler tonal.
+   ========================================================================== */
+
+.wallpaper-panel .wp-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  border-radius: var(--r-xl, 20px);
+}
+
+.wallpaper-panel .wp-head {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 0.85rem 0.6rem 1.15rem;
+}
+
+.wallpaper-panel .wp-head h2 {
+  margin: 0;
+  color: var(--glass-text-primary, var(--text));
+  font: 600 1.12rem/1.2 var(--ui-font, system-ui);
+  letter-spacing: -0.02em;
+}
+
+.wallpaper-panel .wp-close {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--glass-text-secondary, var(--text-soft));
+  border: 0;
+  border-radius: 50%;
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.12));
+  cursor: pointer;
+}
+
+.wallpaper-panel .wp-close svg { width: 18px; height: 18px; }
+
+.wallpaper-panel .wp-body {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 1.05rem;
+  min-height: 0;
+  padding: 0.25rem 1.15rem 1.15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.wallpaper-panel .wp-group-title {
+  margin: 0 0 0.5rem;
+  color: var(--glass-text-secondary, var(--text-soft));
+  font: 600 0.72rem/1.2 var(--ui-font, system-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* --- Mod segmenti --- */
+.wallpaper-panel .wp-segmented {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 13px;
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
+}
+
+.wallpaper-panel .wp-segment {
+  min-height: 44px;
+  padding: 0 0.5rem;
+  color: var(--glass-text-secondary, var(--text-soft));
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: 600 0.82rem/1.2 var(--ui-font, system-ui);
+  cursor: pointer;
+}
+
+.wallpaper-panel .wp-segment.is-selected {
+  color: var(--glass-text-primary, var(--text));
+  background: var(--glass-bg-strong, rgba(255, 255, 255, 0.5));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+/* --- Buyuk onizleme --- */
+.wallpaper-panel .wp-preview {
+  overflow: hidden;
+  border: 1px solid var(--glass-border, rgba(120, 120, 130, 0.2));
+  border-radius: 14px;
+  aspect-ratio: 16 / 9;
+}
+
+.wallpaper-panel .wp-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Oran korunur, kirpma cover ile yapilir - gorsel ASLA gerilmez. */
+  object-fit: cover;
+}
+
+.wallpaper-panel .wp-preview-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0.5rem 0 0.6rem;
+}
+
+.wallpaper-panel .wp-preview-name {
+  color: var(--glass-text-primary, var(--text));
+  font: 600 0.94rem/1.25 var(--ui-font, system-ui);
+}
+
+.wallpaper-panel .wp-preview-mode {
+  color: var(--glass-text-tertiary, var(--text-soft));
+  font: 500 0.76rem/1.2 var(--ui-font, system-ui);
+}
+
+.wallpaper-panel .wp-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.wallpaper-panel .wp-action {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 0.6rem;
+  color: var(--glass-text-primary, var(--text));
+  border: 0;
+  border-radius: 12px;
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
+  font: 600 0.84rem/1.2 var(--ui-font, system-ui);
+  cursor: pointer;
+}
+
+.wallpaper-panel .wp-action svg { width: 18px; height: 18px; }
+.wallpaper-panel .wp-action[disabled] { opacity: 0.45; cursor: default; }
+
+/* --- Galeri --- */
+.wallpaper-panel .wp-gallery {
+  display: grid;
+  /* Responsive: panel genisligine gore dogal dagilim, sabit viewport yok. */
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 0.6rem;
+}
+
+.wallpaper-panel .wp-thumb {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--glass-text-secondary, var(--text-soft));
+  font: 500 0.72rem/1.25 var(--ui-font, system-ui);
+  text-align: left;
+  cursor: pointer;
+}
+
+.wallpaper-panel .wp-thumb-frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  /* Dokunma hedefi: cerceve tek basina 44px'i asar. */
+  min-height: 64px;
+  border: 1.5px solid var(--glass-border, rgba(120, 120, 130, 0.24));
+  border-radius: 12px;
+  aspect-ratio: 4 / 3;
+  transition: border-color 140ms var(--ease-out, ease), transform 140ms var(--ease-out, ease);
+}
+
+.wallpaper-panel .wp-thumb-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wallpaper-panel .wp-thumb:hover .wp-thumb-frame {
+  border-color: var(--glass-accent, var(--accent, #d4669c));
+  transform: translateY(-1px);
+}
+
+.wallpaper-panel .wp-thumb:active .wp-thumb-frame { transform: scale(0.985); }
+
+/* Klavye odagi: semantic halka, tarayici mavisi degil. */
+.wallpaper-panel .wp-thumb:focus-visible {
+  outline: none;
+}
+
+.wallpaper-panel .wp-thumb:focus-visible .wp-thumb-frame {
+  outline: 2px solid var(--glass-accent, var(--accent, #d4669c));
+  outline-offset: 2px;
+}
+
+/* Secili durum: belirgin ama sakin - glow yok. */
+.wallpaper-panel .wp-thumb.is-selected .wp-thumb-frame {
+  border-color: var(--glass-accent, var(--accent, #d4669c));
+  box-shadow: 0 0 0 2px var(--glass-accent, var(--accent, #d4669c));
+}
+
+.wallpaper-panel .wp-thumb.is-selected .wp-thumb-name {
+  color: var(--glass-text-primary, var(--text));
+  font-weight: 600;
+}
+
+.wallpaper-panel .wp-thumb-check {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  display: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  border-radius: 50%;
+  background: var(--glass-accent, var(--accent, #d4669c));
+}
+
+.wallpaper-panel .wp-thumb-check svg { width: 14px; height: 14px; }
+.wallpaper-panel .wp-thumb.is-selected .wp-thumb-check { display: grid; }
+
+.wallpaper-panel .wp-thumb-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Hareket azaltma tercihi: yukselme/olcek animasyonu kalkar. */
+@media (prefers-reduced-motion: reduce) {
+  .wallpaper-panel .wp-thumb-frame { transition: none; }
+  .wallpaper-panel .wp-thumb:hover .wp-thumb-frame,
+  .wallpaper-panel .wp-thumb:active .wp-thumb-frame { transform: none; }
+}
+
+/* Control Center'daki Arka Plan tile'i: ikincil mod etiketi. */
+.control-center .cc-tile--stacked { align-items: center; }
+.control-center .cc-tile-text { display: grid; min-width: 0; gap: 0.1rem; }
+.control-center .cc-tile-sub {
+  color: var(--glass-text-tertiary, var(--text-soft));
+  font: 500 0.74rem/1.2 var(--ui-font, system-ui);
+}

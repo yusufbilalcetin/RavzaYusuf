@@ -12,6 +12,7 @@ import { bindThemeControls, getThemeState, initThemeSystem } from "./theme.js";
 import { registerCoreOverlays } from "./overlay-registrations.js";
 import { initAppearance } from "./appearance.js";
 import { initControlCenter } from "../ui/control-center.js";
+import { initWallpaperPanel } from "../ui/wallpaper-panel.js";
 
 // legacy-app.js normalde çok hızlı yüklenir (yerel/CDN'den tek modül); bu
 // süre yalnızca "CDN tamamen tıkanırsa ana içerik sonsuza dek beklemesin"
@@ -106,6 +107,7 @@ export async function initApp() {
     registerCoreOverlays();
     initAppearance();
     initControlCenter();
+    initWallpaperPanel();
     initThemeSystem();
     startupState.domReady = true;
     pbnLog("boot", {

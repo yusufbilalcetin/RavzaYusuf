@@ -1,4 +1,5 @@
 import { ANA_SAYFA_GORSELLERI } from "../../data/ana-sayfa-gorselleri.js";
+import { resolveWallpaperId } from "../core/wallpaper.js";
 
 export const HOME_HERO_STORAGE_KEY = "ravzaYusufLastHomeHero";
 export const HOME_HERO_SELECTION_KEY = "__RAVZA_YUSUF_HOME_HERO__";
@@ -88,6 +89,16 @@ export function getOrSelectHomeHero(themes = ANA_SAYFA_GORSELLERI) {
   const pool = validThemes(themes);
   if (!pool.length) return null;
 
+  /* Arka plan durumu (sabit / oturumluk rastgele) once sorulur.
+     resolveWallpaperId rastgele secimi YALNIZCA oturumda henuz secim yoksa
+     yapar, yani gezinme ve yeniden render arka plani degistirmez. */
+  const resolvedId = resolveWallpaperId(pool.map((theme) => theme.id));
+  const resolved = pool.find((theme) => theme.id === resolvedId);
+  if (resolved) {
+    globalThis[HOME_HERO_SELECTION_KEY] = resolved;
+    return resolved;
+  }
+
   const earlySelection = globalThis[HOME_HERO_SELECTION_KEY];
   const selectedFromBootstrap = pool.find((theme) => theme.id === earlySelection?.id);
   if (selectedFromBootstrap) return selectedFromBootstrap;
@@ -95,6 +106,45 @@ export function getOrSelectHomeHero(themes = ANA_SAYFA_GORSELLERI) {
   const selected = rastgeleTemaSec(pool);
   if (selected) globalThis[HOME_HERO_SELECTION_KEY] = selected;
   return selected;
+}
+
+/**
+ * Secili arka plani sahneye uygular.
+ *
+ * Disa aciliyor cunku Arka Plan paneli de ayni yolu kullanmali - ikinci bir
+ * uygulama yolu yazmak, iki farkli gorsel durumuna yol acardi.
+ * Gorsel ONCE preload edilir; hazir olmadan degistirilmez, boylece
+ * beyaz/siyah flash olusmaz (§13).
+ */
+export function applyHomeHero(theme) {
+  if (!theme) return false;
+  const stage = document.getElementById("anaSayfaHeroStage");
+  const heroImage = document.getElementById("anaSayfaHeroImage");
+  if (!stage || !heroImage) return false;
+
+  const paint = () => {
+    stage.dataset.homeHeroTheme = theme.id;
+    stage.classList.remove("is-home-hero-error");
+    stage.style.setProperty("--home-hero-placeholder", cssUrl(theme.placeholder));
+    stage.style.setProperty("--home-hero-desktop-position", theme.desktopPosition || "center center");
+    stage.style.setProperty("--home-hero-mobile-position", theme.mobilePosition || "center center");
+    heroImage.alt = theme.alt;
+    setSource(document.getElementById("anaSayfaHeroMobileAvif"), theme.mobile.avifSrcSet);
+    setSource(document.getElementById("anaSayfaHeroMobileWebp"), theme.mobile.webpSrcSet);
+    setSource(document.getElementById("anaSayfaHeroDesktopAvif"), theme.desktop.avifSrcSet);
+    setSource(document.getElementById("anaSayfaHeroDesktopWebp"), theme.desktop.webpSrcSet);
+    heroImage.src = theme.desktop.fallback;
+    stage.classList.add("is-home-hero-loaded");
+    globalThis[HOME_HERO_SELECTION_KEY] = theme;
+  };
+
+  const preload = new Image();
+  preload.onload = paint;
+  // Yuklenemezse eski gorsel ekranda kalir; kirik goruntu gosterilmez.
+  preload.onerror = () => {};
+  preload.src = theme.desktop.fallback;
+  if (preload.complete && preload.naturalWidth) paint();
+  return true;
 }
 
 export function initAnaSayfaRastgeleGorsel(themes = ANA_SAYFA_GORSELLERI) {

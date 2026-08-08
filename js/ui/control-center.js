@@ -19,6 +19,7 @@
  *    geri getirilmedi. Spotlight henuz yok, olu dugme konmadi.
  */
 import { claimOverlay, registerOverlay, releaseOverlay } from "../core/overlay-manager.js";
+import { openWallpaperPanel, wallpaperModeLabel } from "./wallpaper-panel.js";
 import { openThemeSheet } from "../core/theme.js";
 
 const DIALOG_ID = "control-center";
@@ -35,6 +36,7 @@ const ICONS = {
   exam: ICON('<path d="M6 3.5h9L19 8v12.5H6Z"/><path d="M14 3.5V8h5"/><path d="M9 13h6M9 16.5h4"/>'),
   games: ICON('<rect x="2.5" y="7" width="19" height="10" rx="4"/><path d="M7 10.5v3M5.5 12h3"/><circle cx="16" cy="11" r="1"/><circle cx="18.5" cy="13.5" r="1"/>'),
   close: ICON('<path d="M6 6l12 12M18 6 6 18"/>'),
+  settings: ICON('<circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 14.5H4.5a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.56-1.1 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 10.5 4.6h.1a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1.56 1.04 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V10.5a2 2 0 1 1 0 4Z"/>'),
 };
 
 /** Hizli uygulamalar: rota adlari GERCEK router rotalaridir. */
@@ -64,10 +66,19 @@ function markup() {
       <div class="cc-body">
         <section class="cc-group">
           <h3 class="cc-group-title" id="cc-system-title">Sistem</h3>
-          <div class="cc-tiles cc-tiles--wide" role="group" aria-labelledby="cc-system-title">
-            <button class="cc-tile" type="button" data-cc-action="wallpaper">
+          <div class="cc-tiles" role="group" aria-labelledby="cc-system-title">
+            <button class="cc-tile cc-tile--stacked" type="button" data-cc-action="wallpaper">
               <span class="cc-tile-icon" aria-hidden="true">${ICONS.wallpaper}</span>
-              <span class="cc-tile-label">Duvar Kağıdı ve Tema</span>
+              <span class="cc-tile-text">
+                <span class="cc-tile-label">Arka Plan</span>
+                <!-- Ikincil etiket mevcut modu soyler: kullanici arka planin
+                     neden degistigini (ya da degismedigini) anlar. -->
+                <span class="cc-tile-sub" id="cc-wallpaper-mode">${wallpaperModeLabel()}</span>
+              </span>
+            </button>
+            <button class="cc-tile" type="button" data-cc-action="settings">
+              <span class="cc-tile-icon" aria-hidden="true">${ICONS.settings}</span>
+              <span class="cc-tile-label">Görünüm Ayarları</span>
             </button>
           </div>
         </section>
@@ -95,7 +106,8 @@ function markup() {
  * buradan tazelenecek.
  */
 function syncControls() {
-  // Su an tazelenecek dinamik durum yok.
+  const label = document.getElementById("cc-wallpaper-mode");
+  if (label) label.textContent = wallpaperModeLabel();
 }
 
 function ensureDialog() {
@@ -132,10 +144,16 @@ function handleClick(event) {
     return;
   }
 
-  if (target.closest('[data-cc-action="wallpaper"]')) {
-    // Mevcut tema/duvar kagidi panelini acar. Koordinator sayesinde Kontrol
-    // Merkezi kendiliginden kapanir - burada elle kapatmaya gerek yok.
+  if (target.closest('[data-cc-action="settings"]')) {
+    // Tema (Acik/Koyu/Sistem) ve renk stili Ayarlar'da yasiyor; Kontrol
+    // Merkezi yalnizca GIRIS noktasidir, kontrollerin kopyasini tasimaz.
     openThemeSheet(document.getElementById("control-center-open"));
+    return;
+  }
+
+  if (target.closest('[data-cc-action="wallpaper"]')) {
+    // Koordinator sayesinde Kontrol Merkezi kendiliginden kapanir.
+    openWallpaperPanel(document.getElementById("control-center-open"));
     return;
   }
 
