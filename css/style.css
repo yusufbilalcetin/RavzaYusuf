@@ -61,3 +61,4 @@
 /* EN SON: tum popup/modal/dialog pencerelerinin ortalanmis geometrisi.
    ios-dialog-geometry.css'in mobil "alttan sheet" donusumunu notrler. */
 @import url("./components/centered-dialogs.css?v=centered-dialogs-20260808-1");
+@import url("./components/control-center.css?v=control-center-20260808-1");

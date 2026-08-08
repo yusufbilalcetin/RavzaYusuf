@@ -194,9 +194,41 @@ export function closeOverlaysForNavigation() {
   return closeOverlay(activeId, { navigation: true });
 }
 
+/**
+ * Kayit defterinden GERCEGI okuyup aktif kaydi ve govde kilidini tazeler.
+ *
+ * Neden gerekli: kilit yalnizca "aktif kim?" diye soruldugunda hesaplansaydi,
+ * bir panel kendi kendine kapandiktan sonra kimse sormazsa `overflow: hidden`
+ * govdede ASILI kalirdi. Bu fonksiyon kapanis anlarinda cagrilir.
+ */
+export function refreshOverlayState() {
+  let found = null;
+  for (const entry of registry.values()) {
+    if (safeIsOpen(entry)) { found = entry.id; break; }
+  }
+  activeId = found;
+  applyBodyState();
+  return activeId;
+}
+
+/** Belirli bir overlay kapandi: kaydi birak ve kilidi tazele. */
+export function releaseOverlay(id) {
+  if (activeId === String(id)) activeId = null;
+  return refreshOverlayState();
+}
+
 /** Kapanan overlay'in odagi geri almamasi gerekip gerekmedigi. */
 export function isReplacingOverlay() {
   return replacing;
+}
+
+/**
+ * Native <dialog> kapanislarini yakalar. `close` olayi BUBBLE ETMEZ, bu yuzden
+ * capture fazinda dinlenir; Escape / backdrop / close() yollarinin hepsi buraya
+ * duser ve govde kilidi asili kalmaz.
+ */
+if (typeof document !== "undefined") {
+  document.addEventListener("close", () => refreshOverlayState(), true);
 }
 
 /** Yalnizca testler icin: kayit defterini ve durumu sifirlar. */

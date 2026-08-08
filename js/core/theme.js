@@ -1,4 +1,4 @@
-import { claimOverlay, OVERLAY_IDS } from "./overlay-manager.js";
+import { claimOverlay, refreshOverlayState, OVERLAY_IDS } from "./overlay-manager.js";
 const THEME_MODES = Object.freeze(["light", "dark", "system"]);
 const THEME_STYLES = Object.freeze([
   "noel-ask",
@@ -300,6 +300,9 @@ export function closeThemeSheet(options = {}) {
     panelReturnFocus.focus({ preventScroll: true });
   }
   panelReturnFocus = null;
+  // Sinif tabanli panel native `close` olayi yaymaz; koordinator govde scroll
+  // kilidini birakabilmek icin kapanisi buradan ogrenir.
+  refreshOverlayState();
   return wasOpen;
 }
 

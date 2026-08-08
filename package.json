@@ -32,6 +32,7 @@
     "security:check": "npm audit --audit-level=high",
     "check:modules": "node ./scripts/check-module-versions.mjs",
     "check": "npm run check:modules && npm run css:check && npm run icons:audit && npm run audit:assets && npm run audit:background-assets && npm run games:icons:check && npm run books:check && npm run test:search-clear && npm run test:scroll-reveal && npm run test:ui-primitives && npm run test:theme-system && npm run audit:theme-contrast",
+    "test:control-center": "node ./scripts/test-control-center.mjs",
     "test:overlay-manager": "node ./scripts/test-overlay-manager.mjs",
     "test:ui-primitives": "node ./scripts/test-ui-primitives.mjs",
     "test:home-hero": "node ./js/pages/ana-sayfa-rastgele-gorsel.test.mjs",

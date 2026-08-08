@@ -1,0 +1,268 @@
+/* ==========================================================================
+   KONTROL MERKEZI
+
+   Konum/genislik/VisualViewport davranisi components/centered-dialogs.css'ten
+   gelir (.ui-sheet + .ui-dialog--medium). Burada YALNIZCA panel ici duzen ve
+   renk vardir - ikinci bir geometri sistemi yok.
+
+   Cam yalnizca DIS kabukta (.cc-panel .glass-surface--overlay). Ic gruplar
+   tonal/opak yuzeydir: cam icinde cam yok.
+   ========================================================================== */
+
+.control-center .cc-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  border-radius: var(--r-xl, 20px);
+}
+
+.control-center .cc-head {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 0.85rem 0.6rem 1.15rem;
+}
+
+.control-center .cc-head h2 {
+  margin: 0;
+  color: var(--glass-text-primary, var(--text));
+  font: 600 1.12rem/1.2 var(--ui-font, system-ui);
+  letter-spacing: -0.02em;
+}
+
+.control-center .cc-close {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--glass-text-secondary, var(--text-soft));
+  border: 0;
+  border-radius: 50%;
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.12));
+  cursor: pointer;
+}
+
+.control-center .cc-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.control-center .cc-body {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 1.05rem;
+  min-height: 0;
+  padding: 0.25rem 1.15rem 1.15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.control-center .cc-group-title {
+  margin: 0 0 0.5rem;
+  color: var(--glass-text-secondary, var(--text-soft));
+  font: 600 0.72rem/1.2 var(--ui-font, system-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* --- Segmented (Tema / Liquid Glass) --- */
+.control-center .cc-segmented {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 13px;
+  /* Tonal ic yuzey - cam DEGIL. */
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
+}
+
+.control-center .cc-segment {
+  min-height: 44px;
+  padding: 0 0.6rem;
+  color: var(--glass-text-secondary, var(--text-soft));
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: 600 0.88rem/1 var(--ui-font, system-ui);
+  cursor: pointer;
+  transition: background-color var(--dur-fast, 150ms) var(--ease-out, ease),
+    color var(--dur-fast, 150ms) var(--ease-out, ease);
+}
+
+.control-center .cc-segment.is-selected {
+  color: var(--glass-text-primary, var(--text));
+  background: var(--glass-bg-strong, rgba(255, 255, 255, 0.5));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+/* --- Anahtar satiri --- */
+.control-center .cc-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 0.85rem;
+  border-radius: 13px;
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
+}
+
+.control-center .cc-row-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--glass-text-secondary, var(--text-soft));
+}
+
+.control-center .cc-row-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.control-center .cc-row-label {
+  flex: 1 1 auto;
+  color: var(--glass-text-primary, var(--text));
+  font: 600 0.94rem/1.25 var(--ui-font, system-ui);
+}
+
+/* Dokunma hedefi 44px; gorsel ray 30px ve dikeyde ortalanir. */
+.control-center .cc-switch {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  width: 52px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.control-center .cc-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.control-center .cc-switch-track {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--glass-text-secondary, #6b7280) 32%, transparent);
+  transition: background-color var(--dur-fast, 150ms) var(--ease-out, ease);
+}
+
+.control-center .cc-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  transition: transform var(--dur-fast, 150ms) var(--ease-out, ease);
+}
+
+.control-center .cc-switch input:checked + .cc-switch-track {
+  background: var(--glass-accent, var(--accent, #d4669c));
+}
+
+.control-center .cc-switch input:checked + .cc-switch-track::after {
+  transform: translateX(22px);
+}
+
+.control-center .cc-note {
+  margin: 0.4rem 0 0;
+  color: var(--glass-text-tertiary, var(--text-soft));
+  font: 500 0.76rem/1.35 var(--ui-font, system-ui);
+}
+
+/* --- Kutucuklar (sistem + hizli uygulamalar) --- */
+.control-center .cc-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.control-center .cc-tiles--wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.control-center .cc-tile {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 0.85rem;
+  color: var(--glass-text-primary, var(--text));
+  border: 0;
+  border-radius: 13px;
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
+  font: 600 0.88rem/1.25 var(--ui-font, system-ui);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast, 150ms) var(--ease-out, ease);
+}
+
+.control-center .cc-tile:hover {
+  background: var(--glass-bg-hover, rgba(120, 120, 130, 0.16));
+}
+
+.control-center .cc-tile-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: var(--glass-accent, var(--accent, #d4669c));
+}
+
+.control-center .cc-tile-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.control-center .cc-tile-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tablet/masaustunde daha kompakt: dort sutun hizli uygulama. */
+@media (min-width: 720px) {
+  .control-center .cc-tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* Tek ogeli grup dort sutuna DUSMEZ: aksi halde "Duvar Kağıdı ve Tema"
+     dar bir kutuya sikisip uc satira kiriliyordu. */
+  .control-center .cc-tiles--wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .control-center .cc-tiles--wide .cc-tile {
+    flex-direction: row;
+    justify-content: flex-start;
+    min-height: 56px;
+    text-align: left;
+  }
+
+  .control-center .cc-tile {
+    flex-direction: column;
+    gap: 0.4rem;
+    justify-content: center;
+    min-height: 84px;
+    padding: 0.7rem 0.5rem;
+    text-align: center;
+  }
+}
+
+/* Launcher serididen giris. */
+.launcher-control-center-open svg {
+  width: 22px;
+  height: 22px;
+}

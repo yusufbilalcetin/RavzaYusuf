@@ -131,11 +131,16 @@ try {
   await runCase("Escape aktif overlay'i kapatir ve kilidi birakir", async () => {
     await browser.key("Escape");
     await delay(600);
+    // ONEMLI: kilit, getActiveOverlay() CAGRILMADAN once okunur. Ayni ifade
+    // icinde once koordinatore sormak, syncActive()'i tetikleyip iddiayi kendi
+    // kendine dogru yapiyordu - kilit gercekte asili kalsa bile test geciyordu.
+    const locked = await browser.evaluate("document.body.classList.contains('system-overlay-open')");
     const state = await browser.evaluate(`(async () => ({
       active: ${MANAGER}.getActiveOverlay(),
       open: ${OPEN_OVERLAYS},
-      locked: document.body.classList.contains('system-overlay-open'),
+      locked: ${JSON.stringify(false)} || false,
     }))()`);
+    state.locked = locked;
     assert.deepEqual(state.open, [], `Escape sonrası açık kalan: ${state.open.join(", ")}`);
     assert.equal(state.active, null, "Escape sonrası aktif overlay kaydı bayat kaldı");
     assert.equal(state.locked, false, "Escape sonrası scroll kilidi kalkmadı");
@@ -152,10 +157,11 @@ try {
     );
     await browser.evaluate("window.closeThemeSheet && window.closeThemeSheet()");
     await delay(400);
+    const lockedNow = await browser.evaluate("document.body.classList.contains('system-overlay-open')");
     const after = await browser.evaluate(`(async () => ({
       active: ${MANAGER}.getActiveOverlay(),
-      locked: document.body.classList.contains('system-overlay-open'),
     }))()`);
+    after.locked = lockedNow;
     assert.equal(after.active, null, "kendi kendine kapanan panel aktif görünmeye devam ediyor");
     assert.equal(after.locked, false, "scroll kilidi bayat kaldı");
   });
@@ -176,16 +182,18 @@ try {
       await browser.key("Escape");
       await delay(220);
     }
+    const lockedAfterCycles = await browser.evaluate("document.body.classList.contains('system-overlay-open')");
     const state = await browser.evaluate(`(async () => ({
       active: ${MANAGER}.getActiveOverlay(),
       open: ${OPEN_OVERLAYS},
-      locked: document.body.classList.contains('system-overlay-open'),
+      locked: false,
       // Tek backdrop kurali: her acilista yeni backdrop uretilmemeli.
       backdrops: document.querySelectorAll('#theme-sheet-backdrop').length,
       openBackdrops: [...document.querySelectorAll('#theme-sheet-backdrop')]
         .filter(node => node.classList.contains('open')).length,
       lockClasses: [...document.body.classList].filter(c => /overlay-open|sheet-open/.test(c)),
     }))()`);
+    state.locked = lockedAfterCycles;
     assert.deepEqual(state.open, [], "tekrarlı açılıştan sonra panel açık kaldı");
     assert.equal(state.active, null, "aktif kayıt temizlenmedi");
     assert.equal(state.locked, false, "scroll kilidi birikti");

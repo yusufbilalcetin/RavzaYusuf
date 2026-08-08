@@ -10,7 +10,7 @@ import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
 import { syncSearchClearControl } from "../utils/search-clear.js";
 import { appIconPictureMarkup } from "../../data/app-icons.js";
-import { claimOverlay, OVERLAY_IDS } from "./overlay-manager.js";
+import { claimOverlay, refreshOverlayState, OVERLAY_IDS } from "./overlay-manager.js";
 import {
   LAUNCHER_LAYOUT_KEY,
   LAUNCHER_WIDGETS,
@@ -598,6 +598,10 @@ function hideLayer(layer, trigger, restoreFocus = true) {
   closingTimer = setTimeout(() => {
     layer.hidden = true;
     if (restoreFocus) trigger?.focus?.({ preventScroll: true });
+    // Bildirim `hidden` GERCEKTEN yazildiktan SONRA: koordinator katmanin
+    // acikligini `hidden` niteliginden okuyor, gecis suresi bitmeden sorulursa
+    // katman hala acik gorunur ve govde kilidi asili kalirdi.
+    refreshOverlayState();
   }, OVERLAY_TRANSITION_MS);
 }
 

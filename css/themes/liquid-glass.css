@@ -524,3 +524,60 @@ html.theme-liquid-glass.reduce-transparency :is(.exam-cancel-dialog, .exam-histo
     opacity: 0 !important;
   }
 }
+
+/* =========================================================================
+   KULLANICI SEVIYESI CAM YOGUNLUGU  (Clear / Dengeli / Tinted)
+
+   Kullaniciya `blur: 24px` gibi ham deger GOSTERILMEZ; secenek semantiktir ve
+   burada MEVCUT tokenlara baglanir. Cam mekanigi (specular, kenar, golge)
+   degismez - yalnizca tint yogunlugu ve bulaniklik olceklenir.
+
+   Tek carpan kullanilir (--glass-tint-scale / --glass-blur-scale) ki her tema
+   ve her yuzey ayni orani izlesin; yuzey yuzey elle deger yazilmaz.
+   ========================================================================= */
+html[data-glass-level="clear"] {
+  --glass-tint-scale: 0.6;
+  --glass-blur-scale: 0.75;
+}
+
+html[data-glass-level="balanced"] {
+  --glass-tint-scale: 1;
+  --glass-blur-scale: 1;
+}
+
+html[data-glass-level="tinted"] {
+  --glass-tint-scale: 1.45;
+  --glass-blur-scale: 1.15;
+}
+
+/* Olcek yalnizca cam KABUGUNA uygulanir (navigasyon, dock, overlay, sistem
+   kontrolleri) - icerik kartlarina degil. */
+html.theme-liquid-glass[data-glass-level] .glass-surface {
+  --glass-bg: color-mix(in srgb, var(--glass-surface-base, rgba(255, 255, 255, .84))
+    calc(28% * var(--glass-tint-scale, 1)), transparent);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  html.theme-liquid-glass[data-glass-level] .glass-surface {
+    -webkit-backdrop-filter: saturate(var(--glass-sat-lg))
+      blur(calc(var(--glass-blur-lg) * var(--glass-blur-scale, 1)));
+    backdrop-filter: saturate(var(--glass-sat-lg))
+      blur(calc(var(--glass-blur-lg) * var(--glass-blur-scale, 1)));
+  }
+}
+
+/* =========================================================================
+   HAREKET AZALTMA
+
+   Sistem tercihi varsayilandir; kullanici acikca override ederse
+   html[data-reduced-motion="true"] olur ve gecisler pratikte kapanir.
+   `prefers-reduced-motion` medyasi da ayrica saygi gorur (base/animasyonlar).
+   ========================================================================= */
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
