@@ -49,6 +49,21 @@ export const RAVZA_BOOKS = Object.freeze([
     "coverPage": 3
   },
   {
+    "id": "ask-i-memnu",
+    "type": "pdf",
+    "title": "Ask İ Memnu",
+    "author": "Bilinmeyen yazar",
+    "file": "./assets/books/original/A%C5%9Fk-%C4%B1%20Memnu.pdf?v=0a754359ee30",
+    "sourceHash": "0a754359ee304301f77b1167fceb892215992dbc391c589d7cf41044532f0757",
+    "cover": "./assets/books/optimized/ask-i-memnu-cover-640-debbd514.webp",
+    "coverSrcSet": "./assets/books/optimized/ask-i-memnu-cover-320-0eb83846.webp 320w, ./assets/books/optimized/ask-i-memnu-cover-640-debbd514.webp 640w",
+    "coverWidth": 640,
+    "coverHeight": 1167,
+    "description": "Ask İ Memnu kitabının orijinal PDF sürümü.",
+    "totalPages": 392,
+    "coverPage": 1
+  },
+  {
     "id": "atesten-gomlek",
     "type": "pdf",
     "title": "Atesten Gomlek",
@@ -64,6 +79,21 @@ export const RAVZA_BOOKS = Object.freeze([
     "coverPage": 1
   },
   {
+    "id": "resat-nuri-guntekin-dudaktan-kalbe",
+    "type": "pdf",
+    "title": "Dudaktan Kalbe",
+    "author": "Reşat Nuri Güntekin",
+    "file": "./assets/books/original/Re%C5%9Fat%20Nuri%20G%C3%BCntekin%20-%20Dudaktan%20Kalbe.pdf?v=ce7442aeef78",
+    "sourceHash": "ce7442aeef78d4dcf5fc4662c9b5b6a021dfb210a45dad94797e933734ed4ac4",
+    "cover": "./assets/books/optimized/resat-nuri-guntekin-dudaktan-kalbe-cover-640-d79d8971.webp",
+    "coverSrcSet": "./assets/books/optimized/resat-nuri-guntekin-dudaktan-kalbe-cover-320-5a46a1fe.webp 320w, ./assets/books/optimized/resat-nuri-guntekin-dudaktan-kalbe-cover-640-d79d8971.webp 640w",
+    "coverWidth": 640,
+    "coverHeight": 828,
+    "description": "Dudaktan Kalbe kitabının orijinal PDF sürümü.",
+    "totalPages": 201,
+    "coverPage": 1
+  },
+  {
     "id": "kasagi",
     "type": "pdf",
     "title": "Kaşağı",
@@ -76,6 +106,51 @@ export const RAVZA_BOOKS = Object.freeze([
     "coverHeight": 853,
     "description": "Kaşağı kitabının orijinal PDF sürümü.",
     "totalPages": 146,
+    "coverPage": 1
+  },
+  {
+    "id": "kralin-donusu-jrr-tolkien",
+    "type": "pdf",
+    "title": "Kralın Dönüşü",
+    "author": "J.R.R. Tolkien",
+    "file": "./assets/books/original/Kralin%20Donusu%20-%20J.R.R.%20Tolkien.pdf?v=ccd1093d9848",
+    "sourceHash": "ccd1093d98485dd769a708f080967253c8bb86200dbf2183220e51518dce5290",
+    "cover": "./assets/books/optimized/kralin-donusu-jrr-tolkien-cover-640-fc6acde5.webp",
+    "coverSrcSet": "./assets/books/optimized/kralin-donusu-jrr-tolkien-cover-320-2d2ef070.webp 320w, ./assets/books/optimized/kralin-donusu-jrr-tolkien-cover-640-fc6acde5.webp 640w",
+    "coverWidth": 640,
+    "coverHeight": 828,
+    "description": "Kralın Dönüşü kitabının orijinal PDF sürümü.",
+    "totalPages": 267,
+    "coverPage": 1
+  },
+  {
+    "id": "yuzuk-kardesligi-jrr-tolkien",
+    "type": "pdf",
+    "title": "Yüzük Kardeşliği",
+    "author": "J.R.R. Tolkien",
+    "file": "./assets/books/original/Yuzuk%20Kardesligi%20-%20J.R.R.%20Tolkien.pdf?v=188a022d8c8f",
+    "sourceHash": "188a022d8c8fcc4a39659307bc17ab99b985f8acce1f3b454dd50302fd32aefe",
+    "cover": "./assets/books/optimized/yuzuk-kardesligi-jrr-tolkien-cover-640-f0431d20.webp",
+    "coverSrcSet": "./assets/books/optimized/yuzuk-kardesligi-jrr-tolkien-cover-320-e007f168.webp 320w, ./assets/books/optimized/yuzuk-kardesligi-jrr-tolkien-cover-640-f0431d20.webp 640w",
+    "coverWidth": 640,
+    "coverHeight": 828,
+    "description": "Yüzük Kardeşliği kitabının orijinal PDF sürümü.",
+    "totalPages": 352,
+    "coverPage": 1
+  },
+  {
+    "id": "yuzuklerin-efendisi-iki-kule-jrr-tolkien",
+    "type": "pdf",
+    "title": "Yüzüklerin Efendisi İki Kule",
+    "author": "J.R.R. Tolkien",
+    "file": "./assets/books/original/Yuzuklerin%20Efendisi%20Iki%20Kule%20-%20J.R.R.%20Tolkien.pdf?v=0b256064033c",
+    "sourceHash": "0b256064033ca95b6e8b5ec35a6d9b414c77facc04abb8fbf9bec057cd648601",
+    "cover": "./assets/books/optimized/yuzuklerin-efendisi-iki-kule-jrr-tolkien-cover-640-1163d50a.webp",
+    "coverSrcSet": "./assets/books/optimized/yuzuklerin-efendisi-iki-kule-jrr-tolkien-cover-320-694aeb0c.webp 320w, ./assets/books/optimized/yuzuklerin-efendisi-iki-kule-jrr-tolkien-cover-640-1163d50a.webp 640w",
+    "coverWidth": 640,
+    "coverHeight": 828,
+    "description": "Yüzüklerin Efendisi İki Kule kitabının orijinal PDF sürümü.",
+    "totalPages": 318,
     "coverPage": 1
   }
 ]);
