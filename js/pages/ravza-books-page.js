@@ -1,5 +1,6 @@
 import { RAVZA_BOOKS } from '../../data/ravza-books.js?v=books-pipeline-20260716-1';
 import { createPageEntry, flattenTextContent, searchBookIndex, isSearchableQuery } from './ravza-books-search.js';
+import { claimOverlay, OVERLAY_IDS } from '../core/overlay-manager.js';
 
 const PAGE_FLIP_SRC = new URL('../../assets/vendor/page-flip/page-flip.browser.js', import.meta.url).href;
 const PDFJS_MODULE_URL = new URL('../../assets/vendor/pdfjs/pdf.js', import.meta.url).href;
@@ -2930,6 +2931,8 @@ function openSheets() {
 function openSheet(id) {
   const sheet = document.getElementById(id);
   if (!sheet || sheet.open) return false;
+  // Global koordinator: tema paneli / launcher katmani aciksa kapanir.
+  claimOverlay(OVERLAY_IDS.readerSheet);
   for (const other of openSheets()) closeSheet(other);
   // Sayfa açıkken kontroller kaybolmamalı: kullanıcı hâlâ etkileşimde.
   clearTimeout(controlsTimer);

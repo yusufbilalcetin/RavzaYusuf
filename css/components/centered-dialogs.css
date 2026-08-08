@@ -222,3 +222,25 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
+/* -------------------------------------------------------------------------
+   SISTEM OVERLAY SCROLL KILIDI
+
+   Bir birincil overlay acikken (tema paneli, launcher katmani, okuyucu
+   sayfasi) arkadaki sayfa yanlislikla kaydirilmamali. Kilit TEK yerden -
+   js/core/overlay-manager.js - yonetilir; her ozellik kendi kilidini kurmaz.
+
+   `position: fixed` HILESI KULLANILMAZ: o yontem kaydirma konumunu sifirlayip
+   acilis/kapanista ziplama yaratir. `overflow: hidden` konumu korur.
+   Kaydirma cubugu genisligi `scrollbar-gutter` ile ayrilir, boylece kilit
+   devreye girince duzen yana kaymaz.
+------------------------------------------------------------------------- */
+body.system-overlay-open {
+  overflow: hidden;
+}
+
+@supports (scrollbar-gutter: stable) {
+  body.system-overlay-open {
+    scrollbar-gutter: stable;
+  }
+}

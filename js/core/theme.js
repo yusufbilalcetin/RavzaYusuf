@@ -1,3 +1,4 @@
+import { claimOverlay, OVERLAY_IDS } from "./overlay-manager.js";
 const THEME_MODES = Object.freeze(["light", "dark", "system"]);
 const THEME_STYLES = Object.freeze([
   "noel-ask",
@@ -256,6 +257,8 @@ function focusThemeSheetSelection() {
 }
 
 export function openThemeSheet(trigger = document.activeElement) {
+  // Baska bir birincil overlay aciksa koordinator onu kapatir (tek aktif kural).
+  claimOverlay(OVERLAY_IDS.themePanel);
   const sheet = document.getElementById("theme-sheet");
   const backdrop = document.getElementById("theme-sheet-backdrop");
   if (!sheet || !backdrop) return false;

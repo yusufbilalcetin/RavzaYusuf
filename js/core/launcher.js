@@ -10,6 +10,7 @@ import { KONU_LISTESI } from "../../data/konu-listesi.js";
 import { createSearchIndex, matchesSearchIndex, normalizeSearchText } from "../utils/search.js";
 import { syncSearchClearControl } from "../utils/search-clear.js";
 import { appIconPictureMarkup } from "../../data/app-icons.js";
+import { claimOverlay, OVERLAY_IDS } from "./overlay-manager.js";
 import {
   LAUNCHER_LAYOUT_KEY,
   LAUNCHER_WIDGETS,
@@ -605,6 +606,7 @@ function pushOverlayHistory(kind, id = "") {
 }
 
 export function openLauncherFolder(groupId, trigger = document.activeElement, pushHistory = true) {
+  claimOverlay(OVERLAY_IDS.launcherFolder);
   const group = resolveLauncherGroup(groupId);
   const isCustom = launcherState.layouts.folders.some((folder) => folder.id === groupId);
   if (launcherState.isEditing && !isCustom) return;
@@ -669,6 +671,7 @@ function renderSearchResults(query = "") {
 
 export function openLauncherSearch(trigger = document.activeElement, pushHistory = true) {
   if (launcherState.isEditing) return;
+  claimOverlay(OVERLAY_IDS.launcherSearch);
   const layer = document.getElementById("launcherSearchLayer");
   const dialog = document.getElementById("launcherSearchDialog");
   const input = document.getElementById("launcherSearchInput");
@@ -725,6 +728,7 @@ function editorRemoveMarkup() {
 
 function openLauncherEditor(kind, trigger = document.activeElement) {
   if (!launcherState.isEditing) return;
+  claimOverlay(OVERLAY_IDS.launcherEditor);
   const layer = document.getElementById("launcherEditorLayer");
   const dialog = document.getElementById("launcherEditorDialog");
   const title = document.getElementById("launcherEditorTitle");

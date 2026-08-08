@@ -9,6 +9,7 @@ import { initLiquidGlassSurfaceSystem } from "../services/liquid-glass-service.j
 import { initSearchClearControls } from "../utils/search-clear.js";
 import { initViewportMetrics } from "../ui/viewport-metrics.js";
 import { bindThemeControls, getThemeState, initThemeSystem } from "./theme.js";
+import { registerCoreOverlays } from "./overlay-registrations.js";
 
 // legacy-app.js normalde çok hızlı yüklenir (yerel/CDN'den tek modül); bu
 // süre yalnızca "CDN tamamen tıkanırsa ana içerik sonsuza dek beklemesin"
@@ -98,6 +99,9 @@ export async function initApp() {
     installDiagnostics();
     // Head'deki senkron bootstrap ilk paint'i korur; bu merkez runtime state,
     // system media listener ve tek app:theme-change olayının sahipliğini alır.
+    // Overlay koordinatoru tema sisteminden ONCE kurulur: tema paneli
+    // acilirken kayit defterinde kendini bulabilmeli.
+    registerCoreOverlays();
     initThemeSystem();
     startupState.domReady = true;
     pbnLog("boot", {
