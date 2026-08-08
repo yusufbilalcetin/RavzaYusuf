@@ -803,12 +803,20 @@ button {
   place-items: center;
   width: 100%;
   height: 100%;
-  /* Dikey dolgu, yuzen okuyucu kabugu kadar alani ayirir; degiskenler JS'te
-     gercek kontrol yuksekliginden olculur (bkz. measureReaderChrome). */
+  /* KABUK ARTIK YER AYIRMAZ - ustune BINER.
+     Onceden dikey dolgu, olculen kontrol yuksekligini (--reader-chrome-*)
+     sahneden dusuyordu. Sonuc: 1440x900 ekranda sahne yalnizca 1400x702
+     kaliyordu; 198px yukseklik kalici olarak kabuga gidiyordu. Sayfa
+     "sayfaya sigdir"da YUKSEKLIKLE sinirli oldugu icin bu, kitabi dogrudan
+     ~%22 kucultuyordu - ekranin ortasinda kucuk bir kitap kartI gorunumunun
+     sebebi buydu.
+     Kontroller artik yuzen katman: kitap tam alani kullanir, kabuk uzerine
+     biner ve kendiliginden gizlenir. Geometri kabuk gorunur/gizli iken AYNI
+     kalir, yani kontroller acilip kapanirken kitap ziplamaz. */
   padding:
-    calc(max(18px, env(safe-area-inset-top)) + var(--reader-chrome-top, 0px))
+    max(18px, env(safe-area-inset-top))
     max(20px, env(safe-area-inset-right))
-    calc(max(18px, env(safe-area-inset-bottom)) + var(--reader-chrome-bottom, 0px))
+    max(18px, env(safe-area-inset-bottom))
     max(20px, env(safe-area-inset-left));
   overflow: hidden;
   touch-action: none;

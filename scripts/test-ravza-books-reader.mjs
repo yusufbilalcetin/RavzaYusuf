@@ -393,8 +393,79 @@ try {
     });
   }
 
-  // Sonraki testler acik tema bekliyor.
+  /**
+   * UYGULAMA TEMASI KOYU + OKUMA TEMASI AÇIK (bildirilen kusur).
+   *
+   * Yukarıdaki dört test yalnızca OKUMA temasını değiştiriyordu; uygulama
+   * teması hep açıktı, bu yüzden gerçek kusuru KAÇIRDILAR. Kusur şuydu:
+   * paylaşılan components/search-clear.css input'un zeminini
+   * `var(--search-bg)` ile boyuyor ve o token'ı UYGULAMA teması tanımlıyor.
+   * `body.dark` altında --search-bg lacivert (#1e2430 türevi) oluyordu, yani
+   * açık temalı okuyucunun içinde yabancı koyu mavi bir kapsül beliriyordu.
+   *
+   * Bu test tam da o kombinasyonu kurar ve alanın TEK yüzey kalmasını ister.
+   */
+  for (const readerTheme of ["light", "sepia", "dark", "black"]) {
+    await testCase(`uygulama teması koyuyken ${readerTheme} arama alanı tek yüzey kalır`, async () => {
+      await browser.evaluate(`(() => {
+        document.body.classList.add('dark');
+        localStorage.setItem('eul_theme', 'dark');
+        const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
+        prefs.theme = ${JSON.stringify(readerTheme)};
+        localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
+      })()`);
+      await openLibrary();
+      await openBook("perili-kosk");
+      await browser.evaluate("document.getElementById('rdr-search-open').click()");
+      await browser.waitFor("document.getElementById('rdr-search-sheet')?.open === true", "arama");
+      await browser.evaluate("document.getElementById('rdr-search-input').focus()");
+      await delay(400);
+
+      const style = await browser.evaluate(`(() => {
+        const input = document.getElementById('rdr-search-input');
+        const field = input.closest('.reader-search-field');
+        const ci = getComputedStyle(input);
+        const cf = getComputedStyle(field);
+        return {
+          bodyDark: document.body.classList.contains('dark'),
+          inputBg: ci.backgroundColor,
+          inputShadow: ci.boxShadow,
+          inputBorderWidth: parseFloat(ci.borderTopWidth) || 0,
+          caret: ci.caretColor,
+          fieldBg: cf.backgroundColor,
+          fieldShadow: cf.boxShadow,
+          searchBgToken: cf.getPropertyValue('--search-bg').trim(),
+        };
+      })()`);
+
+      assert.equal(style.bodyDark, true, "test uygulama temasını koyu kurmalıydı");
+      // 1. INPUT IKINCI BIR YUZEY OLUSTURMAMALI: zemini saydam, kenarlıksız,
+      //    gölgesiz. Lacivert kapsülün tam olarak ölçülebilir hâli budur.
+      assert.match(
+        String(style.inputBg).replace(/\s/g, ""),
+        /^(rgba\(0,0,0,0\)|transparent)$/,
+        `input ikinci bir yüzey çiziyor: ${style.inputBg}`,
+      );
+      assert.equal(style.inputShadow, "none", `input gölgesi ikinci yüzey üretiyor: ${style.inputShadow}`);
+      assert.equal(style.inputBorderWidth, 0, "input kendi kenarlığını çizmemeli");
+      // 2. Paylasilan bilesenin token'i okuyucuya baglanmis olmali.
+      assert.equal(style.searchBgToken, "transparent", `--search-bg okuyucuya bağlanmamış: ${style.searchBgToken}`);
+      // 3. Gorsel sahiplik DIS alanda: zemin ve odak halkasi orada.
+      assert.ok(!/rgba\(0,\s*0,\s*0,\s*0\)/.test(style.fieldBg), "dış alan opak zemin taşımalı");
+      assert.notEqual(style.fieldShadow, "none", "odak halkası dış alanda görünmeli");
+      // 4. Caret GORUNUR olmali - token'i transparent yapip imleci yok etmedik.
+      assert.ok(!/transparent|rgba\(0,\s*0,\s*0,\s*0\)/.test(style.caret), `caret görünmez: ${style.caret}`);
+      assert.ok(!isBlueish(style.inputBg) && !isBlueish(style.fieldBg), "alan hâlâ mavi");
+
+      await browser.evaluate("document.querySelector('#rdr-search-sheet [data-close-sheet]').click()");
+      await delay(200);
+    });
+  }
+
+  // Sonraki testler acik uygulama + acik okuma temasi bekliyor.
   await browser.evaluate(`(() => {
+    document.body.classList.remove('dark');
+    localStorage.setItem('eul_theme', 'light');
     const prefs = JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
     prefs.theme = 'light';
     localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
@@ -703,10 +774,19 @@ try {
         g.canvasAttrWidth >= g.canvasRectWidth * 1.5,
         `canvas çözünürlüğü DPR için yetersiz (${g.canvasAttrWidth} vs ${g.canvasRectWidth})`,
       );
-      // Sayfa, yüzen kontrollerin arkasında kalmamalı (§25).
+      /* KABUK ARTIK YER AYIRMIYOR - BILINCLI URUN KARARI DEGISIKLIGI.
+         Eski iddia "sayfanin alti dock'un ustunu gecmesin" idi; yani kontroller
+         kalici olarak yer ayiriyordu. Bu, 1440x900'de sahneden 198px yiyip
+         kitabi ~%22 kucultuyordu. Yeni kural (Apple Books gibi): kontroller
+         YUZEN katman, kitap tam alani kullanir.
+         Iddia kaldirilmadi, YERINE DAHA GUCLUSU kondu:
+           - dock sayfanin okunur alanini asiri ortmemeli (ayri testte %35 siniri)
+           - ve asagida: kontroller gorunur/gizli iken GEOMETRI DEGISMEMELI.
+         Ikincisi eskisinin yakalayamadigi bir kusuru da yakalar: kabuk
+         acilip kapanirken kitabin ziplamasi. */
       assert.ok(
-        g.page.bottom <= g.dockTop + 1,
-        `sayfa dock'un arkasına giriyor (sayfa alt ${g.page.bottom.toFixed(1)} > dock üst ${g.dockTop.toFixed(1)})`,
+        g.page.bottom <= height + 1,
+        `sayfa alttan taşıyor (${g.page.bottom.toFixed(1)} > ${height})`,
       );
       assert.ok(g.page.top >= -1, `sayfa üstten taşıyor (${g.page.top.toFixed(1)})`);
 
@@ -745,6 +825,100 @@ try {
         fillsWidth || fillsHeight,
         `sayfa hicbir ekseni doldurmuyor (${g.page.width.toFixed(0)}x${g.page.height.toFixed(0)} / kullanilabilir ${availableWidth.toFixed(0)}x${availableHeight.toFixed(0)})`,
       );
+    });
+  }
+
+  await testCase("kontroller açılıp kapanırken kitap boyutu DEĞİŞMEZ", async () => {
+    // §21: kabuk yuzen katman oldugu icin geometri sabit kalmali. Kabuk yer
+    // ayirsaydi kontroller gorununce kitap kucultur, gizlenince buyurdu.
+    await browser.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, mobile: true });
+    await openWith("kucuk-prens", "page");
+    const measure = () => browser.evaluate(`(() => {
+      const root = document.getElementById('reader-inner');
+      const page = document.querySelector('.pdf-page[data-pdf-page="' + root.dataset.currentPage + '"]');
+      const r = page.getBoundingClientRect();
+      return { w: +r.width.toFixed(1), h: +r.height.toFixed(1),
+               visible: root.classList.contains('controls-visible') };
+    })()`);
+    await browser.evaluate("document.querySelector('.reader-root').classList.add('controls-visible')");
+    await delay(500);
+    const shown = await measure();
+    await browser.evaluate("document.querySelector('.reader-root').classList.remove('controls-visible')");
+    await delay(500);
+    const hidden = await measure();
+    assert.equal(shown.visible, true, "kontroller görünür olmalıydı");
+    assert.equal(hidden.visible, false, "kontroller gizlenmeliydi");
+    assert.ok(
+      Math.abs(shown.w - hidden.w) <= 1 && Math.abs(shown.h - hidden.h) <= 1,
+      `kabuk kitabı yeniden boyutlandırdı: görünür ${shown.w}x${shown.h} vs gizli ${hidden.w}x${hidden.h}`,
+    );
+  });
+
+  // §44/§49: masaustunde kitap GERCEK sahneyi kullanmali. Eskiden kabuk
+  // rezervasyonu yuzunden 1440x900'de sahne 1400x702'ye dusuyor ve iki sayfali
+  // yayilim ekranin ortasinda kucuk bir kart gibi duruyordu.
+  for (const [width, height] of [[1440, 900], [1920, 1080]]) {
+    await testCase(`masaüstü ${width}x${height}: yayılım gerçek sahneyi doldurur`, async () => {
+      await browser.setViewport({ width, height, deviceScaleFactor: 1, mobile: false });
+      // Kapak tek sayfa gosterildigi icin kitabin ortasindan bir yayilim sec.
+      await browser.evaluate(`localStorage.setItem('ravza-books-last-read', JSON.stringify({ 'kucuk-prens': { page: 24 } }))`);
+      await openWith("kucuk-prens", "page");
+      const g = await browser.evaluate(`(() => {
+        const stage = document.getElementById('rdr-stage');
+        const cs = getComputedStyle(stage);
+        const pad = s => parseFloat(cs['padding' + s]) || 0;
+        const inner = { w: stage.clientWidth - pad('Left') - pad('Right'),
+                        h: stage.clientHeight - pad('Top') - pad('Bottom') };
+        const pages = [...document.querySelectorAll('.pdf-page')]
+          .map(el => el.getBoundingClientRect())
+          .filter(r => r.width > 1);
+        return {
+          spread: document.getElementById('reader-inner').dataset.spread,
+          inner,
+          spreadWidth: pages.reduce((sum, r) => sum + r.width, 0),
+          spreadHeight: Math.max(...pages.map(r => r.height), 0),
+          aspects: pages.map(r => +(r.width / r.height).toFixed(4)),
+          docScrollWidth: document.documentElement.scrollWidth,
+        };
+      })()`);
+
+      /* ASIL REGRESYON KORUMASI: SAHNE = GERCEK GORUNTU ALANI.
+         "Yayilim sahneyi dolduruyor mu" tek basina YETMEZ; eski kodda sahne
+         kabuk kadar kuculuyor, yayilim da o kucuk sahneyi %100 dolduruyordu -
+         yani o iddia eski kodda da gecerdi. Kusurun olculebilir hali, sahnenin
+         VIEWPORT'a gore kucuk kalmasiydi:
+           1440x900 ONCE:  sahne 1400x702  (kabuk 198px yiyor)
+           1440x900 SONRA: sahne 1400x864  (yalnizca 18px x2 kenar payi)
+         Asagidaki iddia eski kodda DUSER. */
+      const verticalMargin = height - g.inner.h;
+      assert.ok(
+        verticalMargin <= 60,
+        `sahne viewport'un ${verticalMargin.toFixed(0)}px'ini yitiriyor (kabuk yer ayırıyor olabilir, sınır 60px)`,
+      );
+      const horizontalMargin = width - g.inner.w;
+      assert.ok(
+        horizontalMargin <= 60,
+        `sahne yatayda ${horizontalMargin.toFixed(0)}px yitiriyor (sınır 60px)`,
+      );
+
+      assert.equal(g.spread, "double", "geniş masaüstünde çift sayfa beklenir");
+      assert.equal(g.aspects.length, 2, `yayılımda iki sayfa görünmeli, gelen ${g.aspects.length}`);
+      // En-boy orani bozulmamis olmali (gerilme yok).
+      assert.ok(
+        Math.abs(g.aspects[0] - g.aspects[1]) < 0.01,
+        `iki sayfanın oranı farklı: ${JSON.stringify(g.aspects)}`,
+      );
+      // Sinirlayici eksen sahnenin en az %90'ini kullanmali (§44). Diger eksende
+      // bosluk kalmasi matematiksel olarak DOGRU - talep edilmiyor.
+      const widthUse = g.spreadWidth / g.inner.w;
+      const heightUse = g.spreadHeight / g.inner.h;
+      assert.ok(
+        Math.max(widthUse, heightUse) >= 0.9,
+        `yayılım sahneyi doldurmuyor: %${(widthUse * 100).toFixed(1)} genişlik / %${(heightUse * 100).toFixed(1)} yükseklik`,
+      );
+      // Tasma yok.
+      assert.ok(widthUse <= 1.01 && heightUse <= 1.01, "yayılım sahneyi aşıyor");
+      assert.ok(g.docScrollWidth <= width + 1, `yatay kaydırma oluştu (${g.docScrollWidth} > ${width})`);
     });
   }
 

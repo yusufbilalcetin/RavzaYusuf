@@ -218,6 +218,56 @@
    Kitapta ara
 -------------------------------------------------------------------------- */
 
+/* PAYLAŞILAN ARAMA BİLEŞENİNİ OKUYUCU SEMANTİĞİNE BAĞLA.
+ *
+ * KUSUR: "Kitapta Ara" alanının içinde koyu LACİVERT bir kapsül çıkıyordu.
+ * Kaynak Ravza Books değil, paylaşılan components/search-clear.css:
+ *     .search-clear-control > input[data-clearable-search] {
+ *       background-color: var(--search-bg, ...);
+ *       color-scheme: var(--search-color-scheme, light);
+ *     }
+ * Bu token'ları UYGULAMA teması tanımlıyor ve `body.dark` altında
+ *     --input-bg: #1e2430
+ *     --search-bg: color-mix(in srgb, var(--input-bg) 94%, #000 6%)  -> lacivert
+ *     --search-color-scheme: dark
+ * oluyor. Okuyucu bilinçli olarak KENDİ temasını (Beyaz/Kâğıt) sürdürdüğü için
+ * genel arayüz koyu iken alanın içine yabancı bir lacivert yüzey basılıyordu.
+ * Bu yüzden mobil testlerim yakalayamadı: onlar okuma temasını değiştiriyordu,
+ * uygulama teması hep açıktı.
+ *
+ * ÇÖZÜM (§27): dış alan chrome'un TEK sahibi olur - zemin, kenarlık, odak
+ * halkası ondadır. Bileşenin token'ları burada okuyucuya bağlanır ve input
+ * görsel olarak saydamlaşır; input yalnızca metin/caret/seçim taşır.
+ * Launcher da aynı deseni kullanıyor (--search-bg: var(--launcher-search-bg)),
+ * yani bu bileşenin token'ını ezmek beklenen kullanım - !important yok,
+ * özgüllük savaşı yok. */
+.ravza-books-page .reader-search-field {
+  --search-bg: transparent;
+  --search-hover-bg: transparent;
+  --search-disabled-bg: transparent;
+  --search-border: transparent;
+  --search-hover-border: transparent;
+  /* DİKKAT: bileşen caret rengini bu token'dan türetiyor
+     (caret-color: var(--search-focus-border)). `transparent` verilseydi imleç
+     GÖRÜNMEZ olurdu. Kenarlık zaten input'ta 0 genişlikte, o yüzden burada
+     okuma vurgusunu vermek güvenli: caret doğru renklenir, ikinci bir kenarlık
+     çizilmez. */
+  --search-focus-border: var(--reader-caret);
+  --search-focus-ring: transparent;
+  --search-shadow: none;
+  --search-text: var(--reader-field-text);
+  --search-placeholder: var(--reader-field-placeholder);
+  --search-caret: var(--reader-caret);
+  /* Renk şeması OKUMA temasını izler; koyu okuma temalarında caret ve
+     kaydırma çubukları doğru renklenir. Aşağıda tema başına yeniden verilir. */
+  --search-color-scheme: light;
+}
+
+.ravza-books-page[data-reader-theme="dark"] .reader-search-field,
+.ravza-books-page[data-reader-theme="black"] .reader-search-field {
+  --search-color-scheme: dark;
+}
+
 /* Cam kabuk + TONAL/OPAK iç yüzey (§12): cam içinde cam istemiyoruz. */
 .ravza-books-page .reader-search-field {
   display: flex;
