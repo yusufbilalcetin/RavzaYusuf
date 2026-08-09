@@ -3,6 +3,8 @@
   "unusedIgnore": [
     "assets/icons/apps/**",
     "assets/icons/games/source/**",
+    "assets/icons/games/128/**",
+    "assets/icons/games/256/**",
     "assets/vendor/pdfjs/cmaps/**",
     "assets/vendor/pdfjs/standard_fonts/**",
     "assets/vendor/pdfjs/iccs/**",

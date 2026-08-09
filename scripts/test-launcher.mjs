@@ -208,8 +208,14 @@ async function runBrowser(browserConfig) {
     assert.ok(![...loadedLocalResources].some((url) => url.startsWith("/games/candy-crush/dist/assets/")), "Candy Crush paketi oyun açılmadan yüklendi");
     // Oyun ikonları 128/256 görüntüleme varyantlarından gelir; 1024 master yalnız
     // bağımsız oyun sayfalarının favicon'u içindir ve launcher'da hiç istenmemelidir.
-    const gameIconRequests = (icon) => (initialRequestCounts.get(`/assets/icons/games/128/${icon}.png`) || 0)
-      + (initialRequestCounts.get(`/assets/icons/games/256/${icon}.png`) || 0);
+    // Görüntüleme varyantları AVIF/WebP/PNG olarak üretiliyor ve <picture> ile
+    // seçiliyor; kilitlenen değişmez BİÇİM değil, ikon başına TEK istektir.
+    const gameIconRequests = (icon) => ["avif", "webp", "png"].reduce(
+      (total, extension) => total
+        + (initialRequestCounts.get(`/assets/icons/games/128/${icon}.${extension}`) || 0)
+        + (initialRequestCounts.get(`/assets/icons/games/256/${icon}.${extension}`) || 0),
+      0,
+    );
     for (const icon of ["candy-crush", "meyve-eslestirme", "flappy-bird", "boyama"]) {
       assert.equal(gameIconRequests(icon), 1, `${icon}: kritik ikon ilk açılışta tam bir istek oluşturmadı`);
       assert.equal(initialRequestCounts.get(`/assets/icons/games/${icon}.png`) || 0, 0, `${icon}: 1024 master launcher açılışında gereksiz yüklendi`);

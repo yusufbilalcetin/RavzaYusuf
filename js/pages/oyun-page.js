@@ -54,6 +54,24 @@ function visibleIconCount() {
   return ACTIVE_GAMES.length;
 }
 
+/**
+ * Oyun ikonu: AVIF -> WebP -> PNG.
+ *
+ * Üç biçimi de scripts/build-game-icons.mjs üretiyor. PNG yedek olarak kalır;
+ * ölçülen kazanç 256 px varyantlarında 182 KB -> 45 KB. Launcher tarafındaki
+ * eşdeğeri js/core/launcher.js icindeki modernIconSources().
+ */
+function gameIconPictureMarkup(gameId, isPriority) {
+  const id = escapeHtml(gameId);
+  const source = (extension) =>
+    `<source type="image/${extension}" srcset="./assets/icons/games/128/${id}.${extension} 1x, ./assets/icons/games/256/${id}.${extension} 2x">`;
+  return `<picture class="game-icon-picture">${source("avif")}${source("webp")}`
+    + `<img class="game-tile-img" src="./assets/icons/games/128/${id}.png"`
+    + ` srcset="./assets/icons/games/128/${id}.png 1x, ./assets/icons/games/256/${id}.png 2x"`
+    + ` alt="" width="1024" height="1024" loading="${isPriority ? "eager" : "lazy"}"`
+    + ` decoding="async" fetchpriority="${isPriority ? "high" : "low"}"></picture>`;
+}
+
 function renderGameCatalog(root) {
   const grid = root.querySelector("[data-game-catalog]");
   if (!grid || grid.dataset.rendered === "true") return;
@@ -68,7 +86,7 @@ function renderGameCatalog(root) {
           width: 128,
           height: 128
         })
-      : `<img class="game-tile-img" src="./assets/icons/games/128/${escapeHtml(game.id)}.png" srcset="./assets/icons/games/128/${escapeHtml(game.id)}.png 1x, ./assets/icons/games/256/${escapeHtml(game.id)}.png 2x" alt="" width="1024" height="1024" loading="${isPriority ? "eager" : "lazy"}" decoding="async" fetchpriority="${isPriority ? "high" : "low"}">`;
+      : gameIconPictureMarkup(game.id, isPriority);
     const content = `<span class="game-tile-art game-tile-art--icon" aria-hidden="true">${image}<span class="game-tile-fallback">${escapeHtml(game.name.charAt(0))}</span></span><span class="game-tile-copy"><strong>${escapeHtml(game.name)}</strong></span>`;
     if (game.launchMode === "link") {
       return `<a class="game-tile is-live" href="./${escapeHtml(game.path)}" aria-label="${escapeHtml(game.name)} oyununu aç">${content}</a>`;

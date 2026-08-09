@@ -56,12 +56,31 @@ await mkdir(outputDir, { recursive: true });
 // ekranlarda bile tam keskinliği korurken 1024 masterın ağırlığını taşımıyor.
 const displaySizes = Object.freeze([128, 256]);
 
+/**
+ * Görüntüleme varyantları PNG'nin YANINA AVIF ve WebP olarak da yazılır.
+ *
+ * Ölçüldü: launcher ilk boyamada oyun ikonlarını PNG olarak indiriyordu
+ * (candy-crush 37 KB, meyve-eslestirme 36 KB, boyama 31 KB...), oysa uygulama
+ * ikonları aynı boyutta AVIF olarak 9-11 KB. Kalite ayarları uygulama ikon
+ * hattıyla (scripts/generate-app-icons.mjs) birebir aynı tutuldu ki iki ikon
+ * ailesi yan yana aynı görünsün. PNG SİLİNMEZ: <picture> yedeği olarak kalır.
+ */
+const modernFormats = Object.freeze([
+  { extension: "avif", apply: (image) => image.avif({ quality: 60, effort: 6, chromaSubsampling: "4:4:4" }) },
+  { extension: "webp", apply: (image) => image.webp({ quality: 86, alphaQuality: 100, smartSubsample: true, effort: 6 }) },
+]);
+
 async function writeDisplayVariants(id, pipeline, kernel) {
   for (const size of displaySizes) {
     await pipeline()
       .resize({ width: size, height: size, fit: "contain", kernel })
       .png({ compressionLevel: 9, adaptiveFiltering: true, effort: 10 })
       .toFile(path.join(outputDir, String(size), `${id}.png`));
+    for (const format of modernFormats) {
+      await format
+        .apply(pipeline().resize({ width: size, height: size, fit: "contain", kernel }))
+        .toFile(path.join(outputDir, String(size), `${id}.${format.extension}`));
+    }
   }
 }
 
