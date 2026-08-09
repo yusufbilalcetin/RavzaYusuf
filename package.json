@@ -67,7 +67,8 @@
     "test:ravza-books": "node ./scripts/test-ravza-books.mjs",
     "test:ravza-books:reader": "node ./scripts/test-ravza-books-reader.mjs",
     "test:ravza-books-performance": "node ./tests/e2e/ravza-books-performance.spec.mjs",
-    "audit:ravza-books": "node ./tests/e2e/ravza-books-performance.spec.mjs"
+    "audit:ravza-books": "node ./tests/e2e/ravza-books-performance.spec.mjs",
+    "test:books-memory": "node ./scripts/test-books-memory.mjs"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.0.2",

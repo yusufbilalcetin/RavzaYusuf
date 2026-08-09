@@ -678,6 +678,12 @@ function trimPdfBitmapCache() {
 }
 
 async function rememberPdfBitmap(pageNumber, canvas, renderKey) {
+  // GECIKMIS YAZIM KORUMASI: createImageBitmap beklenirken okuyucu kapanabilir
+  // ya da baska bir kitap acilabilir. O sirada cancelPdfRenders() onbellegi
+  // bosaltmis olur; guard olmadan bu yazim onbellegi TEKRAR doldurur. Sonraki
+  // kitap ayni olcude acilirsa renderKey de ayni cikar ve paintFromPdfBitmapCache
+  // ONCEKI kitabin sayfasini yeni kitabin tuvaline boyar.
+  const generation = pdfRenderGeneration;
   const previous = pdfBitmapCache.get(pageNumber);
   if (previous) {
     disposePdfBitmap(previous);
@@ -686,6 +692,10 @@ async function rememberPdfBitmap(pageNumber, canvas, renderKey) {
   try {
     if (typeof createImageBitmap === 'function') {
       const bitmap = await createImageBitmap(canvas);
+      if (generation !== pdfRenderGeneration) {
+        try { bitmap.close?.(); } catch (_) { /* kapatilamayan bitmap GC'ye kalir */ }
+        return;
+      }
       pdfBitmapCache.set(pageNumber, { bitmap, renderKey, width: canvas.width, height: canvas.height });
     } else {
       // Safari'nin eski sürümleri: canvas kopyası da işi görür.
