@@ -67,6 +67,7 @@
     "test:ravza-books": "node ./scripts/test-ravza-books.mjs",
     "test:ravza-books:reader": "node ./scripts/test-ravza-books-reader.mjs",
     "test:reader-interaction": "node ./scripts/test-reader-interaction.mjs",
+    "test:ravza-books:feature-freeze": "node ./scripts/test-ravza-books-feature-freeze.mjs",
     "test:transparent-content-cards": "node ./scripts/test-transparent-content-cards.mjs",
     "test:ravza-books-performance": "node ./tests/e2e/ravza-books-performance.spec.mjs",
     "audit:ravza-books": "node ./tests/e2e/ravza-books-performance.spec.mjs",

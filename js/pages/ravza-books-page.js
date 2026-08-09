@@ -3642,7 +3642,9 @@ function installDirectPageCurl() {
   interactionOwner.addEventListener('pointermove', onPointerMove, { passive: false });
   interactionOwner.addEventListener('pointerup', onPointerUp, { passive: false });
   interactionOwner.addEventListener('pointercancel', onPointerCancel, { passive: false });
-  interactionOwner.addEventListener('lostpointercapture', onLostCapture);
+  // lostpointercapture capture'i alan dugumde teslim edilir; yasam dongusunun
+  // diger olaylari stage'e ait olsa da bu cleanup capture sahibinde kalmalidir.
+  surface.addEventListener('lostpointercapture', onLostCapture);
   window.addEventListener('blur', onWindowBlur);
   surface.addEventListener('click', onClick, true);
   surface.addEventListener('contextmenu', onContextMenu);
@@ -3652,7 +3654,7 @@ function installDirectPageCurl() {
     interactionOwner.removeEventListener('pointermove', onPointerMove);
     interactionOwner.removeEventListener('pointerup', onPointerUp);
     interactionOwner.removeEventListener('pointercancel', onPointerCancel);
-    interactionOwner.removeEventListener('lostpointercapture', onLostCapture);
+    surface.removeEventListener('lostpointercapture', onLostCapture);
     window.removeEventListener('blur', onWindowBlur);
     surface.removeEventListener('click', onClick, true);
     surface.removeEventListener('contextmenu', onContextMenu);

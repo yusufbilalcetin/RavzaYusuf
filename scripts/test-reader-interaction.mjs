@@ -18,8 +18,9 @@ try {
     const block = document.querySelector('.stf__block');
     const book = block.getBoundingClientRect();
     const stage = document.getElementById('rdr-stage');
-    window.__readerProbe = { moves: 0, got: 0, lost: 0 };
+    window.__readerProbe = { moves: 0, got: 0, lost: 0, pointerId: null };
     stage.addEventListener('pointermove', () => window.__readerProbe.moves++, true);
+    block.addEventListener('pointerdown', event => { window.__readerProbe.pointerId = event.pointerId; }, true);
     block.addEventListener('gotpointercapture', () => window.__readerProbe.got++);
     block.addEventListener('lostpointercapture', () => window.__readerProbe.lost++);
     return JSON.stringify({x:book.x,y:book.y,w:book.width,h:book.height});
@@ -51,8 +52,49 @@ try {
   await mouse("mousePressed", sx, sy);
   await browser.evaluate(`window.dispatchEvent(new Event('blur'))`);
   assert.equal(await browser.evaluate(`document.getElementById('rdr-stage').classList.contains('is-page-curling')`), false, "blur cleanup");
+
+  await mouse("mouseReleased", sx, sy);
+  await mouse("mousePressed", sx, sy);
+  await browser.evaluate(`document.getElementById('rdr-stage').dispatchEvent(new PointerEvent('pointercancel', {
+    bubbles: true, pointerId: window.__readerProbe.pointerId, pointerType: 'mouse', clientX: ${Math.round(sx)}, clientY: ${Math.round(sy)}
+  }))`);
+  assert.equal(await browser.evaluate(`document.getElementById('rdr-stage').classList.contains('is-page-curling')`), false, "pointercancel cleanup");
+
+  await mouse("mouseReleased", sx, sy);
+  await mouse("mousePressed", sx, sy);
+  await browser.evaluate(`document.querySelector('.stf__block').dispatchEvent(new PointerEvent('lostpointercapture', {
+    pointerId: window.__readerProbe.pointerId, pointerType: 'mouse'
+  }))`);
+  assert.equal(await browser.evaluate(`document.getElementById('rdr-stage').classList.contains('is-page-curling')`), false, "lostpointercapture cleanup");
+
+  await mouse("mouseReleased", sx, sy);
+  await mouse("mousePressed", sx, sy);
+  await browser.evaluate(`document.querySelector('.mode-btn[data-mode="scroll"]').click()`);
+  await browser.waitFor("document.getElementById('reader-inner')?.dataset.readerMode === 'scroll'", "mode cleanup", 60000);
+  assert.equal(await browser.evaluate(`document.getElementById('rdr-stage').classList.contains('is-page-curling')`), false, "mode change cleanup");
+  await mouse("mouseReleased", sx, sy);
+  await browser.waitFor("document.querySelector('.pdf-scroll-page.is-rendered, .pdf-page.is-rendered')", "scroll mode rendered", 60000);
+  await delay(500);
+
+  await browser.evaluate(`document.getElementById('rdr-back').click()`);
+  await browser.waitFor("document.querySelector('#ravzabooks')?.dataset.appMode === 'library'", "library after mode cleanup", 60000);
+  await browser.evaluate(`(() => {
+    const prefs=JSON.parse(localStorage.getItem('ravza-books-prefs') || '{}');
+    prefs.readerMode='page'; localStorage.setItem('ravza-books-prefs', JSON.stringify(prefs));
+    document.querySelector('.library-book-card[data-book-id="atesten-gomlek"]').click();
+  })()`);
+  await browser.waitFor("document.querySelector('.pdf-scroll-page.is-rendered, .pdf-page.is-rendered')", "reader reopened", 60000);
+  await delay(500);
+  await browser.evaluate(`document.querySelector('.mode-btn[data-mode="page"]').click()`);
+  await browser.waitFor("document.querySelector('.stf__block')", "page mode restored", 60000);
+  await delay(900);
+  const closePoint = JSON.parse(await browser.evaluate(`(() => { const r=document.querySelector('.stf__block').getBoundingClientRect(); return JSON.stringify({x:r.right-30,y:r.top+r.height/2}); })()`));
+  await mouse("mousePressed", closePoint.x, closePoint.y);
+  await browser.evaluate(`document.getElementById('rdr-back').click()`);
+  await browser.waitFor("document.querySelector('#ravzabooks')?.dataset.appMode === 'library'", "reader close cleanup", 60000);
+  assert.equal(await browser.evaluate(`document.querySelector('.is-page-curling') === null`), true, "reader close cleanup");
   assertCleanDiagnostics(browser, "reader interaction");
-  console.log("PASS reader stage capture: 4 yon, outside release ve blur cleanup");
+  console.log("PASS reader stage capture: 4 yon, outside release, cancel/capture-loss/blur/mode/close cleanup");
 } finally {
   await browser.close();
   await server.close();

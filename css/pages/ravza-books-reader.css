@@ -488,7 +488,7 @@
 }
 
 .ravza-books-page .reader-sheet .setting-btn {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 0.6rem;
   color: var(--ink);
   border: 0;
@@ -500,6 +500,24 @@
 .ravza-books-page .reader-sheet .setting-btn.selected {
   background: var(--control-bg);
   box-shadow: 0 1px 3px var(--control-shadow);
+}
+
+.ravza-books-page .reader-sheet .file-btn {
+  min-height: 44px;
+}
+
+/* Track kompakt kalir; label'in tamamı 44px dokunma alanidir. */
+.ravza-books-page .reader-sheet .switch {
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.ravza-books-page .reader-sheet .switch-track {
+  position: relative;
+  width: 42px;
+  height: 24px;
 }
 
 /* Desteklenmeyen ayar gizlenmez, dürüstçe soluklaştırılır (§42). */
