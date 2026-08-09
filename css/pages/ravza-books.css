@@ -843,6 +843,16 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* PDF'nin kendisi sayfadir. Fiziksel kitap dekorasyonu veya kontrol rezervi
+   fit hesabindan alan calmaz; yalnizca gercek cihaz safe-area payi korunur. */
+.reader-root[data-book-type="pdf"] .reader-stage {
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
 .book-cradle {
   position: relative;
   z-index: var(--z-book);
@@ -890,6 +900,11 @@ button {
   opacity: 1;
 }
 
+.reader-root[data-book-type="pdf"] .book-cradle::before,
+.reader-root[data-book-type="pdf"] .book-cradle::after {
+  content: none;
+}
+
 #rdr-flipbook {
   width: 100% !important;
   height: 100% !important;
@@ -918,7 +933,7 @@ button {
 
 .book-sheet.pdf-page,
 .book-sheet.pdf-back-cover {
-  background: #fff !important;
+  background: transparent !important;
   background-image: none !important;
 }
 
@@ -928,13 +943,9 @@ button {
   place-items: center;
   width: 100%;
   height: 100%;
-  padding:
-    max(6px, env(safe-area-inset-top))
-    max(6px, env(safe-area-inset-right))
-    max(6px, env(safe-area-inset-bottom))
-    max(6px, env(safe-area-inset-left));
+  padding: 0;
   overflow: hidden;
-  background: #fff;
+  background: transparent;
 }
 
 .pdf-page canvas {

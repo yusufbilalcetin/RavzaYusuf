@@ -1496,8 +1496,8 @@ function measureRenderBox(fallbackMetrics = null) {
   // Çerçeve henüz ölçülemiyorsa (ilk boyamadan önce) düzen ölçüsüne düş.
   if (fallbackMetrics) {
     pdfRenderBox = {
-      width: Math.max(1, fallbackMetrics.pageWidth - 12),
-      height: Math.max(1, fallbackMetrics.pageHeight - 12),
+      width: Math.max(1, fallbackMetrics.pageWidth),
+      height: Math.max(1, fallbackMetrics.pageHeight),
     };
     return true;
   }
@@ -2627,7 +2627,7 @@ async function openPdfReader(book, position = null) {
     height: metrics.pageHeight,
     size: 'fixed',
     startPage: startIndex,
-    drawShadow: true,
+    drawShadow: false,
     flippingTime: PAGE_CURL_CONFIG.flipDuration,
     usePortrait: metrics.portrait,
     startZIndex: 0,
