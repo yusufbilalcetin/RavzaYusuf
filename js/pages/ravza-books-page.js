@@ -510,6 +510,20 @@ function shouldUsePortrait() {
     || (window.matchMedia('(orientation: portrait)').matches && window.innerWidth <= 1100);
 }
 
+/**
+ * Telefon portresi + sayfa modu + PDF: fiziksel yaprak sahnenin tamamini
+ * kaplar, gercek PDF icerigi yapragin icinde contain edilir.
+ *
+ * Kosul, ayni ayrimi yapan CSS media query'siyle birebir ayni tutulur:
+ * (max-width: 767px) and (orientation: portrait).
+ */
+function shouldUseMobileFullSheet() {
+  return state.bookType === 'pdf'
+    && state.readerMode === 'page'
+    && window.innerWidth < 768
+    && window.matchMedia('(orientation: portrait)').matches;
+}
+
 function getCurrentPosition() {
   const page = readerPages[state.currentIndex];
   if (page) {
@@ -1335,8 +1349,22 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
   const pageHeight = scale;
   const pageWidth = pageHeight * ratio;
 
-  const width = pageWidth * pagesAcross;
-  const height = pageHeight;
+  // TELEFON PORTRESI: FIZIKSEL YAPRAK != PDF ICERIGI.
+  //
+  // Masaustunde yaprak ile PDF ayni dikdortgendir ve bu dogrudur. Telefonda
+  // ise 0.75 oranli sayfa 0.46 oranli ekrana sigdirilinca yaprak ekranin
+  // yalnizca ortasinda kaliyor; cevirme animasyonu da yalnizca o kucuk
+  // dikdortgeni kivirip ust/alt seridi yerinde birakiyordu.
+  //
+  // Bu yuzden telefonda BESIK sahnenin tamamini alir: St.PageFlip'in fiziksel
+  // sayfasi = tam boy yaprak, dolayisiyla kivrilma, golge ve arka yuz butun
+  // yuksekligi kullanir. Gercek PDF ise bu yapragin ICINDE contain edilir -
+  // .pdf-canvas-frame tuvali kendi orani ile ortalar, tuvalin CSS ve backing
+  // olculeri DEGISMEZ (bkz. renderPdfPage'deki Math.min olcegi). Yani tam boy
+  // yaprak icin dev bir tuval uretilmez.
+  const fullSheet = shouldUseMobileFullSheet();
+  const width = fullSheet ? availableWidth : pageWidth * pagesAcross;
+  const height = fullSheet ? availableHeight : pageHeight;
   if (width < 2 || height < 2) return false;
   // Yalnızca gerçekten değiştiyse yaz: aksi hâlde bu yazım, cradle'ı gözleyen
   // ResizeObserver'ı yeniden tetikleyip oku-yaz döngüsü kuruyor.

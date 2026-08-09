@@ -67,23 +67,35 @@ async function assertMaximumMobilePageFill(viewport) {
     const availableWidth = stage.clientWidth - padding.left - padding.right;
     const availableHeight = stage.clientHeight - padding.top - padding.bottom;
     const ratio = parseFloat(getComputedStyle(cradle).getPropertyValue('--pdf-page-aspect'));
-    const expectedWidth = Math.min(availableWidth, availableHeight * ratio);
-    const expectedHeight = expectedWidth / ratio;
-    const topGap = pageRect.top - (stageRect.top + padding.top);
-    const bottomGap = stageRect.bottom - padding.bottom - pageRect.bottom;
+    // FIZIKSEL YAPRAK = pageRect (sahnenin tamami), PDF ICERIGI = tuval.
+    // EKRANDAKI yapragin tuvali: DOM'daki ilk render edilmis sayfa ekran
+    // disinda olabilir, olcusu de farkli olabilir.
+    const canvas = [...document.querySelectorAll('.pdf-page.is-rendered canvas')]
+      .find(element => element.getBoundingClientRect().width > 1);
+    const canvasRect = canvas ? canvas.getBoundingClientRect() : null;
+    const expectedContentHeight = Math.min(pageRect.height, pageRect.width / ratio);
+    const expectedContentWidth = expectedContentHeight * ratio;
+    const topGap = canvasRect ? canvasRect.top - pageRect.top : 0;
+    const bottomGap = canvasRect ? pageRect.bottom - canvasRect.bottom : 0;
     return {
-      availableWidth, availableHeight, ratio, expectedWidth, expectedHeight,
-      pageWidth: pageRect.width, pageHeight: pageRect.height, topGap, bottomGap,
+      availableWidth, availableHeight, ratio, expectedContentWidth, expectedContentHeight,
+      pageWidth: pageRect.width, pageHeight: pageRect.height,
+      contentWidth: canvasRect ? canvasRect.width : 0,
+      contentHeight: canvasRect ? canvasRect.height : 0,
+      topGap, bottomGap,
     };
   })()`);
   assert.ok(metrics, `${viewport.width}x${viewport.height}: mobile page geometry missing`);
-  assert.ok(Math.abs(metrics.pageWidth - metrics.expectedWidth) <= 2, `${viewport.width}x${viewport.height}: page does not use maximum contain width`);
-  assert.ok(Math.abs(metrics.pageHeight - metrics.expectedHeight) <= 2, `${viewport.width}x${viewport.height}: page does not use maximum contain height`);
-  assert.ok(Math.abs(metrics.pageWidth / metrics.pageHeight - metrics.ratio) <= 0.005, `${viewport.width}x${viewport.height}: PDF aspect ratio distorted`);
-  assert.ok(metrics.pageWidth <= metrics.availableWidth + 1 && metrics.pageHeight <= metrics.availableHeight + 1, `${viewport.width}x${viewport.height}: PDF page is cropped`);
-  assert.ok(Math.abs(metrics.topGap - metrics.bottomGap) <= 2, `${viewport.width}x${viewport.height}: unavoidable vertical remainder is not balanced`);
-  const unavoidableGap = Math.max(0, (metrics.availableHeight - metrics.expectedHeight) / 2);
-  assert.ok(Math.abs(metrics.topGap - unavoidableGap) <= 2, `${viewport.width}x${viewport.height}: avoidable top/bottom space remains`);
+  // 1. Fiziksel yaprak sahnenin tamamini kaplar.
+  assert.ok(Math.abs(metrics.pageWidth - metrics.availableWidth) <= 3, `${viewport.width}x${viewport.height}: physical sheet width ${metrics.pageWidth} != stage ${metrics.availableWidth}`);
+  assert.ok(Math.abs(metrics.pageHeight - metrics.availableHeight) <= 3, `${viewport.width}x${viewport.height}: physical sheet height ${metrics.pageHeight} != stage ${metrics.availableHeight}`);
+  // 2. PDF icerigi yaprak icinde maksimum contain olcegiyle durur.
+  assert.ok(Math.abs(metrics.contentWidth - metrics.expectedContentWidth) <= 2, `${viewport.width}x${viewport.height}: content does not use maximum contain width`);
+  assert.ok(Math.abs(metrics.contentHeight - metrics.expectedContentHeight) <= 2, `${viewport.width}x${viewport.height}: content does not use maximum contain height`);
+  assert.ok(Math.abs(metrics.contentWidth / metrics.contentHeight - metrics.ratio) <= 0.006, `${viewport.width}x${viewport.height}: PDF aspect ratio distorted`);
+  assert.ok(metrics.contentWidth <= metrics.pageWidth + 1 && metrics.contentHeight <= metrics.pageHeight + 1, `${viewport.width}x${viewport.height}: PDF content is cropped by the sheet`);
+  // 3. Icerik yaprak icinde dikey olarak ortali (ust/alt kagit uzantisi esit).
+  assert.ok(Math.abs(metrics.topGap - metrics.bottomGap) <= 2, `${viewport.width}x${viewport.height}: content is not vertically centred in the sheet`);
   mobileFillResults.push({ viewport: `${viewport.width}x${viewport.height}`, ...metrics });
 }
 
@@ -285,10 +297,10 @@ try {
   assertCleanDiagnostics(browser, "reader mobile flip backside");
   console.table(mobileFillResults.map(result => ({
     viewport: result.viewport,
-    page: `${Math.round(result.pageWidth)}x${Math.round(result.pageHeight)}`,
-    topGap: Math.round(result.topGap),
-    bottomGap: Math.round(result.bottomGap),
-    avoidableGap: Math.round(result.topGap - Math.max(0, (result.availableHeight - result.expectedHeight) / 2)),
+    sheet: `${Math.round(result.pageWidth)}x${Math.round(result.pageHeight)}`,
+    content: `${Math.round(result.contentWidth)}x${Math.round(result.contentHeight)}`,
+    paperTop: Math.round(result.topGap),
+    paperBottom: Math.round(result.bottomGap),
   })));
   console.log("PASS mobile PDF flip backside: real canvas, forward/previous mapping, cancel cleanup, 390-440 portrait only");
 } finally {

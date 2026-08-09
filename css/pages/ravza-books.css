@@ -894,6 +894,18 @@ button {
   .reader-root[data-book-type="pdf"][data-reader-mode="page"] .pdf-canvas-frame {
     background: var(--reader-mobile-paper) !important;
   }
+
+  /* St.PageFlip kendi stil sayfasinda `.stf__parent canvas { position:absolute;
+     left:0; top:0 }` yayinliyor ve bu inen secici bizim PDF tuvalimizi de
+     yakaliyor. Yaprak ile icerik ayni dikdortgenken sonucu degistirmiyordu;
+     tam boy yaprakta ise tuvali yapragin TEPESINE yapistiriyor. Tuvali normal
+     akisa dondurunce .pdf-canvas-frame'in place-items:center'i tuvali yaprak
+     icinde yatay ve dikey olarak ortalar. */
+  .reader-root[data-book-type="pdf"][data-reader-mode="page"] .pdf-page canvas {
+    position: relative;
+    top: auto;
+    left: auto;
+  }
 }
 
 .book-cradle {

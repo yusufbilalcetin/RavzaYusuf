@@ -385,18 +385,26 @@ try {
   assert.equal(readerProbe.hasDirectionButtons, false, 'Okuyucuda yön düğmesi bulunuyor');
   assert.equal(readerProbe.spread, 'single', 'Mobil okuyucu tek sayfa değil');
 
+  // Mobil portrede FIZIKSEL YAPRAK (beşik) sahnenin tamamını kaplar; gerçek
+  // PDF içeriği (tuval) bu yaprağın içinde kendi oranıyla contain edilir.
   const mobilePdfFit = await evaluate(`(() => {
+    const stage = document.querySelector('#rdr-stage').getBoundingClientRect();
     const cradle = document.querySelector('#book-cradle').getBoundingClientRect();
-    const canvas = document.querySelector('.pdf-page.is-rendered canvas').getBoundingClientRect();
+    const canvas = [...document.querySelectorAll('.pdf-page.is-rendered canvas')]
+      .find(element => element.getBoundingClientRect().width > 1).getBoundingClientRect();
     return {
-      bookRatio: cradle.width / cradle.height,
-      canvasWidthFill: canvas.width / cradle.width,
-      canvasHeightFill: canvas.height / cradle.height,
+      sheetFillsStageWidth: cradle.width / stage.width,
+      sheetFillsStageHeight: cradle.height / stage.height,
+      contentRatio: canvas.width / canvas.height,
+      contentWithinSheet: canvas.width <= cradle.width + 1 && canvas.height <= cradle.height + 1,
+      contentCentred: Math.abs((canvas.top - cradle.top) - (cradle.bottom - canvas.bottom)) <= 2,
       overflow: Math.max(0, cradle.right - innerWidth) + Math.max(0, -cradle.left),
     };
   })()`);
-  assert.ok(Math.abs(mobilePdfFit.bookRatio - 0.75) < 0.01, 'Mobil PDF alanı sayfa oranına uymuyor');
-  assert.ok(mobilePdfFit.canvasWidthFill > 0.95 && mobilePdfFit.canvasHeightFill > 0.95, 'Mobil PDF tuvali sayfa alanını doldurmuyor');
+  assert.ok(mobilePdfFit.sheetFillsStageWidth > 0.99 && mobilePdfFit.sheetFillsStageHeight > 0.99, 'Mobil fiziksel yaprak sahnenin tamamını kaplamıyor');
+  assert.ok(Math.abs(mobilePdfFit.contentRatio - 0.75) < 0.01, 'Mobil PDF içeriği sayfa oranına uymuyor');
+  assert.ok(mobilePdfFit.contentWithinSheet, 'Mobil PDF içeriği yaprağı taşıyor');
+  assert.ok(mobilePdfFit.contentCentred, 'Mobil PDF içeriği yaprak içinde ortalanmamış');
   assert.equal(mobilePdfFit.overflow, 0, 'Mobil PDF yatay taşıyor');
 
   await evaluate("document.querySelector('.theme-btn[data-theme=\"sepia\"]').click()");

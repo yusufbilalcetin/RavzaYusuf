@@ -11,8 +11,8 @@ import {
 } from "./lib/theme-test-runtime.mjs";
 
 const server = await ensureTestServer();
-const browser = await ThemeTestBrowser.launch("reader-mobile-fit-page");
-const artifactDir = join(ROOT, "test-artifacts", "reader-mobile-fit-page");
+const browser = await ThemeTestBrowser.launch("reader-mobile-full-sheet");
+const artifactDir = join(ROOT, "test-artifacts", "reader-mobile-full-sheet");
 await mkdir(artifactDir, { recursive: true });
 
 const viewports = [
@@ -152,7 +152,7 @@ async function measure() {
  * icinde kalir, en-boy orani korunur ve olcek mumkun olan EN BUYUK
  * contain olcegidir (yani "tam gorunur ama minicik" de degildir).
  */
-function assertFitPage(result, label, { fullViewport = false } = {}) {
+function assertFitPage(result, label, { fullViewport = false, fullSheet = false } = {}) {
   assert.ok(result, `${label}: reader geometry missing`);
 
   if (fullViewport) {
@@ -166,49 +166,54 @@ function assertFitPage(result, label, { fullViewport = false } = {}) {
   assert.ok(Math.abs(result.stage.width - result.root.width) <= 1, `${label}: stage/root width mismatch`);
   assert.ok(Math.abs(result.stage.height - result.root.height) <= 1, `${label}: stage/root height mismatch`);
 
-  // 1. CONTAIN: hicbir kenar disari tasmaz -> hicbir metin kirpilmaz.
-  assert.ok(result.leftInset >= -2, `${label}: page clipped on the LEFT by ${(-result.leftInset).toFixed(1)}px`);
-  assert.ok(result.rightInset >= -2, `${label}: page clipped on the RIGHT by ${(-result.rightInset).toFixed(1)}px`);
-  assert.ok(result.topInset >= -2, `${label}: page clipped on the TOP by ${(-result.topInset).toFixed(1)}px`);
-  assert.ok(result.bottomInset >= -2, `${label}: page clipped on the BOTTOM by ${(-result.bottomInset).toFixed(1)}px`);
-
-  // 2. En-boy orani bozulmadi (tek olcek, gerilme/ezilme yok).
+  // FIZIKSEL YAPRAK (.stf__item) ile PDF ICERIGI (canvas) ayri iki
+  // dikdortgendir. Telefon portresinde yaprak sahnenin tamamini kaplar;
+  // masaustunde ise yaprak = icerik (mevcut spread sozlesmesi).
+  const sheet = result.item;
+  const content = result.canvas;
   const pagesAcross = result.spread === 'double' ? 2 : 1;
-  const singleAspect = (result.page.width / pagesAcross) / result.page.height;
-  assert.ok(Math.abs(singleAspect - result.pdfAspect) <= 0.005, `${label}: aspect distorted ${singleAspect.toFixed(4)} vs ${result.pdfAspect.toFixed(4)}`);
+  assert.ok(sheet && content, `${label}: sheet/content rect missing`);
 
-  // 3. MAKSIMUM contain olcegi: en az bir eksen kullanilabilir alani doldurur.
-  const expectedHeight = Math.min(result.usable.height, (result.usable.width / pagesAcross) / result.pdfAspect);
-  const expectedWidth = expectedHeight * result.pdfAspect * pagesAcross;
-  assert.ok(Math.abs(result.page.height - expectedHeight) <= 2, `${label}: page height ${result.page.height.toFixed(1)} is not the max contain height ${expectedHeight.toFixed(1)}`);
-  assert.ok(Math.abs(result.page.width - expectedWidth) <= 2, `${label}: page width ${result.page.width.toFixed(1)} is not the max contain width ${expectedWidth.toFixed(1)}`);
-  assert.ok(result.pageHeightRatio >= 0.999 || result.pageWidthRatio >= 0.999, `${label}: neither axis is saturated (page is needlessly small)`);
+  // 1. FIZIKSEL YAPRAK OLCUSU.
+  if (fullSheet) {
+    assert.ok(Math.abs(sheet.width - result.usable.width / pagesAcross) <= 3, `${label}: sheet width ${sheet.width} != stage ${result.usable.width}`);
+    assert.ok(Math.abs(sheet.height - result.usable.height) <= 3, `${label}: physical sheet height ${sheet.height} != stage height ${result.usable.height} - the whole sheet must be the page`);
+  } else {
+    assert.ok(Math.abs(sheet.height - content.height) <= 2, `${label}: non-mobile sheet must equal the PDF content rect (${sheet.height} vs ${content.height})`);
+    assert.ok(Math.abs(sheet.width - content.width) <= 2, `${label}: non-mobile sheet width mismatch (${sheet.width} vs ${content.width})`);
+  }
 
-  // 4. Ortalama.
-  assert.ok(Math.abs(result.leftInset - result.rightInset) <= 2, `${label}: not horizontally centered (${result.leftInset.toFixed(1)}/${result.rightInset.toFixed(1)})`);
-  assert.ok(Math.abs(result.topInset - result.bottomInset) <= 2, `${label}: not vertically centered (${result.topInset.toFixed(1)}/${result.bottomInset.toFixed(1)})`);
+  // 2. ICERIK YAPRAGIN ICINDE TAMAMEN GORUNUR: hicbir yazi kirpilmaz.
+  assert.ok(content.left >= sheet.left - 2, `${label}: PDF content clipped on the LEFT`);
+  assert.ok(content.right <= sheet.right + 2, `${label}: PDF content clipped on the RIGHT`);
+  assert.ok(content.top >= sheet.top - 2, `${label}: PDF content clipped on the TOP`);
+  assert.ok(content.bottom <= sheet.bottom + 2, `${label}: PDF content clipped on the BOTTOM`);
+  // Sahne sinirlari icinde de tamamen gorunur olmali.
+  assert.ok(content.left >= result.usable.left - 2 && content.right <= result.usable.right + 2, `${label}: PDF content outside the stage horizontally`);
+  assert.ok(content.top >= result.usable.top - 2 && content.bottom <= result.usable.bottom + 2, `${label}: PDF content outside the stage vertically`);
 
-  // 5. Fit Page'de pan yok: stale transform/pan state kalmamali.
+  // 3. EN-BOY ORANI: gerilme/ezilme yok.
+  const contentAspect = content.width / content.height;
+  assert.ok(Math.abs(contentAspect - result.pdfAspect) <= 0.006, `${label}: PDF aspect distorted ${contentAspect.toFixed(4)} vs ${result.pdfAspect.toFixed(4)}`);
+
+  // 4. MAKSIMUM contain: icerik yapragin icinde olabilecek en buyuk olcekte.
+  const expectedContentHeight = Math.min(sheet.height, sheet.width / result.pdfAspect);
+  const expectedContentWidth = expectedContentHeight * result.pdfAspect;
+  assert.ok(Math.abs(content.height - expectedContentHeight) <= 2, `${label}: content height ${content.height.toFixed(1)} is not the max contain height ${expectedContentHeight.toFixed(1)}`);
+  assert.ok(Math.abs(content.width - expectedContentWidth) <= 2, `${label}: content width ${content.width.toFixed(1)} is not the max contain width ${expectedContentWidth.toFixed(1)}`);
+
+  // 5. ICERIK YAPRAK ICINDE ORTALI.
+  const insetLeft = content.left - sheet.left;
+  const insetRight = sheet.right - content.right;
+  const insetTop = content.top - sheet.top;
+  const insetBottom = sheet.bottom - content.bottom;
+  assert.ok(Math.abs(insetLeft - insetRight) <= 2, `${label}: content not horizontally centered in the sheet (${insetLeft.toFixed(1)}/${insetRight.toFixed(1)})`);
+  assert.ok(Math.abs(insetTop - insetBottom) <= 2, `${label}: content not vertically centered in the sheet (${insetTop.toFixed(1)}/${insetBottom.toFixed(1)})`);
+
+  // 6. Pan yok: stale transform/pan state kalmamali.
   assert.ok(result.cradleTransform === 'none' || /matrix\(1, 0, 0, 1, 0, 0\)/.test(result.cradleTransform), `${label}: stale pan transform ${result.cradleTransform}`);
-  assert.equal(result.panDataset.limit, null, `${label}: pan state leaked into Fit Page`);
-  assert.equal(result.panDataset.x, null, `${label}: pan offset leaked into Fit Page`);
+  assert.equal(result.panDataset.limit, null, `${label}: pan state leaked in`);
   assert.equal(result.pannableClass, false, `${label}: reader still marked pannable`);
-
-  // 6. SAYFA YUZEYININ ICINDE bos kagit bandi YOK: PageFlip'in fiziksel
-  //    sayfasi, PDF sarmalayici ve tuval ayni dikdortgen olmali (§H/§I).
-  if (result.item && result.pdfWrapper) {
-    assert.ok(Math.abs(result.item.height - result.pdfWrapper.height) <= 2, `${label}: PageFlip page height ${result.item.height} != PDF wrapper ${result.pdfWrapper.height}`);
-    assert.ok(Math.abs(result.item.width - result.pdfWrapper.width) <= 2, `${label}: PageFlip page width ${result.item.width} != PDF wrapper ${result.pdfWrapper.width}`);
-    const innerTop = result.pdfWrapper.top - result.item.top;
-    const innerBottom = result.item.bottom - result.pdfWrapper.bottom;
-    assert.ok(Math.abs(innerTop) <= 2, `${label}: empty paper band INSIDE page, top ${innerTop.toFixed(1)}px`);
-    assert.ok(Math.abs(innerBottom) <= 2, `${label}: empty paper band INSIDE page, bottom ${innerBottom.toFixed(1)}px`);
-  }
-  if (result.canvas && result.pdfWrapper) {
-    const canvasTop = result.canvas.top - result.pdfWrapper.top;
-    const canvasBottom = result.pdfWrapper.bottom - result.canvas.bottom;
-    assert.ok(Math.abs(canvasTop) <= 2 && Math.abs(canvasBottom) <= 2, `${label}: PDF canvas letterboxed inside its wrapper (${canvasTop.toFixed(1)}/${canvasBottom.toFixed(1)})`);
-  }
 
   // 7. KAGIT OPAK (§J/§K): saydamlik yalnizca arka yuz BASKISINDA olabilir,
   //    yaprak yuzeyinde asla.
@@ -240,14 +245,22 @@ async function assertNoPaperSeam(label, artifactName) {
   const surface = createCanvas(image.width, image.height);
   const context = surface.getContext("2d");
   context.drawImage(image, 0, 0);
-  const pixel = (x, y) => [...context.getImageData(Math.round(x * scale), Math.round(y * scale), 1, 1).data].slice(0, 3);
+  const pixel = (x, y) => {
+    const px = Math.min(image.width - 1, Math.max(0, Math.round(x * scale)));
+    const py = Math.min(image.height - 1, Math.max(0, Math.round(y * scale)));
+    return [...context.getImageData(px, py, 1, 1).data].slice(0, 3);
+  };
 
+  // Yaprak artik sahnenin tamamini kapladigi icin "bant" siniri kalmadi.
+  // Anlamli dikis testi su an ICERIK ile KAGIT UZANTISI arasindadir (§10):
+  // kullanici "PDF burada basliyor" diyebilecegi bir cizgi gormemeli.
   let worstDelta = 0;
   let worstAt = "";
-  for (const edgeY of [geometry.item.top, geometry.item.bottom]) {
+  for (const edgeY of [geometry.canvas.top, geometry.canvas.bottom]) {
+    if (edgeY < 6 || edgeY > geometry.stage.height - 6) continue;
     for (let x = 30; x < geometry.stage.width - 30; x += 10) {
-      const outside = pixel(x, edgeY < geometry.stage.height / 2 ? edgeY - 4 : edgeY + 4);
-      const inside = pixel(x, edgeY < geometry.stage.height / 2 ? edgeY + 4 : edgeY - 4);
+      const outside = pixel(x, edgeY === geometry.canvas.top ? edgeY - 4 : edgeY + 4);
+      const inside = pixel(x, edgeY === geometry.canvas.top ? edgeY + 4 : edgeY - 4);
       const delta = Math.max(...outside.map((value, index) => Math.abs(value - inside[index])));
       if (delta > worstDelta) { worstDelta = delta; worstAt = `x=${x} y=${Math.round(edgeY)} ${outside} vs ${inside}`; }
     }
@@ -307,8 +320,15 @@ async function edgeDrag({ direction, ratio, commit, screenshotName }) {
       page:Number(element.dataset.mobileFlipBacksidePage), pdfPage:Number(element.dataset.pdfPage),
       width:canvas.width, height:canvas.height,
       // Kivrilma sirasinda sayfa DONDURULUR; getBoundingClientRect donmus
-      // AABB verir. Gercek yerlesim kutusu icin offset* kullanilir (§29).
+      // AABB verir. Gercek yerlesim kutusu icin offset* kullanilir (§55).
       cssWidth:element.offsetWidth, cssHeight:element.offsetHeight,
+      // Aynalanan BASKI yalnizca gercek PDF icerik dikdortgeni kadar olmali.
+      printWidth:canvas.offsetWidth, printHeight:canvas.offsetHeight,
+      // Kivrilan katmanlarin en buyuk YERLESIM yuksekligi: fiziksel yaprak
+      // yuksekligine esit olmali, PDF icerigine degil (§54).
+      maxFlippingHeight:Math.max(0, ...[...document.querySelectorAll('.stf__item')]
+        .filter(el => el.getBoundingClientRect().width > 1)
+        .map(el => el.offsetHeight)),
       sourceWidth:source?.width||0, sourceHeight:source?.height||0,
       renderKey:canvas.dataset.renderKey||'', opaque, colors:colors.size,
       opacity:Number(style.opacity), transform:style.transform,
@@ -333,10 +353,22 @@ async function edgeDrag({ direction, ratio, commit, screenshotName }) {
   assert.ok(backside.frameBgAlpha >= 0.99, `${direction}: backside frame is translucent (alpha ${backside.frameBgAlpha})`);
   assert.ok(backside.pageOpacity >= 0.99, `${direction}: whole backside sheet faded (${backside.pageOpacity}) - use the print layer instead`);
   assert.ok(backside.opacity >= 0.10 && backside.opacity <= 0.30, `${direction}: backside print strength ${backside.opacity} outside the 0.10-0.30 ghost-print range`);
-  // Fold sirasinda on yuz geometrisi Fit Page olcusunde kalmali (§29).
-  assert.ok(Math.abs(folded.page.width - before.page.width) <= 1 && Math.abs(folded.page.height - before.page.height) <= 1, `${direction}: fold changed Fit Page geometry`);
-  assert.ok(Math.abs(backside.cssWidth - before.page.width) <= 2, `${direction}: backside width ${backside.cssWidth} != front ${before.page.width}`);
-  assert.ok(Math.abs(backside.cssHeight - before.page.height) <= 2, `${direction}: backside height ${backside.cssHeight} != front ${before.page.height}`);
+  // Fold sirasinda on yuz geometrisi degismemeli.
+  assert.ok(Math.abs(folded.page.width - before.page.width) <= 1 && Math.abs(folded.page.height - before.page.height) <= 1, `${direction}: fold changed the sheet geometry`);
+
+  // §54 EN KRITIK: kivrilan yuzey FIZIKSEL YAPRAK yuksekliginde olmali.
+  // Eskiden yalnizca PDF icerigi (586px) kivriliyor, ust/alt serit yerinde
+  // kaliyordu; artik butun yaprak (956px) tek kagit gibi doner.
+  assert.ok(
+    Math.abs(backside.maxFlippingHeight - before.item.height) <= 3,
+    `${direction}: flipping surface is ${backside.maxFlippingHeight}px but the physical sheet is ${before.item.height}px - only part of the sheet is curling`,
+  );
+
+  // §55 arka yuz: YAPRAK tam boy, aynalanan BASKI ise icerik dikdortgeni.
+  assert.ok(Math.abs(backside.cssHeight - before.item.height) <= 2, `${direction}: backside sheet height ${backside.cssHeight} != physical sheet ${before.item.height}`);
+  assert.ok(Math.abs(backside.cssWidth - before.item.width) <= 2, `${direction}: backside sheet width ${backside.cssWidth} != physical sheet ${before.item.width}`);
+  assert.ok(Math.abs(backside.printHeight - before.canvas.height) <= 2, `${direction}: mirrored print height ${backside.printHeight} != PDF content ${before.canvas.height}`);
+  assert.ok(Math.abs(backside.printWidth - before.canvas.width) <= 2, `${direction}: mirrored print width ${backside.printWidth} != PDF content ${before.canvas.width}`);
   if (screenshotName) await screenshot(screenshotName);
   if (!commit) await delay(180);
   await touch("touchEnd", endX, y);
@@ -351,7 +383,7 @@ async function edgeDrag({ direction, ratio, commit, screenshotName }) {
     before.currentPage + (commit ? (forward ? 1 : -1) : 0),
     `${direction}: wrong commit/cancel result`,
   );
-  assertFitPage(after, `${direction} after ${commit ? 'commit' : 'cancel'}`, { fullViewport:true });
+  assertFitPage(after, `${direction} after ${commit ? 'commit' : 'cancel'}`, { fullViewport:true, fullSheet:true });
   assert.equal(await browser.evaluate("document.querySelectorAll('[data-mobile-flip-backside-page]').length"), 0, `${direction}: stale backside layer`);
 }
 
@@ -370,6 +402,7 @@ async function canvasMemoryProbe() {
       count:canvases.length,
       bytes:canvases.reduce((sum,item)=>sum+item.bytes,0),
       maxScale:Math.max(0,...canvases.map(item=>item.width/Math.max(1,item.cssWidth))),
+      maxCssHeight:Math.max(0,...canvases.map(item=>item.cssHeight)),
     };
   })()`);
 }
@@ -385,12 +418,12 @@ async function captureBrowserFullscreen(viewport) {
   await browser.waitFor("Boolean(document.fullscreenElement || document.webkitFullscreenElement)", "fullscreen enter");
   await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
   await delay(500);
-  assertFitPage(await measure(), `${viewport.width}x${viewport.height} browser fullscreen`, { fullViewport:true });
+  assertFitPage(await measure(), `${viewport.width}x${viewport.height} browser fullscreen`, { fullViewport:true, fullSheet:true });
   await screenshot(`${viewport.width}x${viewport.height}-browser-fullscreen`);
   await browser.evaluate("document.exitFullscreen?.() || document.webkitExitFullscreen?.()");
   await browser.waitFor("!document.fullscreenElement && !document.webkitFullscreenElement", "fullscreen exit");
   await delay(500);
-  assertFitPage(await measure(), `${viewport.width}x${viewport.height} fullscreen exit`, { fullViewport:true });
+  assertFitPage(await measure(), `${viewport.width}x${viewport.height} fullscreen exit`, { fullViewport:true, fullSheet:true });
   return true;
 }
 
@@ -402,13 +435,13 @@ try {
     const label = `${viewport.width}x${viewport.height}`;
     await openPdf(viewport);
     const visible = await measure();
-    assertFitPage(visible, `${label} controls visible`, { fullViewport:true });
+    assertFitPage(visible, `${label} controls visible`, { fullViewport:true, fullSheet:true });
     assert.equal(visible.controlsVisible, true, `${label}: controls should start visible`);
     await screenshot(`${label}-controls-visible`);
 
     await tapReaderCenter();
     const hidden = await measure();
-    assertFitPage(hidden, `${label} controls hidden`, { fullViewport:true });
+    assertFitPage(hidden, `${label} controls hidden`, { fullViewport:true, fullSheet:true });
     assert.equal(hidden.controlsVisible, false, `${label}: real center tap did not hide controls`);
     assert.ok(Math.abs(hidden.page.width - visible.page.width) <= 1 && Math.abs(hidden.page.height - visible.page.height) <= 1, `${label}: controls changed PDF geometry`);
     const seam = await assertNoPaperSeam(`${label} controls hidden`, `${label}-controls-hidden`);
@@ -425,7 +458,7 @@ try {
     await touch('touchEnd', centerX - 108, centerY);
     await delay(220);
     const afterCenterDrag = await measure();
-    assertFitPage(afterCenterDrag, `${label} after center drag`, { fullViewport:true });
+    assertFitPage(afterCenterDrag, `${label} after center drag`, { fullViewport:true, fullSheet:true });
     assert.equal(afterCenterDrag.currentPage, hidden.currentPage, `${label}: center drag changed the page`);
 
     await edgeDrag({ direction:"forward", ratio:0.16, commit:false, screenshotName:`${label}-mid-flip` });
@@ -433,12 +466,11 @@ try {
     results.push({
       viewport: label,
       stage: `${Math.round(hidden.stage.width)}x${Math.round(hidden.stage.height)}`,
-      page: `${Math.round(hidden.page.width)}x${Math.round(hidden.page.height)}`,
-      scale: Number((hidden.page.width / hidden.usable.width).toFixed(3)),
-      left: Math.round(hidden.leftInset),
-      right: Math.round(hidden.rightInset),
-      top: Math.round(hidden.topInset),
-      bottom: Math.round(hidden.bottomInset),
+      sheet: `${Math.round(hidden.item.width)}x${Math.round(hidden.item.height)}`,
+      content: `${Math.round(hidden.canvas.width)}x${Math.round(hidden.canvas.height)}`,
+      contentAspect: Number((hidden.canvas.width / hidden.canvas.height).toFixed(3)),
+      paperTop: Math.round(hidden.canvas.top - hidden.item.top),
+      paperBottom: Math.round(hidden.item.bottom - hidden.canvas.bottom),
       seamDelta: seam,
     });
   }
@@ -454,7 +486,7 @@ try {
     await openPdf({ width:440, height:956 }, 24, 'page', theme);
     const themed = await measure();
     assert.equal(themed.theme, theme, `theme ${theme} not applied`);
-    assertFitPage(themed, `440x956 ${theme} normal`, { fullViewport:true });
+    assertFitPage(themed, `440x956 ${theme} normal`, { fullViewport:true, fullSheet:true });
 
     // Kagit yuzeyi sahnenin TAMAMINI kaplar ve yaprakla AYNI tondadir:
     // boylece sayfanin disinda kalan alan ayri bir arka plan bandi olmaz.
@@ -469,9 +501,8 @@ try {
       sheet: themed.paper.itemBg,
       sheetAlpha: themed.paper.itemAlpha,
       seamDelta,
-      page: `${Math.round(themed.item.width)}x${Math.round(themed.item.height)}`,
-      innerTopBand: Math.round(themed.pdfWrapper.top - themed.item.top),
-      innerBottomBand: Math.round(themed.item.bottom - themed.pdfWrapper.bottom),
+      sheet: `${Math.round(themed.item.width)}x${Math.round(themed.item.height)}`,
+      content: `${Math.round(themed.canvas.width)}x${Math.round(themed.canvas.height)}`,
     });
     // %50 surukleme dogal olarak commit esigini gecer; ekran goruntusu fold
     // ANINDA alinir, birakis ise sayfayi ilerletir.
@@ -479,6 +510,13 @@ try {
   }
 
   const memory = await canvasMemoryProbe();
+  // §60/§61: tam boy yaprak, tam boy TUVAL demek DEGIL. Tuval hala yalnizca
+  // gercek PDF icerigi kadar; yaprak uzantisi saf CSS yuzeyi.
+  const contentNow = await measure();
+  assert.ok(
+    memory.maxCssHeight <= contentNow.canvas.height + 4,
+    `live canvas CSS height ${memory.maxCssHeight} exceeds the PDF content rect ${contentNow.canvas.height} - a full-sheet canvas was rendered`,
+  );
   assert.ok(memory.count >= 1 && memory.count <= 5, `mobile live canvas window escaped its bound (${memory.count})`);
   assert.ok(memory.maxScale >= 1.5 && memory.maxScale <= 2.01, `unexpected DPR render scale ${memory.maxScale}`);
   assert.ok(memory.bytes < 64 * 1024 * 1024, `live PDF canvas backing stores exceed 64 MiB (${memory.bytes})`);
@@ -488,7 +526,7 @@ try {
   try {
     await openPdf({ width:440, height:956 });
     const safeArea = await measure();
-    assertFitPage(safeArea, "440x956 safe area", { fullViewport:true });
+    assertFitPage(safeArea, "440x956 safe area", { fullViewport:true, fullSheet:true });
     assert.ok(safeArea.padding.top >= 46 && safeArea.padding.bottom >= 33, `safe-area insets not applied (${safeArea.padding.top}/${safeArea.padding.bottom})`);
     await screenshot("440x956-safe-area");
   } finally {
@@ -519,7 +557,7 @@ try {
   })()`, "portrait repagination", 30000);
   await delay(500);
   const portraitAgain = await measure();
-  assertFitPage(portraitAgain, "landscape to portrait", { fullViewport:true });
+  assertFitPage(portraitAgain, "landscape to portrait", { fullViewport:true, fullSheet:true });
   assert.equal(portraitAgain.currentPage, rotationPage, "landscape to portrait lost reading position");
 
   // Mod turu: sayfa -> kaydirma -> sayfa. Geri donuste stale transform/olcu olmamali.
@@ -532,7 +570,7 @@ try {
   await browser.evaluate("document.querySelector('#rdr-settings-sheet [data-close-sheet]').click()");
   await browser.waitFor("document.querySelector('.stf__block')", "page mode restored", 30000);
   await delay(600);
-  assertFitPage(await measure(), "scroll -> page round trip", { fullViewport:true });
+  assertFitPage(await measure(), "scroll -> page round trip", { fullViewport:true, fullSheet:true });
 
   // Tablet + masaustu: mobil kural sizmamali, mevcut contain/spread korunmali.
   for (const viewport of [
@@ -574,7 +612,7 @@ try {
     liveBackingMiB: Number((memory.bytes/1024/1024).toFixed(1)),
     outputScale: Number(memory.maxScale.toFixed(3)),
   });
-  console.log("PASS mobile Fit Page: true contain, max scale, centered, no clipping, no pan, curl/backside intact");
+  console.log("PASS mobile full sheet: sheet = stage, PDF contained + centered + uncropped, whole sheet curls, backside full-height with content-sized ghost print");
 } finally {
   await browser.close();
   await server.close();

@@ -73,7 +73,16 @@ try {
       assert.equal(page.shadow, "none", `${viewport.width}: PDF shadow ${page.shadow}`);
       assert.ok(page.framePadding.every(value => value === "0px"), `${viewport.width}: frame padding ${page.framePadding}`);
       assert.ok(page.canvas, `${viewport.width}: canvas yok`);
-      assert.ok(Math.abs(page.canvas.w-page.w)<=1 && Math.abs(page.canvas.h-page.h)<=1, `${viewport.width}: canvas gercek sayfayi doldurmuyor`);
+      // Telefon portresinde FIZIKSEL YAPRAK ile PDF ICERIGI bilincli olarak
+      // ayrilir: yaprak sahnenin tamamini kaplar, tuval onun icinde contain
+      // edilir. Diger tum duzenlerde ikisi hala ayni dikdortgendir.
+      const mobilePortrait = viewport.mobile && viewport.height > viewport.width;
+      if (mobilePortrait) {
+        assert.ok(page.canvas.w <= page.w+1 && page.canvas.h <= page.h+1, `${viewport.width}: canvas fiziksel yapragi tasiyor`);
+        assert.ok(Math.abs(page.canvas.w-page.w)<=1, `${viewport.width}: canvas genisligi yaprak genisligini doldurmuyor`);
+      } else {
+        assert.ok(Math.abs(page.canvas.w-page.w)<=1 && Math.abs(page.canvas.h-page.h)<=1, `${viewport.width}: canvas gercek sayfayi doldurmuyor`);
+      }
     }
     if (shown.pages.length === 2) {
       const gap=shown.pages[1].x-shown.pages[0].right;
