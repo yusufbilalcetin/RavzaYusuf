@@ -70,7 +70,8 @@
     "audit:ravza-books": "node ./tests/e2e/ravza-books-performance.spec.mjs",
     "test:books-memory": "node ./scripts/test-books-memory.mjs",
     "test:firebase-lifecycle": "node ./scripts/test-firebase-lifecycle.mjs",
-    "test:pbn-performance": "node ./scripts/test-pbn-performance.mjs"
+    "test:pbn-performance": "node ./scripts/test-pbn-performance.mjs",
+    "test:mobile-gpu": "node ./scripts/test-mobile-gpu.mjs"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.0.2",
