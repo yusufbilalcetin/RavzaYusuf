@@ -82,6 +82,9 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --reader-font: "Iowan Old Style", Charter, Georgia, "Palatino Linotype", "Times New Roman", serif;
   --controls-ease: 220ms var(--ease-out);
+  /* Iki gercek PDF sayfasini ayiran tek canonical seam. JS fit hesabi bu
+     custom property'yi okuyarak ayni fiziksel genisligi kullanir. */
+  --reader-spread-gap: 8px;
   /* Sürekli modda sayfa arası boşluk (§7). Dar telefonda 10px, geniş ekranda
      16px'e kadar açılır; asla yüzlerce piksel olmaz. */
   --reader-page-gap: clamp(10px, 2vw, 16px);
@@ -903,6 +906,17 @@ button {
 .reader-root[data-book-type="pdf"] .book-cradle::before,
 .reader-root[data-book-type="pdf"] .book-cradle::after {
   content: none;
+}
+
+/* PageFlip sayfalari merkez cizgisinde bitisik yerlestirir. Inline transform'a
+   dokunmadan bagimsiz `translate` ile her sayfayi seam'in yarisi kadar disa
+   aliriz; arada yalnizca seffaf reader background'u kalir. */
+.reader-root[data-book-type="pdf"][data-spread="double"] .stf__item.--left {
+  translate: calc(var(--reader-spread-gap) / -2) 0;
+}
+
+.reader-root[data-book-type="pdf"][data-spread="double"] .stf__item.--right {
+  translate: calc(var(--reader-spread-gap) / 2) 0;
 }
 
 #rdr-flipbook {

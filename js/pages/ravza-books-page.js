@@ -1326,7 +1326,9 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
   if (availableWidth < 2 || availableHeight < 2) return false;
   const portrait = shouldUsePortrait();
   const pagesAcross = portrait ? 1 : 2;
-  const pageWidth = Math.min(availableWidth / pagesAcross, availableHeight * ratio);
+  const configuredGap = parseFloat(getComputedStyle(root).getPropertyValue('--reader-spread-gap')) || 0;
+  const spreadGap = portrait ? 0 : Math.max(0, configuredGap);
+  const pageWidth = Math.min((availableWidth - spreadGap) / pagesAcross, availableHeight * ratio);
   const pageHeight = pageWidth / ratio;
 
   const width = pageWidth * pagesAcross;

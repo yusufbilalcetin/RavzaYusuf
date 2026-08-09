@@ -21,6 +21,7 @@ const measure = () => browser.evaluate(`JSON.stringify((() => {
   const stage=document.getElementById('rdr-stage');
   const cradle=document.getElementById('book-cradle');
   const root=document.getElementById('reader-inner');
+  const block=document.querySelector('.stf__block'); const wrapper=document.querySelector('.stf__wrapper');
   const sr=stage.getBoundingClientRect();
   const cr=cradle.getBoundingClientRect();
   const ss=getComputedStyle(stage); const cs=getComputedStyle(cradle);
@@ -43,6 +44,7 @@ const measure = () => browser.evaluate(`JSON.stringify((() => {
   }).map(el => el.className);
   return {
     spread:root.dataset.spread, stage:{x:sr.x,y:sr.y,w:sr.width,h:sr.height}, cradle:{x:cr.x,y:cr.y,w:cr.width,h:cr.height},
+    blockBg:block?getComputedStyle(block).backgroundColor:null, wrapperBg:wrapper?getComputedStyle(wrapper).backgroundColor:null,
     padding:[px('paddingTop'),px('paddingRight'),px('paddingBottom'),px('paddingLeft')],
     cradleShadow:cs.boxShadow, before:{content:before.content,shadow:before.boxShadow},
     after:{content:after.content,width:after.width,opacity:after.opacity,background:after.backgroundImage},
@@ -74,7 +76,11 @@ try {
     }
     if (shown.pages.length === 2) {
       const gap=shown.pages[1].x-shown.pages[0].right;
-      assert.ok(gap >= -0.5 && gap <= 2, `${viewport.width}: spread gap ${gap}`);
+      assert.ok(gap >= 6 && gap <= 12, `${viewport.width}: spread gap ${gap}`);
+      assert.ok(Math.abs(shown.pages[0].y-shown.pages[1].y)<=1, `${viewport.width}: page top hizasi bozuk`);
+      assert.ok(Math.abs(shown.pages[0].bottom-shown.pages[1].bottom)<=1, `${viewport.width}: page bottom hizasi bozuk`);
+      assert.equal(shown.blockBg, "rgba(0, 0, 0, 0)", `${viewport.width}: spread block background ${shown.blockBg}`);
+      assert.equal(shown.wrapperBg, "rgba(0, 0, 0, 0)", `${viewport.width}: spread wrapper background ${shown.wrapperBg}`);
     }
     const spreadWidth=shown.pages.at(-1).right-shown.pages[0].x;
     const spreadHeight=Math.max(...shown.pages.map(page => page.h));
@@ -83,6 +89,20 @@ try {
     assert.ok(spreadWidth<=shown.stage.w+1 && spreadHeight<=shown.stage.h+1, `${viewport.width}: fit-page crop/tasma`);
     assert.ok(shown.pages.every(page => Math.abs(page.aspect-shown.pages[0].aspect)<0.002), `${viewport.width}: aspect ratio farki`);
     assert.ok(shown.docWidth<=viewport.width+1, `${viewport.width}: yatay document tasmasi`);
+
+    if (viewport.width === 1440) {
+      for (const theme of ["light", "sepia", "dark", "black"]) {
+        await browser.evaluate(`document.querySelector('.theme-btn[data-theme="${theme}"]').click(); document.getElementById('reader-inner').classList.remove('controls-visible')`);
+        await delay(180);
+        const themed=JSON.parse(await measure());
+        assert.equal(themed.pages.length, 2, `${theme}: spread iki sayfa degil`);
+        const themeGap=themed.pages[1].x-themed.pages[0].right;
+        assert.ok(themeGap>=6 && themeGap<=12, `${theme}: spread gap ${themeGap}`);
+        assert.equal(themed.blockBg, "rgba(0, 0, 0, 0)", `${theme}: gap reader background'unu gostermiyor`);
+        const themeShot=await browser.command("Page.captureScreenshot", {format:"png",captureBeyondViewport:false});
+        await writeFile(join(artifactDir, `fullpage-1440x900-${theme}.png`), Buffer.from(themeShot.data,"base64"));
+      }
+    }
 
     await browser.evaluate(`document.getElementById('reader-inner').classList.remove('controls-visible')`);
     await delay(300); const hidden=JSON.parse(await measure());
