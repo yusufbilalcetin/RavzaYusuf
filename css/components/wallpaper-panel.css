@@ -63,40 +63,18 @@
   text-transform: uppercase;
 }
 
-/* --- Mod segmenti --- */
-.wallpaper-panel .wp-segmented {
-  display: grid;
-  grid-auto-columns: 1fr;
-  grid-auto-flow: column;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 13px;
-  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.1));
-}
-
-.wallpaper-panel .wp-segment {
-  min-height: 44px;
-  padding: 0 0.5rem;
-  color: var(--glass-text-secondary, var(--text-soft));
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  font: 600 0.82rem/1.2 var(--ui-font, system-ui);
-  cursor: pointer;
-}
-
-.wallpaper-panel .wp-segment.is-selected {
-  color: var(--glass-text-primary, var(--text));
-  background: var(--glass-bg-strong, rgba(255, 255, 255, 0.5));
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
-}
-
 /* --- Buyuk onizleme --- */
 .wallpaper-panel .wp-preview {
   overflow: hidden;
   border: 1px solid var(--glass-border, rgba(120, 120, 130, 0.2));
   border-radius: 14px;
+  /* Genislik KESIN olmali: yalniz aspect-ratio + max-height verildiginde
+     tarayici oran icin GENISLIGI daraltiyor ve sagda bosluk kaliyordu.
+     Genislik sabitlenince max-height yalnizca yuksekligi kirpar, kirpma
+     object-fit: cover ile yapilir. */
+  width: 100%;
   aspect-ratio: 16 / 9;
+  max-height: 190px;
 }
 
 .wallpaper-panel .wp-preview img {
@@ -125,14 +103,19 @@
   font: 500 0.76rem/1.2 var(--ui-font, system-ui);
 }
 
+/* Sabitle YALNIZCA rastgele modda gorunur; [hidden] gridi ezmemeli. */
 .wallpaper-panel .wp-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 0.5rem;
+}
+
+.wallpaper-panel .wp-actions[hidden] {
+  display: none;
 }
 
 .wallpaper-panel .wp-action {
   display: flex;
+  flex: 1 1 auto;
   gap: 0.45rem;
   align-items: center;
   justify-content: center;
@@ -245,10 +228,43 @@
   .wallpaper-panel .wp-thumb:active .wp-thumb-frame { transform: none; }
 }
 
-/* Control Center'daki Arka Plan tile'i: ikincil mod etiketi. */
-.control-center .cc-tile--stacked { align-items: center; }
-.control-center .cc-tile-text { display: grid; min-width: 0; gap: 0.1rem; }
-.control-center .cc-tile-sub {
-  color: var(--glass-text-tertiary, var(--text-soft));
-  font: 500 0.74rem/1.2 var(--ui-font, system-ui);
+/* --- Galerinin ilk karti: RASTGELE (mod secimi, gorsel degil) --- */
+.wallpaper-panel .wp-thumb--random .wp-thumb-frame {
+  display: grid;
+  place-items: center;
+  /* Tonal yuzey: bu kart bir fotograf tasimadigi icin cerceve bos kalmaz. */
+  background: var(--glass-bg-soft, rgba(120, 120, 130, 0.14));
+}
+
+.wallpaper-panel .wp-thumb-shuffle {
+  display: grid;
+  place-items: center;
+  color: var(--glass-accent, var(--accent, #d4669c));
+}
+
+.wallpaper-panel .wp-thumb-shuffle svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* --- "Su an gosterilen" isareti --- */
+/* Rastgele modda hicbir gorsel SECILI degildir; yalnizca o an gosterilen
+   isaretlenir. Secili durumla ayni check rozeti KULLANILMAZ - kullanicinin
+   modu gorselle karistirmamasi icin gorsel dil bilincli olarak farklidir. */
+.wallpaper-panel .wp-thumb.is-showing .wp-thumb-frame {
+  border-color: color-mix(in srgb, var(--glass-accent, #d4669c) 45%, transparent);
+}
+
+/* Cerceve icinde kucuk rozet: secili durumun accent halkasi + check rozetiyle
+   karistirilmayacak kadar farkli, adin icine girip kirpilmayacak kadar ayri. */
+.wallpaper-panel .wp-thumb-now {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  padding: 2px 6px;
+  color: #fff;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  font: 600 0.62rem/1.35 var(--ui-font, system-ui);
+  letter-spacing: 0.01em;
 }

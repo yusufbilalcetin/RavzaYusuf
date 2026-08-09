@@ -1,11 +1,15 @@
 /**
- * ARKA PLAN PANELI - mod secimi + gorsel galeri.
+ * ARKA PLAN PANELI - gorsel odakli, Apple tarzi sade secici.
  *
  * Yeni bir popup ya da arka plan sistemi YAZILMAZ:
  *   - panel native <dialog> + `.ui-sheet` (centered-dialogs.css geometriyi verir)
- *   - kayit defteri  data/ana-sayfa-gorselleri.js
+ *   - kayit defteri  data/ana-sayfa-gorselleri.js  (TAMAMEN LOCAL)
  *   - durum          js/core/wallpaper.js (tek kanonik kaynak)
  *   - uygulama       ana-sayfa-rastgele-gorsel.js -> applyHomeHero()
+ *
+ * MOD SECIMI GALERININ ICINDEDIR. Ustte ayri bir Sabit/Rastgele kontrolu YOK:
+ *   - galerinin ILK karti "Rastgele" -> mod secimidir, bir gorsel degildir
+ *   - gercek bir gorsele tiklamak -> mod SABIT olur (ikinci onay istenmez)
  *
  * Kucuk resimler `mobile.fallback` kullanir (masaustu gorseli degil) ve
  * `loading="lazy"` tasir: 12 gorselin tamami tam cozunurlukte yuklenmez.
@@ -19,10 +23,13 @@ import {
   randomizeWallpaper,
 } from "../core/wallpaper.js";
 import { ANA_SAYFA_GORSELLERI } from "../../data/ana-sayfa-gorselleri.js";
-import { validThemes, applyHomeHero } from "../pages/ana-sayfa-rastgele-gorsel.js";
+import { validThemes, applyHomeHero, preloadHomeHero } from "../pages/ana-sayfa-rastgele-gorsel.js";
 
 const DIALOG_ID = "wallpaper-panel";
 export const WALLPAPER_OVERLAY_ID = "wallpaper-panel";
+
+/** Bozuk gorsel denemesi SINIRLI: sonsuz retry yok (§30). */
+const MAX_PRELOAD_ATTEMPTS = 3;
 
 const ICON = (paths) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
@@ -52,30 +59,53 @@ function currentTheme() {
   return themeById(state.currentId) || pool()[0] || null;
 }
 
-const MODE_LABELS = Object.freeze({
-  fixed: "Sabit",
-  "random-session": "Her Ziyarette Rastgele",
-});
+/** Kutucuk ve panel icin KISA mod karsiligi (§22 - uzun ifade tekrar edilmez). */
+const MODE_LABELS = Object.freeze({ fixed: "Sabit", "random-session": "Rastgele" });
 
 export function wallpaperModeLabel() {
   return MODE_LABELS[getWallpaperState().mode] || MODE_LABELS.fixed;
 }
 
-/**
- * Kutucuk icin KISA karsilik. Panelde "Her Ziyarette Rastgele" acikca yazar,
- * ama Kontrol Merkezi kartinda bu ifade iki satira tasip kutuyu bozuyordu.
- * Ayni duruma bakar - ikinci bir durum kaynagi degildir.
- */
-const SHORT_MODE_LABELS = Object.freeze({ fixed: "Sabit", "random-session": "Rastgele" });
+/** Kontrol Merkezi karti ayni kisa etiketi kullanir - ikinci durum kaynagi yok. */
+export const wallpaperModeShortLabel = wallpaperModeLabel;
 
-export function wallpaperModeShortLabel() {
-  return SHORT_MODE_LABELS[getWallpaperState().mode] || SHORT_MODE_LABELS.fixed;
+function galleryMarkup(state) {
+  const isRandom = state.mode === "random-session";
+  // ILK KART = MOD. Bir gorsel dosyasi degildir, bu yuzden <img> tasimaz.
+  const randomTile = `
+    <button class="wp-thumb wp-thumb--random${isRandom ? " is-selected" : ""}" type="button"
+            data-wp-random aria-pressed="${isRandom}">
+      <span class="wp-thumb-frame">
+        <span class="wp-thumb-shuffle" aria-hidden="true">${ICONS.shuffle}</span>
+        <span class="wp-thumb-check" aria-hidden="true">${ICONS.check}</span>
+      </span>
+      <span class="wp-thumb-name">Rastgele</span>
+    </button>`;
+
+  const tiles = pool().map((theme) => {
+    // Secili = SABIT moddaki gercek secim. Rastgele modda hicbir gorsel
+    // "secili" degildir; o an gosterilen gorsel yalnizca ISARETLENIR (§20).
+    const selected = state.mode === "fixed" && theme.id === state.currentId;
+    const showing = state.mode !== "fixed" && theme.id === state.currentId;
+    return `
+      <button class="wp-thumb${selected ? " is-selected" : ""}${showing ? " is-showing" : ""}" type="button"
+              data-wp-select="${theme.id}" aria-pressed="${selected}">
+        <span class="wp-thumb-frame">
+          <img src="${theme.mobile.fallback}" alt="" loading="lazy" decoding="async" />
+          <span class="wp-thumb-check" aria-hidden="true">${ICONS.check}</span>
+          ${showing ? '<span class="wp-thumb-now">şu an</span>' : ""}
+        </span>
+        <span class="wp-thumb-name">${theme.name}</span>
+      </button>`;
+  }).join("");
+
+  return randomTile + tiles;
 }
 
 function markup() {
   const state = getWallpaperState();
   const current = currentTheme();
-  const items = pool();
+  const isRandom = state.mode === "random-session";
   return `
     <div class="wp-panel ui-sheet-panel glass-surface glass-surface--overlay">
       <header class="wp-head">
@@ -85,41 +115,25 @@ function markup() {
 
       <div class="wp-body">
         <section class="wp-group">
-          <h3 class="wp-group-title" id="wp-mode-title">Mod</h3>
-          <div class="wp-segmented" role="group" aria-labelledby="wp-mode-title">
-            ${Object.entries(MODE_LABELS).map(([value, label]) => `
-              <button class="wp-segment${state.mode === value ? " is-selected" : ""}" type="button"
-                      data-wp-mode="${value}" aria-pressed="${state.mode === value}">${label}</button>`).join("")}
-          </div>
-        </section>
-
-        <section class="wp-group">
           <h3 class="wp-group-title">Mevcut Arka Plan</h3>
           <div class="wp-preview">
             ${current ? `<img id="wp-preview-image" src="${current.mobile.fallback}" alt="${current.alt}" />` : ""}
           </div>
           <p class="wp-preview-meta">
             <span class="wp-preview-name" id="wp-current-name">${current ? current.name : "—"}</span>
-            <span class="wp-preview-mode" id="wp-current-mode">${MODE_LABELS[state.mode]}</span>
+            <span class="wp-preview-mode" id="wp-current-mode" hidden>${MODE_LABELS["random-session"]}</span>
           </p>
-          <div class="wp-actions">
-            <button class="wp-action" type="button" data-wp-randomize>${ICONS.shuffle}<span>Rastgele Değiştir</span></button>
+          <!-- "Sabitle" YALNIZCA rastgele modda anlamlidir; sabit modda
+               gosterilmez, boylece olu bir dugme kalmaz (§18). -->
+          <div class="wp-actions" id="wp-actions"${isRandom ? "" : " hidden"}>
             <button class="wp-action" type="button" data-wp-pin>${ICONS.pin}<span>Sabitle</span></button>
           </div>
         </section>
 
         <section class="wp-group">
           <h3 class="wp-group-title" id="wp-gallery-title">Arka Planlar</h3>
-          <div class="wp-gallery" role="group" aria-labelledby="wp-gallery-title">
-            ${items.map((theme) => `
-              <button class="wp-thumb${theme.id === state.currentId ? " is-selected" : ""}" type="button"
-                      data-wp-select="${theme.id}" aria-pressed="${theme.id === state.currentId}">
-                <span class="wp-thumb-frame">
-                  <img src="${theme.mobile.fallback}" alt="" loading="lazy" decoding="async" />
-                  <span class="wp-thumb-check" aria-hidden="true">${ICONS.check}</span>
-                </span>
-                <span class="wp-thumb-name">${theme.name}</span>
-              </button>`).join("")}
+          <div class="wp-gallery" id="wp-gallery" role="group" aria-labelledby="wp-gallery-title">
+            ${galleryMarkup(state)}
           </div>
         </section>
       </div>
@@ -134,16 +148,8 @@ function sync({ apply = true } = {}) {
   if (apply && current) applyHomeHero(current);
   if (!node) return;
 
-  node.querySelectorAll("[data-wp-mode]").forEach((button) => {
-    const selected = button.dataset.wpMode === state.mode;
-    button.classList.toggle("is-selected", selected);
-    button.setAttribute("aria-pressed", String(selected));
-  });
-  node.querySelectorAll("[data-wp-select]").forEach((button) => {
-    const selected = button.dataset.wpSelect === state.currentId;
-    button.classList.toggle("is-selected", selected);
-    button.setAttribute("aria-pressed", String(selected));
-  });
+  const gallery = node.querySelector("#wp-gallery");
+  if (gallery) gallery.innerHTML = galleryMarkup(state);
 
   const preview = node.querySelector("#wp-preview-image");
   if (preview && current) {
@@ -152,11 +158,52 @@ function sync({ apply = true } = {}) {
   }
   const name = node.querySelector("#wp-current-name");
   if (name) name.textContent = current ? current.name : "—";
+
+  // Mod rozeti ve Sabitle YALNIZCA rastgele modda gorunur.
+  const isRandom = state.mode === "random-session";
   const mode = node.querySelector("#wp-current-mode");
-  if (mode) mode.textContent = MODE_LABELS[state.mode];
-  // "Sabitle" yalnizca sabit olmayan bir gorsel varken anlamli.
-  const pin = node.querySelector("[data-wp-pin]");
-  if (pin) pin.disabled = state.mode === "fixed" && state.fixedId === state.currentId;
+  if (mode) mode.hidden = !isRandom;
+  const actions = node.querySelector("#wp-actions");
+  if (actions) actions.hidden = !isRandom;
+}
+
+/**
+ * Gorseli ONCE dogrular, sonra durumu yazar (§29).
+ *
+ * Bozuk bir gorsel hicbir zaman aktif duruma yazilmaz; yuklenemezse ekrandaki
+ * arka plan oldugu gibi kalir. Beyaz/siyah/kirik flash olusmaz.
+ */
+async function commitSelection(id) {
+  const theme = themeById(id);
+  if (!theme) return false;
+  const ok = await preloadHomeHero(theme);
+  if (!ok) return false;
+  selectWallpaper(id);
+  sync();
+  return true;
+}
+
+/**
+ * Rastgele moda gecer ve bu oturumun gorselini SECER.
+ *
+ * Aday yuklenemezse SINIRLI sayida baska aday denenir; hicbiri olmazsa mod
+ * yine de rastgele kalir ve ekrandaki gorsel korunur - kor retry dongusu yok.
+ */
+async function commitRandomMode() {
+  const ids = pool().map((theme) => theme.id);
+  setWallpaperMode("random-session", ids);
+
+  for (let attempt = 0; attempt < MAX_PRELOAD_ATTEMPTS; attempt += 1) {
+    const theme = themeById(getWallpaperState().currentId);
+    if (theme && (await preloadHomeHero(theme))) {
+      sync();
+      return true;
+    }
+    // Modu DEGISTIRMEDEN bu oturum icin baska bir aday sec.
+    randomizeWallpaper(ids);
+  }
+  sync({ apply: false });
+  return false;
 }
 
 function handleClick(event) {
@@ -165,16 +212,14 @@ function handleClick(event) {
 
   if (target.closest("[data-wp-close]")) { closeWallpaperPanel(); return; }
 
-  const ids = pool().map((theme) => theme.id);
+  // Galerinin ilk karti: MOD secimi.
+  if (target.closest("[data-wp-random]")) { void commitRandomMode(); return; }
 
-  const mode = target.closest("[data-wp-mode]");
-  if (mode) { setWallpaperMode(mode.dataset.wpMode, ids); sync(); return; }
-
+  // Gercek bir gorsel: manuel secim = SABIT mod, ikinci onay yok (§5).
   const pick = target.closest("[data-wp-select]");
-  if (pick) { selectWallpaper(pick.dataset.wpSelect); sync(); return; }
+  if (pick) { void commitSelection(pick.dataset.wpSelect); return; }
 
-  if (target.closest("[data-wp-randomize]")) { randomizeWallpaper(ids); sync(); return; }
-  if (target.closest("[data-wp-pin]")) { pinCurrentWallpaper(); sync(); }
+  if (target.closest("[data-wp-pin]")) { pinCurrentWallpaper(); sync({ apply: false }); }
 }
 
 function ensureDialog() {

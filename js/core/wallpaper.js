@@ -20,6 +20,8 @@
 export const WALLPAPER_MODES = Object.freeze(["fixed", "random-session"]);
 
 export const WALLPAPER_KEYS = Object.freeze({
+  /** Guncellemeden onceki tek anahtarli secim (yalnizca OKUNUR, migration icin). */
+  legacy: "ravzaYusufSelectedWallpaper",
   mode: "ravzaYusufWallpaperMode",
   fixed: "ravzaYusufWallpaperFixed",
   previous: "ravzaYusufWallpaperPrevious",
@@ -60,7 +62,24 @@ export function getWallpaperMode() {
   return normalizeWallpaperMode(readLocal(WALLPAPER_KEYS.mode));
 }
 
+/**
+ * MIGRATION (§34): guncellemeden onceki tek anahtarli secim.
+ *
+ * Yeni anahtar yoksa ama eski anahtar varsa, eski secim SABIT kabul edilir.
+ * Yazma islemi bir kez yapilir; sonrasinda eski anahtar okunmaz bile.
+ * Boylece hicbir mevcut kullanici guncelleme sonrasi rastgele moda dusmez.
+ */
+function migrateLegacyFixedId() {
+  if (readLocal(WALLPAPER_KEYS.fixed)) return;
+  const legacy = readLocal(WALLPAPER_KEYS.legacy);
+  if (typeof legacy !== "string" || !legacy) return;
+  writeLocal(WALLPAPER_KEYS.fixed, legacy);
+  // Mod anahtari hic yoksa zaten "fixed" okunur; yine de acikca yazilir.
+  if (!readLocal(WALLPAPER_KEYS.mode)) writeLocal(WALLPAPER_KEYS.mode, "fixed");
+}
+
 export function getFixedWallpaperId() {
+  migrateLegacyFixedId();
   const value = readLocal(WALLPAPER_KEYS.fixed);
   return typeof value === "string" && value ? value : null;
 }
@@ -98,7 +117,8 @@ function emit(reason) {
  * Deterministik ve test edilebilir: rastgelelik disaridan verilebilir.
  * Tek aday varsa onu dondurur - hata vermez (§12).
  */
-export function pickDifferentId(ids, excludeId, random = Math.random) {
+export function chooseRandomWallpaper(ids, excludeId, random = Math.random) {
+  // slice/filter zaten kopya uretir: kaynak dizi ASLA degistirilmez.
   const pool = (Array.isArray(ids) ? ids : []).filter((id) => typeof id === "string" && id);
   if (!pool.length) return null;
   const candidates = pool.filter((id) => id !== excludeId);
@@ -123,16 +143,20 @@ export function resolveWallpaperId(ids, { random = Math.random } = {}) {
   if (mode === "fixed") {
     const fixed = getFixedWallpaperId();
     if (fixed && pool.includes(fixed)) return fixed;
-    // Sabit mod ama gecerli bir secim yok: havuzdan biri secilir ve sabitlenir.
-    const chosen = pickDifferentId(pool, getPreviousWallpaperId(), random);
-    if (chosen) writeLocal(WALLPAPER_KEYS.fixed, chosen);
-    return chosen;
+    /* SABIT MODDA RASTGELE SECICI CAGRILMAZ (§8, §42).
+       Kayitli id yoksa ya da kayit defterinden silinmisse VARSAYILAN kullanilir:
+       havuzun ilk gecerli ogesi. Deterministiktir - ayni depo hep ayni sonucu
+       verir - ve durum onarilir (§31, §35). Burada rastgele secmek, "sabit"
+       sozunu bozup her acilista farkli arka plan gosterebilirdi. */
+    const fallback = pool[0] || null;
+    if (fallback) writeLocal(WALLPAPER_KEYS.fixed, fallback);
+    return fallback;
   }
 
   const session = getSessionWallpaperId();
   if (session && pool.includes(session)) return session;
   // Yeni oturum: onceki ziyaretin gorselinden FARKLI olmaya calis (§10).
-  const chosen = pickDifferentId(pool, getPreviousWallpaperId(), random);
+  const chosen = chooseRandomWallpaper(pool, getPreviousWallpaperId(), random);
   if (chosen) {
     writeSession(WALLPAPER_KEYS.session, chosen);
     writeLocal(WALLPAPER_KEYS.previous, chosen);
@@ -156,7 +180,7 @@ export function setWallpaperMode(mode, ids = []) {
   writeLocal(WALLPAPER_KEYS.mode, next);
   if (next === "random-session") {
     // Moda gecerken bu oturum icin bir gorsel secilir; sonra sabit kalir.
-    const chosen = pickDifferentId(ids, getPreviousWallpaperId());
+    const chosen = chooseRandomWallpaper(ids, getPreviousWallpaperId());
     if (chosen) {
       writeSession(WALLPAPER_KEYS.session, chosen);
       writeLocal(WALLPAPER_KEYS.previous, chosen);
@@ -180,7 +204,7 @@ export function pinCurrentWallpaper() {
 /** "Rastgele Degistir": modu DEGISTIRMEDEN yeni bir gorsel secer (§12). */
 export function randomizeWallpaper(ids, { random = Math.random } = {}) {
   const current = getWallpaperState().currentId;
-  const chosen = pickDifferentId(ids, current, random);
+  const chosen = chooseRandomWallpaper(ids, current, random);
   if (!chosen) return getWallpaperState();
   writeSession(WALLPAPER_KEYS.session, chosen);
   writeLocal(WALLPAPER_KEYS.previous, chosen);

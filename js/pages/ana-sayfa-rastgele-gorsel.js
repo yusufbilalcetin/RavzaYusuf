@@ -109,6 +109,24 @@ export function getOrSelectHomeHero(themes = ANA_SAYFA_GORSELLERI) {
 }
 
 /**
+ * Gorseli yalnizca YUKLER; hicbir durum yazmaz, sahneye dokunmaz.
+ *
+ * Cagiran taraf once bunu bekler, sonra secimi kalici hale getirir. Boylece
+ * bozuk bir gorsel kimligi asla aktif duruma yazilmaz (§29).
+ * Ayni <img> onbellegini kullandigi icin sonrasindaki applyHomeHero anindadir.
+ */
+export function preloadHomeHero(theme) {
+  if (!theme?.desktop?.fallback) return Promise.resolve(false);
+  return new Promise((resolveLoad) => {
+    const image = new Image();
+    image.onload = () => resolveLoad(true);
+    image.onerror = () => resolveLoad(false);
+    image.src = theme.desktop.fallback;
+    if (image.complete) resolveLoad(Boolean(image.naturalWidth));
+  });
+}
+
+/**
  * Secili arka plani sahneye uygular.
  *
  * Disa aciliyor cunku Arka Plan paneli de ayni yolu kullanmali - ikinci bir
