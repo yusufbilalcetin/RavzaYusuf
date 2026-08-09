@@ -818,8 +818,8 @@ body.dark[data-theme-style="noel-ask"] .memory-back {
      bırakıyordu; parlak kadrajlarda 2.57:1'e düşüyordu. Okunabilirlik katmanı
      olarak koyu yarı saydam dolgu: en parlak fotoğrafta bile 5.9:1, kartın
      "cam" görünümü ve ince açık kenarlığı korunuyor. */
-  background: rgba(16, 9, 23, .58) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(16, 9, 23, .58);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   box-shadow: none;
   backdrop-filter: none;
@@ -927,8 +927,8 @@ body.dark:has(#studyhub.active) .topbar {
      bırakıyordu; parlak kadrajlarda 2.57:1'e düşüyordu. Okunabilirlik katmanı
      olarak koyu yarı saydam dolgu: en parlak fotoğrafta bile 5.9:1, kartın
      "cam" görünümü ve ince açık kenarlığı korunuyor. */
-  background: rgba(16, 9, 23, .58) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(16, 9, 23, .58);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   box-shadow: none;
   backdrop-filter: none;

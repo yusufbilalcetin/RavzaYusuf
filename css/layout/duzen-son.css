@@ -197,19 +197,13 @@ body.dark .theme-switch::before { transform: translateX(22px) !important; }
 /* Kart genişliği ekrana göre: dar ekranda tek kolon, geniş ekranda otomatik.
    #studyhub/#quizhub seçicileri alt dosyalarda 300-340px min veriyordu; sidebar
    sabit kolona dönünce içerik daralıp kolon sayısı 3'ten 2'ye düşüyordu. */
-.hub-grid,
-#studyhub .hub-grid,
-#quizhub .hub-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)) !important;
-}
-
 .topic-card {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
   height: 100%;
   /* Diger kartlarla ayni nefes payi (bkz. pages/ana-sayfa.css). */
-  padding: clamp(20px, 2.2vw, 30px) !important;
+  padding: clamp(20px, 2.2vw, 30px);
   border-radius: var(--r-lg);
 }
 

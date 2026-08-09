@@ -3418,7 +3418,8 @@ function installDirectPageCurl() {
 
   const ui = pageFlip.getUI?.();
   const surface = ui?.getDistElement?.();
-  if (!surface) return;
+  const interactionOwner = document.getElementById('rdr-stage');
+  if (!surface || !interactionOwner) return;
 
   try { ui.removeHandlers?.(); } catch (_) {}
   surface.style.touchAction = 'none';
@@ -3511,6 +3512,7 @@ function installDirectPageCurl() {
   };
 
   const onPointerDown = event => {
+    if (!surface.contains(event.target)) return;
     if (!pageFlip || gesture || centerTap || event.isPrimary === false || isInteractiveTarget(event.target)) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     if (pageFlip.getState() !== 'read') return;
@@ -3620,6 +3622,15 @@ function installDirectPageCurl() {
     try { pageFlip.userStop(gesture.current, true); } catch (_) {}
     resetGesture();
   };
+  const onWindowBlur = () => {
+    if (centerTap) releaseCapture(centerTap.pointerId);
+    centerTap = null;
+    if (!gesture) return;
+    const pointerId = gesture.pointerId;
+    try { pageFlip.userStop(gesture.current, true); } catch (_) {}
+    releaseCapture(pointerId);
+    resetGesture();
+  };
   const onClick = event => {
     if (Date.now() >= suppressClickUntil) return;
     event.preventDefault();
@@ -3628,19 +3639,21 @@ function installDirectPageCurl() {
   const onContextMenu = event => event.preventDefault();
 
   surface.addEventListener('pointerdown', onPointerDown, { passive: false });
-  surface.addEventListener('pointermove', onPointerMove, { passive: false });
-  surface.addEventListener('pointerup', onPointerUp, { passive: false });
-  surface.addEventListener('pointercancel', onPointerCancel, { passive: false });
-  surface.addEventListener('lostpointercapture', onLostCapture);
+  interactionOwner.addEventListener('pointermove', onPointerMove, { passive: false });
+  interactionOwner.addEventListener('pointerup', onPointerUp, { passive: false });
+  interactionOwner.addEventListener('pointercancel', onPointerCancel, { passive: false });
+  interactionOwner.addEventListener('lostpointercapture', onLostCapture);
+  window.addEventListener('blur', onWindowBlur);
   surface.addEventListener('click', onClick, true);
   surface.addEventListener('contextmenu', onContextMenu);
 
   removeDirectPageCurl = () => {
     surface.removeEventListener('pointerdown', onPointerDown);
-    surface.removeEventListener('pointermove', onPointerMove);
-    surface.removeEventListener('pointerup', onPointerUp);
-    surface.removeEventListener('pointercancel', onPointerCancel);
-    surface.removeEventListener('lostpointercapture', onLostCapture);
+    interactionOwner.removeEventListener('pointermove', onPointerMove);
+    interactionOwner.removeEventListener('pointerup', onPointerUp);
+    interactionOwner.removeEventListener('pointercancel', onPointerCancel);
+    interactionOwner.removeEventListener('lostpointercapture', onLostCapture);
+    window.removeEventListener('blur', onWindowBlur);
     surface.removeEventListener('click', onClick, true);
     surface.removeEventListener('contextmenu', onContextMenu);
     if (gesture) {

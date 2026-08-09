@@ -136,6 +136,13 @@ body {
   --surface-hover: color-mix(in srgb, var(--text) 6%, transparent);
   --surface-active: color-mix(in srgb, var(--text) 10%, transparent);
   --surface-selected: var(--accent-soft);
+  /* Wallpaper uzerindeki icerik kartlari. Renk paletle birlikte doner; alpha
+     sabit kaldigi icin light/dark/system modlarinda gercekten yari saydamdir. */
+  --content-surface: transparent;
+  --content-surface-hover: transparent;
+  --content-surface-border: color-mix(in srgb, var(--text) 24%, transparent);
+  --content-surface-border-hover: color-mix(in srgb, var(--text) 38%, transparent);
+  --content-surface-shadow: none;
   /* Açık temada Gece Mavisi accent'i beyaz yüzeyde 2.48:1 kalır; koyu
      preset ana rengi tüm açık yüzeylerde 3:1 UI sınırını rahatça geçer. */
   --focus-ring: var(--navy);

@@ -122,15 +122,99 @@ body:not(.dark) :is(#studyhub, #quizhub, #studydetail).active::after {
    üzerinde koyu-üstüne-koyu %58 olduğu için kartın sınırı hiç görünmüyordu.
    `#page-root .page.active` (1,3,0) o kuralı ID'siz aşmanın en ucuz yolu. */
 #page-root .page.active :is(.topic-card, .content-card, .quiz-card, .sinav-karti, .side-card) {
-  background: color-mix(in srgb, var(--bg-surface) 97%, transparent) !important;
-  border: 1px solid var(--separator) !important;
+  background: var(--content-surface);
+  border: 1px solid var(--content-surface-border);
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--content-surface-shadow);
 }
 
 #page-root .page.active :is(.topic-card, .content-card):hover {
-  border-color: var(--separator-strong) !important;
-  box-shadow: var(--shadow-md);
+  background: var(--content-surface-hover);
+  border-color: var(--content-surface-border-hover);
+  box-shadow: var(--content-surface-shadow);
+  transform: none;
+}
+
+/* Quiz, sinav ve sonuc akislari ayni hafif icerik malzemesini paylasir.
+   Secili/dogru/yanlis kurallari bu bloktan sonra gelen durum renklerini kendi
+   ozgullukleriyle korur. Kart basina backdrop-filter bilerek yoktur. */
+#page-root .page.active :is(
+  .quiz-shell, .question-card, .option-item, .quiz-result, .result-box,
+  .review-card, .result-insight-card, .topic-score-card, .premium-exam-shell,
+  .premium-result-box, .exam-focus-card, .exam-option-btn, .exam-pro-panel,
+  .exam-category-card, .kahoot-panel, .kahoot-category-card,
+  .kahoot-question-card, .kahoot-result-card, .kahoot-review-item
+) {
+  background: var(--content-surface);
+  border-color: var(--content-surface-border);
+  box-shadow: var(--content-surface-shadow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#page-root #examcenter.page.active :is(.exam-pro-panel, .exam-category-card),
+#page-root #sinavcoz.page.active :is(.premium-exam-shell, .premium-result-box, .exam-focus-card, .exam-option-btn) {
+  background: var(--content-surface);
+  border-color: var(--content-surface-border);
+  box-shadow: var(--content-surface-shadow);
+}
+
+#page-root .page.active :is(.option-item, .exam-option-btn):hover {
+  background: var(--content-surface-hover);
+  border-color: var(--content-surface-border-hover);
+  transform: none;
+}
+
+#page-root .page.active :is(.option-item, .exam-option-btn):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+#page-root .page.active :is(.option-item.correct, .exam-option-btn.correct) {
+  background: transparent;
+  border-color: var(--success-border);
+  color: var(--success-fg);
+}
+
+#page-root .page.active :is(.option-item.wrong, .exam-option-btn.wrong) {
+  background: transparent;
+  border-color: var(--error-border);
+  color: var(--error-fg);
+}
+
+#page-root .page.active .exam-option-btn.selected {
+  background: transparent;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+#page-root .page.active .quiz-result.success {
+  background: transparent;
+  border-color: var(--success-border);
+  color: var(--success-fg);
+}
+
+#page-root .page.active .quiz-result.error {
+  background: transparent;
+  border-color: var(--error-border);
+  color: var(--error-fg);
+}
+
+@media (max-width: 600px) {
+  body {
+    --content-surface: transparent;
+    --content-surface-hover: transparent;
+  }
+}
+
+:is(#studyhub, #quizhub).page.active :is(.topic-card, .question-card, .option-item, .quiz-shell, .result-box, .review-card) {
+  color: rgba(255, 248, 252, .96);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .42);
+}
+
+:is(#studyhub, #quizhub).page.active :is(.topic-card, .question-card, .quiz-shell, .result-box, .review-card)::before,
+:is(#studyhub, #quizhub).page.active :is(.topic-card, .question-card, .quiz-shell, .result-box, .review-card)::after {
+  content: none;
 }
 
 /* Kart içi tipografi + mürekkep.
@@ -144,23 +228,23 @@ body:not(.dark) :is(#studyhub, #quizhub, #studydetail).active::after {
    text-shadow da kaldırılıyor: opak bir kart yüzeyinde gölgenin işlevi yok,
    yalnızca metni kirletiyor (aynı gerekçe launcher etiketlerinde de geçerliydi). */
 #page-root .page.active :is(.topic-card, .content-card) {
-  color: var(--text-primary) !important;
+  color: var(--text-primary);
 }
 
 #page-root .page.active :is(.topic-card, .content-card) :is(h3, .topic-title) {
-  color: var(--text-primary) !important;
+  color: var(--text-primary);
   font-size: var(--font-headline-size);
   line-height: var(--font-headline-line);
   letter-spacing: var(--font-headline-track);
   font-weight: var(--font-headline-weight);
-  text-shadow: none !important;
+  text-shadow: none;
 }
 
 #page-root .page.active :is(.topic-card, .content-card) :is(p, .topic-desc, .topic-sub) {
-  color: var(--text-secondary) !important;
+  color: var(--text-secondary);
   font-size: var(--font-footnote-size);
   line-height: var(--font-footnote-line);
-  text-shadow: none !important;
+  text-shadow: none;
 }
 
 /* -------------------------------------------------------------------------
@@ -508,5 +592,33 @@ body:not(.dark) :is(#studyhub, #quizhub, #studydetail).active::after {
   #quizhub.active::after,
   #studydetail.active::after {
     background: none;
+  }
+}
+
+/* Wallpaper bu iki hub'da light/dark moddan bagimsiz olarak koyu bir gece
+   illüstrasyonudur. Transparent kartta murekkep de wallpaper'a gore secilir. */
+#page-root :is(#studyhub, #quizhub).page.active
+  :is(.topic-card, .question-card, .quiz-shell, .result-box, .review-card)
+  :is(h3, h4, .topic-title, .question-title, p, .topic-desc, .topic-sub, .helper-line) {
+  color: rgba(255, 248, 252, .96);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .5);
+}
+
+@media (min-width: 340px) and (max-width: 480px) {
+  #page-root :is(#studyhub, #quizhub).page.active .hub-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  #page-root :is(#studyhub, #quizhub).page.active .topic-card {
+    min-width: 0;
+    padding: 14px;
+  }
+
+  #page-root :is(#studyhub, #quizhub).page.active .topic-card :is(p, .topic-desc, .topic-sub) {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 }
