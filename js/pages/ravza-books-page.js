@@ -151,6 +151,7 @@ let audioContext = null;
 let pageSoundBuffer = null;
 let pageFlipScriptPromise = null;
 let removeDirectPageCurl = null;
+let prepareMobilePdfPreviousBackside = null;
 let curlDragging = false;
 let resizePending = false;
 let originalThemeColor = null;
@@ -3410,6 +3411,7 @@ function safeFlip(direction, corner = 'top') {
 
 function flipPrevious(corner = 'top') {
   if (!pageFlip) return;
+  prepareMobilePdfPreviousBackside?.();
   const rect = pageFlip.getBoundsRect();
   pageFlip.getFlipController().flip({
     x: rect.left + 10,
@@ -3432,6 +3434,122 @@ function installDirectPageCurl() {
   surface.style.overscrollBehavior = 'none';
   surface.style.webkitUserSelect = 'none';
   surface.style.webkitTouchCallout = 'none';
+
+  // St.PageFlip portre/ileri harekette gorunen sayfayi cloneNode(true) ile
+  // gecici olarak kopyalar. Canvas dugumu kopyalansa da piksel tamponu
+  // kopyalanmadigi icin kivrimin arka yuzu bos gorunur. Mobil PDF sayfa
+  // modunda bu tek gecici canvas'i ayni fiziksel sayfanin mevcut bitmap'iyle
+  // bir kez boyar, yatay ters cevirir ve soluklastiririz. Boylece goruntu,
+  // sayfanin arkasindan gorulen baski gibi davranir. Animasyon karelerinde
+  // hicbir PDF render'i, bitmap kopyasi veya piksel okuma yoktur.
+  const shouldHydrateMobilePdfBackside = state.bookType === 'pdf'
+    && state.readerMode === 'page'
+    && window.innerWidth < 768
+    && shouldUsePortrait();
+
+  const styleAsPrintedBackside = (page, canvas, pageNumber) => {
+    canvas.style.transformOrigin = 'center center';
+    canvas.style.transform = 'scaleX(-1)';
+    canvas.style.opacity = '0.52';
+    page.dataset.mobileFlipBacksidePage = String(pageNumber);
+  };
+
+  const hydrateMobilePdfBackside = temporaryPage => {
+    if (!shouldHydrateMobilePdfBackside
+      || !(temporaryPage instanceof Element)
+      || !temporaryPage.matches('.pdf-page[data-pdf-page]')) return;
+
+    const frontPageNumber = Number(temporaryPage.dataset.pdfPage);
+    if (!Number.isInteger(frontPageNumber)
+      || frontPageNumber < 1
+      || frontPageNumber > (pdfDocument?.numPages || 0)) return;
+
+    // Observer yalnizca sonradan eklenen dugumleri gorur; yine de ayni PDF
+    // sayfasindan iki tane bulunmasini isteyerek normal sayfayi degistirmeyiz.
+    const frontCopies = surface.querySelectorAll(`.pdf-page[data-pdf-page="${frontPageNumber}"]`);
+    if (frontCopies.length < 2) return;
+
+    const sourcePage = [...surface.querySelectorAll(`.pdf-page[data-pdf-page="${frontPageNumber}"]`)]
+      .find(element => element !== temporaryPage && element.classList.contains('is-rendered'));
+    const sourceCanvas = sourcePage?.querySelector('canvas');
+    const cached = pdfBitmapCache.get(frontPageNumber);
+    const cachedSource = cached?.bitmap || cached?.canvas;
+    const source = sourceCanvas?.width > 1 && sourceCanvas?.height > 1
+      ? sourceCanvas
+      : cachedSource;
+    const width = sourceCanvas?.width > 1 ? sourceCanvas.width : cached?.width;
+    const height = sourceCanvas?.height > 1 ? sourceCanvas.height : cached?.height;
+    const targetCanvas = temporaryPage.querySelector('canvas');
+    if (!source || !targetCanvas || !(width > 1) || !(height > 1)) return;
+
+    targetCanvas.width = width;
+    targetCanvas.height = height;
+    if (sourceCanvas) {
+      targetCanvas.style.width = sourceCanvas.style.width;
+      targetCanvas.style.height = sourceCanvas.style.height;
+    }
+    const context = targetCanvas.getContext('2d', { alpha: false });
+    if (!context) return;
+    try {
+      context.drawImage(source, 0, 0);
+    } catch (_) {
+      return;
+    }
+
+    targetCanvas.dataset.renderKey = sourceCanvas?.dataset.renderKey || cached?.renderKey || '';
+    styleAsPrintedBackside(temporaryPage, targetCanvas, frontPageNumber);
+    temporaryPage.setAttribute('aria-hidden', 'true');
+    temporaryPage.classList.add('is-rendered');
+    temporaryPage.querySelector('.pdf-page-status')?.setAttribute('aria-hidden', 'true');
+  };
+
+  const mobilePdfBacksideObserver = shouldHydrateMobilePdfBackside
+    ? new MutationObserver(records => {
+      for (const record of records) {
+        for (const node of record.addedNodes) hydrateMobilePdfBackside(node);
+      }
+    })
+    : null;
+  mobilePdfBacksideObserver?.observe(surface, { childList: true });
+
+  let previousBackside = null;
+  const restorePreviousBackside = () => {
+    if (!previousBackside) return;
+    const { page, canvas, transform, transformOrigin, opacity, marker } = previousBackside;
+    canvas.style.transform = transform;
+    canvas.style.transformOrigin = transformOrigin;
+    canvas.style.opacity = opacity;
+    if (marker === null) delete page.dataset.mobileFlipBacksidePage;
+    else page.dataset.mobileFlipBacksidePage = marker;
+    previousBackside = null;
+  };
+  const preparePreviousBackside = () => {
+    if (!shouldHydrateMobilePdfBackside || previousBackside || !pageFlip) return;
+    const previousIndex = pageFlip.getCurrentPageIndex() - 1;
+    if (previousIndex < 0) return;
+    const page = pageFlip.getPage(previousIndex)?.getElement?.();
+    const canvas = page?.querySelector?.('canvas');
+    const pageNumber = Number(page?.dataset?.pdfPage);
+    if (!canvas || canvas.width < 2 || canvas.height < 2 || !Number.isInteger(pageNumber)) return;
+    previousBackside = {
+      page,
+      canvas,
+      transform: canvas.style.transform,
+      transformOrigin: canvas.style.transformOrigin,
+      opacity: canvas.style.opacity,
+      marker: page.getAttribute('data-mobile-flip-backside-page'),
+    };
+    styleAsPrintedBackside(page, canvas, pageNumber);
+  };
+  prepareMobilePdfPreviousBackside = preparePreviousBackside;
+
+  const readerRoot = document.getElementById('reader-inner');
+  const pageFlipStateObserver = shouldHydrateMobilePdfBackside && readerRoot
+    ? new MutationObserver(() => {
+      if (readerRoot.dataset.pageFlipState === 'read') restorePreviousBackside();
+    })
+    : null;
+  pageFlipStateObserver?.observe(readerRoot, { attributes: true, attributeFilter: ['data-page-flip-state'] });
 
   let gesture = null;
   let centerTap = null;
@@ -3531,6 +3649,7 @@ function installDirectPageCurl() {
       try { surface.setPointerCapture(event.pointerId); } catch (_) {}
       return;
     }
+    if (direction === 'back') preparePreviousBackside();
 
     gesture = {
       pointerId: event.pointerId,
@@ -3656,6 +3775,12 @@ function installDirectPageCurl() {
   surface.addEventListener('contextmenu', onContextMenu);
 
   removeDirectPageCurl = () => {
+    mobilePdfBacksideObserver?.disconnect();
+    pageFlipStateObserver?.disconnect();
+    restorePreviousBackside();
+    if (prepareMobilePdfPreviousBackside === preparePreviousBackside) {
+      prepareMobilePdfPreviousBackside = null;
+    }
     surface.removeEventListener('pointerdown', onPointerDown);
     interactionOwner.removeEventListener('pointermove', onPointerMove);
     interactionOwner.removeEventListener('pointerup', onPointerUp);
