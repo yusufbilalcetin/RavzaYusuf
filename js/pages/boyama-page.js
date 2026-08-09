@@ -549,9 +549,10 @@ export function renderBoyamaApp(target, options = {}) {
       return false;
     }
     const { record, merged } = mergeEmergencySnapshot(loadedRecord);
-    console.warn("[PBN SAVE DEBUG] resume loaded", {
-      projectId: record?.id,
-      paintedCount: record?.paintedRegionIds?.length
+    pbnLog("resumeProject.loaded", {
+      id: record?.id,
+      painted: record?.paintedRegionIds?.length,
+      merged
     });
     currentProject = record;
     resultScreenOpening = false;
@@ -1054,16 +1055,13 @@ export function renderBoyamaApp(target, options = {}) {
     try {
       while (record) {
         saveAgainAfterCurrent = false;
-        console.warn("[PBN SAVE DEBUG] save start", {
-          projectId: record?.id,
-          paintedCount: record?.paintedRegionIds?.length
+        pbnLog("saveProjectNow.start", {
+          reason: nextReason,
+          id: record?.id,
+          painted: record?.paintedRegionIds?.length
         });
         await saveProject(record);
         await verifyProjectSaved(record);
-        console.warn("[PBN SAVE DEBUG] save success", {
-          projectId: record?.id,
-          paintedCount: record?.paintedRegionIds?.length
-        });
         pbnLog("saveProjectNow.ok", { reason: nextReason, id: record.id, painted: record.paintedRegionIds.length });
 
         if (!saveAgainAfterCurrent) return true;
@@ -1239,10 +1237,10 @@ export function renderBoyamaApp(target, options = {}) {
     viewport.__pbnEngine = engine;
     engine.setOnChange((event) => {
       if (event.type === "paint") {
-        console.warn("[PBN SAVE DEBUG] paint event", {
-          projectId: currentProject?.id,
-          paintedCount: engine?.getPaintedRegionIds?.().length
-        });
+        // Buradaki kosulsuz console.warn kaldirildi: her boyama isleminde bir
+        // kez calisiyor ve yalnizca loglamak icin getPaintedRegionIds() ile
+        // butun boyali bolge listesini kopyaliyordu. Tesihs gerekiyorsa
+        // pbnLog kullanilir; o ?pbndebug=1 ile aciliyor.
         updateProgressUi();
         updatePaletteChips();
         autoAdvanceIfComplete();
