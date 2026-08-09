@@ -94,6 +94,9 @@ const READER_MODES = Object.freeze(['page', 'scroll']);
  */
 /** Kontroller bu kadar hareketsizlikten sonra kaybolur (iOS oynatıcı hissi). */
 const CONTROLS_HIDE_MS = 4000;
+/** Kabuk sönme süresi (--controls-ease 220ms) + küçük pay. Bu süre boyunca
+ *  kontroller hâlâ görünür olduğu için tıklanabilir de kalır. */
+const CONTROLS_FADE_MS = 260;
 /** Arama indeksi bu büyüklükte parçalar hâlinde kurulur; ana iş parçacığı boğulmasın. */
 const SEARCH_INDEX_CHUNK = 8;
 /** Listelenecek en fazla sonuç. Tavana dayanildiginda sayi "80+" gosterilir. */
@@ -139,6 +142,11 @@ let importedBook = null;
 let readerPages = [];
 let pageFlip = null;
 let readerAbort = null;
+/** Araç çubuğu delegasyonu: kabuk basıldığı anda kurulur, PDF'i beklemez. */
+let readerShellAbort = null;
+let controlsFadeTimer = 0;
+/** Yeniden sayfalama kabugu bastan basarken tasinan arama sorgusu. */
+let pendingSearchRestore = null;
 let layoutObserver = null;
 let controlsTimer = 0;
 let repaginateTimer = 0;
@@ -621,7 +629,10 @@ function cleanupReader() {
   readerAbort = null;
   layoutObserver?.disconnect();
   layoutObserver = null;
+  readerShellAbort?.abort();
+  readerShellAbort = null;
   clearTimeout(controlsTimer);
+  clearTimeout(controlsFadeTimer);
   clearTimeout(repaginateTimer);
   clearTimeout(toastTimer);
   clearTimeout(lugatTimer);
@@ -1061,6 +1072,12 @@ function showReaderLoading(message, progress = null) {
     return;
   }
 
+  // Yeniden sayfalama (döndürme/boyut değişimi) kabuğu baştan basar; açık
+  // arama sayfası bu satırda yok oluyor ve sorgu sessizce kayboluyordu.
+  // Sorguyu taşı, kitap hazır olunca resumeSearchSheetWhenReady geri yükler.
+  if (document.getElementById('rdr-search-sheet')?.open) {
+    pendingSearchRestore = document.getElementById('rdr-search-input')?.value ?? '';
+  }
   root.className = 'reader-root';
   root.innerHTML = `
     <div class="reader-loading" role="status" aria-live="polite">
@@ -1177,6 +1194,9 @@ function buildReaderShell(book) {
     </div>
     <div class="reader-toast" id="rdr-toast" role="status" aria-live="polite"></div>
   `;
+  // Araç çubuğu basıldığı ANDA sahibini alır: PDF'in yüklenmesini beklemez,
+  // aksi hâlde görünür ama ölü düğmeler oluşuyordu.
+  bindReaderShellControls();
   return root;
 }
 
@@ -1849,6 +1869,7 @@ async function openTextReader(book, position = null) {
   installDirectPageCurl();
   document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
   setAppMode('reading');
+  resumeSearchSheetWhenReady();
   showControls(true);
 }
 
@@ -2085,33 +2106,44 @@ function readingStatusText(pageNumber, totalPages) {
  * kendiliğinden sağlanır: arama hazır bir dizide çalışır.
  */
 function ensureSearchIndex(bookId, onProgress) {
+  // PDF henüz hazır DEĞİLSE önbelleğe alma. Eskiden boş bir indeks kurulup
+  // hatırlanıyordu; kitap yüklendikten sonra bile arama "sonuç yok" demeye
+  // devam ediyordu ve bu durumdan çıkış yoktu (§128). null = "henüz hazır
+  // değil", [] = "gerçekten boş" - çağıran ikisini ayırt edebilmeli.
+  if (!pdfDocument) return Promise.resolve(null);
   if (searchIndexBookId === bookId && searchIndexPromise) return searchIndexPromise;
   searchIndexAbort = false;
   searchIndexBookId = bookId;
   searchIndex = [];
 
   const document_ = pdfDocument;
+  // Girdiler ÖNCE yerel diziye toplanır. Modül dizisine doğrudan yazmak,
+  // indeksleme sürerken kitap değişirse eski oturumun sayfalarını yeni
+  // kitabın indeksine sızdırıyordu (§16).
+  const entries = [];
   searchIndexPromise = (async () => {
-    if (!document_) return [];
     const total = document_.numPages;
     for (let pageNumber = 1; pageNumber <= total; pageNumber += 1) {
       if (searchIndexAbort || pdfDocument !== document_) break;
       try {
         const page = await document_.getPage(pageNumber);
         const textContent = await page.getTextContent();
-        searchIndex.push(createPageEntry(pageNumber, flattenTextContent(textContent)));
+        entries.push(createPageEntry(pageNumber, flattenTextContent(textContent)));
         // Sayfa nesnesini indeksleme için tutma: render cache'i ayrı yönetiliyor.
         if (!pdfPageCache.has(pageNumber)) page.cleanup();
       } catch (_) {
         // Tek sayfanın metni çıkmadıysa arama o sayfayı atlar; kitap açık kalır.
       }
       if (pageNumber % SEARCH_INDEX_CHUNK === 0) {
-        onProgress?.(pageNumber, total);
+        // Sonlanmış oturumun ilerlemesi arayüze yazılmamalı (§130).
+        if (searchIndexBookId === bookId && pdfDocument === document_) onProgress?.(pageNumber, total);
         await new Promise(resolve => runWhenIdle(resolve));
       }
     }
+    if (searchIndexBookId !== bookId || pdfDocument !== document_) return entries;
+    searchIndex = entries;
     onProgress?.(total, total);
-    return searchIndex;
+    return entries;
   })();
   return searchIndexPromise;
 }
@@ -2653,6 +2685,7 @@ async function openPdfReader(book, position = null) {
     await updatePdfRenderWindow(startIndex, true);
     document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
     setAppMode('reading');
+    resumeSearchSheetWhenReady();
     showControls(true);
     return;
   }
@@ -2705,6 +2738,7 @@ async function openPdfReader(book, position = null) {
   await updatePdfRenderWindow(startIndex, true);
   document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
   setAppMode('reading');
+  resumeSearchSheetWhenReady();
   showControls(true);
 }
 
@@ -2955,6 +2989,8 @@ function showControls(autoHide = true) {
   if (!root) return;
   state.controlsVisible = true;
   root.classList.add('controls-visible');
+  clearTimeout(controlsFadeTimer);
+  root.classList.remove('controls-fading');
   clearTimeout(controlsTimer);
   if (autoHide && !controlsAreLocked()) {
     controlsTimer = window.setTimeout(hideControls, CONTROLS_HIDE_MS);
@@ -2966,7 +3002,22 @@ function hideControls() {
   // Kullanıcı hâlâ kontrollerle etkileşimdeyse gizleme.
   if (controlsAreLocked()) return;
   state.controlsVisible = false;
-  document.getElementById('reader-inner')?.classList.remove('controls-visible');
+  const root = document.getElementById('reader-inner');
+  if (!root) return;
+  root.classList.remove('controls-visible');
+  // GÖRÜNÜRKEN TIKLANABİLİR KALSIN.
+  //
+  // Sınıf kalkar kalkmaz pointer-events kapanıyordu, ama kabuk sönme
+  // animasyonu boyunca ~220ms daha EKRANDA duruyordu. Ölçüldü: opacity
+  // 0.27 iken elementFromPoint "Ara" düğmesini değil altındaki
+  // .pdf-canvas-frame'i veriyordu. Kullanıcı gördüğü düğmeye basıyor,
+  // dokunuş sahneye düşüyor ve yalnızca kontroller geri geliyordu -
+  // "bazen çalışıyor" şikâyetinin doğrudan kaynağı buydu.
+  root.classList.add('controls-fading');
+  clearTimeout(controlsFadeTimer);
+  controlsFadeTimer = window.setTimeout(() => {
+    document.getElementById('reader-inner')?.classList.remove('controls-fading');
+  }, CONTROLS_FADE_MS);
 }
 
 function toggleControls() {
@@ -3020,6 +3071,9 @@ function closeSheet(sheet) {
 
 /** Açık olan her sayfayı kapatır. @returns {boolean} bir şey kapandı mı */
 function closeSettings() {
+  // Kullanıcı KAPATTIYSA bekleyen geri yükleme iptal olur; aksi hâlde sırada
+  // bekleyen bir yeniden sayfalama arama sayfasını geri diriltiyordu.
+  pendingSearchRestore = null;
   const open = openSheets();
   if (!open.length) return false;
   for (const sheet of open) closeSheet(sheet);
@@ -3387,13 +3441,22 @@ async function runBookSearch(query) {
     return;
   }
   setSearchState('Aranıyor…');
-  await ensureSearchIndex(state.bookId, (done, total) => {
+  const bookId = state.bookId;
+  const index = await ensureSearchIndex(bookId, (done, total) => {
     setSearchState(done < total ? `Kitap taranıyor… %${Math.round((done / total) * 100)}` : 'Aranıyor…');
   });
+  // Kitap henüz açılmadıysa sessizce "sonuç yok" deme; durumu dürüst söyle.
+  if (index === null) {
+    setSearchState('Kitap hazırlanıyor…');
+    return;
+  }
+  // Arama sürerken kullanıcı başka bir kitaba geçmiş olabilir: eski sonucu
+  // yeni kitabın arayüzüne yazma (§73).
+  if (state.bookId !== bookId) return;
   // İndeksleme sürerken kullanıcı sorguyu değiştirmiş olabilir.
   const input = document.getElementById('rdr-search-input');
   if (input && input.value.trim() !== String(query).trim()) return;
-  const results = searchBookIndex(searchIndex, query, { limit: SEARCH_RESULT_LIMIT });
+  const results = searchBookIndex(index, query, { limit: SEARCH_RESULT_LIMIT });
   // Liste tavana dayandiysa "80 sonuç" demek yaniltici olur - kitapta daha
   // fazlasi olabilir. Tavanda "80+" denir.
   const capped = results.length >= SEARCH_RESULT_LIMIT;
@@ -3404,14 +3467,50 @@ async function runBookSearch(query) {
 }
 
 function openSearchSheet() {
+  // Zaten açıksa ikinci bir dialog açılmaz; kapalıysa HER ZAMAN açılır (§139).
+  const sheet = document.getElementById('rdr-search-sheet');
+  if (sheet?.open) { document.getElementById('rdr-search-input')?.focus(); return; }
   if (!openSheet('rdr-search-sheet')) return;
   const input = document.getElementById('rdr-search-input');
-  setSearchState('');
-  // İndeksi arka planda şimdiden kurmaya başla: kullanıcı yazarken hazır olsun.
-  void ensureSearchIndex(state.bookId, (done, total) => {
-    if (done < total) setSearchState(`Kitap taranıyor… %${Math.round((done / total) * 100)}`);
-  });
+  const bookId = state.bookId;
+  // Kitap hâlâ yükleniyorsa dialog yine AÇILIR (§11): kullanıcı yazabilir,
+  // indeks hazır olduğunda sorgu kendiliğinden çalışır.
+  if (!pdfDocument) setSearchState('Kitap hazırlanıyor…');
+  else {
+    setSearchState('');
+    // İndeksi arka planda şimdiden kur: kullanıcı yazarken hazır olsun.
+    void ensureSearchIndex(bookId, (done, total) => {
+      if (state.bookId !== bookId) return;
+      if (done < total) setSearchState(`Kitap taranıyor… %${Math.round((done / total) * 100)}`);
+    });
+  }
   input?.focus();
+}
+
+/**
+ * Kitap yüklenmeden Ara açıldıysa, hazır olur olmaz indekslemeyi başlat ve
+ * kullanıcının o sırada yazdığı sorguyu çalıştır - tekrar yazmasın (§20).
+ */
+function resumeSearchSheetWhenReady() {
+  if (!pdfDocument) return;
+  const sheet = document.getElementById('rdr-search-sheet');
+  // Yeniden sayfalama arama sayfasını kapattıysa aynı sorguyla geri getir.
+  if (pendingSearchRestore !== null) {
+    const restore = pendingSearchRestore;
+    pendingSearchRestore = null;
+    openSearchSheet();
+    const input = document.getElementById('rdr-search-input');
+    if (input && restore) {
+      input.value = restore;
+      void runBookSearch(restore);
+    }
+    return;
+  }
+  if (!sheet?.open) return;
+  const input = document.getElementById('rdr-search-input');
+  const pending = input?.value.trim() || '';
+  if (pending) void runBookSearch(pending);
+  else openSearchSheet();
 }
 
 /* ------------------------------------------------------------------------ */
@@ -3857,22 +3956,46 @@ function installDirectPageCurl() {
   };
 }
 
+/**
+ * ARAÇ ÇUBUĞU EYLEMLERİNİN TEK SAHİBİ.
+ *
+ * NEDEN: Kabuk (araç çubuğu dâhil) PDF yüklenmeden ÖNCE basılıyor,
+ * dinleyiciler ise ancak PDF çözüldükten sonra bağlanıyordu. Aradaki
+ * sürede - büyük bir kitapta saniyeler - düğmeler görünür ama ÖLÜYDÜ:
+ * kullanıcı "Ara"ya basıyor, hiçbir şey olmuyordu. Ölçüldü: appMode
+ * "loading-book" iken düğme 99x52px, click çalışıyor, sahip yok.
+ *
+ * Delegasyon sahipliği tek bir düğüme (okuyucu kökü) taşır: araç çubuğu
+ * yeniden basılsa da sahiplik korunur, düğme başına mükerrer dinleyici
+ * birikmez ve kabuk göründüğü andan itibaren tıklanabilir.
+ */
+function bindReaderShellControls() {
+  readerShellAbort?.abort();
+  readerShellAbort = new AbortController();
+  const root = document.getElementById('reader-inner');
+  if (!root) return;
+  root.addEventListener('click', event => {
+    const target = event.target instanceof Element ? event.target : null;
+    const action = target?.closest('#rdr-back, #rdr-search-open, #rdr-contents-open, #rdr-settings-open, #rdr-bookmark');
+    if (!action) return;
+    switch (action.id) {
+      case 'rdr-back': void showLibrary(); break;
+      case 'rdr-search-open': openSearchSheet(); break;
+      case 'rdr-contents-open': renderContentsSheet(); openSheet('rdr-contents-sheet'); break;
+      case 'rdr-settings-open': openSettings(); break;
+      case 'rdr-bookmark': toggleBookmark(); break;
+      default: break;
+    }
+  }, { signal: readerShellAbort.signal });
+}
+
 function bindReaderEvents(book) {
   readerAbort?.abort();
   readerAbort = new AbortController();
   const { signal } = readerAbort;
   const stage = document.getElementById('rdr-stage');
-
-  document.getElementById('rdr-back')?.addEventListener('click', () => {
-    void showLibrary();
-  }, { signal });
-  document.getElementById('rdr-bookmark')?.addEventListener('click', toggleBookmark, { signal });
-  document.getElementById('rdr-settings-open')?.addEventListener('click', openSettings, { signal });
-  document.getElementById('rdr-contents-open')?.addEventListener('click', () => {
-    renderContentsSheet();
-    openSheet('rdr-contents-sheet');
-  }, { signal });
-  document.getElementById('rdr-search-open')?.addEventListener('click', openSearchSheet, { signal });
+  // Araç çubuğu eylemleri bindReaderShellControls'ün sahipliğinde; burada
+  // TEKRAR bağlanmaz, yoksa her yeniden bağlamada ikinci bir sahip olurdu.
 
   // Sayfa kapatma: başlıktaki düğme, backdrop tıklaması ve Escape.
   for (const id of SHEET_IDS) {

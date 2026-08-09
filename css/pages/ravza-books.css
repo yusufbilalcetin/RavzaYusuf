@@ -1351,6 +1351,14 @@ button {
   transform: translateY(14px);
 }
 
+/* Sönme animasyonu sürerken kabuk hâlâ EKRANDA; o sürede tıklanabilir de
+   kalmalı. Görünen ile tıklanabilen aynı olmazsa kullanıcı gördüğü düğmeye
+   basıp hiçbir şey olmadığını görüyor. */
+.reader-root.controls-fading .reader-topbar,
+.reader-root.controls-fading .reader-dock {
+  pointer-events: auto;
+}
+
 .reader-root.controls-visible .reader-topbar,
 .reader-root.controls-visible .reader-dock {
   opacity: 1;
