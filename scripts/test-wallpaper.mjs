@@ -50,7 +50,7 @@ function withStorage(local = {}, session = {}) {
   return { localStore, sessionStore };
 }
 
-const { chooseRandomWallpaper, resolveWallpaperId, WALLPAPER_KEYS } =
+const { chooseRandomWallpaper, resolveWallpaperId, resetRuntimeWallpaper, WALLPAPER_KEYS } =
   await import("../js/core/wallpaper.js");
 
 const IDS = ["anneanne", "asansor", "fantastik", "galata"];
@@ -110,35 +110,78 @@ await runCase("SABIT mod ayni depoda HEP ayni sonucu verir", () => {
   assert.deepEqual([...new Set(reads)], ["fantastik"], "sabit mod kararsiz");
 });
 
-await runCase("RASTGELE mod: oturumda secim varsa yeniden zar ATILMAZ", () => {
+await runCase("RASTGELE mod: AYNI document icinde yeniden zar ATILMAZ", () => {
+  withStorage({ [WALLPAPER_KEYS.mode]: "random-session" });
+  resetRuntimeWallpaper();
+  const first = resolveWallpaperId(IDS, { random: () => 0.4 });
+
+  // Sonraki cagrilar SPA gezinme / yeniden render'i temsil eder: ayni deger.
   let calls = 0;
-  const spy = () => { calls += 1; return 0; };
-  withStorage(
-    { [WALLPAPER_KEYS.mode]: "random-session" },
-    { [WALLPAPER_KEYS.session]: "fantastik" },
-  );
+  const spy = () => { calls += 1; return 0.9; };
   for (let index = 0; index < 10; index += 1) {
-    assert.equal(resolveWallpaperId(IDS, { random: spy }), "fantastik");
+    assert.equal(resolveWallpaperId(IDS, { random: spy }), first, "document icinde gorsel degisti");
   }
-  assert.equal(calls, 0, "oturum secimi varken rastgele yeniden cagrildi");
+  assert.equal(calls, 0, "document icinde rastgele yeniden cagrildi");
 });
 
-await runCase("RASTGELE mod: yeni oturumda onceki gorselden KACINIR", () => {
+await runCase("RASTGELE mod: HER document yuklemesi yeni gorsel secer", () => {
+  withStorage({ [WALLPAPER_KEYS.mode]: "random-session" });
+  const seen = [];
+  // resetRuntimeWallpaper() gercek bir sayfa yenilemesini temsil eder:
+  // modul kapsamindaki secim sifirlanir, tercihler (localStorage) kalir.
+  for (let load = 0; load < 8; load += 1) {
+    resetRuntimeWallpaper();
+    seen.push(resolveWallpaperId(IDS));
+  }
+  assert.equal(seen.filter(Boolean).length, seen.length, "bir yuklemede gorsel secilemedi");
+  for (let index = 1; index < seen.length; index += 1) {
+    assert.notEqual(seen[index], seen[index - 1],
+      `${index}. yuklemede ayni gorsel arka arkaya geldi: ${seen[index]}`);
+  }
+  assert.ok(new Set(seen).size > 1, "yenilemeler hep ayni gorseli verdi");
+});
+
+await runCase("RASTGELE sonucu depoya YAZILMAZ", () => {
+  const { localStore, sessionStore } = withStorage({ [WALLPAPER_KEYS.mode]: "random-session" });
+  resetRuntimeWallpaper();
+  const chosen = resolveWallpaperId(IDS);
+  // Yalnizca TERCIH kalici: mod ve "bir onceki". Secimin kendisi degil.
+  assert.equal(sessionStore.getItem(WALLPAPER_KEYS.legacySession), null, "oturum anahtarina yazildi");
+  assert.equal(localStore.getItem(WALLPAPER_KEYS.fixed), null, "rastgele secim sabit gibi kaydedildi");
+  assert.equal(localStore.getItem(WALLPAPER_KEYS.previous), chosen, "tekrar onleme bilgisi yazilmadi");
+});
+
+await runCase("ESKI oturum anahtari yenilemede gorseli SABITLEMEZ", () => {
   const { sessionStore } = withStorage(
-    { [WALLPAPER_KEYS.mode]: "random-session", [WALLPAPER_KEYS.previous]: "galata" },
-    {},
+    { [WALLPAPER_KEYS.mode]: "random-session" },
+    { [WALLPAPER_KEYS.legacySession]: "galata" },
   );
+  const loads = [];
+  for (let load = 0; load < 6; load += 1) {
+    resetRuntimeWallpaper();
+    loads.push(resolveWallpaperId(IDS));
+  }
+  assert.ok(new Set(loads).size > 1, "eski oturum anahtari gorseli sabitledi");
+  assert.equal(sessionStore.getItem(WALLPAPER_KEYS.legacySession), null, "eski anahtar temizlenmedi");
+});
+
+await runCase("RASTGELE mod: bir onceki yuklemenin gorselinden KACINIR", () => {
+  const { localStore } = withStorage(
+    { [WALLPAPER_KEYS.mode]: "random-session", [WALLPAPER_KEYS.previous]: "galata" },
+  );
+  resetRuntimeWallpaper();
   // random=0 ilk adayi secer; "galata" aday listesinden cikarilmis olmali.
   const chosen = resolveWallpaperId(IDS, { random: () => 0 });
-  assert.notEqual(chosen, "galata", "onceki oturumun gorseli tekrar secildi");
-  assert.equal(sessionStore.getItem(WALLPAPER_KEYS.session), chosen, "oturuma yazilmadi");
+  assert.notEqual(chosen, "galata", "bir onceki yuklemenin gorseli tekrar secildi");
+  assert.equal(localStore.getItem(WALLPAPER_KEYS.previous), chosen, "tekrar onleme bilgisi guncellenmedi");
 });
 
 await runCase("bozuk depo cokertmez", () => {
   withStorage({ [WALLPAPER_KEYS.mode]: "{bozuk-json", [WALLPAPER_KEYS.fixed]: "" });
   assert.equal(resolveWallpaperId(IDS), IDS[0]);
-  withStorage({ [WALLPAPER_KEYS.mode]: "random-session" }, { [WALLPAPER_KEYS.session]: "yok-boyle" });
-  assert.ok(IDS.includes(resolveWallpaperId(IDS)), "gecersiz oturum id'si onarilmadi");
+  withStorage({ [WALLPAPER_KEYS.mode]: "random-session" });
+  resetRuntimeWallpaper();
+  assert.ok(IDS.includes(resolveWallpaperId(IDS)), "rastgele modda gecerli gorsel uretilmedi");
   // Depolama tamamen erisilemez olsa bile cokmemeli.
   globalThis.localStorage = null;
   globalThis.sessionStorage = null;
@@ -202,7 +245,7 @@ const STORE = `(() => ({
   mode: localStorage.getItem('ravzaYusufWallpaperMode'),
   fixed: localStorage.getItem('ravzaYusufWallpaperFixed'),
   previous: localStorage.getItem('ravzaYusufWallpaperPrevious'),
-  session: sessionStorage.getItem('ravzaYusufWallpaperSession'),
+  legacySession: sessionStorage.getItem('ravzaYusufWallpaperSession'),
 }))()`;
 
 /* Etkin mod MODULDEN okunur. Eksik ya da bozuk bir deger okuma aninda
@@ -210,11 +253,12 @@ const STORE = `(() => ({
    ham localStorage degerini degil, sistemin GERCEKTEN kullandigi modu olcuyoruz. */
 const EFFECTIVE_MODE = `(async () => (await import('/js/core/wallpaper.js')).getWallpaperMode())()`;
 
-/** Yeni sekme/oturum: sessionStorage gider, localStorage KALIR. */
-async function startNewSession() {
-  await browser.evaluate("sessionStorage.clear()");
-  await gotoHome();
-}
+/* GERCEK sayfa yuklemesi. gotoHome() zaten tam bir document navigasyonudur:
+   modul kapsami sifirlanir, localStorage kalir - yani F5 ile ayni sey. */
+const reload = gotoHome;
+
+/** O an EKRANDA olan arka planin kimligi (gorulen sey, depo degil). */
+const CURRENT = STAGE_THEME;
 
 try {
   await browser.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
@@ -277,9 +321,11 @@ try {
     await delay(600);
     assert.equal(await browser.evaluate(STAGE_THEME), chosen, "gezinme arka plani degistirdi");
 
-    // Yeni sekme/oturum: localStorage kaldigi icin ayni gorsel gelmeli.
-    await startNewSession();
-    assert.equal(await browser.evaluate(STAGE_THEME), chosen, "yeni oturumda sabit gorsel degisti");
+    // Bes ardisik gercek yenileme: sabit gorsel HIC degismemeli (§32).
+    for (let load = 0; load < 5; load += 1) {
+      await reload();
+      assert.equal(await browser.evaluate(CURRENT), chosen, `${load + 1}. yenilemede sabit gorsel degisti`);
+    }
     assert.equal((await browser.evaluate(STORE)).fixed, chosen, "sabit kayit bozuldu");
   });
 
@@ -289,11 +335,11 @@ try {
     await browser.evaluate(`localStorage.removeItem('ravzaYusufWallpaperPrevious')`);
     const chosen = (await browser.evaluate(STORE)).fixed;
     for (let visit = 0; visit < 3; visit += 1) {
-      await startNewSession();
+      await reload();
       const store = await browser.evaluate(STORE);
-      assert.equal(await browser.evaluate(STAGE_THEME), chosen, `${visit}. ziyarette gorsel degisti`);
+      assert.equal(await browser.evaluate(CURRENT), chosen, `${visit}. yenilemede gorsel degisti`);
       assert.equal(store.previous, null, "sabit modda rastgele yolu calisti (previous yazildi)");
-      assert.equal(store.session, null, "sabit modda oturum gorseli yazildi");
+      assert.equal(store.legacySession, null, "sabit modda eski oturum anahtari yazildi");
     }
   });
 
@@ -302,19 +348,20 @@ try {
     await browser.evaluate(`document.querySelector('[data-wp-random]').click()`);
     await delay(900);
     const store = await browser.evaluate(STORE);
+    const current = await browser.evaluate(CURRENT);
     assert.equal(store.mode, "random-session", `mod ${store.mode}`);
-    assert.ok(store.session, "oturum gorseli secilmedi");
+    assert.ok(current, "rastgele mod gorsel uygulamadi");
     const panel = await browser.evaluate(PANEL);
     assert.equal(panel.randomSelected, true, "Rastgele karti secili degil");
     assert.equal(panel.randomPressed, true, "Rastgele karti aria-pressed=false");
     assert.equal(panel.selectedIds.length, 0, "rastgele modda bir gorsel de 'secili' isaretlenmis");
-    assert.deepEqual(panel.showingIds, [store.session], "o an gosterilen gorsel isaretlenmemis");
+    assert.deepEqual(panel.showingIds, [current], "o an gosterilen gorsel isaretlenmemis");
     assert.equal(panel.pinVisible, true, "rastgele modda Sabitle gorunmuyor");
     assert.equal(panel.modeBadgeVisible, true, "rastgele modda mod rozeti gorunmuyor");
   });
 
-  await runCase("RASTGELE: ayni oturumda hicbir sey degistirmez", async () => {
-    const sessionId = (await browser.evaluate(STORE)).session;
+  await runCase("RASTGELE: ayni document icinde hicbir sey degistirmez", async () => {
+    const pinned = await browser.evaluate(CURRENT);
     await browser.evaluate("window.closeWallpaperPanel && window.closeWallpaperPanel()");
     await delay(200);
 
@@ -324,7 +371,7 @@ try {
     await browser.evaluate("window.navigate && window.navigate('ana-sayfa')");
     await browser.waitFor("document.body.dataset.currentRoute === 'ana-sayfa'", "ana sayfa", 30000);
     await delay(500);
-    assert.equal((await browser.evaluate(STORE)).session, sessionId, "gezinme oturum gorselini degistirdi");
+    assert.equal(await browser.evaluate(CURRENT), pinned, "SPA gezinme arka plani degistirdi");
 
     // Kontrol Merkezi + Spotlight.
     await browser.evaluate("window.openControlCenter && window.openControlCenter()");
@@ -345,48 +392,72 @@ try {
     })()`);
     await delay(400);
 
-    const after = await browser.evaluate(STORE);
-    assert.equal(after.session, sessionId, "oturum gorseli degisti");
-    assert.equal(after.mode, "random-session", "mod degisti");
-    assert.equal(await browser.evaluate(STAGE_THEME), sessionId, "sahnedeki gorsel degisti");
-
-    // F5: ayni sekme, ayni gorsel.
-    await gotoHome();
-    assert.equal((await browser.evaluate(STORE)).session, sessionId, "F5 yeni gorsel secti");
-    assert.equal(await browser.evaluate(STAGE_THEME), sessionId, "F5 sonrasi sahne degisti");
+    assert.equal((await browser.evaluate(STORE)).mode, "random-session", "mod degisti");
+    assert.equal(await browser.evaluate(CURRENT), pinned, "sahnedeki gorsel degisti");
   });
 
-  await runCase("RASTGELE: YENI oturum yeni gorsel secer", async () => {
-    const before = (await browser.evaluate(STORE)).session;
-    await startNewSession();
-    const after = await browser.evaluate(STORE);
-    assert.ok(after.session, "yeni oturumda gorsel secilmedi");
-    assert.equal(after.mode, "random-session", "mod kalici degil");
-    // Kayit defterinde birden fazla gorsel var: tekrar ETMEMELI (§15, §45).
-    assert.notEqual(after.session, before, "yeni oturum onceki gorseli tekrar secti");
-    assert.equal(await browser.evaluate(STAGE_THEME), after.session, "sahne yeni gorseli almadi");
+  await runCase("RASTGELE: HER yenilemede yeni gorsel gelir", async () => {
+    // Bu turun en kritik kabul kriteri (§30): dort ardisik GERCEK yenileme,
+    // her biri bir oncekinden farkli olmali.
+    const seen = [await browser.evaluate(CURRENT)];
+    for (let load = 0; load < 4; load += 1) {
+      await reload();
+      const current = await browser.evaluate(CURRENT);
+      assert.ok(current, `${load + 1}. yenilemede gorsel uygulanmadi`);
+      assert.notEqual(current, seen[seen.length - 1],
+        `${load + 1}. yenilemede AYNI gorsel arka arkaya geldi: ${current}`);
+      assert.equal((await browser.evaluate(STORE)).mode, "random-session", "mod yenilemede kaybedildi");
+      seen.push(current);
+    }
+    assert.ok(new Set(seen).size > 2, `yenilemeler yeterince cesitlenmedi: ${seen.join(", ")}`);
+  });
+
+  await runCase("RASTGELE sonucu depoda TASINMIYOR", async () => {
+    const store = await browser.evaluate(STORE);
+    const current = await browser.evaluate(CURRENT);
+    // Kalici olan yalnizca tercih: mod + tekrar onleme bilgisi.
+    assert.equal(store.legacySession, null, "eski oturum anahtari hala yaziliyor");
+    assert.notEqual(store.mode, "fixed", "rastgele mod sabite cevrildi");
+    assert.equal(store.previous, current, "tekrar onleme bilgisi guncel degil");
+  });
+
+  await runCase("ESKI oturum anahtari enjekte edilse bile gorseli SABITLEMEZ", async () => {
+    const before = await browser.evaluate(CURRENT);
+    await browser.evaluate(
+      `sessionStorage.setItem('ravzaYusufWallpaperSession', ${JSON.stringify("galata")})`);
+    const seen = [];
+    for (let load = 0; load < 3; load += 1) {
+      await reload();
+      seen.push(await browser.evaluate(CURRENT));
+    }
+    assert.ok(new Set(seen).size > 1, `eski anahtar gorseli sabitledi: ${seen.join(", ")}`);
+    assert.equal((await browser.evaluate(STORE)).legacySession, null, "eski anahtar temizlenmedi");
+    assert.ok(before, "onceki gorsel okunamadi");
   });
 
   await runCase("Sabitle: gorsel degismez, mod SABIT olur", async () => {
     await openPanel();
-    const beforeStage = await browser.evaluate(STAGE_THEME);
-    const sessionId = (await browser.evaluate(STORE)).session;
+    const beforeStage = await browser.evaluate(CURRENT);
+    const currentId = beforeStage;
     await browser.evaluate(`document.querySelector('[data-wp-pin]').click()`);
     await delay(600);
 
     const store = await browser.evaluate(STORE);
     assert.equal(store.mode, "fixed", `Sabitle sonrasi mod ${store.mode}`);
-    assert.equal(store.fixed, sessionId, "sabitlenen gorsel yanlis");
-    assert.equal(await browser.evaluate(STAGE_THEME), beforeStage, "Sabitle gorseli degistirdi");
+    assert.equal(store.fixed, currentId, "sabitlenen gorsel yanlis");
+    assert.equal(await browser.evaluate(CURRENT), beforeStage, "Sabitle gorseli degistirdi");
 
     const panel = await browser.evaluate(PANEL);
     assert.equal(panel.pinVisible, false, "sabitledikten sonra Sabitle hala gorunuyor");
     assert.equal(panel.randomSelected, false, "sabitledikten sonra Rastgele hala secili");
-    assert.deepEqual(panel.selectedIds, [sessionId], "sabitlenen gorsel secili isaretlenmedi");
+    assert.deepEqual(panel.selectedIds, [currentId], "sabitlenen gorsel secili isaretlenmedi");
 
-    // Yeni oturumda da ayni kalmali.
-    await startNewSession();
-    assert.equal(await browser.evaluate(STAGE_THEME), sessionId, "sabitlenen gorsel yeni oturumda degisti");
+    // Uc ardisik yenileme: sabitlenen gorsel degismemeli (§36).
+    for (let load = 0; load < 3; load += 1) {
+      await reload();
+      assert.equal(await browser.evaluate(CURRENT), currentId,
+        `${load + 1}. yenilemede sabitlenen gorsel degisti`);
+    }
   });
 
   await runCase("rastgele moddan manuel secim SABIT'e dondurur", async () => {
@@ -407,7 +478,12 @@ try {
     assert.equal(store.fixed, target, "manuel secim kaydedilmedi");
     assert.equal(panel.randomSelected, false, "Rastgele karti hala secili");
     assert.deepEqual(panel.selectedIds, [target], "secili gorsel yanlis");
-    assert.equal(await browser.evaluate(STAGE_THEME), target, "sahne guncellenmedi");
+    assert.equal(await browser.evaluate(CURRENT), target, "sahne guncellenmedi");
+
+    // Yenileme sonrasi da ayni kalmali (§37).
+    await reload();
+    assert.equal(await browser.evaluate(CURRENT), target, "manuel secim yenilemede degisti");
+    assert.equal((await browser.evaluate(STORE)).mode, "fixed", "yenilemede mod degisti");
   });
 
   await runCase("Kontrol Merkezi etiketi gercek durumla senkron", async () => {

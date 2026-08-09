@@ -9,12 +9,16 @@
  * de bunu import etmesi gerekmesi - aksi halde dongusel bagimlilik olusurdu.
  *
  * IKI MOD:
- *   fixed          - kullanici bir gorsel sectii; degismez.
- *   random-session - her YENI oturumda rastgele; oturum icinde SABIT.
+ *   fixed          - kullanici bir gorsel sectii; hicbir kosulda degismez.
+ *   random-session - HER GERCEK SAYFA YUKLEMESINDE yeni gorsel.
  *
- * "Oturum" = sessionStorage omru. Ayni sekmede yenileme ayni gorseli verir;
- * sekme kapanip yeniden acilinca yeni gorsel gelir. Boylece "her geldigimde
- * yeni arka plan" hissi olusur ama gezinirken arka plan zıplamaz.
+ * Rastgele modun sinirini "document omru" belirler: secim sessionStorage'da
+ * DEGIL, modul kapsamindaki bir degiskende tutulur. Yenileme modulu yeniden
+ * degerlendirir, degisken sifirlanir ve yeni gorsel gelir; ayni document
+ * icinde ise deger korunur, yani SPA gezinme arka plani ziplatmaz.
+ *
+ * KALICI olan yalnizca TERCIH'tir (mod, sabit secim, bir onceki gorsel) -
+ * rastgele modun O ANKI sonucu asla depoya yazilmaz.
  */
 
 export const WALLPAPER_MODES = Object.freeze(["fixed", "random-session"]);
@@ -25,8 +29,20 @@ export const WALLPAPER_KEYS = Object.freeze({
   mode: "ravzaYusufWallpaperMode",
   fixed: "ravzaYusufWallpaperFixed",
   previous: "ravzaYusufWallpaperPrevious",
-  session: "ravzaYusufWallpaperSession",
+  /** ESKI: rastgele secimi yenileme boyunca tasiyordu. Artik YALNIZCA silinir. */
+  legacySession: "ravzaYusufWallpaperSession",
 });
+
+/**
+ * BU DOCUMENT icin cozulmus rastgele arka plan.
+ *
+ * Bilincli olarak KALICI DEGILDIR. Document yeniden yuklenince modul yeniden
+ * degerlendirilir, bu degisken null'a doner ve yeni bir secim yapilir - "her
+ * yenilemede yeni arka plan" davranisi tam olarak buradan gelir.
+ * Ayni document icinde ise memoization gorevi gorur: SPA gezinme, overlay
+ * acilisi ve yeniden render yeni secim URETMEZ.
+ */
+let runtimeWallpaperId = null;
 
 export const WALLPAPER_CHANGE_EVENT = "app:wallpaper-change";
 
@@ -36,14 +52,6 @@ function readLocal(key) {
 
 function writeLocal(key, value) {
   try { globalThis.localStorage?.setItem(key, value); } catch { /* depolama kapali olabilir */ }
-}
-
-function readSession(key) {
-  try { return globalThis.sessionStorage?.getItem(key) ?? null; } catch { return null; }
-}
-
-function writeSession(key, value) {
-  try { globalThis.sessionStorage?.setItem(key, value); } catch { /* yok sayilir */ }
 }
 
 export function normalizeWallpaperMode(value) {
@@ -84,9 +92,24 @@ export function getFixedWallpaperId() {
   return typeof value === "string" && value ? value : null;
 }
 
-export function getSessionWallpaperId() {
-  const value = readSession(WALLPAPER_KEYS.session);
-  return typeof value === "string" && value ? value : null;
+/**
+ * ESKI OTURUM ANAHTARI TEMIZLIGI (§9).
+ *
+ * Onceki surum rastgele secimi sessionStorage'da tutuyordu; o anahtar hala
+ * duruyorsa yenileme sonrasi eski gorseli geri getirmemeli. Okunmaz, SILINIR.
+ */
+function purgeLegacySessionKey() {
+  try { globalThis.sessionStorage?.removeItem(WALLPAPER_KEYS.legacySession); } catch { /* yok sayilir */ }
+}
+
+/** Bu document icin cozulmus rastgele gorsel; depoya YAZILMAZ. */
+export function getRuntimeWallpaperId() {
+  return runtimeWallpaperId;
+}
+
+/** Yalnizca testler icin: document sinirini taklit eder. */
+export function resetRuntimeWallpaper() {
+  runtimeWallpaperId = null;
 }
 
 export function getPreviousWallpaperId() {
@@ -99,9 +122,9 @@ export function getWallpaperState() {
   return {
     mode,
     fixedId: getFixedWallpaperId(),
-    sessionId: getSessionWallpaperId(),
+    runtimeId: runtimeWallpaperId,
     previousId: getPreviousWallpaperId(),
-    currentId: mode === "fixed" ? getFixedWallpaperId() : getSessionWallpaperId(),
+    currentId: mode === "fixed" ? getFixedWallpaperId() : runtimeWallpaperId,
   };
 }
 
@@ -153,12 +176,18 @@ export function resolveWallpaperId(ids, { random = Math.random } = {}) {
     return fallback;
   }
 
-  const session = getSessionWallpaperId();
-  if (session && pool.includes(session)) return session;
-  // Yeni oturum: onceki ziyaretin gorselinden FARKLI olmaya calis (§10).
+  /* RASTGELE MOD: secim HER GERCEK DOCUMENT YUKLEMESINDE yenilenir.
+     Bu document icin zaten cozulduyse ayni deger doner; boylece SPA gezinme,
+     overlay acilisi ve yeniden render yeni secim URETMEZ (§10, §21, §29).
+     Eski surumun sessionStorage'i burada BILINCLI olarak okunmaz - okusaydi
+     yenileme sonrasi ayni gorsel geri gelirdi (§2, §20). */
+  purgeLegacySessionKey();
+  if (runtimeWallpaperId && pool.includes(runtimeWallpaperId)) return runtimeWallpaperId;
+
+  // Ardisik tekrari onle: bir onceki yuklemenin gorseli adaylardan cikarilir.
   const chosen = chooseRandomWallpaper(pool, getPreviousWallpaperId(), random);
   if (chosen) {
-    writeSession(WALLPAPER_KEYS.session, chosen);
+    runtimeWallpaperId = chosen;
     writeLocal(WALLPAPER_KEYS.previous, chosen);
   }
   return chosen;
@@ -170,7 +199,7 @@ export function selectWallpaper(id) {
   writeLocal(WALLPAPER_KEYS.mode, "fixed");
   writeLocal(WALLPAPER_KEYS.fixed, id);
   writeLocal(WALLPAPER_KEYS.previous, id);
-  writeSession(WALLPAPER_KEYS.session, id);
+  runtimeWallpaperId = id;
   emit("select");
   return getWallpaperState();
 }
@@ -179,16 +208,20 @@ export function setWallpaperMode(mode, ids = []) {
   const next = normalizeWallpaperMode(mode);
   writeLocal(WALLPAPER_KEYS.mode, next);
   if (next === "random-session") {
-    // Moda gecerken bu oturum icin bir gorsel secilir; sonra sabit kalir.
-    const chosen = chooseRandomWallpaper(ids, getPreviousWallpaperId());
+    purgeLegacySessionKey();
+    // Moda gecince kullanici sonucu ANINDA gorur; secim yalnizca bellekte.
+    const chosen = chooseRandomWallpaper(ids, runtimeWallpaperId || getPreviousWallpaperId());
     if (chosen) {
-      writeSession(WALLPAPER_KEYS.session, chosen);
+      runtimeWallpaperId = chosen;
       writeLocal(WALLPAPER_KEYS.previous, chosen);
     }
   } else {
     // Sabit moda donuldugunde su an gorunen gorsel sabitlenir.
-    const current = getSessionWallpaperId() || getFixedWallpaperId();
-    if (current) writeLocal(WALLPAPER_KEYS.fixed, current);
+    const current = runtimeWallpaperId || getFixedWallpaperId();
+    if (current) {
+      writeLocal(WALLPAPER_KEYS.fixed, current);
+      runtimeWallpaperId = current;
+    }
   }
   emit("mode");
   return getWallpaperState();
@@ -206,7 +239,7 @@ export function randomizeWallpaper(ids, { random = Math.random } = {}) {
   const current = getWallpaperState().currentId;
   const chosen = chooseRandomWallpaper(ids, current, random);
   if (!chosen) return getWallpaperState();
-  writeSession(WALLPAPER_KEYS.session, chosen);
+  runtimeWallpaperId = chosen;
   writeLocal(WALLPAPER_KEYS.previous, chosen);
   // Sabit moddayken de gorsel degisir; kullanici isterse "Sabitle" der.
   if (getWallpaperMode() === "fixed") writeLocal(WALLPAPER_KEYS.fixed, chosen);
