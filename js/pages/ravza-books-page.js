@@ -1327,8 +1327,13 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
   if (availableWidth < 2 || availableHeight < 2) return false;
   const portrait = shouldUsePortrait();
   const pagesAcross = portrait ? 1 : 2;
-  const pageWidth = Math.min(availableWidth / pagesAcross, availableHeight * ratio);
-  const pageHeight = pageWidth / ratio;
+  // "Sayfaya sigdir" TEK anlama gelir: CONTAIN. Sayfanin dort kenari da
+  // sahnenin icinde kalir. Olcek, genislik ve yukseklik olceklerinin
+  // KUCUGUdur; boylece hicbir yonde kirpma olmaz. Buyuk olceni secmek
+  // (height-first) sayfayi yatayda tasirip metni kesiyordu.
+  const scale = Math.min(availableWidth / pagesAcross / ratio, availableHeight);
+  const pageHeight = scale;
+  const pageWidth = pageHeight * ratio;
 
   const width = pageWidth * pagesAcross;
   const height = pageHeight;
@@ -3450,7 +3455,10 @@ function installDirectPageCurl() {
   const styleAsPrintedBackside = (page, canvas, pageNumber) => {
     canvas.style.transformOrigin = 'center center';
     canvas.style.transform = 'scaleX(-1)';
-    canvas.style.opacity = '0.52';
+    // Arka yuz baskisi: yaprak ARTIK opak oldugu icin bu opaklik alttaki
+    // sayfayla degil kagitla harmanlanir. 0.52 iki okunur metin katmani
+    // uretiyordu; hayalet baski icin dogru aralik 0.12-0.28.
+    canvas.style.opacity = '0.22';
     page.dataset.mobileFlipBacksidePage = String(pageNumber);
   };
 
@@ -3559,13 +3567,15 @@ function installDirectPageCurl() {
 
   const getMetrics = () => {
     const surfaceRect = surface.getBoundingClientRect();
+    const stageRect = interactionOwner.getBoundingClientRect();
     const bounds = pageFlip.getBoundsRect();
     const pageWidth = Math.max(1, bounds?.pageWidth || (shouldUsePortrait() ? surfaceRect.width : surfaceRect.width / 2));
+    const edgeBasis = Math.min(pageWidth, stageRect.width);
     const edgePx = Math.min(
       PAGE_CURL_CONFIG.maximumEdgePx,
-      Math.max(PAGE_CURL_CONFIG.minimumEdgePx, pageWidth * PAGE_CURL_CONFIG.edgeGrabRatio),
+      Math.max(PAGE_CURL_CONFIG.minimumEdgePx, edgeBasis * PAGE_CURL_CONFIG.edgeGrabRatio),
     );
-    return { surfaceRect, bounds, pageWidth, edgePx };
+    return { surfaceRect, stageRect, bounds, pageWidth, edgePx };
   };
 
   // Ölçüm yalnızca pointerdown'da alınır; hareket sırasında layout okunmaz.
@@ -3616,17 +3626,27 @@ function installDirectPageCurl() {
     if (!moveFrame) moveFrame = requestAnimationFrame(flushQueuedMove);
   };
 
+  const releaseLayoutLock = () => {
+    curlDragging = false;
+    if (resizePending) {
+      resizePending = false;
+      scheduleRepagination(40);
+    }
+  };
+
+  const resetCenterGesture = () => {
+    centerTap = null;
+    interactionOwner.classList.remove('is-touching');
+    releaseLayoutLock();
+  };
+
   const resetGesture = () => {
     if (moveFrame) cancelAnimationFrame(moveFrame);
     moveFrame = 0;
     queuedPoint = null;
     gesture = null;
-    curlDragging = false;
     document.getElementById('rdr-stage')?.classList.remove('is-touching', 'is-page-curling');
-    if (resizePending) {
-      resizePending = false;
-      scheduleRepagination(40);
-    }
+    releaseLayoutLock();
   };
 
   const releaseCapture = pointerId => {
@@ -3645,7 +3665,12 @@ function installDirectPageCurl() {
     const point = localPoint(event, metrics);
     const direction = detectDirection(point, metrics);
     if (!direction) {
-      centerTap = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false };
+      centerTap = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        moved: false,
+      };
       try { surface.setPointerCapture(event.pointerId); } catch (_) {}
       return;
     }
@@ -3672,7 +3697,11 @@ function installDirectPageCurl() {
 
   const onPointerMove = event => {
     if (centerTap && event.pointerId === centerTap.pointerId) {
-      centerTap.moved ||= Math.hypot(event.clientX - centerTap.startX, event.clientY - centerTap.startY) >= PAGE_CURL_CONFIG.minimumDragPx;
+      const events = typeof event.getCoalescedEvents === 'function' ? event.getCoalescedEvents() : [event];
+      const sampleEvent = events.length ? events.at(-1) : event;
+      const deltaX = sampleEvent.clientX - centerTap.startX;
+      const deltaY = sampleEvent.clientY - centerTap.startY;
+      centerTap.moved ||= Math.hypot(deltaX, deltaY) >= PAGE_CURL_CONFIG.minimumDragPx;
       return;
     }
     if (!gesture || event.pointerId !== gesture.pointerId) return;
@@ -3690,7 +3719,7 @@ function installDirectPageCurl() {
   const finishPointer = (event, cancelled = false) => {
     if (centerTap && event.pointerId === centerTap.pointerId) {
       const tap = centerTap;
-      centerTap = null;
+      resetCenterGesture();
       releaseCapture(event.pointerId);
       const distance = Math.hypot(event.clientX - tap.startX, event.clientY - tap.startY);
       if (!cancelled && !tap.moved && distance < PAGE_CURL_CONFIG.minimumDragPx) toggleControls();
@@ -3742,14 +3771,17 @@ function installDirectPageCurl() {
   const onPointerUp = event => finishPointer(event, false);
   const onPointerCancel = event => finishPointer(event, true);
   const onLostCapture = event => {
-    if (centerTap?.pointerId === event.pointerId) centerTap = null;
+    if (centerTap?.pointerId === event.pointerId) resetCenterGesture();
     if (!gesture || event.pointerId !== gesture.pointerId) return;
     try { pageFlip.userStop(gesture.current, true); } catch (_) {}
     resetGesture();
   };
   const onWindowBlur = () => {
-    if (centerTap) releaseCapture(centerTap.pointerId);
-    centerTap = null;
+    if (centerTap) {
+      const pointerId = centerTap.pointerId;
+      resetCenterGesture();
+      releaseCapture(pointerId);
+    }
     if (!gesture) return;
     const pointerId = gesture.pointerId;
     try { pageFlip.userStop(gesture.current, true); } catch (_) {}
@@ -3792,7 +3824,7 @@ function installDirectPageCurl() {
     if (gesture) {
       try { pageFlip?.userStop(gesture.current, true); } catch (_) {}
     }
-    centerTap = null;
+    resetCenterGesture();
     resetGesture();
   };
 }
@@ -3857,8 +3889,6 @@ function bindReaderEvents(book) {
   document.getElementById('fullscreen-toggle')?.addEventListener('change', () => {
     void toggleFullscreen();
   }, { signal });
-  // Tam ekrandan ESC ile cikilirsa anahtar gercekle uyumlu kalmali.
-  document.addEventListener('fullscreenchange', syncFullscreenToggle, { signal });
   document.addEventListener('visibilitychange', handleWakeLockVisibility, { signal });
   const progress = document.getElementById('rdr-progress');
   progress?.addEventListener('input', event => {
@@ -3962,6 +3992,12 @@ function bindReaderEvents(book) {
   };
 
   window.addEventListener('resize', onLayoutChange, { signal, passive: true });
+  const onFullscreenChange = () => {
+    syncFullscreenToggle();
+    onLayoutChange();
+  };
+  document.addEventListener('fullscreenchange', onFullscreenChange, { signal });
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange, { signal });
   layoutObserver = new ResizeObserver(onLayoutChange);
   const cradle = document.getElementById('book-cradle');
   if (stage) layoutObserver.observe(stage);

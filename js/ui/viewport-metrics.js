@@ -7,8 +7,10 @@
  * viewport küçülür. Yani sadece CSS ile ortalanan bir arama popup'ı klavyenin
  * arkasında kalır.
  *
- * Bu modül :root üzerine iki değişken yazar:
+ * Bu modül :root üzerine dört değişken yazar:
+ *   --visual-viewport-width   görünür genişlik
  *   --visual-viewport-height  görünür yükseklik
+ *   --visual-viewport-left    görünür alanın solunun sayfa soluna uzaklığı
  *   --visual-viewport-top     görünür alanın üstünün sayfa üstüne uzaklığı
  *
  * CSS bunları kullanır; VisualViewport desteklenmiyorsa değişkenler hiç
@@ -21,7 +23,9 @@
 
 let started = false;
 let frame = 0;
+let lastWidth = -1;
 let lastHeight = -1;
+let lastLeft = -1;
 let lastTop = -1;
 
 function apply() {
@@ -31,14 +35,20 @@ function apply() {
 
   // offsetTop: görünür alanın layout viewport içindeki kayması (klavye veya
   // sayfa yakınlaştırma sırasında sıfırdan farklı olur).
+  const width = Math.round(viewport.width);
   const height = Math.round(viewport.height);
+  const left = Math.round(viewport.offsetLeft);
   const top = Math.round(viewport.offsetTop);
-  if (height === lastHeight && top === lastTop) return;
+  if (width === lastWidth && height === lastHeight && left === lastLeft && top === lastTop) return;
+  lastWidth = width;
   lastHeight = height;
+  lastLeft = left;
   lastTop = top;
 
   const style = document.documentElement.style;
+  style.setProperty("--visual-viewport-width", `${width}px`);
   style.setProperty("--visual-viewport-height", `${height}px`);
+  style.setProperty("--visual-viewport-left", `${left}px`);
   style.setProperty("--visual-viewport-top", `${top}px`);
 }
 

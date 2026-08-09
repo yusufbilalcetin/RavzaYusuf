@@ -48,15 +48,19 @@ body.is-ravza-books-page #page-root > .page:not(#ravzabooks) {
   pointer-events: none !important;
 }
 
+/* Tek viewport source-of-truth: global VisualViewport yöneticisinin yayımladığı
+   dört token. Destek yoksa mevcut vw/dvh fallback'i devrededir. */
 html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza-books-page,
 #ravzabooks.ravza-books-page.active {
   position: fixed !important;
-  inset: 0 !important;
+  inset: auto !important;
+  top: var(--visual-viewport-top, 0px) !important;
+  left: var(--visual-viewport-left, 0px) !important;
   z-index: 9100 !important;
   display: block !important;
-  width: 100vw !important;
+  width: var(--visual-viewport-width, 100vw) !important;
   max-width: none !important;
-  height: 100dvh !important;
+  height: var(--visual-viewport-height, 100dvh) !important;
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -104,6 +108,14 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --reader-field-focus: var(--focus);
   --reader-field-selection: color-mix(in srgb, var(--accent) 30%, var(--paper));
   --reader-caret: var(--accent);
+  /* MOBIL PORTRE / SAYFA MODU KAGIT YUZEYI.
+     Contain sonrasi PDF'in ustunde/altinda kalan alan geometrik olarak
+     kacinilmazdir; sorun onun AYRI RENKTE BIR BANT gibi gorunmesiydi.
+     Bu token, o temada PDF tuvalinin EKRANDA olculen tonudur (tema filtresi
+     uygulandiktan SONRA), boylece cevre yuzey ile sayfa arasinda dikis
+     kalmaz. Deger ekran goruntusu ornekleme ile bulundu; calisma aninda
+     goruntu ornekleme YOK. */
+  --reader-mobile-paper: #fff;
   --z-book: 10;
   --z-controls: 60;
   --z-settings: 80;
@@ -118,6 +130,9 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --ink-muted: #79634d;
   --stage: #cdb893;
   --stage-deep: #bca57d;
+  /* Sepia filtresi beyaz kagidi #f2f2ee'ye tasiyor; yuzey ONU izler,
+     yaprak tokenini (#d8c39c) degil. */
+  --reader-mobile-paper: #f2f2ee;
   --control-bg: rgba(239, 222, 194, 0.9);
   --control-border: rgba(68, 46, 26, 0.16);
   --control-shadow: rgba(66, 43, 22, 0.22);
@@ -133,6 +148,7 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --ink-muted: #aaa095;
   --stage: #171614;
   --stage-deep: #0f0e0d;
+  --reader-mobile-paper: #1b1b1b;
   --control-bg: rgba(33, 31, 28, 0.9);
   --control-border: rgba(241, 230, 214, 0.13);
   --control-shadow: rgba(0, 0, 0, 0.46);
@@ -150,6 +166,7 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --ink-muted: #8d8d8d;
   --stage: #000;
   --stage-deep: #000;
+  --reader-mobile-paper: #000;
   --control-bg: rgba(22, 22, 22, 0.92);
   --control-border: rgba(255, 255, 255, 0.14);
   --control-shadow: rgba(0, 0, 0, 0.7);
@@ -237,11 +254,11 @@ button {
 }
 
 .reader {
-  position: fixed;
+  position: absolute;
   inset: 0;
   width: 100%;
-  height: 100dvh;
-  min-height: 100svh;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--stage) 86%, white 14%), transparent 64%),
@@ -855,6 +872,30 @@ button {
     env(safe-area-inset-left);
 }
 
+/* TEK PARCA KAGIT YUZEYI - YALNIZ MOBIL PORTRE + SAYFA MODU + PDF.
+   Gercek PDF sayfasi contain ile ortada durur (geometri DEGISMEZ: PageFlip
+   fiziksel sayfasi, PDF sarmalayici ve tuval hala 440x586). Degisen tek sey,
+   sayfanin disinda kalan alanin artik ayri bir "sahne arka plani" bandi
+   yerine ayni kagidin devami gibi gorunmesi. Bu SUNUM katmanidir: hit alani,
+   flip geometrisi ve tuval olculeri etkilenmez.
+   Radyal degrade burada bilerek iptal edilir - ust ve alt bandi birbirinden
+   ve sayfadan farkli tonlara ayiran seydi. */
+@media (max-width: 767px) and (orientation: portrait) {
+  .reader-root[data-book-type="pdf"][data-reader-mode="page"] .reader-stage {
+    background: var(--reader-mobile-paper);
+  }
+
+  /* Yaprak zemini de ayni tonu alir. Tuval, en-boy orani yuzunden cerceveyi
+     alt piksel duzeyinde tam kaplamayabiliyor (439px tuval / 440px cerceve);
+     tema tokeni (ornegin sepia #d8c39c) o 1px'te ince bir cizgi olarak
+     goruluyordu. Ayni renk = dikis yok. Yaprak OPAK kalir, yani arka yuz
+     sozlesmesi (opak kagit + soluk ters baski) bozulmaz. */
+  .reader-root[data-book-type="pdf"][data-reader-mode="page"] .book-sheet.pdf-page,
+  .reader-root[data-book-type="pdf"][data-reader-mode="page"] .pdf-canvas-frame {
+    background: var(--reader-mobile-paper) !important;
+  }
+}
+
 .book-cradle {
   position: relative;
   z-index: var(--z-book);
@@ -976,6 +1017,18 @@ button {
   filter: none;
   /* filter geçişi kaldırıldı: büyük tuvalde her karede yeniden rasterize oluyordu. */
   transition: opacity 140ms var(--ease-out);
+}
+
+/* KAGIT OPAK OLMALI - BEYAZ TEMA DAHIL.
+   Sepia/koyu/siyah temalarin ucunde de asagida acik bir yaprak zemini var,
+   ama "light" atlanmisti: yaprak `.book-sheet.pdf-page { background:
+   transparent }` kuralinda kaliyordu. Sonuc, cevirme sirasinda arka yuz
+   baskisinin kagida degil DOGRUDAN ALTTAKI SAYFAYA bindirmesiydi; iki metin
+   ust uste binip "yari saydam plastik panel" gorunumu olusuyordu.
+   Cozum yaprak opakligidir - sayfanin tamaminin opacity'siyle oynamak DEGIL. */
+&[data-reader-theme="light"] .book-sheet.pdf-page,
+&[data-reader-theme="light"] .pdf-canvas-frame {
+  background: #fff !important;
 }
 
 &[data-reader-theme="sepia"] .book-sheet.pdf-page,
@@ -1214,7 +1267,7 @@ button {
 
 .reader-topbar,
 .reader-dock {
-  position: fixed;
+  position: absolute;
   z-index: var(--z-controls);
   opacity: 0;
   pointer-events: none;

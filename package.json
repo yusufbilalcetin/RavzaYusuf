@@ -69,6 +69,7 @@
     "test:reader-interaction": "node ./scripts/test-reader-interaction.mjs",
     "test:reader-page-transition": "node ./scripts/test-reader-page-transition.mjs",
     "test:reader-mobile-flip-backside": "node ./scripts/test-reader-mobile-flip-backside.mjs",
+    "test:reader-mobile-fit-page": "node ./scripts/test-reader-mobile-fit-page.mjs",
     "test:reader-fullpage-geometry": "node ./scripts/test-reader-fullpage-geometry.mjs",
     "test:ravza-books:feature-freeze": "node ./scripts/test-ravza-books-feature-freeze.mjs",
     "test:transparent-content-cards": "node ./scripts/test-transparent-content-cards.mjs",

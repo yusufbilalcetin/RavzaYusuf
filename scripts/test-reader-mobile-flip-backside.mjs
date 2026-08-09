@@ -113,6 +113,10 @@ async function backsideProbe({ currentPage, direction }) {
         opaque,
         colors: colors.size,
         canvasOpacity: Number(canvasStyle.opacity),
+        pageBgAlpha: (() => {
+          const parts = String(style.backgroundColor).match(/[\d.]+/g) || [];
+          return parts.length >= 4 ? Number(parts[3]) : 1;
+        })(),
         canvasTransform: canvasStyle.transform,
         transform: style.transform,
         clipPath: style.clipPath,
@@ -174,7 +178,11 @@ function assertRealBackside(probe, label) {
   assert.ok(probe.target.colors > 4, `${label}: backside canvas is a solid color (${probe.target.colors} colors)`);
   assert.equal(probe.target.backsidePage || probe.target.pdfPage, probe.expected, `${label}: wrong PDF page mapping`);
   assert.match(probe.target.canvasTransform, /matrix\(-1(?:\.0+)?, 0, 0, 1(?:\.0+)?, 0, 0\)/, `${label}: backside is not horizontally reversed`);
-  assert.ok(probe.target.canvasOpacity >= 0.4 && probe.target.canvasOpacity <= 0.65, `${label}: backside print is not naturally muted (${probe.target.canvasOpacity})`);
+  // Yaprak ARTIK opak (her dort temada da). Baski bu yuzden alttaki sayfayla
+  // degil KAGITLA harmanlanir; okunur olmasi icin guclu olmasi gerekmez.
+  // Hayalet baski araligi: 0.12-0.28.
+  assert.ok(probe.target.canvasOpacity >= 0.12 && probe.target.canvasOpacity <= 0.28, `${label}: backside print is not naturally muted (${probe.target.canvasOpacity})`);
+  assert.ok(probe.target.pageBgAlpha >= 0.99, `${label}: backside paper is translucent (alpha ${probe.target.pageBgAlpha})`);
 }
 
 try {
