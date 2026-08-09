@@ -451,6 +451,36 @@ export const KONU_LISTESI = [
       "Vocabulary Practice kelimelerinde kalıp önemlidir: keen on + V-ing, eager to + V1.",
       "Intermediate Vocab Test kaynaklı sorularda phrasal verbs, collocations ve prepositions birlikte çalışılmalı."
     ]
+  },
+  {
+    "id": "multimodaltexts",
+    "unit": "Literacy",
+    "title": "Multimodal Texts",
+    "subtitle": "Text, image, sound, gesture and layout working together",
+    "time": 38,
+    "difficulty": "medium",
+    "order": 24,
+    "contentPath": "./content/topics/multimodaltexts.html",
+    "quizPath": "./data/quizzes/multimodaltexts.js",
+    "quizCount": 10,
+    "searchAliases": [
+      "multimodal",
+      "multimodal texts",
+      "multimodal literacy",
+      "multiliteracies",
+      "modes of communication",
+      "linguistic",
+      "visual",
+      "aural",
+      "gestural",
+      "spatial",
+      "layout"
+    ],
+    "keyPoints": [
+      "Multimodal text, anlam oluşturmak için birden fazla mode kullanan metindir.",
+      "Yaygın kullanılan çerçevede beş mode vardır: linguistic, visual, aural, gestural, spatial.",
+      "Asıl soru modların bir arada nasıl çalıştığıdır; çok öğe kullanmak tek başına etkili iletişim demek değildir."
+    ]
   }
 ];
 

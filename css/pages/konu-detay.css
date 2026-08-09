@@ -121,6 +121,27 @@
   color: rgba(255, 220, 240, 0.80);
 }
 
+/* Mode başlığı: ikon + metin etiketi birlikte. Bilgi yalnızca ikonla
+   verilmez; her ikonun yanında okunabilir bir ad ve Türkçe karşılığı durur.
+   SVG currentColor kullandığı için tema rengini kendiliğinden izler. */
+#studydetail .mode-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+#studydetail .mode-head svg {
+  flex: none;
+  opacity: 0.85;
+}
+
+#studydetail .mode-head .mode-tr {
+  font-size: 0.82em;
+  opacity: 0.72;
+}
+
 .study-detail-actionbar .detail-quiz-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(123,23,49,0.48);
