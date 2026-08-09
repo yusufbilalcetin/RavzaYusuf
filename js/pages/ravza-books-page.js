@@ -1326,9 +1326,7 @@ function fitPdfBookToStage(aspectRatio = pdfPageAspectRatio) {
   if (availableWidth < 2 || availableHeight < 2) return false;
   const portrait = shouldUsePortrait();
   const pagesAcross = portrait ? 1 : 2;
-  const configuredGap = parseFloat(getComputedStyle(root).getPropertyValue('--reader-spread-gap')) || 0;
-  const spreadGap = portrait ? 0 : Math.max(0, configuredGap);
-  const pageWidth = Math.min((availableWidth - spreadGap) / pagesAcross, availableHeight * ratio);
+  const pageWidth = Math.min(availableWidth / pagesAcross, availableHeight * ratio);
   const pageHeight = pageWidth / ratio;
 
   const width = pageWidth * pagesAcross;
@@ -1805,6 +1803,8 @@ async function openTextReader(book, position = null) {
     scheduleLastReadSave();
   });
   pageFlip.on('changeState', event => {
+    const readerRoot = document.getElementById('reader-inner');
+    if (readerRoot) readerRoot.dataset.pageFlipState = String(event.data || 'read');
     const flipping = event.data === 'user_fold' || event.data === 'flipping';
     setFlipCompositing(flipping);
     if (flipping) hideControls();
@@ -2634,8 +2634,9 @@ async function openPdfReader(book, position = null) {
     usePortrait: metrics.portrait,
     startZIndex: 0,
     autoSize: true,
-    // Gecis okunurlugunu geri getir; eski agir kitap/gutter golgesini geri getirme.
-    maxShadowOpacity: Math.min(0.2, PAGE_CURL_CONFIG.shadowOpacity),
+    maxShadowOpacity: state.theme === 'dark'
+      ? Math.min(0.78, PAGE_CURL_CONFIG.shadowOpacity)
+      : Math.min(0.62, PAGE_CURL_CONFIG.shadowOpacity),
     showCover: true,
     mobileScrollSupport: false,
     clickEventForward: true,
@@ -2654,6 +2655,8 @@ async function openPdfReader(book, position = null) {
     schedulePdfRenderWindow(index);
   });
   pageFlip.on('changeState', event => {
+    const readerRoot = document.getElementById('reader-inner');
+    if (readerRoot) readerRoot.dataset.pageFlipState = String(event.data || 'read');
     const flipping = event.data === 'user_fold' || event.data === 'flipping';
     setFlipCompositing(flipping);
     if (flipping) hideControls();

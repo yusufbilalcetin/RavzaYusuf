@@ -45,6 +45,7 @@ const measure = () => browser.evaluate(`JSON.stringify((() => {
   return {
     spread:root.dataset.spread, stage:{x:sr.x,y:sr.y,w:sr.width,h:sr.height}, cradle:{x:cr.x,y:cr.y,w:cr.width,h:cr.height},
     blockBg:block?getComputedStyle(block).backgroundColor:null, wrapperBg:wrapper?getComputedStyle(wrapper).backgroundColor:null,
+    seam:block?(() => { const s=getComputedStyle(block,'::after'); return {content:s.content,width:parseFloat(s.width)||0,background:s.backgroundColor}; })():null,
     padding:[px('paddingTop'),px('paddingRight'),px('paddingBottom'),px('paddingLeft')],
     cradleShadow:cs.boxShadow, before:{content:before.content,shadow:before.boxShadow},
     after:{content:after.content,width:after.width,opacity:after.opacity,background:after.backgroundImage},
@@ -76,7 +77,8 @@ try {
     }
     if (shown.pages.length === 2) {
       const gap=shown.pages[1].x-shown.pages[0].right;
-      assert.ok(gap >= 6 && gap <= 12, `${viewport.width}: spread gap ${gap}`);
+      assert.ok(Math.abs(gap) <= 1, `${viewport.width}: StPageFlip geometry gap ${gap}`);
+      assert.ok(shown.seam.width >= 6 && shown.seam.width <= 12, `${viewport.width}: visual seam ${shown.seam.width}`);
       assert.ok(Math.abs(shown.pages[0].y-shown.pages[1].y)<=1, `${viewport.width}: page top hizasi bozuk`);
       assert.ok(Math.abs(shown.pages[0].bottom-shown.pages[1].bottom)<=1, `${viewport.width}: page bottom hizasi bozuk`);
       assert.equal(shown.blockBg, "rgba(0, 0, 0, 0)", `${viewport.width}: spread block background ${shown.blockBg}`);
@@ -97,7 +99,8 @@ try {
         const themed=JSON.parse(await measure());
         assert.equal(themed.pages.length, 2, `${theme}: spread iki sayfa degil`);
         const themeGap=themed.pages[1].x-themed.pages[0].right;
-        assert.ok(themeGap>=6 && themeGap<=12, `${theme}: spread gap ${themeGap}`);
+        assert.ok(Math.abs(themeGap)<=1, `${theme}: StPageFlip geometry gap ${themeGap}`);
+        assert.ok(themed.seam.width>=6 && themed.seam.width<=12, `${theme}: visual seam ${themed.seam.width}`);
         assert.equal(themed.blockBg, "rgba(0, 0, 0, 0)", `${theme}: gap reader background'unu gostermiyor`);
         const themeShot=await browser.command("Page.captureScreenshot", {format:"png",captureBeyondViewport:false});
         await writeFile(join(artifactDir, `fullpage-1440x900-${theme}.png`), Buffer.from(themeShot.data,"base64"));
@@ -111,7 +114,7 @@ try {
     await writeFile(join(artifactDir, `fullpage-${viewport.width}x${viewport.height}.png`), Buffer.from(shot.data,"base64"));
   }
   assertCleanDiagnostics(browser, "reader fullpage geometry");
-  console.log("PASS reader full-page geometry: no spine/shadow/frame, maximum fit, stable overlay controls, responsive single/spread");
+  console.log("PASS reader full-page geometry: no spine/shadow/frame, StPageFlip-safe seam, maximum fit, responsive single/spread");
 } finally {
   await browser.close();
   await server.close();

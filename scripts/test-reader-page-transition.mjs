@@ -14,6 +14,21 @@ const browser = await ThemeTestBrowser.launch("reader-page-transition");
 const artifactDir = join(ROOT, "test-artifacts", "reader-page-transition");
 await mkdir(artifactDir, { recursive: true });
 
+const mouse = (type, x, y) => browser.command("Input.dispatchMouseEvent", {
+  type,
+  x: Math.round(x),
+  y: Math.round(y),
+  button: "left",
+  buttons: type === "mouseReleased" ? 0 : 1,
+  clickCount: 1,
+  pointerType: "mouse",
+});
+
+const touch = (type, x, y) => browser.command("Input.dispatchTouchEvent", {
+  type,
+  touchPoints: type === "touchEnd" ? [] : [{ x: Math.round(x), y: Math.round(y), id: 1, radiusX: 2, radiusY: 2 }],
+});
+
 const transitionProbe = (durationMs) => `new Promise(resolve => {
   const started = performance.now();
   const samples = [];
@@ -38,7 +53,9 @@ const transitionProbe = (durationMs) => `new Promise(resolve => {
     samples.push({
       at: now - started,
       flipping: document.getElementById('rdr-stage')?.classList.contains('is-flipping') || false,
+      curling: document.getElementById('rdr-stage')?.classList.contains('is-page-curling') || false,
       page: Number(document.getElementById('reader-inner')?.dataset.currentPage || 0),
+      pageFlipState: document.getElementById('reader-inner')?.dataset.pageFlipState || '',
       items,
       visibleShadows,
     });
@@ -95,6 +112,32 @@ async function stableState() {
       flipping: document.getElementById('rdr-stage').classList.contains('is-flipping'),
       visibleShadows,
       fullscreen: Boolean(document.fullscreenElement || document.webkitFullscreenElement),
+      pageFlipState: root.dataset.pageFlipState || '',
+      block: (() => {
+        const element = document.querySelector('.stf__block');
+        const rect = element?.getBoundingClientRect();
+        const seam = element ? getComputedStyle(element, '::after') : null;
+        return rect ? {
+          left: rect.left, right: rect.right, top: rect.top, width: rect.width, height: rect.height,
+          seam: seam ? { content: seam.content, width: parseFloat(seam.width) || 0, background: seam.backgroundColor } : null,
+        } : null;
+      })(),
+      parent: (() => {
+        const rect = document.querySelector('.stf__parent')?.getBoundingClientRect();
+        return rect ? { left: rect.left, right: rect.right, top: rect.top, width: rect.width, height: rect.height } : null;
+      })(),
+      wrapper: (() => {
+        const rect = document.querySelector('.stf__wrapper')?.getBoundingClientRect();
+        return rect ? { left: rect.left, right: rect.right, top: rect.top, width: rect.width, height: rect.height } : null;
+      })(),
+      pages: pages.map(({ element, rect }) => ({
+        page: Number(element.dataset.pdfPage),
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        width: rect.width,
+        translate: getComputedStyle(element.closest('.stf__item')).translate,
+      })),
     };
   })()`);
 }
@@ -128,6 +171,51 @@ async function runTransition(key, { durationMs = 900, artifactPrefix = null } = 
   return { before, after, samples, flippingSamples, motionSignatures, visibleShadowSamples };
 }
 
+async function runEdgeDrag({ direction = "forward", distanceRatio = 0.5, pointer = "mouse", durationMs = 1000 }) {
+  const before = await stableState();
+  const rect = before.block;
+  assert.ok(rect?.width > 100 && rect?.height > 100, "PageFlip interaction surface is not measurable");
+  const pageWidth = before.spread === "double" ? rect.width / 2 : rect.width;
+  const forward = direction === "forward";
+  const startX = forward ? rect.right - 18 : rect.left + 18;
+  const endX = startX + (forward ? -1 : 1) * pageWidth * distanceRatio;
+  const y = rect.top + rect.height * 0.42;
+  const watch = browser.evaluate(transitionProbe(durationMs));
+  const send = pointer === "touch" ? touch : mouse;
+  await send(pointer === "touch" ? "touchStart" : "mousePressed", startX, y);
+  await delay(50);
+  for (let step = 1; step <= 8; step += 1) {
+    await send(pointer === "touch" ? "touchMove" : "mouseMoved", startX + (endX - startX) * step / 8, y);
+    await delay(24);
+  }
+  // Keep the last sample old enough that a short drag cannot be mistaken for a flick.
+  await delay(130);
+  await send(pointer === "touch" ? "touchEnd" : "mouseReleased", endX, y);
+  const samples = await watch;
+  await delay(150);
+  const after = await stableState();
+  return {
+    before,
+    after,
+    samples,
+    userFoldSamples: samples.filter(sample => sample.flipping && sample.curling),
+    flippingSamples: samples.filter(sample => sample.flipping),
+  };
+}
+
+function assertDragLifecycle(result, label, { committed }) {
+  assert.ok(result.userFoldSamples.length > 1, `${label}: user_fold was not observable during edge drag`);
+  assert.ok(result.userFoldSamples.some(sample => sample.pageFlipState === 'user_fold'), `${label}: StPageFlip user_fold state missing`);
+  const motionSignatures = new Set(result.flippingSamples.flatMap(sample => sample.items));
+  assert.ok(motionSignatures.size > 2, `${label}: generated PageFlip transforms did not change`);
+  assert.equal(result.after.flipping, false, `${label}: stale is-flipping state`);
+  assert.equal(result.after.pageFlipState, "read", `${label}: StPageFlip did not return to read state`);
+  assert.equal(result.samples.at(-1)?.curling, false, `${label}: stale is-page-curling state`);
+  const delta = result.after.page - result.before.page;
+  if (committed) assert.notEqual(delta, 0, `${label}: committed drag did not change the page`);
+  else assert.equal(delta, 0, `${label}: short drag unexpectedly changed the page`);
+}
+
 function assertTransitionLifecycle(result, label, { reduced = false } = {}) {
   assert.ok(result.flippingSamples.length > 1, `${label}: is-flipping state was never observable`);
   assert.ok(result.motionSignatures.size > 2, `${label}: page transforms did not change`);
@@ -136,10 +224,13 @@ function assertTransitionLifecycle(result, label, { reduced = false } = {}) {
     `${label}: historical PageFlip transition cue is absent even though transforms are running`,
   );
   assert.equal(result.after.flipping, false, `${label}: stale is-flipping class`);
+  assert.equal(result.after.pageFlipState, "read", `${label}: StPageFlip did not return to read state`);
   assert.deepEqual(result.after.visibleShadows, [], `${label}: shadow remained visible after transition`);
+  const lastFlipping = result.flippingSamples.at(-1)?.at || Infinity;
   if (reduced) {
-    const lastFlipping = result.flippingSamples.at(-1)?.at || Infinity;
     assert.ok(lastFlipping < 380, `${label}: reduced-motion transition lasted ${lastFlipping.toFixed(0)}ms`);
+  } else {
+    assert.ok(lastFlipping >= 350, `${label}: 620/470ms StPageFlip duration collapsed to ${lastFlipping.toFixed(0)}ms`);
   }
 }
 
@@ -147,17 +238,29 @@ try {
   await openPdf({ width: 1440, height: 900, mobile: false });
   const desktopStart = await stableState();
   assert.equal(desktopStart.spread, "double", "desktop must use a spread");
-  assert.ok(desktopStart.gap >= 6 && desktopStart.gap <= 12, `initial spread gap ${desktopStart.gap}`);
+  assert.ok(Math.abs(desktopStart.gap) <= 1, `PageFlip page geometry must remain contiguous, got ${desktopStart.gap}`);
+  assert.ok(desktopStart.block.seam.width >= 6 && desktopStart.block.seam.width <= 12, `initial visual seam ${desktopStart.block.seam.width}`);
 
   const next = await runTransition("ArrowRight", { artifactPrefix: "before-after-next" });
   assertTransitionLifecycle(next, "desktop next");
   assert.equal(next.after.page, next.before.page + 2, "desktop next direction/page convention changed");
-  assert.ok(next.after.gap >= 6 && next.after.gap <= 12, `next spread gap ${next.after.gap}`);
+  assert.ok(next.after.block.seam.width >= 6 && next.after.block.seam.width <= 12, `next visual seam ${next.after.block.seam.width}`);
 
   const previous = await runTransition("ArrowLeft");
   assertTransitionLifecycle(previous, "desktop previous");
   assert.equal(previous.after.page, previous.before.page - 2, "desktop previous direction/page convention changed");
-  assert.ok(previous.after.gap >= 6 && previous.after.gap <= 12, `previous spread gap ${previous.after.gap}`);
+  assert.ok(previous.after.block.seam.width >= 6 && previous.after.block.seam.width <= 12, `previous visual seam ${previous.after.block.seam.width}`);
+
+  const shortMouseDrag = await runEdgeDrag({ distanceRatio: 0.08, pointer: "mouse" });
+  assertDragLifecycle(shortMouseDrag, "desktop short mouse drag", { committed: false });
+  const committedMouseDrag = await runEdgeDrag({ distanceRatio: 0.52, pointer: "mouse" });
+  assertDragLifecycle(committedMouseDrag, "desktop committed mouse drag", { committed: true });
+
+  // StPageFlip owns transform/clip/z-index on these generated elements. An
+  // author-level translate creates a second coordinate system during folding.
+  const authorTranslate = committedMouseDrag.flippingSamples
+    .flatMap(sample => sample.items)
+    .find(signature => !signature.endsWith('|none'));
 
   const rapidStart = await stableState();
   await browser.key("ArrowRight");
@@ -195,6 +298,11 @@ try {
   const mobilePrevious = await runTransition("ArrowLeft");
   assertTransitionLifecycle(mobilePrevious, "mobile previous");
   assert.equal(mobilePrevious.after.page, mobilePrevious.before.page - 1, "mobile previous did not reverse one page");
+  const shortTouchDrag = await runEdgeDrag({ distanceRatio: 0.08, pointer: "touch" });
+  assertDragLifecycle(shortTouchDrag, "mobile short touch drag", { committed: false });
+  const committedTouchDrag = await runEdgeDrag({ distanceRatio: 0.52, pointer: "touch" });
+  assertDragLifecycle(committedTouchDrag, "mobile committed touch drag", { committed: true });
+  assert.equal(authorTranslate, undefined, `PageFlip-managed item has external translate: ${authorTranslate}`);
 
   await openPdf({ width: 390, height: 844, mobile: true, reduced: true });
   const reducedNext = await runTransition("ArrowRight", { durationMs: 500 });
@@ -202,7 +310,7 @@ try {
   assert.equal(reducedNext.after.page, reducedNext.before.page + 1, "reduced-motion next did not advance");
 
   assertCleanDiagnostics(browser, "reader page transition");
-  console.log("PASS reader page transition: next/previous, spread/single, rapid guard, fullscreen, reduced motion, cleanup");
+  console.log("PASS reader page transition: keyboard, mouse/touch edge drag, cancel/commit, spread/single, fullscreen, reduced motion, cleanup");
 } finally {
   await browser.close();
   await server.close();

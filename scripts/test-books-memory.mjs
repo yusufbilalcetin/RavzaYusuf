@@ -322,15 +322,24 @@ async function waitForReaderIdle(browser) {
   const state = `(() => {
     const scroller = document.getElementById('rdr-flipbook');
     return [
+      document.querySelector('#ravzabooks')?.dataset.appMode ?? '',
+      document.getElementById('rdr-stage')?.classList.contains('is-flipping') ?? false,
       document.getElementById('reader-inner')?.dataset.currentPage ?? '',
       Math.round(scroller?.scrollTop ?? -1),
       document.querySelectorAll('.pdf-page.is-rendered').length,
     ].join('|');
   })()`;
   let previous = null;
-  for (let attempt = 0; attempt < 40; attempt += 1) {
+  let stableSamples = 0;
+  for (let attempt = 0; attempt < 80; attempt += 1) {
     const current = await browser.evaluate(state);
-    if (current === previous) return current;
+    stableSamples = current === previous && current.startsWith('reading|false|')
+      ? stableSamples + 1
+      : 0;
+    // Resize repagination 260ms debounce kullanir. Iki ornek (120ms) eski
+    // DOM'u yanlislikla "idle" sayiyordu; bes ardışık ornek debounce ve yeni
+    // reader event binding'i tamamlanmadan panel adimina gecilmesini onler.
+    if (stableSamples >= 5) return current;
     previous = current;
     await delay(120);
   }
@@ -548,8 +557,9 @@ try {
       idleRafBaseline <= 10,
       `boştaki kitaplık zaten ${idleRafBaseline} rAF/sn planlıyor - referans kirli`,
     );
-    assert.ok(
-      idleRafAfterCycles <= idleRafBaseline + 10,
+    assert.equal(
+      idleRafAfterCycles,
+      0,
       `6 sayfa modu oturumundan sonra boştaki kitaplık ${idleRafAfterCycles} rAF/sn planlıyor `
         + `(referans ${idleRafBaseline}). Kapatılan okuyucudan animasyon döngüsü sızıyor.`,
     );
@@ -678,7 +688,13 @@ try {
   mkdirSync(ARTIFACT_DIR, { recursive: true });
   writeFileSync(
     join(ARTIFACT_DIR, "books-memory.json"),
-    `${JSON.stringify({ capturedAt: new Date().toISOString(), viewport: "1440x900", timeline }, null, 2)}\n`,
+    `${JSON.stringify({
+      capturedAt: new Date().toISOString(),
+      viewport: "1440x900",
+      idleRafBaseline,
+      idleRafAfterCycles,
+      timeline,
+    }, null, 2)}\n`,
     "utf8",
   );
   await browser.close();
@@ -696,6 +712,7 @@ const table = timeline.map((entry) => [
 ].join("  "));
 
 console.log(`\n${table.join("\n")}`);
+console.log(`\nidle rAF/sn: baseline ${idleRafBaseline}, after 6 closes ${idleRafAfterCycles}`);
 console.log(`\n${results.join("\n")}`);
 console.log(failures ? `\n${failures} test BAŞARISIZ` : "\nTüm okuyucu bellek testleri geçti");
 process.exit(failures ? 1 : 0);
