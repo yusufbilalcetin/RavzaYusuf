@@ -35,6 +35,8 @@
     "test:wallpaper": "node ./scripts/test-wallpaper.mjs",
     "test:spotlight": "node ./scripts/test-spotlight.mjs",
     "test:control-center": "node ./scripts/test-control-center.mjs",
+    "test:performance": "node ./scripts/test-performance.mjs",
+    "perf:baseline": "node ./scripts/perf-baseline.mjs",
     "test:control-center:visual": "node ./scripts/test-control-center-visual.mjs",
     "test:overlay-manager": "node ./scripts/test-overlay-manager.mjs",
     "test:ui-primitives": "node ./scripts/test-ui-primitives.mjs",
