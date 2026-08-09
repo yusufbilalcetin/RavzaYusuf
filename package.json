@@ -36,6 +36,7 @@
     "test:spotlight": "node ./scripts/test-spotlight.mjs",
     "test:control-center": "node ./scripts/test-control-center.mjs",
     "test:performance": "node ./scripts/test-performance.mjs",
+    "test:books-library-theme": "node ./scripts/test-books-library-theme.mjs",
     "perf:baseline": "node ./scripts/perf-baseline.mjs",
     "test:control-center:visual": "node ./scripts/test-control-center-visual.mjs",
     "test:overlay-manager": "node ./scripts/test-overlay-manager.mjs",
