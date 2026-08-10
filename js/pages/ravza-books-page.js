@@ -45,12 +45,21 @@ const lowPowerDevice = Number.isFinite(navigator.hardwareConcurrency) && navigat
 const lowMemoryDevice = (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 4)
   || Boolean(navigator.connection?.saveData);
 const PAGE_CURL_CONFIG = Object.freeze({
-  edgeGrabRatio: 0.24,
-  minimumEdgePx: 54,
-  maximumEdgePx: 124,
   snapThreshold: 0.28,
   flickVelocity: 0.42,
   minimumDragPx: 6,
+  /* GENIS ALAN SURUKLEME.
+     Sayfa artik yalnizca kenardan degil govdesinden de cevrilebilir. Dokunus
+     ANINDA cevirme baslamaz: once yatay niyet aranir, boylece tek dokunus
+     (kontrolleri ac/kapa) ve dikey hareket sayfayi cevirmez.
+     activationPx kucuk tutuldu - 10px, yaklasik 2-3 karelik parmak yolu;
+     "50 piksel boyunca hicbir sey olmuyor" hissi olusmasin. */
+  activationPx: 10,
+  horizontalBias: 1.2,
+  verticalAbortPx: 18,
+  /* Govdeden baslayan surukleme icin kenar seridi genisligi (yalnizca yon
+     dogrulamasinda kullanilir, hit alani degil). */
+  bodyMarginRatio: 0.05,
   sampleWindowMs: 90,
   flipDuration: reducedMotionQuery.matches ? 180 : (lowPowerDevice ? 470 : 620),
   shadowOpacity: reducedMotionQuery.matches ? 0.2 : (lowPowerDevice ? 0.55 : 0.76),
@@ -3818,12 +3827,7 @@ function installDirectPageCurl() {
     const stageRect = interactionOwner.getBoundingClientRect();
     const bounds = pageFlip.getBoundsRect();
     const pageWidth = Math.max(1, bounds?.pageWidth || (shouldUsePortrait() ? surfaceRect.width : surfaceRect.width / 2));
-    const edgeBasis = Math.min(pageWidth, stageRect.width);
-    const edgePx = Math.min(
-      PAGE_CURL_CONFIG.maximumEdgePx,
-      Math.max(PAGE_CURL_CONFIG.minimumEdgePx, edgeBasis * PAGE_CURL_CONFIG.edgeGrabRatio),
-    );
-    return { surfaceRect, stageRect, bounds, pageWidth, edgePx };
+    return { surfaceRect, stageRect, bounds, pageWidth };
   };
 
   // Ölçüm yalnızca pointerdown'da alınır; hareket sırasında layout okunmaz.
@@ -3837,15 +3841,50 @@ function installDirectPageCurl() {
       && target.closest('a, button, input, textarea, select, label, [contenteditable="true"], .rd-accent'),
   );
 
-  const detectDirection = (point, metrics) => {
+  /* YON ARTIK KONUMDAN DEGIL HAREKETTEN GELIR.
+     Eskiden yalnizca point.x <= edgePx (sol) veya >= width - edgePx (sag)
+     bir cevirme baslatiyordu; 440px'de edgePx=105.6 oldugu icin sayfanin
+     ORTA %52'si tamamen olu bolgeydi ve x=220'de hicbir kivrim olusmuyordu
+     (olculdu: moving=0, sayfa degismiyor). Artik govdenin herhangi bir
+     yerinden baslanabilir; yonu parmagin yatay yonu belirler. */
+  const directionForDelta = (deltaX) => {
     const count = pageFlip.getPageCount();
     const current = pageFlip.getCurrentPageIndex();
-    const nearLeft = point.x <= metrics.edgePx;
-    const nearRight = point.x >= metrics.surfaceRect.width - metrics.edgePx;
-    if (nearRight && current < count - 1) return 'forward';
-    if (nearLeft && current > 0) return 'back';
+    if (deltaX < 0) return current < count - 1 ? 'forward' : null;
+    if (deltaX > 0) return current > 0 ? 'back' : null;
     return null;
   };
+
+  /* Sayfa govdesi: kenarlarda cok dar bir pay birakilir (tarayici/sistem
+     kenar jestleriyle bogusmamak icin degil - orasi zaten calisiyor - yalnizca
+     kazara yakalamalari azaltmak icin). */
+  const withinPageBody = (point, metrics) => {
+    const margin = metrics.surfaceRect.width * PAGE_CURL_CONFIG.bodyMarginRatio;
+    return point.x >= -margin
+      && point.x <= metrics.surfaceRect.width + margin
+      && point.y >= 0
+      && point.y <= metrics.surfaceRect.height;
+  };
+
+  /* PARMAK YOLUNU KIVRIM KOORDINATINA TASI.
+     St.PageFlip yonu ILK fold noktasinin X'inden turetir (portrede
+     ekran x <= genislik/5 ise GERI, degilse ILERI) ve koseyi ayni noktanin
+     Y'sinden alir. Parmak ortadan baslayip saga suruklendiginde ham nokta
+     "ileri" tarafta kalir ve kutuphane GERI cevirmeyi hic uretemez.
+     Bu yuzden kivrimin BASLANGICI secilen yonun kenarina sabitlenir, uzerine
+     parmagin GERCEK YOLU eklenir. Kenardan baslayan surukleme icin
+     travel = point.x - start.x ve anchor = start.x oldugundan sonuc eskisiyle
+     birebir aynidir; degisen tek sey govdeden baslamanin da mumkun olmasi.
+     Y her zaman parmagin GERCEK Y'sidir: kose secimi ve kivrim geometrisi
+     parmagi izler (§18/§21). */
+  const foldPointFor = (active, point) => ({
+    x: clamp(
+      active.anchorX + (point.x - active.start.x),
+      -active.metrics.pageWidth,
+      active.metrics.pageWidth * 2,
+    ),
+    y: point.y,
+  });
 
   const pushSample = (point, time) => {
     if (!gesture) return;
@@ -3911,36 +3950,62 @@ function installDirectPageCurl() {
 
     const metrics = getMetrics();
     const point = localPoint(event, metrics);
-    const direction = detectDirection(point, metrics);
-    if (!direction) {
-      centerTap = {
-        pointerId: event.pointerId,
-        startX: event.clientX,
-        startY: event.clientY,
-        moved: false,
-      };
-      try { surface.setPointerCapture(event.pointerId); } catch (_) {}
-      return;
-    }
+    if (!withinPageBody(point, metrics)) return;
+
+    // Dokunus once ADAY olur. Cevirme ancak yatay niyet netlesince baslar;
+    // boylece tek dokunus kontrolleri acar, dikey hareket sayfayi cevirmez.
+    centerTap = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      point,
+      metrics,
+      moved: false,
+      rejected: false,
+    };
+    try { surface.setPointerCapture(event.pointerId); } catch (_) {}
+  };
+
+  /** Aday jesti gercek kivrima donustur. */
+  const activateCurl = (candidate, deltaX, sampleEvent) => {
+    const direction = directionForDelta(deltaX);
+    if (!direction) { candidate.rejected = true; return false; }
+
+    const metrics = candidate.metrics;
+    /* Kivrimin baslangici, secilen yonun GERCEK sayfa kenaridir - yuzey
+       koordinatlarinda. Portrede yuzey = tek sayfa oldugu icin bu 0 / genislik
+       demektir; masaustu cift sayfada yuzey iki sayfa genisligindedir ve
+       pageWidth (yarim) kullanmak capayi sayfanin ORTASINA koyup birakma
+       hedefleriyle uyusmayan bir koordinat uzayi yaratiyordu (kisa surukleme
+       yanlislikla sayfayi ceviriyordu). */
+    const anchorX = direction === 'back' ? 0 : metrics.surfaceRect.width;
+    const start = candidate.point;
     if (direction === 'back') preparePreviousBackside();
 
     gesture = {
-      pointerId: event.pointerId,
+      pointerId: candidate.pointerId,
       direction,
-      start: point,
-      current: point,
+      start,
+      anchorX,
+      current: start,
       metrics,
-      samples: [{ x: point.x, time: performance.now() }],
+      samples: [{ x: start.x, time: performance.now() }],
       moved: false,
     };
+    resetCenterGesture();
     curlDragging = true;
     closeSettings();
     hideControls();
     hideLugat();
     document.getElementById('rdr-stage')?.classList.add('is-touching', 'is-page-curling');
-    try { surface.setPointerCapture(event.pointerId); } catch (_) {}
-    try { pageFlip.startUserTouch(point); } catch (_) { resetGesture(); return; }
-    event.preventDefault();
+    // Kutuphane once dokunusu kaydeder; ilk userMove fold'u baslatir.
+    try { pageFlip.startUserTouch({ x: anchorX, y: start.y }); } catch (_) { resetGesture(); return false; }
+    const point = localPoint(sampleEvent, metrics);
+    gesture.current = point;
+    gesture.moved = true;
+    pushSample(point, performance.now());
+    try { pageFlip.userMove(foldPointFor(gesture, point), true); } catch (_) {}
+    return true;
   };
 
   const onPointerMove = event => {
@@ -3950,6 +4015,17 @@ function installDirectPageCurl() {
       const deltaX = sampleEvent.clientX - centerTap.startX;
       const deltaY = sampleEvent.clientY - centerTap.startY;
       centerTap.moved ||= Math.hypot(deltaX, deltaY) >= PAGE_CURL_CONFIG.minimumDragPx;
+      if (centerTap.rejected) return;
+      // Dikey baskinsa jest sayfaya ait degildir; bir daha denenmez.
+      if (Math.abs(deltaY) >= PAGE_CURL_CONFIG.verticalAbortPx && Math.abs(deltaY) > Math.abs(deltaX)) {
+        centerTap.rejected = true;
+        return;
+      }
+      const horizontal = Math.abs(deltaX) >= PAGE_CURL_CONFIG.activationPx
+        && Math.abs(deltaX) > Math.abs(deltaY) * PAGE_CURL_CONFIG.horizontalBias;
+      if (!horizontal) return;
+      if (pageFlip.getState() !== 'read') { centerTap.rejected = true; return; }
+      if (activateCurl(centerTap, deltaX, sampleEvent)) event.preventDefault();
       return;
     }
     if (!gesture || event.pointerId !== gesture.pointerId) return;
@@ -3960,7 +4036,7 @@ function installDirectPageCurl() {
     const drag = gesture.direction === 'forward' ? gesture.start.x - point.x : point.x - gesture.start.x;
     if (drag >= PAGE_CURL_CONFIG.minimumDragPx) gesture.moved = true;
     pushSample(point, performance.now());
-    scheduleMove(point);
+    scheduleMove(foldPointFor(gesture, point));
     event.preventDefault();
   };
 
@@ -4002,7 +4078,7 @@ function installDirectPageCurl() {
 
     try {
       if (!active.moved || cancelled) {
-        pageFlip.userStop(point, true);
+        pageFlip.userStop(foldPointFor(active, point), true);
       } else {
         const releasePoint = commit ? forcePoint : returnPoint;
         pageFlip.userMove(releasePoint, true);
