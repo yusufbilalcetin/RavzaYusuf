@@ -20,8 +20,23 @@ const PDF_WINDOW_SIZE = 5;
  * sınırsız büyümez. Tuval kopyaları ayrıca pdfBitmapCacheLimit() ile sınırlı.
  */
 const PDF_SPREAD_WINDOW_SIZE = 6;
-/** Komşu sayfa ön yüklemesi bu kadar sakinlikten sonra başlar. */
+/** SPEKÜLATİF komşu ön yüklemesi bu kadar sakinlikten sonra başlar. */
 const PDF_NEIGHBOUR_DELAY_MS = 220;
+/**
+ * ACİL komşu sayısı: pencere sırasındaki ilk iki komşu.
+ *
+ * Tek sayfada bu "sonraki + önceki", çift sayfada "sonraki spread"tir -
+ * pdfWindowPages sırayı zaten önceliğe göre veriyor.
+ *
+ * Neden ayrı: bütün komşular PDF_NEIGHBOUR_DELAY_MS + requestIdleCallback
+ * arkasında bekliyordu. Sakinlik beklemek HIZLI ÇEVİRMEDE doğru (boşa render
+ * başlatmaz) ama kitap yeni açıldığında kullanıcı hareketsizdir ve o gecikme
+ * doğrudan bekleme süresine dönüşüyordu: açılıştan 0-100ms sonra "sonraki"ye
+ * basan kullanıcı ölçümde 219-343ms bekliyordu. Açılıştan 300ms sonra basan
+ * ise 0ms. Acil komşu, GÖRÜNÜR sayfa bittikten SONRA başlar; yani görünür
+ * render'la yarışmaz, yalnızca boşuna beklemez.
+ */
+const PDF_URGENT_NEIGHBOURS = 2;
 const APP_MODES = new Set(['library', 'loading-book', 'reading', 'error']);
 const COVER_CACHE_NAME = 'ravza-books-covers-v1';
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -186,6 +201,38 @@ let pendingRenderIndex = -1;
 let lastCradleSize = '';
 const coverObjectUrls = new Set();
 const coverGenerationJobs = new Map();
+
+/**
+ * SAYFA GEÇİŞİ SAYAÇLARI - ölçüm içindir, davranışı etkilemez.
+ *
+ * Yalnızca tamsayı artırma: PDF render milisaniyelerle ölçülürken bunun
+ * maliyeti ölçülemez. Ayrıntılı `performance.measure` kaydı ise pahalıdır ve
+ * timeline'ı kirletir; o yüzden `?readerperf=1` ile açılır (pbn-debug ile
+ * aynı desen). Sayaçlar test tarafından window üzerinden okunur.
+ */
+const readerPerf = {
+  enabled: (() => {
+    try {
+      return new URLSearchParams(location.search).get('readerperf') === '1'
+        || localStorage.getItem('readerPerf') === '1';
+    } catch (_) { return false; }
+  })(),
+  renderStarts: 0,      // PDF.js render() gerçekten çalıştı
+  cacheHits: 0,         // bitmap cache'ten boyandı
+  alreadyRendered: 0,   // tuval zaten doğru renderKey ile duruyordu
+  inflightJoins: 0,     // devam eden render'a bağlanıldı (duplicate önlendi)
+  canvasResizes: 0,     // canvas.width/height gerçekten değişti
+  canvasResizeSkips: 0, // aynı ölçü, yeniden ayırma yapılmadı
+  peakInflight: 0,
+  marks: [],
+};
+window.__readerPerf = readerPerf;
+const perfMark = (name, detail) => {
+  if (!readerPerf.enabled) return;
+  // Bayrak localStorage'da unutulursa dizi sınırsız büyümesin.
+  if (readerPerf.marks.length > 2000) readerPerf.marks.splice(0, 1000);
+  readerPerf.marks.push({ name, detail, t: performance.now() });
+};
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -2308,7 +2355,10 @@ function showPageRetry(element, pageNumber) {
 async function renderPdfPage(pageNumber) {
   if (!pdfDocument || !pdfActivePages.has(pageNumber)) return false;
   const existing = pdfRenderPromises.get(pageNumber);
-  if (existing) return existing;
+  if (existing) {
+    readerPerf.inflightJoins += 1;
+    return existing;
+  }
   const generation = pdfRenderGeneration;
   let operation;
   operation = (async () => {
@@ -2335,10 +2385,14 @@ async function renderPdfPage(pageNumber) {
       const viewport = pdfPage.getViewport({ scale: cssScale });
       const outputScale = pdfOutputScale(viewport);
       const renderKey = `${Math.round(viewport.width)}x${Math.round(viewport.height)}@${outputScale}`;
-      if (canvas.dataset.renderKey === renderKey && element.classList.contains('is-rendered')) return true;
+      if (canvas.dataset.renderKey === renderKey && element.classList.contains('is-rendered')) {
+        readerPerf.alreadyRendered += 1;
+        return true;
+      }
 
       // Yakın geçmişte render edilmiş sayfa: PDF'i yeniden çizmeden geri boya.
       if (paintFromPdfBitmapCache(pageNumber, canvas, renderKey)) {
+        readerPerf.cacheHits += 1;
         canvas.style.width = `${Math.floor(viewport.width)}px`;
         canvas.style.height = `${Math.floor(viewport.height)}px`;
         canvas.dataset.renderKey = renderKey;
@@ -2348,11 +2402,21 @@ async function renderPdfPage(pageNumber) {
         return true;
       }
 
-      canvas.width = Math.max(1, Math.floor(viewport.width * outputScale));
-      canvas.height = Math.max(1, Math.floor(viewport.height * outputScale));
+      const backingWidth = Math.max(1, Math.floor(viewport.width * outputScale));
+      const backingHeight = Math.max(1, Math.floor(viewport.height * outputScale));
+      if (canvas.width === backingWidth && canvas.height === backingHeight) {
+        readerPerf.canvasResizeSkips += 1;
+      } else {
+        readerPerf.canvasResizes += 1;
+      }
+      canvas.width = backingWidth;
+      canvas.height = backingHeight;
       canvas.style.width = `${Math.floor(viewport.width)}px`;
       canvas.style.height = `${Math.floor(viewport.height)}px`;
       const canvasContext = canvas.getContext('2d', { alpha: false });
+      readerPerf.renderStarts += 1;
+      readerPerf.peakInflight = Math.max(readerPerf.peakInflight, pdfRenderTasks.size + 1);
+      perfMark('render:start', pageNumber);
       const renderTask = pdfPage.render({
         canvas,
         canvasContext,
@@ -2362,6 +2426,7 @@ async function renderPdfPage(pageNumber) {
       });
       pdfRenderTasks.set(pageNumber, renderTask);
       await renderTask.promise;
+      perfMark('render:end', pageNumber);
       if (generation !== pdfRenderGeneration || !pdfActivePages.has(pageNumber)) return false;
       canvas.dataset.renderKey = renderKey;
       element.classList.remove('has-render-error');
@@ -2464,23 +2529,39 @@ async function updatePdfRenderWindow(pageIndex, waitForCurrent = false) {
 
   const visiblePromises = visible.map(pageNumber => renderPdfPage(pageNumber));
   const neighbours = ordered.filter(pageNumber => !visible.includes(pageNumber));
+  // İKİ KADEMELİ ÖN YÜKLEME. Sıra pdfWindowPages'ten gelir; ilk iki komşu
+  // kullanıcının bir sonraki hamlesinde neredeyse kesin gerekecek olandır.
+  const urgent = neighbours.slice(0, PDF_URGENT_NEIGHBOURS);
+  const speculative = neighbours.slice(PDF_URGENT_NEIGHBOURS);
   cancelIdle(pdfIdleHandle);
   pdfIdleHandle = 0;
   clearTimeout(pdfNeighbourTimer);
-  if (neighbours.length) {
-    // Komşuları hemen başlatmak, kullanıcı çevirmeye devam ettiğinde yarıda
-    // kesilen render'lara yol açıyor. Okuyucu kısa süre sakinleşene kadar
-    // bekle: hızlı çevirmede boşa iş başlatılmaz.
+  // ACİL: görünür sayfa bittiği anda, gecikme/idle beklemeden. Görünür
+  // sayfanın arkasına zincirlenir - hiçbir zaman onunla yarışmaz.
+  if (urgent.length) {
+    void Promise.all(visiblePromises).then(() => {
+      for (const pageNumber of urgent) {
+        if (pdfActivePages.has(pageNumber)) void renderPdfPage(pageNumber);
+      }
+    });
+  }
+  if (speculative.length) {
+    // SPEKÜLATİF: uzak komşular. Hemen başlatmak, kullanıcı çevirmeye devam
+    // ettiğinde yarıda kesilen render'lara yol açıyor - okuyucu kısa süre
+    // sakinleşene kadar bekle, sonra boş ana yerleştir.
     pdfNeighbourTimer = window.setTimeout(() => {
       pdfNeighbourTimer = 0;
       pdfIdleHandle = runWhenIdle(() => {
         pdfIdleHandle = 0;
-        for (const pageNumber of neighbours) {
+        for (const pageNumber of speculative) {
           if (pdfActivePages.has(pageNumber)) void renderPdfPage(pageNumber);
         }
       });
     }, PDF_NEIGHBOUR_DELAY_MS);
   }
+  // Açılış GÖRÜNÜR sayfayı bekler, acil komşuyu beklemez: okuyucuyu daha geç
+  // açmak açılış süresine yazılırdı. Komşu render'ı ~17ms sürüyor, kullanıcı
+  // tuşa basana kadar (>100ms) hazır oluyor.
   if (waitForCurrent) await Promise.all(visiblePromises);
 }
 
