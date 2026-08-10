@@ -37,10 +37,14 @@ const state = () => browser.evaluate(`JSON.stringify((() => {
     const t = getComputedStyle(e).transform;
     return onscreen(e) && t && t !== 'none' && t !== 'matrix(1, 0, 0, 1, 0, 0)';
   });
+  // Inner mobile drags deliberately use their own narrow curl renderer. Keep
+  // this interaction test renderer-agnostic without disguising that layer as
+  // a St.PageFlip item; the dedicated geometry suites validate the band.
+  const centerCurl = document.querySelector('[data-reader-center-curl][data-curl-mode="band"]');
   return {
     page: Number(document.getElementById('reader-inner')?.dataset.currentPage || 0),
     flipState: document.getElementById('reader-inner')?.dataset.pageFlipState || '',
-    folding: moving.length,
+    folding: moving.length + (centerCurl ? 1 : 0),
   };
 })())`).then((raw) => JSON.parse(raw));
 

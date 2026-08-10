@@ -105,6 +105,8 @@ async function sweep({ x, y, dirSign, travels, name }) {
 try {
   const VP = { width: 440, height: 956 };
   const CY = VP.height / 2;
+  const LEFT_EDGE = 8;
+  const RIGHT_EDGE = VP.width - 8;
   const TRAVELS = [4, 8, 12, 20, 30, 45, 70, 110, 160, 220];
 
   /* ---- 1. FIZIK SINIRLARI = FIZIKSEL YAPRAK ---- */
@@ -130,7 +132,10 @@ try {
 
   /* ---- 3. SUREKLI ILERLEME, ANI SICRAMA YOK ---- */
   await openReader(VP);
-  const back = await sweep({ x: VP.width / 2, y: CY, dirSign: +1, travels: TRAVELS, name: "center-previous" });
+  // The inner 20%-80% route now belongs to the custom vertical-band renderer.
+  // This legacy suite remains the St.PageFlip SOFT regression by entering from
+  // the real page edges; custom-center geometry has two dedicated suites.
+  const back = await sweep({ x: LEFT_EDGE, y: CY, dirSign: +1, travels: TRAVELS, name: "edge-previous" });
   const folded = back.filter((r) => r.folding > 0);
   assert.ok(folded.length >= 6, `kıvrım yeterince erken başlamadı (${folded.length}/${TRAVELS.length} örnekte)`);
   const firstFold = back.find((r) => r.folding > 0);
@@ -162,7 +167,7 @@ try {
   const yShapes = [];
   for (const ratio of [0.2, 0.5, 0.8]) {
     await openReader(VP);
-    const rows = await sweep({ x: VP.width / 2, y: VP.height * ratio, dirSign: +1, travels: [12, 40, 80], name: `y${Math.round(ratio * 100)}` });
+    const rows = await sweep({ x: LEFT_EDGE, y: VP.height * ratio, dirSign: +1, travels: [12, 40, 80], name: `y${Math.round(ratio * 100)}` });
     const at80 = rows.at(-1);
     yShapes.push({ y: `%${ratio * 100}`, angle: at80.angle, top: at80.top, ty: at80.ty });
   }
@@ -174,7 +179,7 @@ try {
 
   /* ---- 5. ONCEKI / SONRAKI SIMETRISI ---- */
   await openReader(VP);
-  const fwd = await sweep({ x: VP.width / 2, y: CY, dirSign: -1, travels: TRAVELS });
+  const fwd = await sweep({ x: RIGHT_EDGE, y: CY, dirSign: -1, travels: TRAVELS });
   const fwdFolded = fwd.filter((r) => r.folding > 0);
   assert.ok(fwdFolded.length >= 6, "SONRAKI yönünde kıvrım oluşmadı");
   const fwdFirst = fwd.find((r) => r.folding > 0);

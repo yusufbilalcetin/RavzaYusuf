@@ -1,6 +1,7 @@
 import { RAVZA_BOOKS } from '../../data/ravza-books.js?v=books-pipeline-20260716-1';
 import { createPageEntry, flattenTextContent, searchBookIndex, isSearchableQuery } from './ravza-books-search.js';
 import { claimOverlay, OVERLAY_IDS } from '../core/overlay-manager.js';
+import { CENTER_CURL, createCenterCurlSession } from './ravza-books-center-curl.js';
 
 const PAGE_FLIP_SRC = new URL('../../assets/vendor/page-flip/page-flip.browser.js', import.meta.url).href;
 const PDFJS_MODULE_URL = new URL('../../assets/vendor/pdfjs/pdf.js', import.meta.url).href;
@@ -203,6 +204,17 @@ const pdfRenderTasks = new Map();
 const pdfPageCache = new Map();
 /** Render sonucunun bitmap kopyası: pencereden çıkan sayfa geri geldiğinde PDF yeniden render edilmez. */
 const pdfBitmapCache = new Map();
+/** Merkez kıvrımın tema uygulanmış, PDF.js'e dönmeden yeniden kullandığı dokular. */
+const centerCurlTextureCache = new Map();
+let centerCurlIdleHandle = 0;
+const disposeCenterCurlTexture = entry => {
+  if (!entry?.objectUrl) return;
+  try { URL.revokeObjectURL(entry.objectUrl); } catch (_) {}
+};
+const clearCenterCurlTextureCache = () => {
+  for (const entry of centerCurlTextureCache.values()) disposeCenterCurlTexture(entry);
+  centerCurlTextureCache.clear();
+};
 let pdfActivePages = new Set();
 let pdfIdleHandle = 0;
 let pdfWindowTimer = 0;
@@ -680,6 +692,9 @@ function cleanupReader() {
   teardownScrollReader();
   removeDirectPageCurl?.();
   removeDirectPageCurl = null;
+  cancelIdle(centerCurlIdleHandle);
+  centerCurlIdleHandle = 0;
+  clearCenterCurlTextureCache();
   curlDragging = false;
   resizePending = false;
   readerAbort?.abort();
@@ -2592,7 +2607,7 @@ function flushPdfRenderWindow() {
   if (pendingRenderIndex < 0 || state.bookType !== 'pdf') return;
   const index = pendingRenderIndex;
   pendingRenderIndex = -1;
-  void updatePdfRenderWindow(index);
+  void updatePdfRenderWindow(index).then(() => scheduleCenterCurlTextureWarmup(index));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2825,12 +2840,14 @@ async function openPdfReader(book, position = null) {
     else flushPdfRenderWindow();
   });
   pageFlip.loadFromHTML(flipbook.querySelectorAll('.book-sheet'));
+  document.getElementById('reader-inner')?.setAttribute('data-page-flip-state', pageFlip.getState());
   bindReaderEvents(book);
   installDirectPageCurl();
   await nextFrame();
   if (generation !== renderGeneration) return;
   await pdfRenderDrain;
   await updatePdfRenderWindow(startIndex, true);
+  scheduleCenterCurlTextureWarmup(startIndex);
   document.getElementById('screen-reader')?.setAttribute('aria-busy', 'false');
   setAppMode('reading');
   resumeSearchSheetWhenReady();
@@ -3630,6 +3647,9 @@ function safeFlip(direction, corner = 'top') {
     goToPdfPage(next + 1);
     return;
   }
+  // Ozel merkez kivrimi canonical indeksi ancak kendi gorsel handoff'u
+  // bittiginde ilerletir; bu arada klavye/dugme ikinci bir cevirme baslatmaz.
+  if (curlDragging) return;
   if (!pageFlip || pageFlip.getState() !== 'read') return;
   const index = state.currentIndex;
   if (direction === 'next' && index < readerPages.length - 1) pageFlip.flipNext(corner);
@@ -3646,6 +3666,169 @@ function flipPrevious(corner = 'top') {
   });
 }
 
+const CENTER_CURL_THEME_FILTER = Object.freeze({
+  light: 'none',
+  sepia: 'sepia(0.45) saturate(1.15) brightness(0.97) contrast(0.98)',
+  dark: 'invert(0.9) hue-rotate(180deg) brightness(0.82) contrast(0.94)',
+  black: 'invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.02)',
+});
+
+/**
+ * Mevcut PDF tuvali/bitmap onbelleginden merkez kivrim dokusu olusturur.
+ * Bu islem jest BASINDA en fazla bir kez yapilir; hareket kareleri yalnizca
+ * CSS transform/clip/opacity yazar. Tema filtresi de bu tek kopyaya burada
+ * uygulanir, dolayisiyla 12 dilimde filtre ikinci kez calismaz.
+ */
+function centerCurlTextureForPage(index, sheetWidth, sheetHeight, referenceCanvas) {
+  const model = readerPages[index];
+  const pageNumber = Number(model?.pdfPage);
+  if (model?.type !== 'pdf' || !Number.isInteger(pageNumber)) return null;
+
+  const page = pageFlip?.getPage(index)?.getElement?.()
+    || document.querySelector(`.pdf-page[data-pdf-page="${pageNumber}"]`);
+  const canvas = page?.querySelector?.('canvas');
+  const cached = pdfBitmapCache.get(pageNumber);
+  // PDF.js resizes a canvas before its asynchronous render completes. Width
+  // alone therefore does not prove that pixels are ready: sampling that canvas
+  // could permanently cache a blank/partial center-curl texture. A live source
+  // must carry the completion class + render key; while a render task is active
+  // we reject the gesture instead of racing it or falling back to stale pixels.
+  const rendering = pdfRenderTasks.has(pageNumber);
+  const live = !rendering
+    && page?.classList?.contains('is-rendered')
+    && canvas?.dataset?.renderKey
+    && canvas.width > 1
+    && canvas.height > 1
+    ? canvas
+    : null;
+  const cachedSource = !rendering && cached?.renderKey
+    ? (cached.bitmap || cached.canvas)
+    : null;
+  const source = live || cachedSource;
+  const pixelWidth = Number(live?.width || cached?.width || 0);
+  const pixelHeight = Number(live?.height || cached?.height || 0);
+  if (!source || pixelWidth < 2 || pixelHeight < 2) return null;
+
+  const referenceCssWidth = parseFloat(referenceCanvas?.style?.width) || referenceCanvas?.getBoundingClientRect?.().width || sheetWidth;
+  const referenceCssHeight = parseFloat(referenceCanvas?.style?.height) || referenceCanvas?.getBoundingClientRect?.().height || sheetHeight;
+  const referencePixelWidth = Math.max(1, Number(referenceCanvas?.width) || pixelWidth);
+  const referencePixelHeight = Math.max(1, Number(referenceCanvas?.height) || pixelHeight);
+  const cssWidth = parseFloat(canvas?.style?.width)
+    || pixelWidth / (referencePixelWidth / Math.max(1, referenceCssWidth));
+  const cssHeight = parseFloat(canvas?.style?.height)
+    || pixelHeight / (referencePixelHeight / Math.max(1, referenceCssHeight));
+  const renderKey = live?.dataset?.renderKey || cached?.renderKey || `${pixelWidth}x${pixelHeight}`;
+  const cacheKey = [
+    pdfRenderGeneration,
+    state.theme,
+    pageNumber,
+    renderKey,
+    Math.round(sheetWidth),
+    Math.round(sheetHeight),
+    Math.round(cssWidth * 100) / 100,
+    Math.round(cssHeight * 100) / 100,
+  ].join(':');
+  let cacheEntry = centerCurlTextureCache.get(cacheKey);
+  if (cacheEntry) {
+    // LRU refresh also protects a texture selected for the active session from
+    // being the next entry evicted while its adjacent texture is prepared.
+    centerCurlTextureCache.delete(cacheKey);
+    centerCurlTextureCache.set(cacheKey, cacheEntry);
+  }
+  if (!cacheEntry) {
+    const copy = document.createElement('canvas');
+    copy.width = pixelWidth;
+    copy.height = pixelHeight;
+    const context = copy.getContext('2d', { alpha: false });
+    if (!context) return null;
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, pixelWidth, pixelHeight);
+    context.filter = CENTER_CURL_THEME_FILTER[state.theme] || 'none';
+    try {
+      context.drawImage(source, 0, 0, pixelWidth, pixelHeight);
+      const dataUrl = copy.toDataURL('image/png');
+      let objectUrl = '';
+      try {
+        const payload = dataUrl.slice(dataUrl.indexOf(',') + 1);
+        const binary = atob(payload);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+        objectUrl = URL.createObjectURL(new Blob([bytes], { type: 'image/png' }));
+      } catch (_) {}
+      cacheEntry = { url: objectUrl || dataUrl, objectUrl };
+    } catch (_) {
+      copy.width = 0;
+      copy.height = 0;
+      return null;
+    }
+    copy.width = 0;
+    copy.height = 0;
+    centerCurlTextureCache.set(cacheKey, cacheEntry);
+    // Komşu pencere en fazla 5-6 sayfadır; daha eski dokular tekrar
+    // üretilebilir, sınırsız base64/bellek biriktirilmez.
+    while (centerCurlTextureCache.size > 6) {
+      const oldestKey = centerCurlTextureCache.keys().next().value;
+      disposeCenterCurlTexture(centerCurlTextureCache.get(oldestKey));
+      centerCurlTextureCache.delete(oldestKey);
+    }
+  }
+
+  return {
+    url: cacheEntry.url,
+    pageNumber,
+    contentWidth: cssWidth,
+    contentHeight: cssHeight,
+    contentLeft: (sheetWidth - cssWidth) / 2,
+    contentTop: (sheetHeight - cssHeight) / 2,
+    renderKey,
+  };
+}
+
+/**
+ * Encode the current/adjacent center-curl textures while the reader is idle.
+ * One page is handled per idle callback so PNG encoding cannot monopolize a
+ * frame. Gesture activation still validates readiness and may build a missing
+ * entry, but the normal first interaction arrives after this queue is warm.
+ */
+function scheduleCenterCurlTextureWarmup(pageIndex = state.currentIndex) {
+  cancelIdle(centerCurlIdleHandle);
+  centerCurlIdleHandle = 0;
+  if (!shouldUseMobileFullSheet()
+    || window.innerWidth > CENTER_CURL.maxViewportWidth
+    || !pageFlip) return;
+
+  const generation = pdfRenderGeneration;
+  const ordered = [pageIndex, pageIndex - 1, pageIndex + 1]
+    .filter((index, position, list) => index >= 0
+      && index < readerPages.length
+      && readerPages[index]?.type === 'pdf'
+      && list.indexOf(index) === position);
+  const attempts = new Map();
+  const warmNext = () => {
+    centerCurlIdleHandle = 0;
+    if (generation !== pdfRenderGeneration
+      || !shouldUseMobileFullSheet()
+      || window.innerWidth > CENTER_CURL.maxViewportWidth
+      || !pageFlip
+      || !ordered.length) return;
+    const index = ordered.shift();
+    const surface = pageFlip.getUI?.().getDistElement?.();
+    const currentPage = pageFlip.getPage(pageFlip.getCurrentPageIndex())?.getElement?.();
+    const referenceCanvas = currentPage?.querySelector?.('canvas');
+    const rect = surface?.getBoundingClientRect?.();
+    const ready = rect?.width > 1 && rect?.height > 1 && referenceCanvas
+      ? centerCurlTextureForPage(index, rect.width, rect.height, referenceCanvas)
+      : null;
+    if (!ready) {
+      const count = (attempts.get(index) || 0) + 1;
+      attempts.set(index, count);
+      if (count < 4) ordered.push(index);
+    }
+    if (ordered.length) centerCurlIdleHandle = runWhenIdle(warmNext);
+  };
+  if (ordered.length) centerCurlIdleHandle = runWhenIdle(warmNext);
+}
+
 function installDirectPageCurl() {
   removeDirectPageCurl?.();
   removeDirectPageCurl = null;
@@ -3654,6 +3837,7 @@ function installDirectPageCurl() {
   const ui = pageFlip.getUI?.();
   const surface = ui?.getDistElement?.();
   const interactionOwner = document.getElementById('rdr-stage');
+  const centerCurlHost = document.getElementById('book-cradle');
   if (!surface || !interactionOwner) return;
 
   try { ui.removeHandlers?.(); } catch (_) {}
@@ -3673,6 +3857,13 @@ function installDirectPageCurl() {
     && state.readerMode === 'page'
     && window.innerWidth < 768
     && shouldUsePortrait();
+  // The custom handoff is a single physical mobile sheet. Keep the condition
+  // identical to the full-sheet CSS contract; `shouldUsePortrait()` alone also
+  // returns true for narrow landscape windows and could leak this +/-1 path
+  // into a landscape PageFlip spread.
+  const shouldUseCenterCurl = shouldUseMobileFullSheet()
+    && window.innerWidth <= CENTER_CURL.maxViewportWidth
+    && Boolean(centerCurlHost);
 
   const styleAsPrintedBackside = (page, canvas, pageNumber) => {
     canvas.style.transformOrigin = 'center center';
@@ -3827,7 +4018,8 @@ function installDirectPageCurl() {
     const stageRect = interactionOwner.getBoundingClientRect();
     const bounds = pageFlip.getBoundsRect();
     const pageWidth = Math.max(1, bounds?.pageWidth || (shouldUsePortrait() ? surfaceRect.width : surfaceRect.width / 2));
-    return { surfaceRect, stageRect, bounds, pageWidth };
+    const pageHeight = Math.max(1, bounds?.height || surfaceRect.height);
+    return { surfaceRect, stageRect, bounds, pageWidth, pageHeight };
   };
 
   // Ölçüm yalnızca pointerdown'da alınır; hareket sırasında layout okunmaz.
@@ -3864,6 +4056,14 @@ function installDirectPageCurl() {
       && point.x <= metrics.surfaceRect.width + margin
       && point.y >= 0
       && point.y <= metrics.surfaceRect.height;
+  };
+
+  const originModeFor = (point, metrics) => {
+    if (!shouldUseCenterCurl) return 'edge';
+    const ratio = point.x / Math.max(1, metrics.surfaceRect.width);
+    return ratio >= CENTER_CURL.innerStartRatio && ratio <= CENTER_CURL.innerEndRatio
+      ? 'center'
+      : 'edge';
   };
 
   /* PARMAK YOLUNU KIVRIM KOORDINATINA TASI.
@@ -3905,7 +4105,11 @@ function installDirectPageCurl() {
     if (!gesture || !queuedPoint) return;
     const point = queuedPoint;
     queuedPoint = null;
-    try { pageFlip.userMove(point, true); } catch (_) {}
+    if (gesture.mode === 'center') {
+      gesture.renderer?.update({ x: point.x, fingerX: point.x });
+      return;
+    }
+    try { pageFlip.userMove(foldPointFor(gesture, point), true); } catch (_) {}
   };
 
   const scheduleMove = point => {
@@ -3928,11 +4132,17 @@ function installDirectPageCurl() {
   };
 
   const resetGesture = () => {
+    const active = gesture;
     if (moveFrame) cancelAnimationFrame(moveFrame);
     moveFrame = 0;
     queuedPoint = null;
+    active?.renderer?.destroy();
     gesture = null;
-    document.getElementById('rdr-stage')?.classList.remove('is-touching', 'is-page-curling');
+    document.getElementById('rdr-stage')?.classList.remove('is-touching', 'is-page-curling', 'is-center-curling');
+    if (active?.mode === 'center') {
+      if (readerRoot) readerRoot.dataset.pageFlipState = 'read';
+      setFlipCompositing(false);
+    }
     releaseLayoutLock();
   };
 
@@ -3960,6 +4170,7 @@ function installDirectPageCurl() {
       startY: event.clientY,
       point,
       metrics,
+      originMode: originModeFor(point, metrics),
       moved: false,
       rejected: false,
     };
@@ -3972,6 +4183,84 @@ function installDirectPageCurl() {
     if (!direction) { candidate.rejected = true; return false; }
 
     const metrics = candidate.metrics;
+    const start = candidate.point;
+    const currentIndex = pageFlip.getCurrentPageIndex();
+    const targetIndex = currentIndex + (direction === 'forward' ? 1 : -1);
+    const point = localPoint(sampleEvent, metrics);
+
+    /* IC BOLGE: St.PageFlip'e hic dokunmayan dar dikey band.
+       Kutuphane kose-cizgisi tabanlidir; merkez jestini ona yeniden capalamak
+       buyuk ucgen uretir. Burada mevcut PDF bitmapleri bir kez dokulastirilir,
+       sonra hareket kareleri yalnizca onceden kurulmus 12 dilimi gunceller. */
+    if (candidate.originMode === 'center') {
+      const currentPage = pageFlip.getPage(currentIndex)?.getElement?.();
+      const referenceCanvas = currentPage?.querySelector?.('canvas');
+      const frame = currentPage?.querySelector?.('.pdf-canvas-frame');
+      const currentTexture = centerCurlTextureForPage(
+        currentIndex,
+        metrics.surfaceRect.width,
+        metrics.surfaceRect.height,
+        referenceCanvas,
+      );
+      const targetTexture = centerCurlTextureForPage(
+        targetIndex,
+        metrics.surfaceRect.width,
+        metrics.surfaceRect.height,
+        referenceCanvas,
+      );
+      if (!currentTexture || !targetTexture || !frame || !centerCurlHost) {
+        // Prefetch hazir degilse merkez jestini kose ucgenine dusurme. O karede
+        // gorsel baslatilmaz; bir sonraki jest onbellek hazirken yeniden dener.
+        candidate.rejected = true;
+        return false;
+      }
+      let renderer;
+      try {
+        renderer = createCenterCurlSession({
+          host: centerCurlHost,
+          width: metrics.surfaceRect.width,
+          height: metrics.surfaceRect.height,
+          startX: start.x,
+          startY: start.y,
+          direction,
+          currentTexture,
+          targetTexture,
+          paperColor: getComputedStyle(frame).backgroundColor,
+        });
+      } catch (_) {
+        candidate.rejected = true;
+        return false;
+      }
+      renderer.root.dataset.curlCurrentPage = String(currentTexture.pageNumber);
+      renderer.root.dataset.curlTargetPage = String(targetTexture.pageNumber);
+
+      gesture = {
+        mode: 'center',
+        pointerId: candidate.pointerId,
+        direction,
+        start,
+        current: point,
+        currentIndex,
+        targetIndex,
+        metrics,
+        renderer,
+        samples: [{ x: start.x, time: performance.now() }],
+        moved: true,
+        settling: false,
+      };
+      resetCenterGesture();
+      curlDragging = true;
+      closeSettings();
+      hideControls();
+      hideLugat();
+      document.getElementById('rdr-stage')?.classList.add('is-touching', 'is-page-curling', 'is-center-curling');
+      if (readerRoot) readerRoot.dataset.pageFlipState = 'user_fold';
+      setFlipCompositing(true);
+      pushSample(point, performance.now());
+      renderer.update({ x: point.x, fingerX: point.x });
+      return true;
+    }
+
     /* Kivrimin baslangici, secilen yonun GERCEK sayfa kenaridir - yuzey
        koordinatlarinda. Portrede yuzey = tek sayfa oldugu icin bu 0 / genislik
        demektir; masaustu cift sayfada yuzey iki sayfa genisligindedir ve
@@ -3979,10 +4268,10 @@ function installDirectPageCurl() {
        hedefleriyle uyusmayan bir koordinat uzayi yaratiyordu (kisa surukleme
        yanlislikla sayfayi ceviriyordu). */
     const anchorX = direction === 'back' ? 0 : metrics.surfaceRect.width;
-    const start = candidate.point;
     if (direction === 'back') preparePreviousBackside();
 
     gesture = {
+      mode: 'edge',
       pointerId: candidate.pointerId,
       direction,
       start,
@@ -4000,7 +4289,6 @@ function installDirectPageCurl() {
     document.getElementById('rdr-stage')?.classList.add('is-touching', 'is-page-curling');
     // Kutuphane once dokunusu kaydeder; ilk userMove fold'u baslatir.
     try { pageFlip.startUserTouch({ x: anchorX, y: start.y }); } catch (_) { resetGesture(); return false; }
-    const point = localPoint(sampleEvent, metrics);
     gesture.current = point;
     gesture.moved = true;
     pushSample(point, performance.now());
@@ -4036,8 +4324,45 @@ function installDirectPageCurl() {
     const drag = gesture.direction === 'forward' ? gesture.start.x - point.x : point.x - gesture.start.x;
     if (drag >= PAGE_CURL_CONFIG.minimumDragPx) gesture.moved = true;
     pushSample(point, performance.now());
-    scheduleMove(foldPointFor(gesture, point));
+    scheduleMove(point);
     event.preventDefault();
+  };
+
+  const settleCenterCurl = async (active, commit) => {
+    if (gesture !== active || !active.renderer) return;
+    const destinationX = commit
+      ? (active.direction === 'forward' ? 0 : active.metrics.surfaceRect.width)
+      : active.start.x;
+    const destinationProgress = commit ? 1 : 0;
+    const currentVisual = active.renderer.getState();
+    const remainingRatio = Math.abs(destinationX - currentVisual.x) / Math.max(1, active.metrics.pageWidth);
+    const minimumDuration = reducedMotionQuery.matches ? 90 : 170;
+    const duration = clamp(
+      PAGE_CURL_CONFIG.flipDuration * (0.32 + 0.68 * clamp(remainingRatio, 0, 1)),
+      minimumDuration,
+      PAGE_CURL_CONFIG.flipDuration,
+    );
+    const continued = await active.renderer.animateTo({
+      x: destinationX,
+      progress: destinationProgress,
+      duration,
+    });
+    if (!continued || gesture !== active) return;
+
+    if (commit) {
+      // Gorsel hedefi tamamen orterken canonical PageFlip indeksi tek karede
+      // eslenir. Bu public yol animasyon baslatmaz ama mevcut `flip` eventini
+      // uretir; ses/UI/kayit/prefetch tek sahipte kalir.
+      if (pageFlip?.getState() !== 'read' || pageFlip.getCurrentPageIndex() !== active.currentIndex) {
+        resetGesture();
+        return;
+      }
+      pageFlip.turnToPage(active.targetIndex);
+      await nextFrame();
+      await nextFrame();
+      if (gesture !== active) return;
+    }
+    resetGesture();
   };
 
   const finishPointer = (event, cancelled = false) => {
@@ -4046,7 +4371,10 @@ function installDirectPageCurl() {
       resetCenterGesture();
       releaseCapture(event.pointerId);
       const distance = Math.hypot(event.clientX - tap.startX, event.clientY - tap.startY);
-      if (!cancelled && !tap.moved && distance < PAGE_CURL_CONFIG.minimumDragPx) toggleControls();
+      if (!cancelled
+        && tap.originMode !== 'center'
+        && !tap.moved
+        && distance < PAGE_CURL_CONFIG.minimumDragPx) toggleControls();
       return;
     }
     if (!gesture || event.pointerId !== gesture.pointerId) return;
@@ -4057,12 +4385,31 @@ function installDirectPageCurl() {
     flushQueuedMove();
 
     const drag = active.direction === 'forward' ? active.start.x - point.x : point.x - active.start.x;
-    const progress = Math.max(0, drag / active.metrics.pageWidth);
+    const pageProgress = Math.max(0, drag / active.metrics.pageWidth);
+    const progress = active.mode === 'center'
+      ? active.renderer?.getState().progress || 0
+      : pageProgress;
     const vx = velocityX();
     const flick = active.direction === 'forward'
       ? vx <= -PAGE_CURL_CONFIG.flickVelocity
       : vx >= PAGE_CURL_CONFIG.flickVelocity;
-    const commit = !cancelled && active.moved && (progress >= PAGE_CURL_CONFIG.snapThreshold || flick);
+    const commit = !cancelled
+      && active.moved
+      && drag > 0
+      && (progress >= PAGE_CURL_CONFIG.snapThreshold || flick);
+
+    if (active.mode === 'center') {
+      active.settling = true;
+      active.pointerId = null;
+      if (readerRoot) readerRoot.dataset.pageFlipState = 'flipping';
+      document.getElementById('rdr-stage')?.classList.remove('is-touching');
+      suppressClickUntil = Date.now() + Math.max(450, PAGE_CURL_CONFIG.flipDuration);
+      releaseCapture(event.pointerId);
+      void settleCenterCurl(active, commit);
+      event.preventDefault();
+      return;
+    }
+
     const bounds = active.metrics.bounds || pageFlip.getBoundsRect();
     const foldLine = bounds.left + bounds.width / 2;
     const forcePoint = {
@@ -4097,7 +4444,15 @@ function installDirectPageCurl() {
   const onLostCapture = event => {
     if (centerTap?.pointerId === event.pointerId) resetCenterGesture();
     if (!gesture || event.pointerId !== gesture.pointerId) return;
-    try { pageFlip.userStop(gesture.current, true); } catch (_) {}
+    if (gesture.mode === 'center') {
+      const active = gesture;
+      active.settling = true;
+      active.pointerId = null;
+      if (readerRoot) readerRoot.dataset.pageFlipState = 'flipping';
+      void settleCenterCurl(active, false);
+      return;
+    }
+    try { pageFlip.userStop(foldPointFor(gesture, gesture.current), true); } catch (_) {}
     resetGesture();
   };
   const onWindowBlur = () => {
@@ -4107,8 +4462,21 @@ function installDirectPageCurl() {
       releaseCapture(pointerId);
     }
     if (!gesture) return;
+    // Pointer release already chose commit/cancel and owns the continuation.
+    // A visibility/app-switch blur during that animation must not replace an
+    // accepted settle with a second cancellation animation.
+    if (gesture.settling) return;
     const pointerId = gesture.pointerId;
-    try { pageFlip.userStop(gesture.current, true); } catch (_) {}
+    if (gesture.mode === 'center') {
+      const active = gesture;
+      active.settling = true;
+      active.pointerId = null;
+      if (readerRoot) readerRoot.dataset.pageFlipState = 'flipping';
+      releaseCapture(pointerId);
+      void settleCenterCurl(active, false);
+      return;
+    }
+    try { pageFlip.userStop(foldPointFor(gesture, gesture.current), true); } catch (_) {}
     releaseCapture(pointerId);
     resetGesture();
   };
@@ -4148,8 +4516,8 @@ function installDirectPageCurl() {
     window.removeEventListener('blur', onWindowBlur);
     surface.removeEventListener('click', onClick, true);
     surface.removeEventListener('contextmenu', onContextMenu);
-    if (gesture) {
-      try { pageFlip?.userStop(gesture.current, true); } catch (_) {}
+    if (gesture?.mode === 'edge') {
+      try { pageFlip?.userStop(foldPointFor(gesture, gesture.current), true); } catch (_) {}
     }
     resetCenterGesture();
     resetGesture();
@@ -4266,6 +4634,7 @@ function bindReaderEvents(book) {
     button.addEventListener('click', () => {
       applyTheme(button.dataset.theme);
       savePrefs();
+      scheduleCenterCurlTextureWarmup(state.currentIndex);
     }, { signal });
   });
 

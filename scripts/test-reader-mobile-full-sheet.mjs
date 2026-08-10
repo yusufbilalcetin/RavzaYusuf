@@ -444,37 +444,49 @@ try {
     await screenshot(`${label}-controls-visible`);
 
     await tapReaderCenter();
-    const hidden = await measure();
-    assertFitPage(hidden, `${label} controls hidden`, { fullViewport:true, fullSheet:true });
-    assert.equal(hidden.controlsVisible, false, `${label}: real center tap did not hide controls`);
-    assert.ok(Math.abs(hidden.page.width - visible.page.width) <= 1 && Math.abs(hidden.page.height - visible.page.height) <= 1, `${label}: controls changed PDF geometry`);
-    const seam = await assertNoPaperSeam(`${label} controls hidden`, `${label}-controls-hidden`);
+    const afterCenterTap = await measure();
+    assertFitPage(afterCenterTap, `${label} controls unchanged`, { fullViewport:true, fullSheet:true });
+    assert.equal(afterCenterTap.controlsVisible, visible.controlsVisible, `${label}: center tap changed controls visibility`);
+    assert.ok(Math.abs(afterCenterTap.page.width - visible.page.width) <= 1 && Math.abs(afterCenterTap.page.height - visible.page.height) <= 1, `${label}: center tap changed PDF geometry`);
+    const seam = await assertNoPaperSeam(`${label} controls unchanged`, `${label}-controls-unchanged`);
     await captureBrowserFullscreen(viewport);
 
     // Merkezden surukleme artik pan DEGIL: sayfa kaymamali, sadece tap/curl semantigi.
-    const centerX = hidden.stage.left + hidden.stage.width / 2;
-    const centerY = hidden.stage.top + hidden.stage.height / 2;
+    const centerX = afterCenterTap.stage.left + afterCenterTap.stage.width / 2;
+    const centerY = afterCenterTap.stage.top + afterCenterTap.stage.height / 2;
     await touch('touchStart', centerX, centerY);
     for (let step = 1; step <= 6; step += 1) {
       await touch('touchMove', centerX - 18 * step, centerY);
       await delay(24);
     }
-    await touch('touchEnd', centerX - 108, centerY);
-    await delay(220);
+    // Explicit cancel: effective center-curl progress is measured from the
+    // touch origin to its destination edge, so 108px is already a meaningful
+    // turn. Return to the origin and let the velocity sample expire instead of
+    // relying on a borderline distance/flick threshold.
+    for (let step = 1; step <= 6; step += 1) {
+      await touch('touchMove', centerX - 108 + 18 * step, centerY);
+      await delay(24);
+    }
+    await delay(150);
+    await touch('touchEnd', centerX, centerY);
+    await browser.waitFor(
+      "document.getElementById('reader-inner')?.dataset.pageFlipState === 'read' && !document.querySelector('[data-reader-center-curl]')",
+      `${label} center curl settled`,
+    );
     const afterCenterDrag = await measure();
     assertFitPage(afterCenterDrag, `${label} after center drag`, { fullViewport:true, fullSheet:true });
-    assert.equal(afterCenterDrag.currentPage, hidden.currentPage, `${label}: center drag changed the page`);
+    assert.equal(afterCenterDrag.currentPage, afterCenterTap.currentPage, `${label}: center drag changed the page`);
 
     await edgeDrag({ direction:"forward", ratio:0.16, commit:false, screenshotName:`${label}-mid-flip` });
 
     results.push({
       viewport: label,
-      stage: `${Math.round(hidden.stage.width)}x${Math.round(hidden.stage.height)}`,
-      sheet: `${Math.round(hidden.item.width)}x${Math.round(hidden.item.height)}`,
-      content: `${Math.round(hidden.canvas.width)}x${Math.round(hidden.canvas.height)}`,
-      contentAspect: Number((hidden.canvas.width / hidden.canvas.height).toFixed(3)),
-      paperTop: Math.round(hidden.canvas.top - hidden.item.top),
-      paperBottom: Math.round(hidden.item.bottom - hidden.canvas.bottom),
+      stage: `${Math.round(afterCenterTap.stage.width)}x${Math.round(afterCenterTap.stage.height)}`,
+      sheet: `${Math.round(afterCenterTap.item.width)}x${Math.round(afterCenterTap.item.height)}`,
+      content: `${Math.round(afterCenterTap.canvas.width)}x${Math.round(afterCenterTap.canvas.height)}`,
+      contentAspect: Number((afterCenterTap.canvas.width / afterCenterTap.canvas.height).toFixed(3)),
+      paperTop: Math.round(afterCenterTap.canvas.top - afterCenterTap.item.top),
+      paperBottom: Math.round(afterCenterTap.item.bottom - afterCenterTap.canvas.bottom),
       seamDelta: seam,
     });
   }

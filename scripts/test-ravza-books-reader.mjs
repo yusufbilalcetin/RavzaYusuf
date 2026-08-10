@@ -220,10 +220,11 @@ try {
     assert.deepEqual(small, [], `44px altı hedefler: ${JSON.stringify(small)}`);
   });
 
-  await testCase("kabuk dokunuşla gizlenip geri gelir", async () => {
+  await testCase("merkez dokunuşu kabuk görünürlüğünü değiştirmez", async () => {
     const visibleFirst = await browser.evaluate("document.querySelector('.reader-root').classList.contains('controls-visible')");
     assert.equal(visibleFirst, true, "kitap açılışında kontroller görünür olmalı");
-    // Sahnenin ortasına dokun: sayfa kenarı değil, kabuk anahtarı.
+    // Sahnenin ortasına dokun: yeni merkez-kıvrım sözleşmesinde tek dokunuş
+    // hiçbir şey yapmaz; yalnız yatay niyet kıvrımı başlatır.
     // Olay, dinleyicinin bağlı olduğu yüzeyin İÇİNDEKİ bir elemandan
     // gönderilir; pointer olayları yukarı kabarır, aşağı inmez.
     await browser.evaluate(`(() => {
@@ -238,8 +239,8 @@ try {
       target.dispatchEvent(new PointerEvent('pointerup', opts));
     })()`);
     await delay(250);
-    const hidden = await browser.evaluate("!document.querySelector('.reader-root').classList.contains('controls-visible')");
-    assert.equal(hidden, true, "ortaya dokunuş kabuğu gizlemeli");
+    const stillVisible = await browser.evaluate("document.querySelector('.reader-root').classList.contains('controls-visible')");
+    assert.equal(stillVisible, true, "merkez dokunuşu kabuk görünürlüğünü değiştirmemeli");
   });
 
   await testCase("outline'ı olmayan kitap içindekiler yerine dürüst boş durum gösterir", async () => {

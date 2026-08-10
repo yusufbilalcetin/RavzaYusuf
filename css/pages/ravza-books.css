@@ -1158,6 +1158,134 @@ button {
   transform-origin: center center;
 }
 
+/* MERKEZDEN BASLAYAN MOBIL KIVRIM.
+   St.PageFlip'in soft sayfasi tek bir kose cizgisi + tek bir affine poligon
+   cizer. Sayfa govdesinden baslayan jestte kullanicinin istedigi dikey dar
+   bombe bu modelle uretilemez; bu nedenle yalnizca mobil IC bolge jesti,
+   PageFlip'in kardesi olan gecici bir sunum katmanina ayrilir. Kenar jesti,
+   masaustu, tablet ve surekli mod bu siniflari hic olusturmaz.
+
+   Katman fiziksel yapragi kaplar; genis current/target yuzeyler duzdur.
+   Yalnizca 12 dar dilim clip-path ile deforme edilir. Dugumler jest basinda
+   bir kez kurulur, karelerde sadece transform/clip/opacity yazilir. */
+.center-curl {
+  position: absolute;
+  z-index: 48;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint style;
+  pointer-events: none;
+  background: var(--center-curl-paper, var(--reader-mobile-paper));
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.center-curl__flat,
+.center-curl__print,
+.center-curl__band {
+  position: absolute;
+  inset: 0;
+}
+
+.center-curl__flat {
+  overflow: hidden;
+  background: var(--center-curl-paper, var(--reader-mobile-paper));
+}
+
+.center-curl__flat--current { z-index: 1; }
+.center-curl__flat--target { z-index: 2; }
+
+.center-curl__print {
+  background-repeat: no-repeat;
+  transform-origin: center center;
+}
+
+.center-curl__band {
+  z-index: 5;
+  opacity: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 1.2%, #000 98.8%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 1.2%, #000 98.8%, transparent 100%);
+}
+
+.center-curl__slice,
+.center-curl__shadow,
+.center-curl__crease {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateZ(0);
+  transform-origin: left center;
+  will-change: clip-path, transform;
+}
+
+.center-curl__slice {
+  z-index: 1;
+  background: var(--center-curl-paper, var(--reader-mobile-paper));
+}
+
+.center-curl__slice .center-curl__print {
+  opacity: 1;
+}
+
+/* Gercek on yuz hic aynalanmaz. Arka baski, 4e0acee ile kurulan ayni
+   sozlesmedir: opak kagit ustunde ayri, yatay ters ve %22 baski. */
+.center-curl__slice.is-back .center-curl__print,
+.center-curl__slice .center-curl__print.pdf-backside-print {
+  display: block;
+  opacity: 0.22;
+  transform: scaleX(-1);
+  transform-origin: center center;
+}
+
+.center-curl__slice-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: transparent;
+}
+
+.center-curl__shadow {
+  z-index: 4;
+  opacity: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 2%, #000 98%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 2%, #000 98%, transparent);
+}
+
+.center-curl[data-curl-direction="forward"] .center-curl__shadow--current,
+.center-curl[data-curl-direction="back"] .center-curl__shadow--target {
+  background: linear-gradient(90deg, transparent, rgba(26, 20, 16, 0.22));
+}
+
+.center-curl[data-curl-direction="forward"] .center-curl__shadow--target,
+.center-curl[data-curl-direction="back"] .center-curl__shadow--current {
+  background: linear-gradient(90deg, rgba(26, 20, 16, 0.2), transparent);
+}
+
+.center-curl__crease {
+  z-index: 7;
+  opacity: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.52) 52%, rgba(0, 0, 0, 0.12));
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 1%, #000 99%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 1%, #000 99%, transparent);
+}
+
+&[data-reader-theme="dark"] .center-curl__crease,
+&[data-reader-theme="black"] .center-curl__crease {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.2) 52%, rgba(0, 0, 0, 0.24));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .center-curl,
+  .center-curl__slice,
+  .center-curl__shadow,
+  .center-curl__crease {
+    transition: none;
+  }
+}
+
 .pdf-page-status {
   position: absolute;
   top: 50%;
