@@ -122,22 +122,30 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --z-toast: 100;
 }
 
+/* KAGIT - DOGAL IVORY, PARSOMEN DEGIL.
+   Eski palet olculdu ve reddedildi: yaprak #d8c39c ve sahne #cdb893, kirmizi
+   ile mavi kanal arasinda 58-60 puan fark tasiyordu (R-B). Ekranda gorulen
+   "sari/eski parsomen" hissi ORADAN geliyordu - PDF tuvalinden degil: ayni
+   olcumde tuvalin kagit beyazi #f2f2ee, yani R-B farki yalnizca 4 idi.
+   Yeni palette cevre notr-sicak greige'e cekilir (R-B 20), kagit ise
+   tuvalin gercek tonunu izler. */
 &[data-reader-theme="sepia"] {
   color-scheme: light;
-  --paper: #ead8b9;
-  --paper-edge: #d8bd91;
+  --paper: #f4ece0;
+  --paper-edge: #e3dacb;
   --ink: #2b2118;
-  --ink-muted: #79634d;
-  --stage: #cdb893;
-  --stage-deep: #bca57d;
-  /* Sepia filtresi beyaz kagidi #f2f2ee'ye tasiyor; yuzey ONU izler,
-     yaprak tokenini (#d8c39c) degil. */
-  --reader-mobile-paper: #f2f2ee;
-  --control-bg: rgba(239, 222, 194, 0.9);
-  --control-border: rgba(68, 46, 26, 0.16);
-  --control-shadow: rgba(66, 43, 22, 0.22);
-  --accent: #76502e;
-  --focus: #69401f;
+  --ink-muted: #6f6659;
+  --stage: #d9d2c5;
+  --stage-deep: #c8c0b2;
+  /* Tuval filtresi beyaz kagidi #f5f5ed'e tasiyor; yuzey ONU izler.
+     Bu esitlik zorunludur: mobil tam boy yaprakta sahne ve yaprak ayni
+     tokeni kullanir, ton farki aninda gorunur bir bant/dikis olur. */
+  --reader-mobile-paper: #f5f5ed;
+  --control-bg: rgba(245, 241, 233, 0.9);
+  --control-border: rgba(60, 52, 42, 0.15);
+  --control-shadow: rgba(62, 54, 42, 0.19);
+  --accent: #6f5a42;
+  --focus: #6b5236;
 }
 
 &[data-reader-theme="dark"] {
@@ -906,6 +914,13 @@ button {
     top: auto;
     left: auto;
   }
+
+  /* Telefon portresinde yaprak SAHNENIN TAMAMI kadardir; koyu/siyah temada
+     cizilen 1px'lik sayfa kenari burada ekranin cevresine bir cerceve gibi
+     otururdu. Tam boy yaprak sozlesmesinde ayrilacak bir arka plan da yok. */
+  .reader-root[data-book-type="pdf"][data-reader-mode="page"] .pdf-canvas-frame::after {
+    display: none;
+  }
 }
 
 .book-cradle {
@@ -1043,18 +1058,32 @@ button {
   background: #fff !important;
 }
 
+/* Yaprak, tuvalin filtreden SONRAKI gercek tonudur (#f5f5ed). Eski #d8c39c
+   tuvalden 60 puan daha sari bir tepsi gibi duruyordu. */
 &[data-reader-theme="sepia"] .book-sheet.pdf-page,
 &[data-reader-theme="sepia"] .pdf-canvas-frame {
-  background: #d8c39c !important;
+  background: #f5f5ed !important;
 }
 
+/* Eski deger sepia(.38) saturate(.78) idi: doygunlugu 0.78'e kirmak hem
+   kagidi notr griye (R-B 4) hem de illustrasyonlari soluklastiriyordu -
+   Kucuk Prens'in sacinda R-B 63, ceketinde 54 olculdu; Beyaz temadaki
+   gercek degerler 91 ve 78. Doygunluk 1'in USTUNE alinip sepia biraz
+   arttirilinca kagit hafif sicak (R-B 8) kalirken illustrasyon gercege
+   yaklasir: sac 88, ceket 80. CSS sepia() beyazi kirparak en fazla R-B 9
+   verebilir; bu yuzden "tam ivory" kagit tuval filtresiyle DEGIL, cevre
+   yuzeyleriyle kurulur. */
 &[data-reader-theme="sepia"] .pdf-page canvas {
-  filter: sepia(0.38) saturate(0.78) brightness(0.97) contrast(0.96);
+  filter: sepia(0.45) saturate(1.15) brightness(0.97) contrast(0.98);
 }
 
+/* Yaprak sahneden (#171614) bir tik yukseltilir: masaustunde iki fiziksel
+   sayfa arka plandan ayirt edilebilsin. Mobil tam boy yaprakta bu kural
+   devre disi kalir (medya sorgusu daha spesifiktir), yani orada tek parca
+   yuzey ve dikissiz gorunum korunur. */
 &[data-reader-theme="dark"] .book-sheet.pdf-page,
 &[data-reader-theme="dark"] .pdf-canvas-frame {
-  background: #1a1916 !important;
+  background: #201e1a !important;
 }
 
 &[data-reader-theme="dark"] .pdf-page canvas {
@@ -1064,13 +1093,44 @@ button {
 /* PDF sabit dizgili oldugu icin "okuma temasi" ancak tuval filtresiyle
    yapilabilir - metnin fontu/puntosu kitabin kendi dizgisidir. Siyah temada
    inversiyon tam, parlaklik daha dusuk: OLED'de gece okumasi icin. */
+/* Siyahta sahne saf #000 kalir, yaprak yalnizca 11/255 yukseltilir. Bu fark
+   masaustunde sayfa sinirini gorunur kilmaya yeter ama gri bir karta
+   donusmez. Mobil tam boy yaprakta token (#000) kazanir: OLED'de tum ekran
+   saf siyah kalir. */
 &[data-reader-theme="black"] .book-sheet.pdf-page,
 &[data-reader-theme="black"] .pdf-canvas-frame {
-  background: #000 !important;
+  background: #0b0b0b !important;
 }
 
 &[data-reader-theme="black"] .pdf-page canvas {
   filter: invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.02);
+}
+
+/* KOYU/SIYAH TEMADA FIZIKSEL SAYFA SINIRI.
+   Olculdu (1440x900, sol yapragin sol kenari, parlaklik L):
+     Beyaz  223.8 -> 255.0  (delta 31.2)   sinir zaten belli
+     Kagit  210.5 -> 244.4  (delta 33.9)   sinir zaten belli
+     Koyu    22.1 ->  27.0  (delta  4.9)   zayif ama var
+     Siyah    0.0 ->   0.0  (delta  0.0)   SINIR YOK
+   Siyahta tonal cozum yetmiyor: tuval (675x899) yapragi (675x900) neredeyse
+   tamamen kapatiyor ve tuvalin kendisi de saf siyah. Bu yuzden yaprak
+   zeminini yukseltmek gorunmuyor; halka tuvalin USTUNDE cizilmeli.
+   ::after secilir cunku tuval normal akista duruyor. Sunum katmanidir:
+   pointer-events yok, geometri/hit alani/flip olculeri degismez. */
+&[data-reader-theme="dark"] .pdf-canvas-frame::after,
+&[data-reader-theme="black"] .pdf-canvas-frame::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+&[data-reader-theme="dark"] .pdf-canvas-frame::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+&[data-reader-theme="black"] .pdf-canvas-frame::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.085);
 }
 
 .pdf-page.is-rendered canvas {

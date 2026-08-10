@@ -468,8 +468,12 @@
   white-space: nowrap;
 }
 
-.ravza-books-page .reader-sheet .theme-btn--light { color: #1f1a16; background: #f4ead7; }
-.ravza-books-page .reader-sheet .theme-btn--sepia { color: #2b2118; background: #ead8b9; }
+/* Dugmenin kendisi renk ornegidir, yani okuma temasinin kagidini TEMSIL
+   etmeli. Eski degerlerde Beyaz #f4ead7 (R-B 29) ve Kagit #ead8b9 (R-B 49)
+   idi: ikisi de bej, ustelik "Beyaz" gercek kagidi (#ffffff) hic
+   yansitmiyordu. Yeni degerlerde Beyaz notr, Kagit ise ivory. */
+.ravza-books-page .reader-sheet .theme-btn--light { color: #1f1a16; background: #fcfbf9; }
+.ravza-books-page .reader-sheet .theme-btn--sepia { color: #2b2118; background: #f3ebdd; }
 .ravza-books-page .reader-sheet .theme-btn--dark { color: #e9e2d7; background: #24211c; }
 .ravza-books-page .reader-sheet .theme-btn--black { color: #dcdcdc; background: #000; }
 

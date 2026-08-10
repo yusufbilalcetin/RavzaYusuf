@@ -447,6 +447,63 @@ try {
   assert.equal(await evaluate("getComputedStyle(document.querySelector('.pdf-page.is-rendered canvas')).filter"), 'none', 'Açık tema PDF filtresini temizlemedi');
   assert.equal(await evaluate("localStorage.getItem('ravzaBooksProgress:kucuk-prens')"), null, 'Tema değişimi kayıtlı sayfayı değiştirdi');
 
+  /* OKUMA TEMASI RENK SÖZLEŞMESİ.
+     Kâğıt teması "premium ivory" olarak yeniden tasarlandı; eski parşömen
+     paletine geri dönüş bu iddialarla yakalanır. Ölçüt R-B farkıdır
+     (sarılık): eski yaprak #d8c39c'de 60, sahne #cdb893'te 58 idi.
+     Ayrıca her temada fiziksel yaprak ile okuma zemininin AYNI renk
+     olmaması beklenir - masaüstünde sayfa sınırı görünsün diye. */
+  await setViewport(1440, 900);
+  await delay(600);
+  const contract = JSON.parse(await evaluate(`(() => {
+    const root = document.querySelector('#ravzabooks');
+    const toRgb = value => (String(value).match(/[\\d.]+/g) || []).slice(0, 3).map(Number);
+    const out = {};
+    for (const theme of ['light', 'sepia', 'dark', 'black']) {
+      root.dataset.readerTheme = theme;
+      const cs = getComputedStyle(root);
+      const frame = document.querySelector('.pdf-page .pdf-canvas-frame');
+      const sheet = toRgb(getComputedStyle(frame).backgroundColor);
+      const stage = toRgb(cs.getPropertyValue('--stage').trim() || getComputedStyle(document.getElementById('rdr-stage')).backgroundColor);
+      const button = document.querySelector('.theme-btn[data-theme="' + theme + '"]');
+      const btn = toRgb(getComputedStyle(button).backgroundColor);
+      out[theme] = { sheet, stage, btn };
+    }
+    return JSON.stringify(out);
+  })()`));
+  const yellowness = ([r, , b]) => r - b;
+  const same = (a, b) => a.every((v, i) => v === b[i]);
+
+  // Kâğıt: yaprak beyaz DEĞİL, ama sarı/turuncu da değil.
+  assert.ok(!same(contract.sepia.sheet, [255, 255, 255]), 'Kâğıt yaprağı beyazla aynı');
+  assert.ok(
+    yellowness(contract.sepia.sheet) <= 18,
+    `Kâğıt yaprağı fazla sarı (R-B ${yellowness(contract.sepia.sheet)}, eski parşömen 60 idi)`,
+  );
+  assert.ok(
+    yellowness(contract.sepia.stage) <= 30,
+    `Kâğıt okuma zemini fazla sarı (R-B ${yellowness(contract.sepia.stage)}, eski 58 idi)`,
+  );
+  assert.ok(yellowness(contract.sepia.sheet) >= 3, 'Kâğıt yaprağı tamamen nötr - sıcaklık kaybolmuş');
+  assert.ok(
+    yellowness(contract.sepia.btn) <= 30 && yellowness(contract.sepia.btn) >= 8,
+    `Kâğıt tema düğmesi yeni paleti temsil etmiyor (R-B ${yellowness(contract.sepia.btn)})`,
+  );
+
+  // Her temada yaprak ile zemin AYNI renk olmamalı: sayfa sınırı görünsün.
+  for (const theme of ['light', 'sepia', 'dark', 'black']) {
+    assert.ok(
+      !same(contract[theme].sheet, contract[theme].stage),
+      `${theme}: fiziksel yaprak ile okuma zemini aynı renk (${contract[theme].sheet})`,
+    );
+  }
+  // Siyah kimliği: zemin gerçekten siyaha yakın, yaprak gri karta dönmemiş.
+  assert.ok(contract.black.sheet[0] <= 24, `Siyah yaprak gri karta dönmüş (${contract.black.sheet})`);
+  assert.ok(contract.dark.sheet[0] <= 48, `Koyu yaprak fazla açılmış (${contract.dark.sheet})`);
+  await evaluate("document.querySelector('#ravzabooks').dataset.readerTheme = 'light'");
+  await setViewport(390, 844);
+  await delay(400);
+
   await setViewport(1024, 768);
   await waitFor("document.querySelector('#ravzabooks[data-app-mode=\"reading\"] #reader-inner')?.dataset.spread === 'double'", 30000);
   assert.ok(await evaluate("document.querySelectorAll('.pdf-page canvas[data-render-key]').length <= 5"), 'Yatay tablette PDF render penceresi 5 sayfayı aşıyor');
