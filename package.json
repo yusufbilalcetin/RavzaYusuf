@@ -70,7 +70,6 @@
     "test:reader-page-transition": "node ./scripts/test-reader-page-transition.mjs",
     "test:reader-mobile-flip-backside": "node ./scripts/test-reader-mobile-flip-backside.mjs",
     "test:reader-mobile-full-sheet": "node ./scripts/test-reader-mobile-full-sheet.mjs",
-    "test:reader-theme-artwork-preservation": "node ./scripts/test-reader-theme-artwork-preservation.mjs",
     "test:reader-search-reliability": "node ./scripts/test-reader-search-reliability.mjs",
     "test:reader-search-races": "node ./scripts/test-reader-search-races.mjs",
     "test:reader-fullpage-geometry": "node ./scripts/test-reader-fullpage-geometry.mjs",

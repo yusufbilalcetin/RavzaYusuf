@@ -422,9 +422,7 @@ try {
     };
   })()`);
   assert.equal(sepiaTheme.theme, 'sepia', 'Sepya tema köke uygulanmadı');
-  // YENI SOZLESME: tema tuvale FILTRE uygulamaz. Kagit ve gercek PDF metni
-  // katmanli render ile temalanir; gorseller orijinal kalir.
-  assert.equal(sepiaTheme.filter, 'none', 'Tuvale tema filtresi uygulanmis (gorselleri de boyar)');
+  assert.match(sepiaTheme.filter, /sepia/, 'Sepya görünüm PDF canvasına uygulanmadı');
   assert.notEqual(sepiaTheme.background, 'rgb(255, 255, 255)', 'Sepya görünüm PDF zeminini değiştirmedi');
   assert.equal(sepiaTheme.selected && sepiaTheme.pressed === 'true', true, 'Sepya tema düğmesi seçili görünmüyor');
 
@@ -441,26 +439,12 @@ try {
     };
   })()`);
   assert.equal(darkTheme.theme, 'dark', 'Koyu tema köke uygulanmadı');
-  assert.equal(darkTheme.filter, 'none', 'Koyu temada tuvale invert filtresi uygulanmis');
-  // Kagit/metin renkleri token'lardan gelir ve katmanli render'a beslenir.
-  // Piksel duzeyindeki kanit (koyu kagit + acik metin + orijinal gorsel)
-  // sayfa tipini kontrol edebildigimiz test:reader-theme-artwork-preservation
-  // suite'inde yapilir; burada sozlesmenin kurulu oldugu dogrulanir.
-  const darkTokens = await evaluate(`(() => {
-    const style = getComputedStyle(document.querySelector('#ravzabooks'));
-    return JSON.stringify({
-      paper: style.getPropertyValue('--pdf-paper').trim(),
-      text: style.getPropertyValue('--pdf-text').trim(),
-    });
-  })()`);
-  const dt = JSON.parse(darkTokens);
-  assert.ok(/^#(1b1b1b|000000)$/i.test(dt.paper), `Koyu temada PDF kagit token'i beklenmedik: ${dt.paper}`);
-  assert.ok(dt.text.length > 0, 'Koyu temada PDF metin rengi token\'i tanimli degil');
+  assert.match(darkTheme.filter, /invert/, 'Koyu görünüm PDF canvasına uygulanmadı');
   assert.equal(darkTheme.selected && darkTheme.pressed === 'true', true, 'Koyu tema düğmesi seçili görünmüyor');
 
   await evaluate("document.querySelector('.theme-btn[data-theme=\"light\"]').click()");
   await delay(240);
-  assert.equal(await evaluate("getComputedStyle(document.querySelector('.pdf-page.is-rendered canvas')).filter"), 'none', 'Açık temada tuvalde filtre kalmis');
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('.pdf-page.is-rendered canvas')).filter"), 'none', 'Açık tema PDF filtresini temizlemedi');
   assert.equal(await evaluate("localStorage.getItem('ravzaBooksProgress:kucuk-prens')"), null, 'Tema değişimi kayıtlı sayfayı değiştirdi');
 
   await setViewport(1024, 768);

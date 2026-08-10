@@ -2305,52 +2305,6 @@ function showPageRetry(element, pageNumber) {
   element.querySelector('.pdf-canvas-frame')?.appendChild(button);
 }
 
-/**
- * KATMANLI TEMA RENDERI — İŞLEM SINIFLANDIRICI.
- *
- * Tema, PDF'in KAĞIDINI ve GERÇEK METNİNİ değiştirir; görselleri ASLA.
- * Tuvalin tamamına filtre (invert/sepia) uygulamak metni, fotoğrafı ve
- * vektör çizimi birlikte boyadığı için bu ayrımı yapmak imkânsızdı.
- *
- * PDF.js 5.7.284'ün resmî `operationsFilter(index)` kancası bir işlemi
- * atlamayı sağlar. Sınıflandırma PDF.js'in kendi OPS anlamlarına dayanır;
- * piksel rengi tahminine DEĞİL.
- *
- * ÖNEMLİ: `constructPath` ilk argümanında gerçek boyama işlemini taşır.
- * clip/eoClip türevleri DURUM kurar - atlanırsa metin yanlış kırpılır.
- */
-let pdfOpsCache = null;
-function pdfOpsClassifier() {
-  if (pdfOpsCache) return pdfOpsCache;
-  const OPS = pdfjsLib?.OPS;
-  if (!OPS) return null;
-  const textPaint = new Set([OPS.showText, OPS.showSpacedText, OPS.nextLineShowText, OPS.nextLineSetSpacingShowText]);
-  const imagePaint = new Set([
-    OPS.paintImageXObject, OPS.paintImageXObjectRepeat,
-    OPS.paintInlineImageXObject, OPS.paintInlineImageXObjectGroup,
-    OPS.paintImageMaskXObject, OPS.paintImageMaskXObjectGroup, OPS.paintImageMaskXObjectRepeat,
-    OPS.paintSolidColorImageMask, OPS.shadingFill,
-  ]);
-  const pathPaint = new Set([
-    OPS.fill, OPS.eoFill, OPS.stroke, OPS.closeStroke,
-    OPS.fillStroke, OPS.eoFillStroke, OPS.closeFillStroke, OPS.closeEOFillStroke, OPS.rawFillPath,
-  ]);
-  const clipIntent = new Set([OPS.clip, OPS.eoClip]);
-  pdfOpsCache = { OPS, textPaint, imagePaint, pathPaint, clipIntent };
-  return pdfOpsCache;
-}
-
-/** Geçerli temanın PDF kağıt/metin renkleri; kaynak CSS token'larıdır. */
-function pdfThemeColors() {
-  const root = document.getElementById('ravzabooks');
-  if (!root) return { paper: '#ffffff', text: '' };
-  const style = getComputedStyle(root);
-  return {
-    paper: style.getPropertyValue('--pdf-paper').trim() || '#ffffff',
-    text: style.getPropertyValue('--pdf-text').trim(),
-  };
-}
-
 async function renderPdfPage(pageNumber) {
   if (!pdfDocument || !pdfActivePages.has(pageNumber)) return false;
   const existing = pdfRenderPromises.get(pageNumber);
@@ -2380,9 +2334,7 @@ async function renderPdfPage(pageNumber) {
       );
       const viewport = pdfPage.getViewport({ scale: cssScale });
       const outputScale = pdfOutputScale(viewport);
-      // Tema anahtarın parçası: kağıt ve metin rengi tuvale çizildiği için
-      // tema değişimi gerçekten yeni bir çıktıdır (görseller aynı kalır).
-      const renderKey = `${Math.round(viewport.width)}x${Math.round(viewport.height)}@${outputScale}:${state.theme}`;
+      const renderKey = `${Math.round(viewport.width)}x${Math.round(viewport.height)}@${outputScale}`;
       if (canvas.dataset.renderKey === renderKey && element.classList.contains('is-rendered')) return true;
 
       // Yakın geçmişte render edilmiş sayfa: PDF'i yeniden çizmeden geri boya.
@@ -2401,74 +2353,15 @@ async function renderPdfPage(pageNumber) {
       canvas.style.width = `${Math.floor(viewport.width)}px`;
       canvas.style.height = `${Math.floor(viewport.height)}px`;
       const canvasContext = canvas.getContext('2d', { alpha: false });
-      const transform = outputScale === 1 ? null : [outputScale, 0, 0, outputScale, 0, 0];
-      const classifier = pdfOpsClassifier();
-      const theme = pdfThemeColors();
-
-      if (classifier && theme.text) {
-        // ---- KATMANLI GEÇİŞ: görseller orijinal, metin temalı ----
-        const { OPS, textPaint, imagePaint, pathPaint, clipIntent } = classifier;
-        const list = await pdfPage.getOperatorList();
-        if (generation !== pdfRenderGeneration || !pdfActivePages.has(pageNumber)) return false;
-        const fn = list.fnArray;
-        const args = list.argsArray;
-        const isArtworkPaint = index => {
-          const code = fn[index];
-          if (imagePaint.has(code) || pathPaint.has(code)) return true;
-          // constructPath boyama işlemini ilk argümanında taşır; kırpma
-          // niyeti DURUMDUR, atlanmaz.
-          if (code === OPS.constructPath) return !clipIntent.has(args[index]?.[0]);
-          return false;
-        };
-
-        const pass = async (filter) => {
-          const layer = document.createElement('canvas');
-          layer.width = canvas.width;
-          layer.height = canvas.height;
-          const task = pdfPage.render({
-            canvas: layer,
-            canvasContext: layer.getContext('2d'),
-            viewport,
-            transform,
-            background: 'rgba(0, 0, 0, 0)',
-            operationsFilter: filter,
-          });
-          pdfRenderTasks.set(pageNumber, task);
-          await task.promise;
-          return layer;
-        };
-
-        // 1) GÖRSEL: yalnızca metin boyama atlanır -> resim + vektör orijinal.
-        const artwork = await pass(index => !textPaint.has(fn[index]));
-        if (generation !== pdfRenderGeneration || !pdfActivePages.has(pageNumber)) return false;
-        // 2) METİN: görsel boyama atlanır, durum/kırpma korunur -> saydam maske.
-        const textLayer = await pass(index => !isArtworkPaint(index));
-        if (generation !== pdfRenderGeneration || !pdfActivePages.has(pageNumber)) return false;
-        // 3) Maskeyi tema rengine boya; glif alfası/antialiasing korunur.
-        const textCtx = textLayer.getContext('2d');
-        textCtx.globalCompositeOperation = 'source-in';
-        textCtx.fillStyle = theme.text;
-        textCtx.fillRect(0, 0, textLayer.width, textLayer.height);
-        textCtx.globalCompositeOperation = 'source-over';
-        // 4) Kağıt + görsel + temalı metin.
-        canvasContext.fillStyle = theme.paper;
-        canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-        canvasContext.drawImage(artwork, 0, 0);
-        canvasContext.drawImage(textLayer, 0, 0);
-        artwork.width = artwork.height = 0;
-        textLayer.width = textLayer.height = 0;
-      } else {
-        // Beyaz tema (ve sınıflandırıcı yoksa): PDF kendi orijinal renkleriyle.
-        const renderTask = pdfPage.render({
-          canvas,
-          canvasContext,
-          viewport,
-          transform,
-          background: theme.paper || 'rgb(255, 255, 255)',
-        });
-        pdfRenderTasks.set(pageNumber, renderTask);
-        await renderTask.promise;
-      }
+      const renderTask = pdfPage.render({
+        canvas,
+        canvasContext,
+        viewport,
+        transform: outputScale === 1 ? null : [outputScale, 0, 0, outputScale, 0, 0],
+        background: 'rgb(255, 255, 255)',
+      });
+      pdfRenderTasks.set(pageNumber, renderTask);
+      await renderTask.promise;
       if (generation !== pdfRenderGeneration || !pdfActivePages.has(pageNumber)) return false;
       canvas.dataset.renderKey = renderKey;
       element.classList.remove('has-render-error');
