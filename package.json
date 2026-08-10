@@ -71,6 +71,7 @@
     "test:reader-mobile-flip-backside": "node ./scripts/test-reader-mobile-flip-backside.mjs",
     "test:reader-mobile-full-sheet": "node ./scripts/test-reader-mobile-full-sheet.mjs",
     "test:reader-mobile-left-flip-mirror": "node ./scripts/test-reader-mobile-left-flip-mirror.mjs",
+    "test:reader-mobile-search-stability": "node ./scripts/test-reader-mobile-search-stability.mjs",
     "test:reader-mobile-center-drag": "node ./scripts/test-reader-mobile-center-drag.mjs",
     "test:reader-mobile-center-curl-band": "node ./scripts/test-reader-mobile-center-curl-band.mjs",
     "test:reader-mobile-soft-curl": "node ./scripts/test-reader-mobile-soft-curl.mjs",

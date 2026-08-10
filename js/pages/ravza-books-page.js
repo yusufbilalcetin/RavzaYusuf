@@ -179,6 +179,8 @@ let toastTimer = 0;
 let lugatTimer = 0;
 let renderGeneration = 0;
 let lastLayoutKey = '';
+/** Yukseklikten bagimsiz duzen kimligi: klavye ile gercek duzen degisimini ayirir. */
+let lastLayoutStableKey = '';
 let lastFlipIndex = -1;
 let audioContext = null;
 let pageSoundBuffer = null;
@@ -1639,12 +1641,33 @@ function getLayoutMetrics() {
   const pageWidth = Math.floor(rect.width / (portrait ? 1 : 2));
   const pageHeight = Math.floor(rect.height);
   if (pageWidth < 1 || pageHeight < 1) return null;
+  const shape = `${portrait ? 'single' : 'double'}:${state.bookType}:${state.fontSize}:${state.lineHeight}:${state.accessible}`;
   return {
     portrait,
     pageWidth,
     pageHeight,
-    key: `${pageWidth}x${pageHeight}:${portrait ? 'single' : 'double'}:${state.bookType}:${state.fontSize}:${state.lineHeight}:${state.accessible}`,
+    /* YUKSEKLIKTEN BAGIMSIZ KIMLIK.
+       Sanal klavye YALNIZCA yuksekligi degistirir; genislik, yon ve dizgi
+       ayni kalir. Bu iki anahtari ayirmak, "klavye acildi" ile "duzen
+       gercekten degisti" ayrimini yapmayi mumkun kilar. */
+    stableKey: `${pageWidth}:${shape}`,
+    key: `${pageWidth}x${pageHeight}:${shape}`,
   };
+}
+
+/**
+ * Odak, okuyucunun icindeki bir metin girisinde mi?
+ *
+ * Sanal klavyenin acik oldugunun tek tasinabilir isareti budur: Android'de
+ * `window.resize` ile innerHeight kuculur, iOS'ta yalnizca visualViewport
+ * daralir - ikisinde de ortak olan sey, o sirada bir metin girisinin odakta
+ * olmasidir.
+ */
+function readerTextInputFocused() {
+  const active = document.activeElement;
+  if (!active || !(active instanceof HTMLElement)) return false;
+  if (!active.matches('input, textarea, [contenteditable="true"]')) return false;
+  return Boolean(active.closest('#screen-reader, #ravzabooks'));
 }
 
 function chapterSourceHTML(chapter) {
@@ -1883,6 +1906,7 @@ async function openTextReader(book, position = null) {
   const metrics = getLayoutMetrics();
   if (!metrics || metrics.pageWidth < 1 || metrics.pageHeight < 1) return;
   lastLayoutKey = metrics.key;
+  lastLayoutStableKey = metrics.stableKey;
   readerPages = paginateBook(book, metrics);
   const startIndex = findStartIndex(readerPages, position || state.readingProgress[book.id]);
   state.currentIndex = startIndex;
@@ -2771,6 +2795,7 @@ async function openPdfReader(book, position = null) {
     return;
   }
   lastLayoutKey = metrics.key;
+  lastLayoutStableKey = metrics.stableKey;
   readerPages = createPdfPageModels(pdfDocument.numPages);
   const startIndex = resolveStartIndex(book, position, pdfDocument.numPages);
   state.currentIndex = startIndex;
@@ -4707,6 +4732,20 @@ function bindReaderEvents(book) {
     repaginateTimer = window.setTimeout(() => {
       const metrics = getLayoutMetrics();
       if (!metrics || metrics.key === lastLayoutKey) return;
+      /* SANAL KLAVYE YENIDEN DIZME SEBEBI DEGILDIR.
+         Olculdu (440x956, Ara acikken klavye 336px):
+             13ms  resize 440x620
+            221ms  #rdr-search-sheet DOM'dan SILINDI (kabuk yeniden kuruldu)
+            230ms  yeni (kapali) dugum eklendi
+            300ms  display:none  -> kullanici "atildim" diyor
+            600ms  geri yukleme nihayet aciyor
+         Genislik ve yon AYNIYKEN yalnizca yukseklik degistiginde tam okuyucu
+         yeniden kurulumu yapiliyordu. Odak okuyucunun icindeki bir metin
+         girisindeyse bu degisim klavyedir; dizgi etkilenmez.
+         lastLayoutKey bilerek GUNCELLENMEZ - klavye kapanip yukseklik geri
+         geldiginde anahtar yeniden eslesir, fazladan kurulum da olmaz.
+         Genislik/yon degisirse stableKey degisir ve normal yol isler. */
+      if (metrics.stableKey === lastLayoutStableKey && readerTextInputFocused()) return;
       scheduleRepagination(0);
     }, 200);
   };
