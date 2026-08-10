@@ -116,6 +116,12 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
      kalmaz. Deger ekran goruntusu ornekleme ile bulundu; calisma aninda
      goruntu ornekleme YOK. */
   --reader-mobile-paper: #fff;
+  /* PDF ICERIK KATMANI TOKENLARI.
+     --pdf-paper : PDF sayfasinin kagidi (tuvale cizilir)
+     --pdf-text  : gercek PDF metninin rengi; bos ise metin ORIJINAL renginde
+                   birakilir (Beyaz temada dogru davranis budur). */
+  --pdf-paper: #ffffff;
+  --pdf-text: ;
   --z-book: 10;
   --z-controls: 60;
   --z-settings: 80;
@@ -133,6 +139,8 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   /* Sepia filtresi beyaz kagidi #f2f2ee'ye tasiyor; yuzey ONU izler,
      yaprak tokenini (#d8c39c) degil. */
   --reader-mobile-paper: #f2f2ee;
+  --pdf-paper: #f2f2ee;
+  --pdf-text: #2b2118;
   --control-bg: rgba(239, 222, 194, 0.9);
   --control-border: rgba(68, 46, 26, 0.16);
   --control-shadow: rgba(66, 43, 22, 0.22);
@@ -149,6 +157,8 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --stage: #171614;
   --stage-deep: #0f0e0d;
   --reader-mobile-paper: #1b1b1b;
+  --pdf-paper: #1b1b1b;
+  --pdf-text: #e9e2d7;
   --control-bg: rgba(33, 31, 28, 0.9);
   --control-border: rgba(241, 230, 214, 0.13);
   --control-shadow: rgba(0, 0, 0, 0.46);
@@ -167,6 +177,8 @@ html.launcher-experience body.is-ravza-books-page #page-root > #ravzabooks.ravza
   --stage: #000;
   --stage-deep: #000;
   --reader-mobile-paper: #000;
+  --pdf-paper: #000000;
+  --pdf-text: #dcdcdc;
   --control-bg: rgba(22, 22, 22, 0.92);
   --control-border: rgba(255, 255, 255, 0.14);
   --control-shadow: rgba(0, 0, 0, 0.7);
@@ -1048,18 +1060,14 @@ button {
   background: #d8c39c !important;
 }
 
-&[data-reader-theme="sepia"] .pdf-page canvas {
-  filter: sepia(0.38) saturate(0.78) brightness(0.97) contrast(0.96);
-}
+
 
 &[data-reader-theme="dark"] .book-sheet.pdf-page,
 &[data-reader-theme="dark"] .pdf-canvas-frame {
   background: #1a1916 !important;
 }
 
-&[data-reader-theme="dark"] .pdf-page canvas {
-  filter: invert(0.9) hue-rotate(180deg) brightness(0.82) contrast(0.94);
-}
+
 
 /* PDF sabit dizgili oldugu icin "okuma temasi" ancak tuval filtresiyle
    yapilabilir - metnin fontu/puntosu kitabin kendi dizgisidir. Siyah temada
@@ -1069,9 +1077,7 @@ button {
   background: #000 !important;
 }
 
-&[data-reader-theme="black"] .pdf-page canvas {
-  filter: invert(1) hue-rotate(180deg) brightness(0.72) contrast(1.02);
-}
+
 
 .pdf-page.is-rendered canvas {
   opacity: 1;
