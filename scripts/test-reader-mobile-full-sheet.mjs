@@ -299,7 +299,11 @@ async function edgeDrag({ direction, ratio, commit, screenshotName }) {
   const folded = await measure();
   const backside = await browser.evaluate(`(() => {
     const element=document.querySelector('[data-mobile-flip-backside-page]');
-    const canvas=element?.querySelector('canvas');
+    /* Geri cevirmede arka yuz baskisi artik .pdf-backside-print katmanindadir:
+       birazdan ON YUZ olacak gercek tuvale ayna/hayalet uygulanmiyor. Gorsel
+       sozlesme ayni, olculecek dugum degisti. Ileri cevirmede PageFlip'in
+       kendi kopyasi kullanildigi icin orada sayfanin tuvali gecerli kalir. */
+    const canvas=element?.querySelector('.pdf-backside-print canvas')||element?.querySelector('canvas');
     if(!element||!canvas) return null;
     const probe=document.createElement('canvas');
     probe.width=24; probe.height=24;

@@ -1137,6 +1137,27 @@ button {
   opacity: 1;
 }
 
+/* GERI CEVIRMEDE ARKA YUZ KATMANI.
+   Kagit OPAK bir div zeminidir (tema kagit rengi, JS'te okunur) - altindaki
+   GERCEK tuvali tamamen orter, boylece o tuvale hic dokunulmaz ve on yuz
+   hicbir kosulda aynalanmaz. Baski ise ayri bir tuvaldir: yatay ters, soluk.
+   Filtre yalnizca tuvale uygulanir (div zemin zaten temali), yani bilesim
+   bugunku gorunumun aynisidir: temali kagit + %22 temali ters baski. */
+.pdf-backside-print {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.pdf-page.is-rendered .pdf-backside-print canvas,
+.pdf-page .pdf-backside-print canvas {
+  opacity: 0.22;
+  transform: scaleX(-1);
+  transform-origin: center center;
+}
+
 .pdf-page-status {
   position: absolute;
   top: 50%;

@@ -102,7 +102,14 @@ async function assertMaximumMobilePageFill(viewport) {
 async function backsideProbe({ currentPage, direction }) {
   return browser.evaluate(`(() => {
     const pageStats = element => {
-      const canvas = element?.querySelector('canvas');
+      /* ARKA YUZ BASKISI ARTIK AYRI BIR KATMANDA.
+         Geri cevirmede arka yuz, birazdan on yuz olacak GERCEK tuvale
+         uygulanmiyor; .pdf-backside-print katmanindaki kendi tuvaline
+         ciziliyor. Gorsel sozlesme ayni (aynali + soluk + opak kagit),
+         yalnizca dugum degisti. Katman varsa olculecek olan odur; yoksa
+         (ileri cevirmedeki PageFlip kopyasi) sayfanin kendi tuvali. */
+      const canvas = element?.querySelector('.pdf-backside-print canvas')
+        || element?.querySelector('canvas');
       if (!canvas) return null;
       const probe = document.createElement('canvas');
       probe.width = 24; probe.height = 24;

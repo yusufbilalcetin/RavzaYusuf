@@ -175,6 +175,7 @@ let pageSoundBuffer = null;
 let pageFlipScriptPromise = null;
 let removeDirectPageCurl = null;
 let prepareMobilePdfPreviousBackside = null;
+let clearMobilePdfPreviousBackside = null;
 let curlDragging = false;
 let resizePending = false;
 let originalThemeColor = null;
@@ -2799,6 +2800,10 @@ async function openPdfReader(book, position = null) {
     lastFlipIndex = index;
     updateReaderUI(index);
     scheduleLastReadSave();
+    // Arka yuz katmani BURADA, PageFlip'in kendi geri cagrisinda kaldirilir.
+    // Durum niteligini izleyen MutationObserver asenkron calisiyor ve oturmus
+    // on sayfanin bir kare boyunca hayalet kalmasina yol aciyordu.
+    clearMobilePdfPreviousBackside?.();
     // Ağır render işi çevirme animasyonu bittikten sonra yapılır.
     schedulePdfRenderWindow(index);
   });
@@ -3728,13 +3733,24 @@ function installDirectPageCurl() {
     : null;
   mobilePdfBacksideObserver?.observe(surface, { childList: true });
 
+  /* GERI CEVIRMEDE ARKA YUZ - AYRI YUZEY, GERCEK SAYFA DEGIL.
+     Ileri cevirmede St.PageFlip sayfayi KOPYALIYOR ve arka yuz o kopyaya
+     boyaniyor; gercek sayfalar temiz kaliyor. Geri cevirmede kopya YOKTUR ve
+     eski kod arka yuzu, birazdan ON YUZ olacak gercek sayfanin tuvaline
+     uyguluyordu (scaleX(-1) + opacity .22), sonra durum 'read' olunca geri
+     aliyordu. Olculdu: 440x956'da geri cevirme sirasinda aynalanmis sayfa
+     ekranda 274px genisliginde gorunuyor ve acik temada durum 'read' olduktan
+     SONRA bile on sayfa bir kare boyunca opacity .22 kaliyordu (yani ters/
+     hayalet gorunum on yuze sizyordu).
+     Cozum, ileri yoldaki sozlesmenin aynisi: arka yuz KENDI yuzeyine cizilir.
+     Katman opak kagit (div zemini) + aynalanmis soluk baski (tuval) olarak
+     kurulur - bugunku gorunumun birebir ayni bilesimi. Gercek tuvale hicbir
+     zaman dokunulmaz, dolayisiyla temizlik gecikse bile ON YUZ AYNALANAMAZ. */
   let previousBackside = null;
   const restorePreviousBackside = () => {
     if (!previousBackside) return;
-    const { page, canvas, transform, transformOrigin, opacity, marker } = previousBackside;
-    canvas.style.transform = transform;
-    canvas.style.transformOrigin = transformOrigin;
-    canvas.style.opacity = opacity;
+    previousBackside.layer.remove();
+    const { page, marker } = previousBackside;
     if (marker === null) delete page.dataset.mobileFlipBacksidePage;
     else page.dataset.mobileFlipBacksidePage = marker;
     previousBackside = null;
@@ -3744,20 +3760,44 @@ function installDirectPageCurl() {
     const previousIndex = pageFlip.getCurrentPageIndex() - 1;
     if (previousIndex < 0) return;
     const page = pageFlip.getPage(previousIndex)?.getElement?.();
-    const canvas = page?.querySelector?.('canvas');
+    const frame = page?.querySelector?.('.pdf-canvas-frame');
+    const source = page?.querySelector?.('canvas');
     const pageNumber = Number(page?.dataset?.pdfPage);
-    if (!canvas || canvas.width < 2 || canvas.height < 2 || !Number.isInteger(pageNumber)) return;
-    previousBackside = {
-      page,
-      canvas,
-      transform: canvas.style.transform,
-      transformOrigin: canvas.style.transformOrigin,
-      opacity: canvas.style.opacity,
-      marker: page.getAttribute('data-mobile-flip-backside-page'),
-    };
-    styleAsPrintedBackside(page, canvas, pageNumber);
+    if (!frame || !source || source.width < 2 || source.height < 2 || !Number.isInteger(pageNumber)) return;
+
+    const print = document.createElement('canvas');
+    print.width = source.width;
+    print.height = source.height;
+    print.style.width = source.style.width;
+    print.style.height = source.style.height;
+    const context = print.getContext('2d', { alpha: false });
+    if (!context) return;
+    // HAM pikseller kopyalanir: tema filtresi CSS'te, tuvalde degil. Boylece
+    // katman da gercek sayfayla ayni filtre yolundan gecer.
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, print.width, print.height);
+    try {
+      context.drawImage(source, 0, 0);
+    } catch (_) {
+      return;
+    }
+
+    // Baskinin hangi render'dan geldigi katmanda da izlenebilir kalir.
+    print.dataset.renderKey = source.dataset.renderKey || '';
+    const layer = document.createElement('div');
+    layer.className = 'pdf-backside-print';
+    layer.setAttribute('aria-hidden', 'true');
+    // Opak kagit: alttaki gercek tuvali TAMAMEN orter. Zemin zaten temanin
+    // kagit rengidir; div oldugu icin tuval filtresi ikinci kez uygulanmaz.
+    layer.style.background = getComputedStyle(frame).backgroundColor;
+    layer.appendChild(print);
+    frame.appendChild(layer);
+
+    previousBackside = { page, layer, marker: page.getAttribute('data-mobile-flip-backside-page') };
+    page.dataset.mobileFlipBacksidePage = String(pageNumber);
   };
   prepareMobilePdfPreviousBackside = preparePreviousBackside;
+  clearMobilePdfPreviousBackside = restorePreviousBackside;
 
   const readerRoot = document.getElementById('reader-inner');
   const pageFlipStateObserver = shouldHydrateMobilePdfBackside && readerRoot
@@ -4020,6 +4060,9 @@ function installDirectPageCurl() {
     restorePreviousBackside();
     if (prepareMobilePdfPreviousBackside === preparePreviousBackside) {
       prepareMobilePdfPreviousBackside = null;
+    }
+    if (clearMobilePdfPreviousBackside === restorePreviousBackside) {
+      clearMobilePdfPreviousBackside = null;
     }
     surface.removeEventListener('pointerdown', onPointerDown);
     interactionOwner.removeEventListener('pointermove', onPointerMove);
